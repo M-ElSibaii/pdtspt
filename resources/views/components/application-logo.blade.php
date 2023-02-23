@@ -1,0 +1,1 @@
+<img src="img/logoUminhoPdts.svg" alt="Application logo" width="200 px" />
