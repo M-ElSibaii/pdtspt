@@ -97,138 +97,146 @@
 
                                                     </div>
 
-                                                    {{ \App\Models\comments::where('properties_Id', $property->Id)->whereNull('parent_id')->count() }} comments
+                                                    feedbacks ({{ \App\Models\comments::where('properties_Id', $property->Id)->whereNull('parent_id')->count() }})
 
                                                 </label>
                                                 <article class="ac-sub-text">
                                                     <section class="gradient-custom">
                                                         <div class="container">
-                                                            <div class="row d-flex justify-content-center">
-                                                                <div class="col-md-10 col-lg-10 col-xl-12">
+                                                            <div class="row d-flex justify-content-left">
+                                                                <div class="col-md-8 col-lg-8 col-xl-8">
                                                                     <div class="card">
                                                                         <div class="card-body p-4">
                                                                             <div class="row">
                                                                                 <div class="col">
                                                                                     <div id="comments-section-{{ $property->Id }}">
+                                                                                        <div class="row d-flex justify-content-center">
+                                                                                            <h4> Property feedback section </h4>
+                                                                                        </div>
                                                                                         @foreach ($comments as $comment)
                                                                                         @if ($comment->properties_Id == $property->Id && $comment->parent_id == null)
-                                                                                        <div class="d-flex flex-start mt-4">
+                                                                                        <div class="d-flex flex-start mt-1">
                                                                                             <div class="flex-grow-1 flex-shrink-1">
-                                                                                                <!--<img class="rounded-circle shadow-1-strong me-3" src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(12).webp" alt="avatar" width="65" height="65" />
--->
-                                                                                                <div>
-                                                                                                    <div class="d-flex justify-content-between align-items-center">
-                                                                                                        <p class="mb-1"> <strong>{{$comment->user->name}}</strong><span class="small"> - {{$comment->created_at}}</span>
-                                                                                                            <!--<a href="#!" id="reply-button{{$comment->id}}"><i class="fas fa-reply fa-xs"></i><span>reply</span></a>-->
-                                                                                                        </p>
+                                                                                                <!-- add if statement, if user photo exist add photo, else add default -->
+                                                                                                <div class="d-flex">
+                                                                                                    <img class="rounded-circle shadow-1-strong me-3" src="{{ asset ('img/default.png')}}" alt="userPhoto" width="65" height="65" />
+                                                                                                    <div class="div-username">
+                                                                                                        <h5>{{$comment->user->name}}</h5>
+                                                                                                        <span class="small d-block">{{$comment->created_at}}</span>
                                                                                                     </div>
-                                                                                                    <div class="div-comment">
-                                                                                                        <h5>&ensp;{{ $comment->body }}</h5>
-                                                                                                    </div>
-                                                                                                    <a href="#!" class="like-button" data-comment-id="{{ $comment->id }}">
-                                                                                                        <i class="fas fa-thumbs-up"></i>
-                                                                                                        <span class="like-count">{{ $comment->likes->count() }}</span>
-                                                                                                    </a>
-
+                                                                                                    <!--<a href="#!" id="reply-button{{$comment->id}}"><i class="fas fa-reply fa-xs"></i><span>reply</span></a>-->
                                                                                                 </div>
-                                                                                                @foreach ($comments as $reply)
-                                                                                                @if ($reply->properties_Id == $property->Id && $reply->parent_id == $comment->id)
-                                                                                                <div class="d-flex flex-start offset-1 mt-4">
-                                                                                                    <a class="me-3" href="#">
-                                                                                                        <!-- <img class="rounded-circle shadow-1-strong" src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(11).webp" alt="avatar" width="65" height="65" /> -->
-                                                                                                    </a>
-                                                                                                    <div class="flex-grow-1 flex-shrink-1">
-                                                                                                        <div>
-                                                                                                            <div class="d-flex justify-content-between align-items-center">
-                                                                                                                <p class="mb-1"> <strong>{{$reply->user->name}}</strong> <span class="small"> - {{$reply->created_at}}</span>
-                                                                                                                    <a href="#!" id="reply-button{{$reply->id}}"><i class="fas fa-reply fa-xs"></i><span>reply</span></a>
-                                                                                                                </p>
-                                                                                                            </div>
-                                                                                                            <div class="div-comment">
-                                                                                                                <h5>
-                                                                                                                    &ensp; {{ $reply->body}}
-                                                                                                                </h5>
-                                                                                                            </div>
-                                                                                                            <a href="#!" class="like-button" data-comment-id="{{ $reply->id }}">
-                                                                                                                <i class="fas fa-thumbs-up"></i>
-                                                                                                                <span class="like-count">{{ $reply->likes->count() }}</span>
-                                                                                                            </a>
+                                                                                                <div class="div-comment">
 
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                                @foreach ($comments as $subreply)
-                                                                                                @if ($subreply->properties_Id == $property->Id && $subreply->parent_id == $reply->id)
-                                                                                                <div class="d-flex flex-start offset-2 mt-4">
-                                                                                                    <a class="me-3" href="#">
-                                                                                                        <!-- <img class="rounded-circle shadow-1-strong" src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(11).webp" alt="avatar" width="65" height="65" /> -->
-                                                                                                    </a>
-                                                                                                    <div class="flex-grow-1 flex-shrink-1">
-                                                                                                        <div>
-                                                                                                            <div class="d-flex justify-content-between align-items-center">
-                                                                                                                <p class="mb-1"><strong> {{$subreply->user->name}} </strong><span class="small"> - {{$subreply->created_at}}</span>
-                                                                                                                </p>
-                                                                                                            </div>
-                                                                                                            <div class="div-comment">
-                                                                                                                <h5>
-                                                                                                                    &ensp; {{ $subreply->body}}
-                                                                                                                </h5>
-                                                                                                            </div>@csrf
-                                                                                                            <a href="#!" class="like-button" data-comment-id="{{ $reply->id }}">
-                                                                                                                <i class="fas fa-thumbs-up"></i>
-                                                                                                                <span class="like-count">{{ $subreply->likes->count() }}</span>
-                                                                                                            </a>
-
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                                @endif
-                                                                                                @endforeach
-                                                                                                <div class="container" id="reply-form{{$reply->id}}" style="display: none;">
-                                                                                                    <form action=" {{ route ('replyStore', $reply->id, $property->Id)}} " method="post" class="reply-form" data-property-id="{{ $property->Id }}">
-                                                                                                        @csrf
-                                                                                                        <div class="form-group">
-                                                                                                            <textarea name="body" class="form-control"></textarea>
-                                                                                                        </div>
-                                                                                                        <input type="hidden" name="comment_id" value="{{ $reply->id }}">
-                                                                                                        <input type="hidden" name="properties_Id" value="{{ $property->Id }}">
-                                                                                                        <button type="submit" class="btn btn-primary">Reply</button>
-                                                                                                    </form>
-
-                                                                                                    <script>
-                                                                                                        $(document).ready(function() {
-                                                                                                            $('#reply-button{{$reply->id}}').click(function() {
-                                                                                                                $('#reply-form{{$reply->id}}').toggle();
-                                                                                                            });
-                                                                                                        });
-                                                                                                    </script>
-                                                                                                </div>
-                                                                                                @endif
-                                                                                                @endforeach
-                                                                                                <div class="container" id="reply-form{{$comment->id}}" style="display: none;">
-                                                                                                    <form action="{{ route ('replyStore', $comment->id, $property->Id)}}" method="post" class="reply-form" data-property-id="{{ $property->Id }}">
-                                                                                                        @csrf
-                                                                                                        <div class="form-group">
-                                                                                                            <textarea name="body" class="form-control"></textarea>
-                                                                                                        </div>
-                                                                                                        <input type="hidden" name="comment_id" value="{{ $comment->id }}">
-                                                                                                        <input type="hidden" name="properties_Id" value="{{ $property->Id }}">
-                                                                                                        <button type="submit" class="btn btn-primary">Reply</button>
-                                                                                                    </form>
-
-                                                                                                    <script>
-                                                                                                        $(document).ready(function() {
-                                                                                                            $('#reply-button{{$comment->id}}').click(function() {
-                                                                                                                $('#reply-form{{$comment->id}}').toggle();
-                                                                                                            });
-                                                                                                        });
-                                                                                                    </script>
-
+                                                                                                    <h5 style="margin-top: 8px;">&ensp;{{ $comment->body }}</h5>
 
                                                                                                 </div>
                                                                                             </div>
                                                                                         </div>
+                                                                                        <!-- <a href="#!" class="like-button" data-comment-id="{{ $comment->id }}">
+                                                                                                        <i class="fas fa-thumbs-up"></i>
+                                                                                                        <span class="like-count">{{ $comment->likes->count() }}</span>
+                                                                                                    </a> -->
 
+
+                                                                                        <!--   @foreach ($comments as $reply)
+                                                                                                @if ($reply->properties_Id == $property->Id && $reply->parent_id == $comment->id)
+                                                                                                <div class="d-flex flex-start offset-1 mt-4">
+                                                                                                    <a class="me-3" href="#">
+                                                                                                        <img class="rounded-circle shadow-1-strong" src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(11).webp" alt="avatar" width="65" height="65" />
+                                                                                                </a>
+                                                                                                <div class="flex-grow-1 flex-shrink-1">
+                                                                                                    <div>
+                                                                                                        <div class="d-flex justify-content-between align-items-center">
+                                                                                                            <p class="mb-1"> <strong>{{$reply->user->name}}</strong> <span class="small"> - {{$reply->created_at}}</span>
+                                                                                                                <a href="#!" id="reply-button{{$reply->id}}"><i class="fas fa-reply fa-xs"></i><span>reply</span></a>
+                                                                                                            </p>
+                                                                                                        </div>
+                                                                                                        <div class="div-comment">
+                                                                                                            <h5>
+                                                                                                                &ensp; {{ $reply->body}}
+                                                                                                            </h5>
+                                                                                                        </div>
+                                                                                                        <a href="#!" class="like-button" data-comment-id="{{ $reply->id }}">
+                                                                                                            <i class="fas fa-thumbs-up"></i>
+                                                                                                            <span class="like-count">{{ $reply->likes->count() }}</span>
+                                                                                                        </a>
+
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            
+                                                                                            @foreach ($comments as $subreply)
+                                                                                            @if ($subreply->properties_Id == $property->Id && $subreply->parent_id == $reply->id)
+                                                                                            <div class="d-flex flex-start offset-2 mt-4">
+                                                                                                <a class="me-3" href="#">
+                                                                                                    <img class="rounded-circle shadow-1-strong" src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(11).webp" alt="avatar" width="65" height="65" />
+                                                                                                </a>
+                                                                                                <div class="flex-grow-1 flex-shrink-1">
+                                                                                                    <div>
+                                                                                                        <div class="d-flex justify-content-between align-items-center">
+                                                                                                            <p class="mb-1"><strong> {{$subreply->user->name}} </strong><span class="small"> - {{$subreply->created_at}}</span>
+                                                                                                            </p>
+                                                                                                        </div>
+                                                                                                        <div class="div-comment">
+                                                                                                            <h5>
+                                                                                                                &ensp; {{ $subreply->body}}
+                                                                                                            </h5>
+                                                                                                        </div>@csrf
+                                                                                                        <a href="#!" class="like-button" data-comment-id="{{ $reply->id }}">
+                                                                                                            <i class="fas fa-thumbs-up"></i>
+                                                                                                            <span class="like-count">{{ $subreply->likes->count() }}</span>
+                                                                                                        </a>
+
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            @endif
+                                                                                            @endforeach
+                                                                                            <div class="container" id="reply-form{{$reply->id}}" style="display: none;">
+                                                                                                <form action=" {{ route ('replyStore', $reply->id, $property->Id)}} " method="post" class="reply-form" data-property-id="{{ $property->Id }}">
+                                                                                                    @csrf
+                                                                                                    <div class="form-group">
+                                                                                                        <textarea name="body" class="form-control"></textarea>
+                                                                                                    </div>
+                                                                                                    <input type="hidden" name="comment_id" value="{{ $reply->id }}">
+                                                                                                    <input type="hidden" name="properties_Id" value="{{ $property->Id }}">
+                                                                                                    <button type="submit" class="btn btn-primary">Reply</button>
+                                                                                                </form>
+
+                                                                                                <script>
+                                                                                                    $(document).ready(function() {
+                                                                                                        $('#reply-button{{$reply->id}}').click(function() {
+                                                                                                            $('#reply-form{{$reply->id}}').toggle();
+                                                                                                        });
+                                                                                                    });
+                                                                                                </script>
+                                                                                            </div>
+                                                                                            @endif
+                                                                                            @endforeach
+                                                                                            <div class="container" id="reply-form{{$comment->id}}" style="display: none;">
+                                                                                                <form action="{{ route ('replyStore', $comment->id, $property->Id)}}" method="post" class="reply-form" data-property-id="{{ $property->Id }}">
+                                                                                                    @csrf
+                                                                                                    <div class="form-group">
+                                                                                                        <textarea name="body" class="form-control"></textarea>
+                                                                                                    </div>
+                                                                                                    <input type="hidden" name="comment_id" value="{{ $comment->id }}">
+                                                                                                    <input type="hidden" name="properties_Id" value="{{ $property->Id }}">
+                                                                                                    <button type="submit" class="btn btn-primary">Reply</button>
+                                                                                                </form>
+
+                                                                                                <script>
+                                                                                                    $(document).ready(function() {
+                                                                                                        $('#reply-button{{$comment->id}}').click(function() {
+                                                                                                            $('#reply-form{{$comment->id}}').toggle();
+                                                                                                        });
+                                                                                                    });
+                                                                                                </script>
+
+
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                                -->
                                                                                         @endif
                                                                                         @endforeach
                                                                                         <div class="container">
@@ -239,7 +247,7 @@
                                                                                                         <textarea name="body" class="form-control"></textarea>
                                                                                                     </div>
                                                                                                     <input type="hidden" name="properties_Id" value="{{ $property->Id }}">
-                                                                                                    <button type="submit" class="btn btn-primary" id="submit-btn">Add comment</button>
+                                                                                                    <button type="submit" class="btn btn-primary" id="submit">Add feedback</button>
                                                                                                 </div>
 
                                                                                             </form>
@@ -273,7 +281,7 @@
 
                                         $.ajax({
                                             type: 'POST',
-                                            url: $form.attr('action'),
+                                            url: "{{route('store')}}",
                                             data: formData,
                                             success: function(data) {
                                                 // Refresh comments section for the property

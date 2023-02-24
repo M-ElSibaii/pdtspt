@@ -48,10 +48,65 @@ class ProductdatatemplatesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($pdtID)
     {
-        $PDTs = productdatatemplates::get();
+        $pdt = ProductDataTemplates::where('Id', $pdtID)->get();
+        $gop = GroupOfProperties::where('pdtId', $pdtID)
+            ->join(
+                DB::raw("(SELECT 
+                GUID,
+                MAX(versionNumber) as max_versionNumber,
+                MAX(revisionNumber) as max_revisionNumber
+                FROM groupofproperties 
+                GROUP BY GUID) as mx"),
+                function ($join) {
+                    $join->on('mx.GUID', '=', 'groupofproperties.GUID');
+                    $join->on('mx.max_versionNumber', '=', 'groupofproperties.versionNumber');
+                    $join->on('mx.max_revisionNumber', '=', 'groupofproperties.revisionNumber');
+                }
+            )
+            ->get();
+        $referenceDocument = ReferenceDocuments::all();
+        $properties_dict = PropertiesDataDictionaries::all();
+        $properties = Properties::where('pdtID', $pdtID)->get();
+
+        // Join the properties and propertiesdatadictionaries tables
+        $joined_properties = Properties::leftJoin('propertiesdatadictionaries', function ($join) {
+            $join->on('properties.GUID', '=', 'propertiesdatadictionaries.GUID');
+            $join->on(
+                DB::raw('(propertiesdatadictionaries.versionNumber, propertiesdatadictionaries.revisionNumber)'),
+                DB::raw('(select max(versionNumber), max(revisionNumber) from propertiesdatadictionaries where GUID = properties.GUID)'),
+                '='
+            );
+        })->select(
+            'properties.descriptionEn',
+            'properties.descriptionPt',
+            'properties.GUID',
+            'properties.Id',
+            'properties.pdtID',
+            'propertiesdatadictionaries.versionNumber',
+            'propertiesdatadictionaries.revisionNumber',
+            'properties.gopID',
+            'properties.referenceDocumentGUID',
+            'propertiesdatadictionaries.units',
+            'propertiesdatadictionaries.nameEn',
+            'propertiesdatadictionaries.namePt',
+            'properties.visualRepresentation'
+        )
+            ->get();
+
+        $data = [
+            'pdt' => $pdt,
+            'gop' => $gop,
+            'referenceDocument' => $referenceDocument,
+            'properties_dict' => $properties_dict,
+            'properties' => $properties,
+            'joined_properties' => $joined_properties,
+        ];
+
+        return response()->json($data);
     }
+
 
     /**
      * Show the form for creating a new resource.

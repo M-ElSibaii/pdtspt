@@ -47,6 +47,7 @@ require __DIR__ . '/auth.php';
 Route::get('/pdtssurvey/{pdtID}', [GroupofpropertiesController::class, 'getGroupOfProperties2', 'getComments'])
     ->middleware(['auth'])->name('pdtssurvey');
 
+
 Route::post('/pdtssurvey/like-comment', [GroupofpropertiesController::class, 'likeComment'])->name('like-comment');
 Route::post('/pdtssurvey/replyStore', [GroupofpropertiesController::class, 'replyStore'])->middleware(['auth'])->name('replyStore');
 Route::post('/pdtssurvey/store', [GroupofpropertiesController::class, 'store'])->middleware(['auth'])->name('store');
