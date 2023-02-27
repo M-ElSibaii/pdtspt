@@ -13,6 +13,7 @@ use App\Models\propertiesdatadictionaries;
 use App\Models\referencedocuments;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class GroupofpropertiesController extends Controller
 {
@@ -119,15 +120,6 @@ class GroupofpropertiesController extends Controller
 
         $answers = Answers::where('users_id', Auth::id())->get();
 
-        // foreach ($properties as &$property) {
-        //     $property->answer = 'No opinion';
-        //    foreach ($answers as $answer) {
-        //        if ($answer->property_id == $property->id) {
-        //            $property->answer = $answer->answer;
-        //           break;
-        //       }
-        //   }
-        //  }
 
         return view('pdtssurvey', compact('gop', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'comments', 'answers', 'properties'));
     }
@@ -149,25 +141,7 @@ class GroupofpropertiesController extends Controller
         return redirect()->back()->with('success', 'Answers saved successfully');
     }
 
-    /* did not work
-    public function saveAnswers(Request $request)
-    {
-        $answers = $request->input('answers');
 
-        foreach ($answers as $answer) {
-            $answer = json_decode($answer, true); // decode the answer JSON
-
-            $propertyId = $answer['propertyId']; // get the property ID from the answer
-            $users_id = Auth::user()->id;
-            // find or create the answer record in the database
-            Answers::updateOrCreate(
-
-                ['properties_Id' => $propertyId, 'users_id' => $users_id],
-                ['answer' => $answer['answer'],]
-            );
-        }
-        return redirect()->back()->with('success', 'Answers saved successfully');
-    }*/
 
     /**
      * Store a newly created resource in storage.
@@ -179,38 +153,56 @@ class GroupofpropertiesController extends Controller
     public function store(Request $request)
     {
 
-        $validatedData = $request->validate([
+        $validator = Validator::make($request->all(), [
             'body' => 'required|string',
             'properties_Id' => 'required|integer',
         ]);
 
-        $comment = new comments;
-        $comment->body = $validatedData['body'];
-        $comment->properties_Id = $request->properties_Id;
-        $comment->users_id = Auth::user()->id;
-        $comment->save();
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 400,
+                'errors' => 'The feedback field is required.'
+            ]);
+        } else {
 
-        return redirect()->back();
+            $comment = new comments;
+            $comment->body = $request->input('body');
+            $comment->properties_Id = $request->input('properties_Id');
+            $comment->users_id = Auth::user()->id;
+            $comment->save();
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Feedback added successfully.'
+            ]);
+        }
     }
-
-
-    public function replyStore(Request $request)
+    public function fetchfeedback($propertyId)
     {
-        $validatedData = $request->validate([
-            'body' => 'required|string',
-            'comment_id' => 'required|integer',
-            'properties_Id' => 'required|integer',
+
+        $comments = comments::select()->where('properties_Id', $propertyId);
+        return response()->json([
+            'comments' => $comments,
         ]);
-
-        $reply = new comments;
-        $reply->body = $validatedData['body'];
-        $reply->properties_Id = $request->properties_Id;
-        $reply->parent_id = $request->comment_id;
-        $reply->users_id = Auth::user()->id;
-        $reply->save();
-
-        return redirect()->back();
     }
+
+    public function destroyfeedback($id)
+    {
+        $comment = comments::find($id);
+        if ($comment) {
+            $comment->delete();
+            return response()->json([
+                'status' => 200,
+                'message' => 'Feedback Deleted Successfully.'
+            ]);
+        } else {
+            return response()->json([
+                'status' => 404,
+                'message' => 'No Feedback Found.'
+            ]);
+        }
+    }
+
 
     /**
      * Update the specified resource in storage.
@@ -242,26 +234,6 @@ class GroupofpropertiesController extends Controller
         return redirect()->back();
     }
 
-    public function likeComment(Request $request)
-    {
-        $request->validate([
-            'comment_id' => 'required',
-        ]);
-
-        $commentId = $request->input('comment_id');
-        $userId = Auth::user()->id;
-
-        $like = Likes::updateOrCreate(
-            ['user_id' => $userId, 'comment_id' => $commentId],
-            ['is_liked' => true]
-        );
-
-        return response()->json([
-            'like_count' => $like->comment->likes->count(),
-            'button_text' => $like->wasRecentlyCreated ? 'Unlike' : 'Like',
-        ]);
-    }
-
 
     /**
      * Display a listing of the resource.
@@ -284,16 +256,6 @@ class GroupofpropertiesController extends Controller
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store1(Request $request)
-    {
-        //
-    }
 
     /**
      * Display the specified resource.
@@ -313,29 +275,6 @@ class GroupofpropertiesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit(groupofproperties $groupofproperties)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\groupofproperties  $groupofproperties
-     * @return \Illuminate\Http\Response
-     */
-    public function update1(Request $request, groupofproperties $groupofproperties)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\groupofproperties  $groupofproperties
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy1(groupofproperties $groupofproperties)
     {
         //
     }

@@ -32,7 +32,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/pdtsptapi', function () {
-    return productdatatemplates::all();
-});
-Route::get('/api/pdtsptapi/{pdtID}', [ProductdatatemplatesController::class, 'index']);
+Route::get('/pdtsptapi/productDataTemplates', [ProductdatatemplatesController::class, 'productDataTemplates']);
+
+Route::get('/pdtsptapi/dataDictionary', [ProductdatatemplatesController::class, 'dataDictionary']);
+
+Route::get('/pdtsptapi/referenceDocuments', [ProductdatatemplatesController::class, 'referenceDocuments']);
+
+Route::get('/pdtsptapi/groupsOfProperties', [ProductdatatemplatesController::class, 'groupsOfProperties']);
+
+Route::get('/pdtsptapi/{pdtID}', [ProductdatatemplatesController::class, 'productDataTemplate']);

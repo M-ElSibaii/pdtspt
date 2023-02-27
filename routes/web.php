@@ -46,24 +46,23 @@ require __DIR__ . '/auth.php';
 
 Route::get('/pdtssurvey/{pdtID}', [GroupofpropertiesController::class, 'getGroupOfProperties2'])
     ->middleware(['auth'])->name('pdtssurvey');
-Route::post('/pdtssurvey/{pdtID}', [GroupofpropertiesController::class, 'store'])
-    ->middleware(['auth'])->name('pdtssurvey');
 
-Route::post('/pdtssurvey/like-comment', [GroupofpropertiesController::class, 'likeComment'])->name('like-comment');
-Route::post('/pdtssurvey/replyStore', [GroupofpropertiesController::class, 'replyStore'])->middleware(['auth'])->name('replyStore');
-Route::post('/pdtssurvey/store', [GroupofpropertiesController::class, 'store'])->middleware(['auth'])->name('store');
-Route::post('/pdtssurvey/saveAnswers', [GroupofpropertiesController::class, 'saveAnswers'])->middleware(['auth'])->name('saveAnswers');
-Route::post('/pdtssurvey/update', [GroupofpropertiesController::class, 'update'])->name('update');
-Route::post('/pdtssurvey/destroy', [GroupofpropertiesController::class, 'destroy'])->name('destroy');
+Route::get('/fetchfeedback', [GroupofpropertiesController::class, 'fetchfeedback']);
+
+Route::delete('/deletefeedback/{commentId}', [StudentController::class, 'destroyfeedback']);
+
+Route::post('/pdtssurvey/{pdtID}', [GroupofpropertiesController::class, 'store'])
+    ->middleware(['auth'])->name('pdtssurveystore');
+
+Route::post('/pdtssurvey/saveAnswers', [GroupofpropertiesController::class, 'saveAnswers'])
+    ->middleware(['auth'])->name('saveAnswers');
 
 Route::get(
     '/datadictionaryview/{propID}{propV}{propR}',
     [PropertiesdatadictionariesController::class, 'getPropertyDataDictionary']
-)
-    ->middleware(['auth'])->name('datadictionaryview');
+)->middleware(['auth'])->name('datadictionaryview');
 
 Route::get(
     '/referencedocumentview/{rdGUID}',
     [ReferencedocumentsController::class, 'getReferenceDocument']
-)
-    ->middleware(['auth'])->name('referencedocumentview');
+)->middleware(['auth'])->name('referencedocumentview');

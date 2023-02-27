@@ -93,20 +93,20 @@
             $("#json").on("click", function() {
                 $("#tblpdts").tableHTMLExport({
                     type: "json",
-                    filename: "$pdtname data template.json",
+                    filename: "{{ $pdt[0]->pdtNameEn }} data template.json",
                 });
             });
             $("#csv").on("click", function() {
                 $("#tblpdts").tableHTMLExport({
                     type: "csv",
-                    filename: "$pdtname data template.csv"
+                    filename: "{{ $pdt[0]->pdtNameEn }} data template.csv"
                 });
             });
 
             $("#txt").on("click", function() {
                 $("#tblpdts").tableHTMLExport({
                     type: "txt",
-                    filename: "$pdtname data template.txt"
+                    filename: "{{ $pdt[0]->pdtNameEn }} data template.txt"
                 });
             });
         </script>
