@@ -43,7 +43,7 @@
                                                 <input class="ac-input" id="ac-{{ $property->GUID }}" name="ac-{{ $property->GUID }}" type="checkbox" />
                                                 <label class="ac-label" for="ac-{{ $property->GUID }}">
                                                     <a href="{{ route('datadictionaryview', ['propID' => $property->GUID , 'propV' => $property->versionNumber, 'propR' => $property->revisionNumber]) }}" target="_blank">
-                                                        <h4>{{ $property->namePt }}</h4>
+                                                        <h4>{{ $property->namePt }} {{ $property->Id }}</h4>
                                                         <h6 class='text-muted'>{{ $property->nameEn }}</h6>
                                                     </a>
                                                     <h6 class='text-muted'>Descrição: {{$property->descriptionPt}}<br>
@@ -116,7 +116,7 @@
                                                                                     <div id="comments-section-{{ $property->Id }}" class="comment-form">
                                                                                         @foreach ($comments as $comment)
                                                                                         @if ($comment->properties_Id == $property->Id && $comment->parent_id == null)
-                                                                                        <div id="commentbodysection{{ $property->Id }}" class="d-flex flex-start mt-1">
+                                                                                        <div id="commentbodysection{{ $comment->id }}" class="d-flex flex-start mt-1">
                                                                                             <div class="flex-grow-1 flex-shrink-1">
                                                                                                 <!-- add if statement, if user photo exist add photo, else add default -->
                                                                                                 <div class="d-flex">
@@ -125,7 +125,7 @@
                                                                                                         <h5>{{$comment->user->name}}</h5>
                                                                                                         <span class="small d-block">{{$comment->created_at}}
                                                                                                             @if ($comment->user->name == Auth::user()->name )
-                                                                                                            <button style="color: red;" value="{{$comment->id}}" id="delete{{ $comment->Id }}" class="btn danger deletebtn{{ $property->Id }}">Delete</button>
+                                                                                                            <button style="color: red;" data-target="#DeleteModal{{ $comment->id }}" class="btn danger deletebtn{{ $comment->id }}">Delete</button>
                                                                                                             @endif</span>
                                                                                                     </div>
                                                                                                 </div>
@@ -134,8 +134,74 @@
                                                                                                 </div>
                                                                                             </div>
                                                                                         </div>
+                                                                                        <!-- Delete Modal -->
+                                                                                        <div class="modal fade" id="DeleteModal{{ $comment->id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                                                            <div class="modal-dialog">
+                                                                                                <div class="modal-content">
+                                                                                                    @csrf
+                                                                                                    <div class="modal-header">
+                                                                                                        <h5 class="modal-title" id="exampleModalLabel">Delete</h5>
+                                                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                                                    </div>
+                                                                                                    <div class="modal-body">
+                                                                                                        <h4>Are you sure you want to delete feedback?</h4>
+                                                                                                        <input type="hidden" id="deleting_id{{ $comment->id }}" value="{{ $comment->id }}">
+                                                                                                    </div>
+                                                                                                    <div class="modal-footer">
+                                                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                                                        <button type="button" class="btn btn-primary delete_feedback{{ $comment->id }}">Yes, delete</button>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <script>
+                                                                                            $(document).on('click', '.deletebtn{{ $comment->id }}', function() {
+                                                                                                var comment_id = $(this).val();
+                                                                                                $('#DeleteModal{{ $comment->id }}').modal('show');
+                                                                                                $('#deleting_id{{ $comment->id }}').val(comment_id);
+                                                                                            });
+
+                                                                                            $(document).on('click', '.deletebtn{{ $comment->id }}', function(e) {
+                                                                                                e.preventDefault();
+
+
+                                                                                                var id = $('#deleting_id{{ $comment->id }}').val();
+
+                                                                                                $.ajaxSetup({
+                                                                                                    headers: {
+                                                                                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                                                                                    }
+                                                                                                });
+
+                                                                                                $.ajax({
+                                                                                                    type: "DELETE",
+                                                                                                    url: "/deletefeedback/" + id,
+                                                                                                    dataType: "json",
+                                                                                                    success: function(response) {
+                                                                                                        // console.log(response);
+
+                                                                                                        $('#success_message').html("");
+                                                                                                        $('#success_message').addClass('alert alert-success');
+                                                                                                        $('#success_message').text(response.message);
+                                                                                                        $('.delete_feedback{{ $comment->id }}').text('Yes Delete');
+                                                                                                        $('#DeleteModal{{ $comment->id }}').modal('hide');
+                                                                                                        fetchfeedback();
+
+                                                                                                    }
+                                                                                                });
+                                                                                            });
+                                                                                        </script>
                                                                                         @endif
                                                                                         @endforeach
+
+                                                                                        <div class="container">
+                                                                                            <div data-property-id="{{ $property->Id }}">
+                                                                                                <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#AddFeedbackModal{{ $property->Id }}">Add Feedback</button>
+                                                                                            </div>
+                                                                                        </div>
+
+
+
                                                                                         <!-- Add Modal -->
                                                                                         <div class="modal fade" id="AddFeedbackModal{{ $property->Id }}" tabindex="-1" aria-labelledby="AddFeedbackModalLabel{{ $property->Id }}" aria-hidden="true">
                                                                                             <div class="modal-dialog">
@@ -150,7 +216,7 @@
                                                                                                         <ul id="save_msgList{{ $property->Id }}"></ul>
 
                                                                                                         <div class="form-group mb-3">
-                                                                                                            <strong>{{ $property->nameEn }}</strong>
+                                                                                                            <strong>{{ $property->nameEn }} {{ $property->Id }}</strong>
                                                                                                             <input type="hidden" required class="property{{ $property->Id }} form-control" value="{{ $property->Id }}">
                                                                                                         </div>
                                                                                                         <div class="form-group mb-3">
@@ -160,36 +226,12 @@
                                                                                                     </div>
                                                                                                     <div class="modal-footer">
                                                                                                         <button type="button" class="btn btn-secondary {{ $property->Id }}" data-bs-dismiss="modal">Close</button>
-                                                                                                        <button type="button" class="btn btn-primary add_feedback{{ $property->Id }}">Save</button>
+                                                                                                        <button type="button" class="btn btn-primary add_feedback{{ $property->Id }}">Save {{ $property->Id }}</button>
                                                                                                     </div>
                                                                                                 </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div class="container">
-                                                                                            <div data-property-id="{{ $property->Id }}">
-                                                                                                <button type="button" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#AddFeedbackModal{{ $property->Id }}">Add Feedback</button>
                                                                                             </div>
                                                                                         </div>
 
-                                                                                        <!-- Delete Modal -->
-                                                                                        <div class="modal fade" id="DeleteModal{{ $property->Id }}" tabindex="-1" aria-labelledby="exampleModalLabel{{ $property->Id }}" aria-hidden="true">
-                                                                                            <div class="modal-dialog">
-                                                                                                <div class="modal-content">
-                                                                                                    <div class="modal-header">
-                                                                                                        <h5 class="modal-title" id="exampleModalLabel{{ $property->Id }}">Delete feedback</h5>
-                                                                                                        <button type="button" class="btn-close{{ $property->Id }}" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                                                    </div>
-                                                                                                    <div class="modal-body">
-                                                                                                        <h4>Are you sure you want to delete feedback?</h4>
-                                                                                                        <input type="hidden" id="deleteing_id{{ $property->Id }}">
-                                                                                                    </div>
-                                                                                                    <div class="modal-footer">
-                                                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                                                                        <button type="button" class="btn btn-primary delete_feedback{{ $property->Id }}">Yes, delete</button>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
                                                                                     </div>
 
                                                                                 </div>
@@ -203,100 +245,97 @@
                                                 </article>
                                             </div>
                                         </div>
+                                        <script>
+                                            $(document).on('click', '.add_feedback{{ $property->Id }}', function(e) {
+                                                e.preventDefault();
+
+
+                                                $(this).text('Adding..');
+
+                                                var data = {
+                                                    'properties_Id': $('.property{{ $property->Id }}').val(),
+                                                    'body': $('.feedback{{ $property->Id }}').val(),
+                                                }
+
+
+                                                $.ajaxSetup({
+                                                    headers: {
+                                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                                    }
+                                                });
+
+                                                $.ajax({
+                                                    type: "POST",
+                                                    url: "pdtssurveystore",
+                                                    data: data,
+                                                    dataType: "json",
+                                                    success: function(response) {
+                                                        console.log(response);
+                                                        if (response.status == 400) {
+                                                            $('#save_msgList{{ $property->Id }}').html("");
+                                                            $('#save_msgList{{ $property->Id }}').addClass('alert alert-danger');
+                                                            $('#save_msgList{{ $property->Id }}').append('<li>The feedback field is required.</li>');
+                                                            $('.add_feedback{{ $property->Id }}').text('Save');
+                                                        } else {
+                                                            $('#save_msgList{{ $property->Id }}').html("");
+                                                            $('#success_message').addClass('alert alert-success');
+                                                            $('#success_message').text(response.message);
+                                                            $('#AddFeedbackModal{{ $property->Id }}').find('input').val('');
+                                                            $('.add_feedback{{ $property->Id }}').text('Save');
+                                                            $('#AddFeedbackModal{{ $property->Id }}').modal('hide');
+                                                            fetchfeedback();
+                                                        }
+                                                    }
+                                                });
+
+                                            });
+                                        </script>
+                                        <script>
+                                            $(document).ready(function() {
+
+                                                fetchfeedback();
+
+                                                function fetchfeedback() {
+                                                    $.ajax({
+                                                        type: "GET",
+                                                        url: "/fetchfeedback",
+                                                        dataType: "json",
+                                                        success: function(response) {
+                                                            console.log(response.comments);
+                                                            $('commentbodysection{{ $property->Id }}').html("");
+                                                            $.each(response.comments, function(key, item) {
+                                                                $('commentbodysection{{ $property->Id }}').append(' <div class="flex-grow-1 flex-shrink-1">\
+                                                                                                        <div class="d-flex">\
+                                                                                                            <img class="rounded-circle shadow-1-strong me-3" src="{{ asset ("img/default.png")}}" alt="userPhoto" width="65" height="65" />\
+                                                                                                            <div class="div-username">\
+                                                                                                                <h5>{{$comment->user->name}}</h5>\
+                                                                                                                <span class="small d-block">{{$comment->created_at}}@if ($comment->user->name == Auth::user()->name )\
+                                                                                                                    <button style="color: red" value="' + item.id + '" class="btn danger deletebtn">Delete</button>\
+                                                                                                                    @endif</span>\
+                                                                                                            </div>\
+                                                                                                        </div>\
+                                                                                                        <div class="div-comment">\
+                                                                                                            <h5 style="margin-top: 8px;">&ensp;' + item.body + '</h5>\
+                                                                                                        </div>\
+                                                                                                    </div>');
+                                                            });
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        </script>
                                         @endif
                                         @endforeach
                                     </article>
                                 </div>
                                 @endforeach
 
+
                                 <button class="btn btn-primary" id="saveButton">Save Answers</button>
 
-                                <script>
-                                    $(document).on('click', '.deletebtn{{ $property->Id }}', function() {
-                                        var comment_id = $(this).val();
-                                        $('#DeleteModal{{ $property->Id }}').modal('show');
-                                        $('#deleteing_id{{ $property->Id }}').val(comment_id);
-                                    });
-
-                                    $(document).on('click', '.deletebtn{{ $property->Id }}', function(e) {
-                                        e.preventDefault();
 
 
-                                        var id = $('#deleteing_id{{ $property->Id }}').val();
 
-                                        $.ajaxSetup({
-                                            headers: {
-                                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                            }
-                                        });
-
-                                        $.ajax({
-                                            type: "DELETE",
-                                            url: "/deletefeedback/" + id,
-                                            dataType: "json",
-                                            success: function(response) {
-                                                // console.log(response);
-                                                if (response.status == 404) {
-                                                    $('#success_message').addClass('alert alert-success');
-                                                    $('#success_message').text(response.message);
-                                                    $('.delete_feedback{{ $property->Id }}').text('Yes Delete');
-                                                } else {
-                                                    $('#success_message').html("");
-                                                    $('#success_message').addClass('alert alert-success');
-                                                    $('#success_message').text(response.message);
-                                                    $('.delete_feedback{{ $property->Id }}').text('Yes Delete');
-                                                    $('#DeleteModal{{ $property->Id }}').modal('hide');
-                                                    fetchstudent();
-                                                }
-                                            }
-                                        });
-                                    });
-                                </script>
-                                <script>
-                                    $(document).on('click', '.add_feedback{{ $property->Id }}', function(e) {
-                                        e.preventDefault();
-
-
-                                        $(this).text('Adding..');
-
-                                        var data = {
-                                            'properties_Id': $('.property{{ $property->Id }}').val(),
-                                            'body': $('.feedback{{ $property->Id }}').val(),
-                                        }
-
-
-                                        $.ajaxSetup({
-                                            headers: {
-                                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                            }
-                                        });
-
-                                        $.ajax({
-                                            type: "POST",
-                                            url: "pdtssurveystore",
-                                            data: data,
-                                            dataType: "json",
-                                            success: function(response) {
-                                                console.log(response);
-                                                if (response.status == 400) {
-                                                    $('#save_msgList{{ $property->Id }}').html("");
-                                                    $('#save_msgList{{ $property->Id }}').addClass('alert alert-danger');
-                                                    $('#save_msgList{{ $property->Id }}').append('<li>The feedback field is required.</li>');
-                                                    $('.add_feedback{{ $property->Id }}').text('Save');
-                                                } else {
-                                                    $('#save_msgList{{ $property->Id }}').html("");
-                                                    $('#success_message').addClass('alert alert-success');
-                                                    $('#success_message').text(response.message);
-                                                    $('#AddFeedbackModal{{ $property->Id }}').find('input').val('');
-                                                    $('.add_feedback{{ $property->Id }}').text('Save');
-                                                    $('#AddFeedbackModal{{ $property->Id }}').modal('hide');
-                                                    fetchfeedback();
-                                                }
-                                            }
-                                        });
-
-                                    });
-                                </script>
                                 <script>
                                     //     document.getElementById("saveButton").addEventListener("click", function() {
                                     //         // create a form to submit the answers
