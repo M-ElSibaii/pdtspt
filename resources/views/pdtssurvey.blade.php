@@ -118,9 +118,14 @@
                                                                                         @if ($comment->properties_Id == $property->Id && $comment->parent_id == null)
                                                                                         <div id="commentbodysection{{ $comment->id }}" class="d-flex flex-start mt-1">
                                                                                             <div class="flex-grow-1 flex-shrink-1">
-                                                                                                <!-- add if statement, if user photo exist add photo, else add default -->
+
                                                                                                 <div class="d-flex">
-                                                                                                    <img class="rounded-circle shadow-1-strong me-3" src="{{ asset ('img/default.png')}}" alt="userPhoto" width="65" height="65" />
+                                                                                                    @if ($comment->user->photo)
+                                                                                                    <img src="{{ asset($comment->user->photo) }}" alt="{{ $comment->user->name }}" class="img-fluid rounded-circle mr-3" style="width: 65px; height: 65px;">
+                                                                                                    @else
+                                                                                                    <img src="{{ asset('img/users/default.png') }}" alt="{{ $comment->user->name }}" class="img-fluid rounded-circle mr-3" style="width: 65px; height: 65px;">
+                                                                                                    @endif
+
                                                                                                     <div class="div-username">
                                                                                                         <h5>{{$comment->user->name}}</h5>
                                                                                                         <span class="small d-block">{{$comment->created_at}}

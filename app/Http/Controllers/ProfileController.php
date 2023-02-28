@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Intervention\Image\Facades\Image;
 
 class ProfileController extends Controller
 {
@@ -37,6 +38,24 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
+    public function updatePhoto(ProfileUpdateRequest $request): RedirectResponse
+    {
+
+        $user = $request->user();
+
+        if ($request->hasFile('photo')) {
+            $image = $request->file('photo');
+            $filename = time() . '.' . $image->getClientOriginalExtension();
+            $img = Image::make($image);
+            $img->fit(200)->circle(100);
+            $img->save(public_path('img/users/' . $filename));
+            $user->photo = 'img/users/' . $filename;
+        }
+
+        $user->update($request->only(['name', 'email']));
+        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    }
+
     /**
      * Delete the user's account.
      */
@@ -56,5 +75,25 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function storeImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        $imageName =  Auth::user()->name . '.' . $request->image->extension();
+
+        $request->image->move(public_path('img'), $imageName);
+        //ex. public/img/file.png
+        /* 
+            Write Code Here for
+            Store $imageName name in DATABASE from HERE 
+        */
+
+        return back()
+            ->with('success', 'You have successfully uploaded the image.')
+            ->with('image', $imageName);
     }
 }

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('profession')->default('n/a');
             $table->string('institute')->default('n/a');
             $table->boolean('isAdmin')->default(False);
+            $table->string('profile_photo_path')->default('/img/default.png');
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
