@@ -159,7 +159,8 @@ class GroupofpropertiesController extends Controller
 
             return response()->json([
                 'status' => 200,
-                'message' => 'Feedback added successfully.'
+                'message' => 'Feedback added successfully.',
+                'comment' => $comment
             ]);
         }
     }
@@ -188,14 +189,16 @@ class GroupofpropertiesController extends Controller
         ]);
     }
 
-    public function destroyfeedback($commentId)
+    public function destroyfeedback(Request $request)
     {
-        $comment = comments::find($commentId);
+        $commentId = $request->input('comment_id');
+        $comment = comments::where('id', $commentId);
         if ($comment) {
             $comment->delete();
             return response()->json([
                 'status' => 200,
-                'message' => 'Feedback Deleted Successfully.'
+                'message' => 'Feedback Deleted Successfully.',
+                'comment_id' => $commentId
             ]);
         } else {
             return response()->json([

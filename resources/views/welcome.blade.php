@@ -441,7 +441,7 @@
 
 
                 <div class="ml-4 text-center text-sm text-gray-500 sm:text-right sm:ml-0">
-                    © {{ date('Y') }} UMinho. All rights reserved.
+                    © 2021 UMinho. All rights reserved.
                 </div>
             </div>
         </div>
