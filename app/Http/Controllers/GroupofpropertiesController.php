@@ -126,20 +126,6 @@ class GroupofpropertiesController extends Controller
 
 
 
-    public function saveAnswers(Request $request)
-    {
-
-        $answers = $request->input('answers');
-        foreach ($answers as $answer) {
-            $answer = json_decode($answer);
-            $Answer = new Answers;
-            $Answer->answer = $answer->answer;
-            $Answer->properties_Id = $answer->propertyId;
-            $Answer->users_id = Auth::user()->id;
-            $Answer->save();
-        }
-        return redirect()->back()->with('success', 'Answers saved successfully');
-    }
 
 
 
@@ -177,6 +163,22 @@ class GroupofpropertiesController extends Controller
             ]);
         }
     }
+
+
+    public function saveAnswers(Request $request)
+    {
+
+        $answers = $request->input('answers');
+        foreach ($answers as $answer) {
+            $answer = json_decode($answer);
+            $Answer = new Answers;
+            $Answer->answer = $answer->answer;
+            $Answer->properties_Id = $answer->propertyId;
+            $Answer->users_id = Auth::user()->id;
+            $Answer->save();
+        }
+        return redirect()->back()->with('success', 'Answers saved successfully');
+    }
     public function fetchfeedback($propertyId)
     {
 
@@ -186,9 +188,9 @@ class GroupofpropertiesController extends Controller
         ]);
     }
 
-    public function destroyfeedback($id)
+    public function destroyfeedback($commentId)
     {
-        $comment = comments::find($id);
+        $comment = comments::find($commentId);
         if ($comment) {
             $comment->delete();
             return response()->json([

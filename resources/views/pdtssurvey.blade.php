@@ -153,6 +153,7 @@
                                                                                                         <input type="hidden" id="deleting_id{{ $comment->id }}" value="{{ $comment->id }}">
                                                                                                     </div>
                                                                                                     <div class="modal-footer">
+                                                                                                        @csrf
                                                                                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                                                                                         <button type="button" class="btn btn-primary delete_feedback{{ $comment->id }}">Yes, delete</button>
                                                                                                     </div>
@@ -166,11 +167,11 @@
                                                                                                 $('#deleting_id{{ $comment->id }}').val(comment_id);
                                                                                             });
 
-                                                                                            $(document).on('click', '.deletebtn{{ $comment->id }}', function(e) {
+                                                                                            $(document).on('click', '.delete_feedback{{ $comment->id }}', function(e) {
                                                                                                 e.preventDefault();
 
 
-                                                                                                var id = $('#deleting_id{{ $comment->id }}').val();
+                                                                                                var commentId = $('#deleting_id{{ $comment->id }}').val();
 
                                                                                                 $.ajaxSetup({
                                                                                                     headers: {
@@ -180,10 +181,10 @@
 
                                                                                                 $.ajax({
                                                                                                     type: "DELETE",
-                                                                                                    url: "/deletefeedback/" + id,
+                                                                                                    url: "/deletefeedback/{{ $comment->id }}",
                                                                                                     dataType: "json",
                                                                                                     success: function(response) {
-                                                                                                        // console.log(response);
+
 
                                                                                                         $('#success_message').html("");
                                                                                                         $('#success_message').addClass('alert alert-success');
@@ -221,7 +222,7 @@
                                                                                                         <ul id="save_msgList{{ $property->Id }}"></ul>
 
                                                                                                         <div class="form-group mb-3">
-                                                                                                            <strong>{{ $property->nameEn }} {{ $property->Id }}</strong>
+                                                                                                            <strong>{{ $property->nameEn }}</strong>
                                                                                                             <input type="hidden" required class="property{{ $property->Id }} form-control" value="{{ $property->Id }}">
                                                                                                         </div>
                                                                                                         <div class="form-group mb-3">
@@ -231,7 +232,7 @@
                                                                                                     </div>
                                                                                                     <div class="modal-footer">
                                                                                                         <button type="button" class="btn btn-secondary {{ $property->Id }}" data-bs-dismiss="modal">Close</button>
-                                                                                                        <button type="button" class="btn btn-primary add_feedback{{ $property->Id }}">Save {{ $property->Id }}</button>
+                                                                                                        <button type="button" class="btn btn-primary add_feedback{{ $property->Id }}">Save</button>
                                                                                                     </div>
                                                                                                 </div>
                                                                                             </div>
@@ -275,7 +276,7 @@
                                                     data: data,
                                                     dataType: "json",
                                                     success: function(response) {
-                                                        console.log(response);
+
                                                         if (response.status == 400) {
                                                             $('#save_msgList{{ $property->Id }}').html("");
                                                             $('#save_msgList{{ $property->Id }}').addClass('alert alert-danger');
@@ -306,23 +307,23 @@
                                                         url: "/fetchfeedback",
                                                         dataType: "json",
                                                         success: function(response) {
-                                                            console.log(response.comments);
-                                                            $('commentbodysection{{ $property->Id }}').html("");
+
+                                                            $('commentbodysection' + item.id + '').html("");
                                                             $.each(response.comments, function(key, item) {
-                                                                $('commentbodysection{{ $property->Id }}').append(' <div class="flex-grow-1 flex-shrink-1">\
-                                                                                                        <div class="d-flex">\
-                                                                                                            <img class="rounded-circle shadow-1-strong me-3" src="{{ asset ("img/default.png")}}" alt="userPhoto" width="65" height="65" />\
-                                                                                                            <div class="div-username">\
-                                                                                                                <h5>{{$comment->user->name}}</h5>\
-                                                                                                                <span class="small d-block">{{$comment->created_at}}@if ($comment->user->name == Auth::user()->name )\
-                                                                                                                    <button style="color: red" value="' + item.id + '" class="btn danger deletebtn">Delete</button>\
-                                                                                                                    @endif</span>\
-                                                                                                            </div>\
-                                                                                                        </div>\
-                                                                                                        <div class="div-comment">\
-                                                                                                            <h5 style="margin-top: 8px;">&ensp;' + item.body + '</h5>\
-                                                                                                        </div>\
-                                                                                                    </div>');
+                                                                $('commentbodysection' + item.id + '').append('<div class="flex-grow-1 flex-shrink-1">\
+                                                                            <div class="d-flex">\
+                                                                                <img class="rounded-circle shadow-1-strong me-3" src="{{ asset ("img/default.png")}}" alt="userPhoto" width="65" height="65" />\
+                                                                                <div class="div-username">\
+                                                                                    <h5>{{$comment->user->name}}</h5>\
+                                                                                    <span class="small d-block">{{$comment->created_at}}@if ($comment->user->name == Auth::user()->name )\
+                                                                                        <button style="color: red" value="' + item.id + '" class="btn danger deletebtn">Delete</button>\
+                                                                                        @endif</span>\
+                                                                                </div>\
+                                                                            </div>\
+                                                                            <div class="div-comment">\
+                                                                                <h5 style="margin-top: 8px;">&ensp;' + item.body + '</h5>\
+                                                                            </div>\
+                                                                        </div>');
                                                             });
                                                         }
                                                     });
@@ -339,48 +340,6 @@
                                 <button class="btn btn-primary" id="saveButton">Save Answers</button>
 
 
-
-
-                                <script>
-                                    //     document.getElementById("saveButton").addEventListener("click", function() {
-                                    //         // create a form to submit the answers
-                                    //         var form = document.createElement("form");
-                                    //         form.setAttribute("method", "post");
-                                    //         form.setAttribute("action", "{{ route('saveAnswers') }}");
-
-                                    //         // collect the answers
-                                    //         var answers = [];
-                                    //         var inputs = document.querySelectorAll("input[type='radio']:checked");
-                                    //         inputs.forEach(function(input) {
-                                    //             answers.push({
-                                    //                 answer: input.value,
-                                    //                 propertyId: input.getAttribute("name"),
-                                    //                 user: input.getAttribute("data-user-id")
-                                    //             });
-                                    //         });
-
-                                    //         // add the answers to the form as hidden inputs
-                                    //         answers.forEach(function(answer) {
-                                    //             var input = document.createElement("input");
-                                    //             input.setAttribute("type", "hidden");
-                                    //             input.setAttribute("name", "answers[]");
-                                    //             input.setAttribute("value", JSON.stringify(answer));
-                                    //             form.appendChild(input);
-                                    //         });
-
-                                    //         // add a CSRF token to the form
-                                    //         var csrfInput = document.createElement("input");
-                                    //         csrfInput.setAttribute("type", "hidden");
-                                    //         csrfInput.setAttribute("name", "csrf_token");
-                                    //         csrfInput.setAttribute("value", "{{ csrf_token() }}");
-                                    //         form.appendChild(csrfInput);
-
-                                    //         // submit the form
-                                    //         document.body.appendChild(form);
-                                    //         form.submit();
-                                    //     });
-                                </script>
-
                             </form>
 
 
@@ -391,5 +350,47 @@
             </div>
         </main>
     </body>
+
+    <script>
+        document.getElementById("saveButton").addEventListener("click", function() {
+            // create a form to submit the answers
+            var form = document.createElement("form");
+            form.setAttribute("method", "post");
+            form.setAttribute("action", "{{ route('saveAnswers') }}");
+
+            // collect the answers
+            var answers = [];
+            var inputs = document.querySelectorAll("input[type='radio']:checked");
+            inputs.forEach(function(input) {
+                answers.push({
+                    answer: input.value,
+                    propertyId: input.getAttribute("name"),
+                    user: input.getAttribute("data-user-id")
+                });
+            });
+
+            // add the answers to the form as hidden inputs
+            answers.forEach(function(answer) {
+                var input = document.createElement("input");
+                input.setAttribute("type", "hidden");
+                input.setAttribute("name", "answers[]");
+                input.setAttribute("value", JSON.stringify(answer));
+                form.appendChild(input);
+            });
+
+            // add a CSRF token to the form
+            var csrfInput = document.createElement("input");
+            csrfInput.setAttribute("type", "hidden");
+            csrfInput.setAttribute("name", "csrf_token");
+            csrfInput.setAttribute("value", "{{ csrf_token() }}");
+            form.appendChild(csrfInput);
+
+            // submit the form
+            document.body.appendChild(form);
+            form.submit();
+        });
+    </script>
+
+
 
 </x-app-layout>

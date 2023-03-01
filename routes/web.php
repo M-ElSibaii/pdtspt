@@ -47,13 +47,15 @@ require __DIR__ . '/auth.php';
 
 Route::get('/pdtssurvey/{pdtID}', [GroupofpropertiesController::class, 'getGroupOfProperties2'])
     ->middleware(['auth'])->name('pdtssurvey');
-
+Route::post('/pdtssurvey/{pdtID}', [GroupofpropertiesController::class, 'store'])
+    ->middleware(['auth']);
+Route::post('/pdtssurvey/store', [GroupofpropertiesController::class, 'store'])
+    ->middleware(['auth'])->name('pdtssurveystore');
 Route::get('/fetchfeedback', [GroupofpropertiesController::class, 'fetchfeedback']);
 
 Route::delete('/deletefeedback/{commentId}', [StudentController::class, 'destroyfeedback']);
 
-Route::post('/pdtssurvey/{pdtID}', [GroupofpropertiesController::class, 'store'])
-    ->middleware(['auth'])->name('pdtssurveystore');
+
 
 Route::post('/pdtssurvey/saveAnswers', [GroupofpropertiesController::class, 'saveAnswers'])
     ->middleware(['auth'])->name('saveAnswers');
