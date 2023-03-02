@@ -305,7 +305,7 @@
                                         <img class="rounded-circle shadow-1-strong me-3" src="{{ asset($comment->user->photo) }}" alt="userPhoto" style="width:65px; height:65px;" />\
                                         <div class="div-username">\
                                             <h5>{{$comment->user->name}}</h5>\
-                                            <span class="small d-block">' + response.comment.created_at + '\
+                                            <span class="small d-block">' + "{{ date('Y-m-d H:i:s') }}" + '\
                                                 <button type="button" style="color: red;" onclick="openDeleteModal(' + response.comment.id + ')" class="btn danger">Delete</button>\
                                             </span>\
                                         </div>\

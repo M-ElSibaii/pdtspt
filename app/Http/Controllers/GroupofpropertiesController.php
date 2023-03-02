@@ -8,12 +8,15 @@ use App\Models\groupofproperties;
 use App\Models\properties;
 use App\Models\comments;
 use App\Models\Answers;
-use App\Models\Likes;
+use App\Models\User;
 use App\Models\propertiesdatadictionaries;
 use App\Models\referencedocuments;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Mail\FeedbackMailAdmin;
+use App\Mail\FeedbackMailUsers;
+use Illuminate\Support\Facades\Mail;
 
 class GroupofpropertiesController extends Controller
 {
@@ -150,6 +153,50 @@ class GroupofpropertiesController extends Controller
                 'errors' => 'The feedback field is required.'
             ]);
         } else {
+            $propertyId = $request->input('properties_Id');
+            $commentbody = $request->input('body');
+
+            $pdtId = properties::where('Id', $propertyId)
+                ->value('pdtID');
+
+            $propertyGUID = properties::where('Id', $propertyId)
+                ->value('GUID');
+
+            $propertyName = propertiesdatadictionaries::where('GUID', $propertyGUID)
+                ->where('versionNumber', function ($query) use ($propertyGUID) {
+                    $query->selectRaw('MAX(versionNumber)')
+                        ->from('propertiesdatadictionaries')
+                        ->where('GUID', $propertyGUID);
+                })
+                ->where('revisionNumber', function ($query) use ($propertyGUID) {
+                    $query->selectRaw('MAX(revisionNumber)')
+                        ->from('propertiesdatadictionaries')
+                        ->where('GUID', $propertyGUID)
+                        ->where('versionNumber', function ($query) use ($propertyGUID) {
+                            $query->selectRaw('MAX(versionNumber)')
+                                ->from('propertiesdatadictionaries')
+                                ->where('GUID', $propertyGUID);
+                        });
+                })
+                ->value('namePt');
+
+            $pdtName = productdatatemplates::where('id', $pdtId)
+                ->value('pdtNamePt');
+
+            $userIds = comments::join('properties', 'comments.properties_Id', '=', 'properties.Id')
+                ->where('properties.Id', $propertyId)
+                ->pluck('comments.users_id')
+                ->unique()
+                ->toArray();
+
+            $emails = User::whereIn('id', $userIds)
+                ->pluck('email')
+                ->toArray();
+
+            // $userName = User::where('id', Auth::id())->first('name');
+            Mail::to('pdts.portugal@gmail.com')->send(new FeedbackMailAdmin($commentbody, $pdtName, $propertyName));
+
+            Mail::to($emails)->send(new FeedbackMailUsers($commentbody, $pdtName, $propertyName));
 
             $comment = new comments;
             $comment->body = $request->input('body');
@@ -157,10 +204,13 @@ class GroupofpropertiesController extends Controller
             $comment->users_id = Auth::user()->id;
             $comment->save();
 
+
+
             return response()->json([
                 'status' => 200,
                 'message' => 'Feedback added successfully.',
-                'comment' => $comment
+                'comment' => $comment,
+
             ]);
         }
     }
