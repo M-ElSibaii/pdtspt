@@ -32,12 +32,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/pdtsptapi/productDataTemplates', [ProductdatatemplatesController::class, 'productDataTemplates']);
+Route::get('/productDataTemplates', [ProductdatatemplatesController::class, 'productDataTemplates']);
 
-Route::get('/pdtsptapi/dataDictionary', [ProductdatatemplatesController::class, 'dataDictionary']);
+Route::get('/dataDictionary', [ProductdatatemplatesController::class, 'dataDictionary']);
 
-Route::get('/pdtsptapi/referenceDocuments', [ProductdatatemplatesController::class, 'referenceDocuments']);
+Route::get('/referenceDocuments', [ProductdatatemplatesController::class, 'referenceDocuments']);
 
-Route::get('/pdtsptapi/groupsOfProperties', [ProductdatatemplatesController::class, 'groupsOfProperties']);
+Route::get('/groupsOfProperties', [ProductdatatemplatesController::class, 'groupsOfProperties']);
 
-Route::get('/pdtsptapi/{pdtID}', [ProductdatatemplatesController::class, 'productDataTemplate']);
+Route::get('/{pdtID}', [ProductdatatemplatesController::class, 'productDataTemplate']);

@@ -195,9 +195,9 @@ class GroupofpropertiesController extends Controller
 
             // $userName = User::where('id', Auth::id())->first('name');
             Mail::to('pdts.portugal@gmail.com')->send(new FeedbackMailAdmin($commentbody, $pdtName, $propertyName));
-
-            Mail::to($emails)->send(new FeedbackMailUsers($commentbody, $pdtName, $propertyName));
-
+            foreach ($emails as $email) {
+                Mail::to($email)->send(new FeedbackMailUsers($commentbody, $pdtName, $propertyName));
+            }
             $comment = new comments;
             $comment->body = $request->input('body');
             $comment->properties_Id = $request->input('properties_Id');

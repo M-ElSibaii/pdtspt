@@ -168,7 +168,7 @@
                                 @endforeach
 
 
-                                <button class="btn btn-primary" id="saveButton">Save Answers</button>
+                                <button type="button" class="btn btn-primary" id="saveButton">Save Answers</button>
 
 
                             </form>

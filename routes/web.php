@@ -24,6 +24,11 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+Route::get('/privacypolicy', function () {
+    return view('privacypolicy');
+})->name('privacypolicy');
+
+
 Route::get('/contact',  function () {
     return view('contact');
 });
@@ -39,14 +44,21 @@ Route::get('/pdtsdownload/{pdtID}', [GroupofpropertiesController::class, 'getGro
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::patch('/profile', [ProfileController::class, 'updatePhoto'])->name('profile.updatePhoto');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+Route::delete('/profile/photo', [ProfileController::class, 'deletePhoto'])
+    ->middleware(['auth'])->name('profile.deletePhoto');
+Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])
+    ->middleware(['auth'])->name('profile.updatePhoto');
+Route::post('/updateSubscription', [ProfileController::class, 'updateSubscription'])
+    ->middleware(['auth'])->name('profile.updateSubscription');
 
 require __DIR__ . '/auth.php';
 
 Route::get('/pdtssurvey/{pdtID}', [GroupofpropertiesController::class, 'getGroupOfProperties2'])
     ->middleware(['auth'])->name('pdtssurvey');
+Route::post('/pdtssurvey/saveAnswers', [GroupofpropertiesController::class, 'saveAnswers'])
+    ->middleware(['auth'])->name('saveAnswers');
 Route::post('/pdtssurvey/{pdtID}', [GroupofpropertiesController::class, 'store'])
     ->middleware(['auth']);
 Route::post('/pdtssurvey/store', [GroupofpropertiesController::class, 'store'])
@@ -55,9 +67,6 @@ Route::post('/pdtssurvey/store', [GroupofpropertiesController::class, 'store'])
 Route::delete('/deletefeedback', [GroupofpropertiesController::class, 'destroyfeedback']);
 
 
-
-Route::post('/pdtssurvey/saveAnswers', [GroupofpropertiesController::class, 'saveAnswers'])
-    ->middleware(['auth'])->name('saveAnswers');
 
 Route::get(
     '/datadictionaryview/{propID}{propV}{propR}',

@@ -8,7 +8,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use App\Models\comments;
+use App\Models\Answers;
+use App\Models\User;
+use Illuminate\Support\Facades\File;
+
 
 class ProfileController extends Controller
 {
@@ -27,6 +33,8 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
+        $user = $request->user();
+
         $request->user()->fill($request->validated());
 
         if ($request->user()->isDirty('email')) {
@@ -35,10 +43,11 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return Redirect::route('profile.edit')->with('status', 'profile information updated');
     }
 
-    public function updatePhoto(ProfileUpdateRequest $request): RedirectResponse
+
+    public function updatePhoto(Request $request)
     {
 
         $user = $request->user();
@@ -47,15 +56,36 @@ class ProfileController extends Controller
             $image = $request->file('photo');
             $filename = time() . '.' . $image->getClientOriginalExtension();
             $img = Image::make($image);
-            $img->fit(200)->circle(100);
+            $img->fit(200)->circle(100, 100, 100);
             $img->save(public_path('img/users/' . $filename));
             $user->photo = 'img/users/' . $filename;
+            $request->user()->save();
         }
 
-        $user->update($request->only(['name', 'email']));
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return Redirect::route('profile.edit')->with('photostatus', 'Profile photo updated');
     }
+    public function deletePhoto(Request $request)
+    {
+        $user = $request->user();
+        $photoPath = public_path($user->photo);
 
+        if (File::exists($photoPath)) {
+            File::delete($photoPath);
+            $user->photo = null;
+            $user->save();
+
+            return redirect()->back()->with('photodeletestatus', 'Profile photo deleted.');
+        }
+
+        return redirect()->back()->with('status', 'No photo to delete.');
+    }
+    public function updateSubscription(Request $request)
+    {
+        $user = $request->user();
+        $user->subscribe = $request->input('subscribe');
+        $user->save();
+        return redirect()->back()->with('subscribestatus', 'Subscription status updated.');
+    }
     /**
      * Delete the user's account.
      */
@@ -67,6 +97,14 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
+        // Update comments
+        comments::where('users_id', $user->id)
+            ->update(['users_id' => 1]);
+
+        // Update answers
+        answers::where('users_id', $user->id)
+            ->update(['users_id' => 1]);
+
         Auth::logout();
 
         $user->delete();
@@ -75,25 +113,5 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
-    }
-
-    public function storeImage(Request $request)
-    {
-        $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
-
-        $imageName =  Auth::user()->name . '.' . $request->image->extension();
-
-        $request->image->move(public_path('img'), $imageName);
-        //ex. public/img/file.png
-        /* 
-            Write Code Here for
-            Store $imageName name in DATABASE from HERE 
-        */
-
-        return back()
-            ->with('success', 'You have successfully uploaded the image.')
-            ->with('image', $imageName);
     }
 }
