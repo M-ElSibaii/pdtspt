@@ -302,7 +302,11 @@
                             '<div class="commentbodysection' + response.comment.id + '">\
                                 <div class="flex-grow-1 flex-shrink-1">\
                                     <div class="d-flex">\
-                                        <img class="rounded-circle shadow-1-strong me-3" src="{{ asset($comment->user->photo) }}" alt="userPhoto" style="width:65px; height:65px;" />\
+                                    @if ($comment->user->photo)\
+                                    <img src="{{ asset($comment->user->photo) }}" alt="{{ $comment->user->name }}" class="img-fluid rounded-circle mr-3" style="width: 65px; height: 65px;">\
+                                    @else\
+                                    <img src="{{ asset("img/users/default.png") }}" alt="{{ $comment->user->name }}" class="img-fluid rounded-circle mr-3" style="width: 65px; height: 65px;">\
+                                    @endif\
                                         <div class="div-username">\
                                             <h5>{{$comment->user->name}}</h5>\
                                             <span class="small d-block">' + "{{ date('Y-m-d H:i:s') }}" + '\
