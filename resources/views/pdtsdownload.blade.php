@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __("View and Download Product Data Template") }}
+            {{ __("Ver e descarregar o Modelo de Dados do Produto baseado na EN ISO 23387") }}
         </h2>
     </x-slot>
 
@@ -11,7 +11,7 @@
             <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                 <div class="home_content container">
                     <div class="row">
-                        <h2> {{ $pdt[0]->pdtNameEn }} Data Template V{{ $pdt[0]->versionNumber }}.{{ $pdt[0]->revisionNumber }}
+                        <h2> O Modelo de Dados do Produto ({{ $pdt[0]->pdtNamePt }}) V{{ $pdt[0]->versionNumber }}.{{ $pdt[0]->revisionNumber }}
 
                             <button id="json" class="btn"><i class="fa fa-download"></i> JSON</button>
                             <button id="csv" class="btn"><i class="fa fa-download"></i> CSV/XLS</button>
@@ -22,11 +22,11 @@
                     <div class="table-responsive">
                         <table class="table" id="tblpdts" cellpadding="0" cellspacing="0">
                             <tr>
-                                <th>Group of properties</th>
-                                <th>Property name</th>
-                                <th>Unit</th>
-                                <th>Description</th>
-                                <th>Reference Document</th>
+                                <th style="width: 15%;">Grupo de propriedades</th>
+                                <th>Propriedade </th>
+                                <th style="width: 7%;">Unidade</th>
+                                <th style="width: 40%;">Descrição</th>
+                                <th style="width: 16%;">Documento de referência</th>
                             </tr>
                             @foreach($gop as $group)
 
@@ -36,21 +36,18 @@
 
                             <tr>
                                 <td>
-                                    {{ $group->gopNameEn }}
+                                    {{ $group->gopNamePt }}
                                 </td>
-
                                 <td>
-                                    <form class="mb-3" action="{{ route('datadictionaryview', ['propID' => $property->GUID , 'propV' => $property->versionNumber, 'propR' => $property->revisionNumber]) }}">
-                                        <button class="btn btn-link" type="submit">{{ $property->nameEn }}</button>
-                                    </form>
+                                    <a href="{{ route('datadictionaryview', ['propID' => $property->GUID , 'propV' => $property->versionNumber, 'propR' => $property->revisionNumber]) }}">{{ $property->namePt }}</a>
                                 </td>
                                 <td>
                                     {{ $property->units }}
                                 </td>
                                 <td>
                                     <div class="row">
-                                        <p>{{$property->descriptionEn}}</p>
-                                        @if($property->visualRepresentation == 'True')
+                                        <p>{{$property->descriptionPt}}</p>
+                                        @if($property->visualRepresentation == True)
                                         <div class="col-sm">
                                             <img src="{{ asset ('img/'.$property->nameEn.'.png')}}" alt='{{$property->nameEn}}' class="property-image">
                                         </div>
@@ -63,11 +60,9 @@
                                 </td>
                                 @else
                                 <td>
-                                    <form class="mb-3" action="{{ route('referencedocumentview', ['rdGUID' => $property->referenceDocumentGUID]) }}">
-                                        <button class="btn btn-link" type="submit">
-                                            <a><abbr title="{{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->title }}">{{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->rdName }}</abbr></a>
-                                        </button>
-                                    </form>
+                                    <a href="{{ route('referencedocumentview', ['rdGUID' => $property->referenceDocumentGUID]) }}">
+                                        <abbr title="{{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->title }}">{{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->rdName }}</abbr>
+                                    </a>
                                 </td>
                                 @endif
                             </tr>

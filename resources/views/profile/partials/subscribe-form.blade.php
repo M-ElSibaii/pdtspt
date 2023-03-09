@@ -1,11 +1,11 @@
 <section>
     <header>
         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-            {{ __('Subscribe') }}
+            {{ __('Subscrever') }}
         </h2>
 
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {{ __('By subscribing, you will recieve email notifications only when there is new feedback on a Product Data Template you previously added feedback to.') }}
+            {{ __('Ao subscrever, só receberá notificações por e-mail quando houver um novo feedback sobre um Modelo de Dados de Produto ao qual tenha previamente adicionado feedback.') }}
         </p>
     </header>
 
@@ -13,13 +13,13 @@
         @csrf
         <label>
             <input type="radio" name="subscribe" value="1" {{ $user->subscribe ? 'checked' : '' }}>
-            Yes
+            Sim
         </label>
         <label>
             <input type="radio" name="subscribe" value="0" {{ $user->subscribe ? '' : 'checked' }}>
-            No
+            Não
         </label>
         <br><br>
-        <x-primary-button>{{ __('Save') }}</x-primary-button>
+        <x-primary-button>{{ __('Guardar') }}</x-primary-button>
     </form>
 </section>

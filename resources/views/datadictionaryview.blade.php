@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __("Property attributes in data dictionary") }}
+            {{ __("Atributos de propriedade no dicionário de dados baseado em EN ISO 23386") }}
         </h2>
     </x-slot>
 
@@ -12,14 +12,14 @@
                     <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                         <div class='home_content container'>
                             <div class='row'>
-                                <h2>{{$propdd->nameEn}} </h2>
+                                <h2>{{$propdd->namePt}} </h2>
                             </div>
                             <table id='tblprop' cellpadding='0' cellspacing='0'>
                                 <tr>
                                     <th style="width:50%">GUID</th>
                                     <td>{{$propdd->GUID}}</td>
                                 </tr>
-                                <th>Name</th>
+                                <th>Name En</th>
                                 <td>{{$propdd->nameEn}}</td>
                                 <tr>
                                     <th>Name Pt</th>
@@ -170,17 +170,17 @@
                                 </tr>
                             </table>
                             <div class='row'>
-                                <h4><strong>Property present in:</strong></h4>
+                                <h4><strong>Propriedade presente em:</strong></h4>
                             </div>
                             <table id='tblprop' cellpadding='0' cellspacing='0'>
                                 <tr>
-                                    <th style="width:50%">Data Template</th>
-                                    <th>Property description</th>
+                                    <th style="width:50%">Modelo de dados</th>
+                                    <th>Descrição da propriedade</th>
                                 </tr>
 
                                 @foreach ($propinpdts as $proppdts)
                                 <tr>
-                                    <td>{{$pdts->where('Id', $proppdts->pdtID)->first()->pdtNameEn}} V
+                                    <td>{{$pdts->where('Id', $proppdts->pdtID)->first()->pdtNamePt}} V
                                         {{$pdts->where('Id', $proppdts->pdtID)->first()->versionNumber}}.{{$pdts->where('Id', $proppdts->pdtID)->first()->revisionNumber}}
                                     </td>
                                     <td>{{$proppdts->descriptionPt}}</td>

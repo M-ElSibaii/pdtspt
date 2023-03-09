@@ -180,12 +180,19 @@
             font-family: 'Trebuchet MS', Arial, Helvetica, sans-serif;
             border-collapse: collapse;
             width: 100%;
+            table-layout: fixed;
+        }
+
+        button.btn-link {
+            max-width: 100%;
+            word-wrap: break-word;
         }
 
         #tblpdts td,
         #tblpdts th {
             border: 1px solid #ddd;
             padding: 8px;
+            word-wrap: break-word;
         }
 
         #tblpdts tr:nth-child(even) {

@@ -44,7 +44,7 @@ class ContactController extends Controller
 
         Mail::to($email)->send(new ContactMail($emailArray));
         Mail::to('pdts.portugal@gmail.com')->send(new ContactMailAdmin($emailArray));
-        session()->flash('success', 'Message sent successfully.');
+        session()->flash('success', 'Mensagem enviada com sucesso.');
 
         return redirect()->back();
         // );

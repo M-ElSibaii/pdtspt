@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Reference document attributes') }}
+            {{ __('Atributos do documento de referência') }}
         </h2>
     </x-slot>
 
@@ -35,22 +35,22 @@
                                 <tr>
                             </table>
                             <div class='row'>
-                                <h4><strong>Properties using this reference document:</strong></h4>
+                                <h4><strong>Propriedades que utilizam este documento de referência:</strong></h4>
                             </div>
                             <table id='tblprop' cellpadding='0' cellspacing='0'>
                                 <tr>
-                                    <th>Data Template</th>
-                                    <th>Version</th>
-                                    <th>Property</th>
-                                    <th>property GUID</th>
+                                    <th>Modelo de dados</th>
+                                    <th>Versão</th>
+                                    <th>Propriedade</th>
+                                    <th>GUID de propriedade</th>
                                 </tr>
 
                                 @foreach ($rdinprop as $proprd)
 
                                 <tr>
-                                    <td> {{$proprd->pdtNameEn}}</td>
+                                    <td> {{$proprd->pdtNamePt}}</td>
                                     <td>{{$proprd->versionNumber}}.{{$proprd->revisionNumber}}</td>
-                                    <td>{{$proprd->nameEn}}</td>
+                                    <td>{{$proprd->namePt}}</td>
                                     <td>{{$proprd->GUID}}</td>
                                 </tr>
 

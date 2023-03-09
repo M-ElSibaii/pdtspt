@@ -150,7 +150,7 @@ class GroupofpropertiesController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => 400,
-                'errors' => 'The feedback field is required.'
+                'errors' => 'O campo de feedback é obrigatório.'
             ]);
         } else {
             $propertyId = $request->input('properties_Id');
@@ -208,7 +208,7 @@ class GroupofpropertiesController extends Controller
 
             return response()->json([
                 'status' => 200,
-                'message' => 'Feedback added successfully.',
+                'message' => 'Feedback adicionado com sucesso.',
                 'comment' => $comment,
 
             ]);
@@ -228,7 +228,7 @@ class GroupofpropertiesController extends Controller
             $Answer->users_id = Auth::user()->id;
             $Answer->save();
         }
-        return redirect()->back()->with('success', 'Answers saved successfully');
+        return redirect()->back()->with('success', 'Respostas guardadas com sucesso');
     }
     public function fetchfeedback($propertyId)
     {
@@ -247,13 +247,13 @@ class GroupofpropertiesController extends Controller
             $comment->delete();
             return response()->json([
                 'status' => 200,
-                'message' => 'Feedback Deleted Successfully.',
+                'message' => 'Feedback Apagado com Sucesso.',
                 'comment_id' => $commentId
             ]);
         } else {
             return response()->json([
                 'status' => 404,
-                'message' => 'No Feedback Found.'
+                'message' => 'Não foi encontrado feedback.'
             ]);
         }
     }

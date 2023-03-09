@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Product Data Templates') }}
+            {{ __('Os Modelos de Dados dos Produtos') }}
         </h2>
     </x-slot>
     <main class="flex-shrink-0">
@@ -17,7 +17,7 @@
                                     <div class="card-body">
                                         <div class="card-title">
                                             <strong>
-                                                {{ $pdt->pdtNameEn }}
+                                                {{ $pdt->pdtNamePt }}
                                             </strong>
                                         </div>
                                     </div>

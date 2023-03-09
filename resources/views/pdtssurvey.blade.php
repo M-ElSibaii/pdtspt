@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Product Data Template survey and comments') }}
+            {{ __('Análises e comentários do Modelo de Dados do Produto') }}
         </h2>
     </x-slot>
 
@@ -56,41 +56,41 @@
                                                         @if (is_null($answers->where('properties_Id', $property->Id)->first()?->answer) OR $answers->where('properties_Id',$property->Id)->sortByDesc('created_at')->first()->answer == 'no_opinion')
                                                         <div class="form-check form-check-inline">
                                                             <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerYes-{{$property->Id}}" value="yes">
-                                                            <label class="form-check-label" for="answerYes-{{$property->Id}}"> Yes </label>
+                                                            <label class="form-check-label" for="answerYes-{{$property->Id}}"> Sim </label>
                                                         </div>
                                                         <div class="form-check form-check-inline">
                                                             <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerNo-{{$property->Id}}" value="no">
-                                                            <label class="form-check-label" for="answerNo-{{$property->Id}}"> No </label>
+                                                            <label class="form-check-label" for="answerNo-{{$property->Id}}"> Não </label>
                                                         </div>
                                                         <div class="form-check form-check-inline">
                                                             <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerNoOpinion-{{$property->Id}}" value="no_opinion" checked>
-                                                            <label class="form-check-label" for="answerNoOpinion-{{$property->Id}}"> No Opinion </label>
+                                                            <label class="form-check-label" for="answerNoOpinion-{{$property->Id}}"> Sem opinião </label>
                                                         </div>
                                                         @elseif ($answers->where('properties_Id',$property->Id)->sortByDesc('created_at')->first()->answer == 'no')
                                                         <div class="form-check form-check-inline">
                                                             <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerYes-{{$property->Id}}" value="yes">
-                                                            <label class="form-check-label" for="answerYes-{{$property->Id}}"> Yes </label>
+                                                            <label class="form-check-label" for="answerYes-{{$property->Id}}"> Sim </label>
                                                         </div>
                                                         <div class="form-check form-check-inline">
                                                             <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerNo-{{$property->Id}}" value="no" checked>
-                                                            <label class="form-check-label" for="answerNo-{{$property->Id}}"> No </label>
+                                                            <label class="form-check-label" for="answerNo-{{$property->Id}}"> Não </label>
                                                         </div>
                                                         <div class="form-check form-check-inline">
                                                             <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerNoOpinion-{{$property->Id}}" value="no_opinion">
-                                                            <label class="form-check-label" for="answerNoOpinion-{{$property->Id}}"> No Opinion </label>
+                                                            <label class="form-check-label" for="answerNoOpinion-{{$property->Id}}"> Sem opinião </label>
                                                         </div>
                                                         @elseif ($answers->where('properties_Id',$property->Id)->sortByDesc('created_at')->first()->answer == 'yes')
                                                         <div class="form-check form-check-inline">
                                                             <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerYes-{{$property->Id}}" value="yes" checked>
-                                                            <label class="form-check-label" for="answerYes-{{$property->Id}}"> Yes </label>
+                                                            <label class="form-check-label" for="answerYes-{{$property->Id}}"> Sim </label>
                                                         </div>
                                                         <div class="form-check form-check-inline">
                                                             <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerNo-{{$property->Id}}" value="no">
-                                                            <label class="form-check-label" for="answerNo-{{$property->Id}}"> No </label>
+                                                            <label class="form-check-label" for="answerNo-{{$property->Id}}"> Não </label>
                                                         </div>
                                                         <div class="form-check form-check-inline">
                                                             <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerNoOpinion-{{$property->Id}}" value="no_opinion">
-                                                            <label class="form-check-label" for="answerNoOpinion-{{$property->Id}}"> No Opinion </label>
+                                                            <label class="form-check-label" for="answerNoOpinion-{{$property->Id}}"> Sem opinião </label>
                                                         </div>
                                                         @endif
 
@@ -111,7 +111,7 @@
                                                                                 <div class="col">
 
                                                                                     <div class="row d-flex justify-content-center">
-                                                                                        <h4> Property feedback section </h4>
+                                                                                        <h4> Secção de feedback da propriedade </h4>
                                                                                     </div>
                                                                                     <div id="comments-section-{{ $property->Id }}" class="comment-form">
                                                                                         @foreach ($comments as $comment)
@@ -130,7 +130,7 @@
                                                                                                         <h5>{{$comment->user->name}}</h5>
                                                                                                         <span class="small d-block">{{$comment->created_at}}
                                                                                                             @if ($comment->user->name == Auth::user()->name )
-                                                                                                            <button type="button" style="color: red;" onclick="openDeleteModal('{{ $comment->id }}')" class="btn danger">Delete</button>
+                                                                                                            <button type="button" style="color: red;" onclick="openDeleteModal('{{ $comment->id }}')" class="btn danger">Apagar</button>
                                                                                                             @endif</span>
                                                                                                     </div>
                                                                                                 </div>
@@ -146,7 +146,7 @@
                                                                                     </div>
                                                                                     <div class="container">
                                                                                         <div data-property-id="{{ $property->Id }}">
-                                                                                            <button type="button" class="btn btn-primary float-end" onclick="openModal('{{$property->Id}}')">Add Feedback</button>
+                                                                                            <button type="button" class="btn btn-primary float-end" onclick="openModal('{{$property->Id}}')">Adicionar Feedback</button>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
@@ -168,7 +168,7 @@
                                 @endforeach
 
 
-                                <button type="button" class="btn btn-primary" id="saveButton">Save Answers</button>
+                                <button type="button" class="btn btn-primary" id="saveButton">Guardar Respostas</button>
 
 
                             </form>
@@ -196,8 +196,8 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary " data-bs-dismiss="modal" aria-label="Close">Close</button>
-                            <button type="button" id="add_feedback" data-id="" class="btn btn-primary " data-bs-dismiss="modal" aria-label="Close">Save</button>
+                            <button type="button" class="btn btn-secondary " data-bs-dismiss="modal" aria-label="Close">Fechar</button>
+                            <button type="button" id="add_feedback" data-id="" class="btn btn-primary " data-bs-dismiss="modal" aria-label="Close">Guardar</button>
                         </div>
                     </div>
                 </div>
@@ -208,16 +208,16 @@
                     <div class="modal-content">
                         @csrf
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Delete</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">Apagar</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <h4>Are you sure you want to delete feedback?</h4>
+                            <h4>Tem a certeza de que quer apagar o feedback?</h4>
                         </div>
                         <div class="modal-footer">
 
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" id="delete_feedback" data-id="" class="btn btn-primary" data-bs-dismiss="modal">Yes, delete</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                            <button type="button" id="delete_feedback" data-id="" class="btn btn-primary" data-bs-dismiss="modal">Sim, Apagar</button>
                         </div>
                     </div>
                 </div>
@@ -254,7 +254,7 @@
                 success: function(response) {
                     console.log(response);
                     $('#commentbodysection' + response.comment_id).remove();
-                    alert("Feedback deleted successfully!")
+                    alert("Feedback apagado com sucesso!")
 
                 }
             });
@@ -292,7 +292,7 @@
                 success: function(response) {
                     console.log(response);
                     if (response.status == 400) {
-                        alert('No content in the feedback. The feedback field is required')
+                        alert('Nenhum conteúdo no feedback. O campo de feedback é obrigatório')
                         // $('#save_msgList').html("");
                         // $('#save_msgList').addClass('alert alert-danger');
                         // $('#save_msgList').append('<li>The feedback field is required.</li>');
@@ -314,7 +314,8 @@
                                         <h5 style="margin-top: 8px;">&ensp;' + response.comment.body + '</h5>\
                                     </div>\
                                 </div>\
-                            </div>');
+                            </div>'
+                        );
                     }
                 }
             });

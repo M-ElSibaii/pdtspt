@@ -43,7 +43,7 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile information updated');
+        return Redirect::route('profile.edit')->with('status', 'Informação de perfil actualizada');
     }
 
 
@@ -62,7 +62,7 @@ class ProfileController extends Controller
             $request->user()->save();
         }
 
-        return Redirect::route('profile.edit')->with('photostatus', 'Profile photo updated');
+        return Redirect::route('profile.edit')->with('photostatus', 'Foto do perfil actualizada');
     }
     public function deletePhoto(Request $request)
     {
@@ -74,7 +74,7 @@ class ProfileController extends Controller
             $user->photo = null;
             $user->save();
 
-            return redirect()->back()->with('photodeletestatus', 'Profile photo deleted.');
+            return redirect()->back()->with('photodeletestatus', 'Foto do perfil apagada.');
         }
 
         return redirect()->back()->with('status', 'No photo to delete.');
@@ -84,7 +84,7 @@ class ProfileController extends Controller
         $user = $request->user();
         $user->subscribe = $request->input('subscribe');
         $user->save();
-        return redirect()->back()->with('subscribestatus', 'Subscription status updated.');
+        return redirect()->back()->with('subscribestatus', 'Estado de subscrição actualizado.');
     }
     /**
      * Delete the user's account.
