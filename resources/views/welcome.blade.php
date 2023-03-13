@@ -98,6 +98,7 @@
             </div>
             <br>
             <button class="btn btn-secondary" style="background-color: black;" href="{{route('dashboard')}}">Junte-se a nós &raquo;</button>
+            &emsp; &emsp; &emsp;<button class="btn btn-secondary" style="background-color: black;" href="{{route('participantes')}}">Participantes &raquo;</button>
         </div>
     </div>
 
