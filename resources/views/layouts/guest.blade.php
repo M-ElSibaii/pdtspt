@@ -33,6 +33,30 @@
         color: inherit;
         text-decoration: inherit
     }
+
+    .carousel-item img {
+        object-fit: cover;
+        /* ensure the image fills the container without changing aspect ratio */
+        height: 100%;
+        /* set the height of the image to 100% to ensure it fills the container */
+        width: 100%;
+        /* set the width of the image to 100% to ensure it fills the container */
+    }
+
+    .col-lg-4 {
+        text-align: center;
+        /* center the text and images inside the columns */
+    }
+
+    .col-lg-4 svg rect {
+        fill: #333;
+        /* make the background color of the placeholder image darker */
+    }
+
+    .col-lg-4 .btn-secondary {
+        background-color: lightslategray;
+        /* make the background color of the button darker */
+    }
 </style>
 
 <body class="font-sans text-gray-900 antialiased">

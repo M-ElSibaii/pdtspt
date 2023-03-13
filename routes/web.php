@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\ContactController;
-use App\Http\Controllers\CommentsController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductdatatemplatesController;
 use App\Http\Controllers\GroupofpropertiesController;
@@ -23,6 +23,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+
+
+
+Route::get('/apidoc', function () {
+    return view('apidoc');
+})->name('apidoc');
 
 Route::get('/privacypolicy', function () {
     return view('privacypolicy');
@@ -77,3 +83,7 @@ Route::get(
     '/referencedocumentview/{rdGUID}',
     [ReferencedocumentsController::class, 'getReferenceDocument']
 )->middleware(['auth'])->name('referencedocumentview');
+
+Route::get('/admin', [UserController::class, 'index'])->middleware(['auth'])->name('admin');
+
+Route::post('/admin/update', [UserController::class, 'updateUsers'])->middleware(['auth'])->name('update.users');

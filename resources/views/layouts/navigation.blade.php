@@ -4,16 +4,15 @@
         <div class="flex justify-between h-16">
             <div class="flex">
                 <!-- Logo -->
-                <div class="shrink-0 flex items-center">
+                <div class="space-x-8 sm:-my-px sm:ml-10 ">
                     <a href="{{ route('dashboard') }}">
-                        <div class="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200">
-                            <img src="{{ asset ('img/logoUminhoPdts.svg')}}" alt="Application logo" width="200 px" />
-
-                        </div>
+                        <img src="{{ asset ('img/logoUminhoPdts.svg')}}" alt="Application logo" width="170 px" style="padding-top: 5px; min-width: 170px;" />
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
+
+                @if (Route::has('login'))
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
                         {{ __('Home') }}
@@ -25,17 +24,48 @@
                         {{ __('PDTs') }}
                     </x-nav-link>
                 </div>
+                @auth
+                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                    <x-nav-link :href="route('apidoc')" :active="request()->routeIs('apidoc')">
+                        {{ __('Documentação API') }}
+                    </x-nav-link>
+                </div>
+                @else
+                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                    <x-nav-link :href="route('login')" :active="request()->routeIs('login')">
+                        {{ __('Log in') }}
+                    </x-nav-link>
+                </div>
+                @if (Route::has('register'))
+                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                    <x-nav-link :href="route('register')" :active="request()->routeIs('register')">
+                        {{ __('Registrar') }}
+                    </x-nav-link>
+                </div>
+                @endif
+                @endauth
 
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     <x-nav-link :href="route('contact.store')" :active="request()->routeIs('contact.store')">
                         {{ __('Contact-nos') }}
                     </x-nav-link>
                 </div>
+                @auth
+                @if (Auth::user()->isAdmin === 1)
+                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                    <x-nav-link :href="route('admin')" :active="request()->routeIs('admin')">
+                        {{ __('Admin') }}
+                    </x-nav-link>
+                </div>
+                @endif
+                @endauth
+                @endif
 
             </div>
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ml-6">
+                @auth
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
@@ -50,10 +80,12 @@
                                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                 </svg>
                             </div>
+
                         </button>
                     </x-slot>
-
+                    @endauth
                     <x-slot name="content">
+                        @auth
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Perfil') }}
                         </x-dropdown-link>
@@ -70,6 +102,7 @@
                                 {{ __('Log Out') }}
                             </x-dropdown-link>
                         </form>
+                        @endauth
                     </x-slot>
                 </x-dropdown>
             </div>
@@ -88,36 +121,55 @@
 
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
+        @if (Route::has('login'))
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">
                 {{ __('Home') }}
             </x-responsive-nav-link>
         </div>
+        @auth
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('PDTs') }}
             </x-responsive-nav-link>
         </div>
+        @else
+        <div class="pt-2 pb-3 space-y-1">
+            <x-responsive-nav-link :href="route('login')" :active="request()->routeIs('login')">
+                {{ __('Log in') }}
+            </x-responsive-nav-link>
+        </div>
+        @if (Route::has('register'))
+        <div class="pt-2 pb-3 space-y-1">
+            <x-responsive-nav-link :href="route('register')" :active="request()->routeIs('register')">
+                {{ __('Registrar') }}
+            </x-responsive-nav-link>
+        </div>
+        @endif
+        @endauth
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('contact.store')" :active="request()->routeIs('contact.store')">
                 {{ __('Contact-nos') }}
             </x-responsive-nav-link>
         </div>
-
+        @endif
         <!-- Responsive Settings Options -->
+        @auth
         <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
+
             <div class="px-4">
                 <div class="font-medium text-base text-gray-800 dark:text-gray-200">{{ Auth::user()->name }}</div>
                 <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
             </div>
 
             <div class="mt-3 space-y-1">
+
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Perfil') }}
                 </x-responsive-nav-link>
-                <x-dropdown-link :href="route('privacypolicy')">
+                <x-responsive-nav-link :href="route('privacypolicy')">
                     {{ __('Política de privacidade') }}
-                </x-dropdown-link>
+                </x-responsive-nav-link>
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -127,7 +179,9 @@
                         {{ __('Log Out') }}
                     </x-responsive-nav-link>
                 </form>
+
             </div>
         </div>
+        @endauth
     </div>
 </nav>

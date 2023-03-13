@@ -1,40 +1,153 @@
-<x-guest-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Contact-nos') }}
-        </h2>
-    </x-slot>
+<x-app-layout>
+    <div class="py-9">
+        <div class="max-w-8xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            <div class="p-4  mx-auto bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+                <div class="home content container">
+                    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+                        <ol class="carousel-indicators">
+                            <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+                            <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+                            <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+                        </ol>
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <a href="{{route('dashboard')}}">
+                                    <img class="d-block w-100" src="{{asset('/img/standard.png')}}" alt="First slide">
+                                </a>
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h3>A normalização dos dados na indústria da contrução está a caminho</h3>
+                                    <h5>Aqui tem acesso a modelos de dados de produtos normalizados abertos</h5>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <a href="{{route('apidoc')}}">
+                                    <img class="d-block w-100" src="{{asset('/img/apibackground.png')}}" alt="Second slide">
+                                </a>
+                                <div class="carousel-caption d-none d-md-block" style="background-color: rgba(0, 0, 0, 0.5);">
+                                    <h3>As API's são a chave para ligar a indústria</h3>
+                                    <h5>Obtenha acesso a todos os Modelos de Dados de Produtos através do nosso API</h5>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <a href="{{route('dashboard')}}">
+                                    <img class="d-block w-100" src="{{asset('/img/pdtpage.png')}}" alt="Third slide">
+                                </a>
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h3>Faz parte da digitalização em construção em Portugal</h3>
+                                    <h5>Ver, rever, adicionar feedback e descarregar modelos de dados do produto</h5>
+                                </div>
+                            </div>
+                        </div>
+                        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
 
 
+                    <!-- Marketing messaging and featurettes
+  ================================================== -->
+                    <!-- Wrap the rest of the page in another container to center all the content. -->
+                    <div class="container" style="padding-top: 40px">
+                        <div class="container marketing">
 
-    <div class="home_content container">
-        <div class="row">
-            <h1>Sobre</h1>
-            <p>A normalização é um dos pilares dos processos de implementação do BIM e é uma chave para melhorar a colaboração entre os atores da indústria. Um dos principais desafios no processo de normalização de dados para produtos de construção é a definição de informação relevante "não gráfica" e a sua nomenclatura. A definição destas informações de uma forma normalizada pode ser realizada através da utilização de Modelos de Dados de Produtos, também conhecidos como PDT (Product Data Templates). Embora existam algumas iniciativas a nível internacional para a definição de PDT, este é ainda um processo em amadurecimento, particularmente em face do recente aparecimento de normas internacionais como a ISO 23386 e a ISO 23387 que visam a normalização do processo de criação de PDT’s e da sua ligação através de dicionários de dados.</p>
-            <p>No contexto da comissão CT197 e dos projetos de investigação SECCLASS e REV@Construction, a equipa liderada pela Universidade do Minho está a iniciar esforços comuns para a criação de PDT a nível nacional e a descrevê-los em pormenor com o objetivo de mobilizar a indústria em geral. Serão tidos em conta vários recursos de dados, entre outros fatores, tais como os requisitos de interoperabilidade IFC, Regulamentos de Produtos de Construção (CPR), Declarações Ambientais de Produtos (EPD) e outras iniciativas de normalização. Estes esforços envolverão a consulta direta a vários intervenientes na cadeia de valor para assegurar que os PDT criados reúnam consenso generalizado na indústria AEC.</p>
-            <div class="image-container">
-                <a href="http://www.ct197.pt/" target="_blank" rel="noopener noreferrer"><img src="img/ct197-logo.png" alt="" style="height: 100px; margin-right: 50px;"></a>
-                <a href="https://secclass.pt/" target="_blank" rel="noopener noreferrer"><img src="img/SECClasS-Logo-Website.png" alt="" style="height: 90px; margin-right: 50px;"></a>
-                <a href="https://revconstruction.pt/" target="_blank" rel="noopener noreferrer"><img src="img/rev-logo-main-horizontal-dark.svg" alt="" style="height: 60px; margin-right: 20px;"></a>
+                            <!-- Three columns of text below the carousel -->
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <img class="bd-placeholder-img rounded-circle" width="140" height="140" src="{{asset('/img/downloadthumb.png')}}" alt="PDTs Downlaod">
+                                    <h2 class="fw-normal">PDTs Downlaod</h2>
+                                    <p>Pode descarregar qualquer um dos PDTs nos formatos:
+                                        CSV, XML, e JSON</p>
+                                    <p><a class="btn btn-secondary" href="{{route('dashboard')}}">Ver detalhes &raquo;</a></p>
+                                </div><!-- /.col-lg-4 -->
+                                <div class="col-lg-4">
+                                    <img class="bd-placeholder-img rounded-circle" width="140" height="140" src="{{asset('/img/surveythumb.png')}}" alt="PDTs Downlaod">
+                                    <h2 class="fw-normal">Análise de PDTs</h2>
+                                    <p>Dê o seu feedback sobre as propriedades e responda ao inquérito para nos ajudar a melhorá-lo</p>
+                                    <p><a class="btn btn-secondary" href="{{route('dashboard')}}">Ver detalhes &raquo;</a></p>
+                                </div><!-- /.col-lg-4 -->
+                                <div class="col-lg-4">
+                                    <img class="bd-placeholder-img rounded-circle" width="140" height="140" src="{{asset('/img/apithumb.png')}}" alt="PDTs Downlaod">
+                                    <h2 class="fw-normal">Ligar aos PDTs</h2>
+                                    <p>Utilize o nosso API para se ligar à sua aplicação web ou plugin</p>
+                                    <p><a class="btn btn-secondary" href="{{route('apidoc')}}">Ver detalhes &raquo;</a></p>
+                                </div><!-- /.col-lg-4 -->
+                            </div><!-- /.row -->
+                        </div>
+                    </div>
+
+                    <!-- START THE FEATURETTES -->
+
+                    <hr class="featurette-divider">
+
+                    <div class="row featurette">
+                        <div class="col-md-7">
+                            <h2 class="featurette-heading fw-normal lh-1">Sobre <span class="text-muted"> como esta iniciativa começou</span></h2>
+                            <p class="lead">
+                                A normalização é um dos pilares dos processos de implementação do BIM e é uma chave para melhorar a colaboração entre os atores da indústria. Um dos principais desafios no processo de normalização de dados para produtos de construção é a definição de informação relevante "não gráfica" e a sua nomenclatura. A definição destas informações de uma forma normalizada pode ser realizada através da utilização de Modelos de Dados de Produtos, também conhecidos como PDT (Product Data Templates). Embora existam algumas iniciativas a nível internacional para a definição de PDT, este é ainda um processo em amadurecimento, particularmente em face do recente aparecimento de normas internacionais como a ISO 23386 e a ISO 23387 que visam a normalização do processo de criação de PDT’s e da sua ligação através de dicionários de dados.
+                                No contexto da comissão CT197 e dos projetos de investigação SECCLASS e REV@Construction, a equipa liderada pela Universidade do Minho está a iniciar esforços comuns para a criação de PDT a nível nacional e a descrevê-los em pormenor com o objetivo de mobilizar a indústria em geral. Serão tidos em conta vários recursos de dados, entre outros fatores, tais como os requisitos de interoperabilidade IFC, Regulamentos de Produtos de Construção (CPR), Declarações Ambientais de Produtos (EPD) e outras iniciativas de normalização. Estes esforços envolverão a consulta direta a vários intervenientes na cadeia de valor para assegurar que os PDT criados reúnam consenso generalizado na indústria AEC.
+                            <div class="image-container">
+                                <a href="http://www.ct197.pt/" target="_blank" rel="noopener noreferrer"><img src="img/ct197-logo.png" alt="" style="height: 100px; "></a>
+                                <a href="https://secclass.pt/" target="_blank" rel="noopener noreferrer"><img src="img/SECClasS-Logo-Website.png" alt="" style="height: 90px; "></a>
+                                <a href="https://revconstruction.pt/" target="_blank" rel="noopener noreferrer"><img src="img/rev-logo-main-horizontal-dark.svg" alt="" style="height: 60px; "></a>
+                            </div>
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <img class="bd-placeholder-img rectangle" width="500" height="900" src="{{asset('/img/initiative.jpg')}}" alt="about">
+                        </div>
+                    </div>
+
+                    <hr class="featurette-divider">
+
+                    <div class="row featurette">
+                        <div class="col-md-7 order-md-2">
+                            <h2 class="featurette-heading fw-normal lh-1">O que são os PDTS? <span class="text-muted"> algo que irá mudar a forma como a indústria funciona</span></h2>
+                            <p class="lead">
+                                Um PDT pode simplificamente ser descrito como uma estrutura de dados que visa antecipar a informação necessária por todos os intervenientes envolvidos num determinado produto em todo o seu ciclo de vida. A criação de uma PDT envolve a recolha de dados de fontes como normas harmonizadas, conjuntos de propriedades IFC, Regulamento Ambiental de Produtos, Declaração de Desempenho, COBIE, e outras fontes relevantes.
+                                Uma vez que um PDT é preenchido por um utilizador, torna-se uma Ficha de Dados do Produto (PDS). Uma PDS pode ser utilizada pelo seu criador, como um fabricante, no seu website, objectos BIM, e bibliotecas de objectos online. O formato digital do PDS permite aos seus utilizadores automatizar as suas operações de dados e integrá-los sem problemas nos processos BIM.
+                            </p>
+                        </div>
+                        <div class="col-md-5 order-md-1">
+                            <img class="bd-placeholder-img rectangle" width="500" height="400" src="{{asset('/img/pdtsources.png')}}" alt="PDT">
+                        </div>
+                    </div>
+
+                    <hr class="featurette-divider">
+
+                    <div class="row featurette">
+                        <div class="col-md-7">
+                            <h2 class="featurette-heading fw-normal lh-1">Como pode ajudar? <span class="text-muted"> junte-se a nós</span></h2>
+                            <p class="lead">Cada actor da indústria da construção tem uma perspectiva sobre o tipo de dados que devem estar presentes num produto/sistema de construção. Assim, cada pessoa envolvida na indústria da construção pode contribuir para a especificação das propriedades dos produtos de construção.
+                                Esta iniciativa dá-lhe a oportunidade de ser ouvido/a, e de a sua opinião ser tida em conta. Uma vez registado/a nesta plataforma, terá acesso a uma variedade de Modelos de Dados de Produtos de diferentes produtos de construção. Tudo o que tem de fazer é responder ao questionário e partilhar o seu feedback para contribuir na criação de Modelos de Dados de Produtos para produtos de construção na indústria portuguesa.
+                            </p>
+                        </div>
+                        <div class="col-md-5">
+                            <img class="bd-placeholder-img rectangle" width="500" height="300" src="{{asset('/img/surveyphoto.jpg')}}" alt="Survey">
+                        </div>
+                    </div>
+
+                    <hr class="featurette-divider">
+
+                    <!-- /END THE FEATURETTES -->
+
+                </div><!-- /.container -->
+
+
+                <!-- FOOTER -->
+                <footer class="container">
+                    <p class="float-end"><a href="#">Back to top</a></p>
+                    <p>&copy; © 2021 UMinho. All rights reserved &middot; <a href="{{route('privacypolicy')}}"> Política de privacidade</a></p>
+                </footer>
             </div>
-            <br>
-
-            <h2>O que são os PDTS?</h2>
-            <p>Um PDT pode simplificamente ser descrito como uma estrutura de dados que visa antecipar a informação necessária por todos os intervenientes envolvidos num determinado produto em todo o seu ciclo de vida. A criação de uma PDT envolve a recolha de dados de fontes como normas harmonizadas, conjuntos de propriedades IFC, Regulamento Ambiental de Produtos, Declaração de Desempenho, COBIE, e outras fontes relevantes.</p>
-            <p>Uma vez que um PDT é preenchido por um utilizador, torna-se uma Ficha de Dados do Produto (PDS). Uma PDS pode ser utilizada pelo seu criador, como um fabricante, no seu website, objectos BIM, e bibliotecas de objectos online. O formato digital do PDS permite aos seus utilizadores automatizar as suas operações de dados e integrá-los sem problemas nos processos BIM.</p>
-
-            <h2>Como pode ajudar?</h2>
-            <p>Cada actor da indústria da construção tem uma perspectiva sobre o tipo de dados que devem estar presentes num produto/sistema de construção. Assim, cada pessoa envolvida na indústria da construção pode contribuir para a especificação das propriedades dos produtos de construção.</p>
-            <p>Esta iniciativa dá-lhe a oportunidade de ser ouvido/a, e de a sua opinião ser tida em conta. Uma vez registado/a nesta plataforma, terá acesso a uma variedade de Modelos de Dados de Produtos de diferentes produtos de construção. Tudo o que tem de fazer é responder ao questionário e partilhar o seu feedback para contribuir na criação de Modelos de Dados de Produtos para produtos de construção na indústria portuguesa.</p>
         </div>
     </div>
-
-
-    <div class="ml-4 text-center text-sm text-gray-500 sm:text-right sm:ml-0">
-        © 2021 UMinho. All rights reserved.
-        <p></p>
     </div>
 
 
 
-</x-guest-layout>
+</x-app-layout>

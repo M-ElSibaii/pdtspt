@@ -53,48 +53,24 @@
 
                                                     <div class="form-group">
                                                         @csrf
-                                                        @if (is_null($answers->where('properties_Id', $property->Id)->first()?->answer) OR $answers->where('properties_Id',$property->Id)->sortByDesc('created_at')->first()->answer == 'no_opinion')
+                                                        @php
+                                                        $answer = $answers->where('properties_Id', $property->Id)->sortByDesc('created_at')->first();
+                                                        $yesChecked = $answer && $answer->answer == 'yes' ? 'checked' : '';
+                                                        $noChecked = $answer && $answer->answer == 'no' ? 'checked' : '';
+                                                        $noOpinionChecked = !$answer || $answer->answer == 'no_opinion' ? 'checked' : '';
+                                                        @endphp
                                                         <div class="form-check form-check-inline">
-                                                            <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerYes-{{$property->Id}}" value="yes">
-                                                            <label class="form-check-label" for="answerYes-{{$property->Id}}"> Sim </label>
+                                                            <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerYes-{{$property->Id}}" value="yes" {{$yesChecked}}>
+                                                            <label class="form-check-label" for="answerYes-{{$property->Id}}">Sim</label>
                                                         </div>
                                                         <div class="form-check form-check-inline">
-                                                            <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerNo-{{$property->Id}}" value="no">
-                                                            <label class="form-check-label" for="answerNo-{{$property->Id}}"> Não </label>
+                                                            <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerNo-{{$property->Id}}" value="no" {{$noChecked}}>
+                                                            <label class="form-check-label" for="answerNo-{{$property->Id}}">Não</label>
                                                         </div>
                                                         <div class="form-check form-check-inline">
-                                                            <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerNoOpinion-{{$property->Id}}" value="no_opinion" checked>
-                                                            <label class="form-check-label" for="answerNoOpinion-{{$property->Id}}"> Sem opinião </label>
+                                                            <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerNoOpinion-{{$property->Id}}" value="no_opinion" {{$noOpinionChecked}}>
+                                                            <label class="form-check-label" for="answerNoOpinion-{{$property->Id}}">Sem opinião</label>
                                                         </div>
-                                                        @elseif ($answers->where('properties_Id',$property->Id)->sortByDesc('created_at')->first()->answer == 'no')
-                                                        <div class="form-check form-check-inline">
-                                                            <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerYes-{{$property->Id}}" value="yes">
-                                                            <label class="form-check-label" for="answerYes-{{$property->Id}}"> Sim </label>
-                                                        </div>
-                                                        <div class="form-check form-check-inline">
-                                                            <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerNo-{{$property->Id}}" value="no" checked>
-                                                            <label class="form-check-label" for="answerNo-{{$property->Id}}"> Não </label>
-                                                        </div>
-                                                        <div class="form-check form-check-inline">
-                                                            <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerNoOpinion-{{$property->Id}}" value="no_opinion">
-                                                            <label class="form-check-label" for="answerNoOpinion-{{$property->Id}}"> Sem opinião </label>
-                                                        </div>
-                                                        @elseif ($answers->where('properties_Id',$property->Id)->sortByDesc('created_at')->first()->answer == 'yes')
-                                                        <div class="form-check form-check-inline">
-                                                            <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerYes-{{$property->Id}}" value="yes" checked>
-                                                            <label class="form-check-label" for="answerYes-{{$property->Id}}"> Sim </label>
-                                                        </div>
-                                                        <div class="form-check form-check-inline">
-                                                            <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerNo-{{$property->Id}}" value="no">
-                                                            <label class="form-check-label" for="answerNo-{{$property->Id}}"> Não </label>
-                                                        </div>
-                                                        <div class="form-check form-check-inline">
-                                                            <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerNoOpinion-{{$property->Id}}" value="no_opinion">
-                                                            <label class="form-check-label" for="answerNoOpinion-{{$property->Id}}"> Sem opinião </label>
-                                                        </div>
-                                                        @endif
-
-
                                                     </div>
 
                                                     feedbacks ({{ \App\Models\comments::where('properties_Id', $property->Id)->whereNull('parent_id')->count() }})

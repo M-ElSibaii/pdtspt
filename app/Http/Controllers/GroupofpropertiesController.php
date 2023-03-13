@@ -215,21 +215,39 @@ class GroupofpropertiesController extends Controller
         }
     }
 
-
     public function saveAnswers(Request $request)
     {
+        $userId = Auth::user()->id;
 
-        $answers = $request->input('answers');
-        foreach ($answers as $answer) {
-            $answer = json_decode($answer);
-            $Answer = new Answers;
-            $Answer->answer = $answer->answer;
-            $Answer->properties_Id = $answer->propertyId;
-            $Answer->users_id = Auth::user()->id;
-            $Answer->save();
+        foreach ($request->input('answers') as $answerData) {
+            $answer = json_decode($answerData);
+
+            // Check if there are existing answers for this property and user
+            $existingAnswer = Answers::where('users_id', $userId)
+                ->where('properties_id', $answer->propertyId)
+                ->first();
+
+            if ($existingAnswer) {
+                // An answer already exists for this property and user
+                if ($existingAnswer->answer != $answer->answer) {
+                    // The submitted answer is different, so update the existing answer
+                    $existingAnswer->answer = $answer->answer;
+                    $existingAnswer->save();
+                }
+            } else {
+                // No existing answer for this property and user, so create a new answer
+                $newAnswer = new Answers;
+                $newAnswer->answer = $answer->answer;
+                $newAnswer->properties_id = $answer->propertyId;
+                $newAnswer->users_id = $userId;
+                $newAnswer->save();
+            }
         }
+
         return redirect()->back()->with('success', 'Respostas guardadas com sucesso');
     }
+
+
     public function fetchfeedback($propertyId)
     {
 
