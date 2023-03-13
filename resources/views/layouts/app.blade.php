@@ -106,6 +106,14 @@
             -webkit-overflow-scrolling: touch;
         }
 
+        .card {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+        }
+
         .image-container {
             display: flex;
             flex-wrap: nowrap;
@@ -113,7 +121,7 @@
         }
 
         .image-container img {
-            margin: 100 50px;
+            margin: 0 30px;
             /* optional: add some spacing between the images */
             max-width: 100%;
             height: auto;
@@ -219,6 +227,10 @@
             color: black;
             background-color: transparent;
             text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: gray !important;
         }
 
         .ac-input:checked~.ac-text,

@@ -30,6 +30,10 @@ Route::get('/apidoc', function () {
     return view('apidoc');
 })->name('apidoc');
 
+Route::get('/partners', function () {
+    return view('partners');
+})->name('partners');
+
 Route::get('/privacypolicy', function () {
     return view('privacypolicy');
 })->name('privacypolicy');
