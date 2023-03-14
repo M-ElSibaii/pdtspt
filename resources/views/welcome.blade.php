@@ -1,35 +1,66 @@
 <x-app-layout>
+    <style>
+        .carousel-item {
+            height: 32rem;
+            background: #777;
+            color: white;
+            position: relative;
+            
+        }
+        .container-slider{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding-bottom: 50px;
+        }
+        .overlay-image{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            top: 0;
+            background-position: center;
+            background-size: cover; 
+            opacity: 0.5;
+        }
+    </style>
     <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
         <ol class="carousel-indicators">
             <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
             <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
             <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
         </ol>
+        
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <div class="backgroung-overlay" style="backgroung-image: url({{asset('/img/standard.png')}});"></div>  
-                <div class="carousel-caption d-none d-md-block">
-                    <h3>A normalização dos dados na indústria da contrução está a caminho</h3>
-                    <h5>Aqui tem acesso a modelos de dados de produtos normalizados abertos</h5>
-                    <a class="btn btn-secondary" href="{{route('dashboard')}}">Ver PDTs</a>
+                <div class="container-slider">
+                    <div class="overlay-image" style="backgroung-image: url({{asset('/img/standard.png')}});"></div>  
+                    <div class="carousel-caption d-none d-md-block">
+                        <h3>A normalização dos dados na indústria da contrução está a caminho</h3>
+                        <h5>Aqui tem acesso a modelos de dados de produtos normalizados abertos</h5>
+                        <a class="btn btn-secondary" href="{{route('dashboard')}}">Ver PDTs</a>
+                    </div>
                 </div>
             </div>
             <div class="carousel-item">
-                <a href="{{route('apidoc')}}">
-                    <img class="d-block w-100" src="{{asset('/img/apibackground.png')}}" alt="Second slide">
-                </a>
-                <div class="carousel-caption d-none d-md-block" style="background-color: rgba(0, 0, 0, 0.5);">
-                    <h3>As API's são a chave para ligar a indústria</h3>
-                    <h5>Obtenha acesso a todos os Modelos de Dados de Produtos através do nosso API</h5>
+                <div class="container-slider">
+                    <div class="overlay-image" style="backgroung-image: url({{asset('/img/apibackground.png')}});"></div>  
+                    <div class="carousel-caption d-none d-md-block">
+                        <h3>As API's são a chave para ligar a indústria</h3>
+                        <h5>Obtenha acesso a todos os Modelos de Dados de Produtos através do nosso API</h5>
+                        <a class="btn btn-secondary" href="{{route('apidoc')}}">Documentação</a>
+                    </div>
                 </div>
             </div>
             <div class="carousel-item">
-                <a href="{{route('dashboard')}}">
-                    <img class="d-block w-100" src="{{asset('/img/pdtpage.png')}}" alt="Third slide">
-                </a>
-                <div class="carousel-caption d-none d-md-block">
-                    <h3>Faz parte da digitalização em construção em Portugal</h3>
-                    <h5>Ver, rever, adicionar feedback e descarregar modelos de dados do produto</h5>
+                <div class="container-slider">
+                    <div class="overlay-image" style="backgroung-image: url({{asset('/img/pdtpage.png')}});"></div>  
+                    <div class="carousel-caption d-none d-md-block">
+                        <h3>Faz parte da digitalização em construção em Portugal</h3>
+                        <h5>Ver, rever, adicionar feedback e descarregar modelos de dados do produto</h5>
+                        <a class="btn btn-secondary" href="{{route('dashboard')}}">Participar</a>
+                    </div>
                 </div>
             </div>
         </div>
