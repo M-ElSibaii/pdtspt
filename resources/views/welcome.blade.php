@@ -7,12 +7,11 @@
         </ol>
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <a href="{{route('dashboard')}}">
-                    <img class="d-block w-100" src="{{asset('/img/standard.png')}}" alt="First slide">
-                </a>
+                <div class="backgroung-overlay" style="backgroung-image: url({{asset('/img/standard.png')}});"></div>  
                 <div class="carousel-caption d-none d-md-block">
                     <h3>A normalização dos dados na indústria da contrução está a caminho</h3>
                     <h5>Aqui tem acesso a modelos de dados de produtos normalizados abertos</h5>
+                    <a class="btn btn-secondary" href="{{route('dashboard')}}">Ver PDTs</a>
                 </div>
             </div>
             <div class="carousel-item">
