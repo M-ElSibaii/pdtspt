@@ -11,30 +11,27 @@
                         </ol>
                         <div class="carousel-inner">
                             <div class="carousel-item active">
-                                <a href="{{route('dashboard')}}">
-                                    <img class="d-block w-100" src="{{asset('/img/standard.png')}}" alt="First slide">
-                                </a>
+                                <div class="background-overlay" style="background-image: url({{asset('/img/standard.png')}});"></div>
                                 <div class="carousel-caption d-none d-md-block">
                                     <h3>A normalização dos dados na indústria da contrução está a caminho</h3>
                                     <h5>Aqui tem acesso a modelos de dados de produtos normalizados abertos</h5>
+                                    <a class="btn btn-secondary" href="{{route('dashboard')}}">Ver PDTs</a>
                                 </div>
                             </div>
                             <div class="carousel-item">
-                                <a href="{{route('apidoc')}}">
-                                    <img class="d-block w-100" src="{{asset('/img/apibackground.png')}}" alt="Second slide">
-                                </a>
+                                <div class="background-overlay" style="background-image: url({{asset('/img/apibackground.png')}});"></div>
                                 <div class="carousel-caption d-none d-md-block" style="background-color: rgba(0, 0, 0, 0.5);">
                                     <h3>As API's são a chave para ligar a indústria</h3>
                                     <h5>Obtenha acesso a todos os Modelos de Dados de Produtos através do nosso API</h5>
+                                    <a class="btn btn-secondary" href="{{route('apidoc')}}">Documentação</a>
                                 </div>
                             </div>
                             <div class="carousel-item">
-                                <a href="{{route('dashboard')}}">
-                                    <img class="d-block w-100" src="{{asset('/img/pdtpage.png')}}" alt="Third slide">
-                                </a>
+                                <div class="background-overlay" style="background-image: url({{asset('/img/pdtpage.png')}});"></div>
                                 <div class="carousel-caption d-none d-md-block">
                                     <h3>Faz parte da digitalização em construção em Portugal</h3>
                                     <h5>Ver, rever, adicionar feedback e descarregar modelos de dados do produto</h5>
+                                    <a class="btn btn-secondary" href="{{route('dashboard')}}">Participar</a>
                                 </div>
                             </div>
                         </div>
@@ -52,7 +49,7 @@
                     <!-- Marketing messaging and featurettes
   ================================================== -->
                     <!-- Wrap the rest of the page in another container to center all the content. -->
-                    <div class="container" style="padding-top: 40px">
+                    <div class="container" style="padding-top: 100px; padding-bottom: 100px;">
                         <div class="container marketing">
 
                             <!-- Three columns of text below the carousel -->
@@ -82,7 +79,21 @@
 
                     <!-- START THE FEATURETTES -->
 
-                    <hr class="featurette-divider">
+                    <div class="row featurette">
+                        <div class="col-md-7 order-md-2">
+                            <h2 class="featurette-heading fw-normal lh-1">O que são os PDTS?</h2>
+                            <h4 class="text-muted"> algo que irá mudar a forma como a indústria funciona</h4>
+                            <p class="lead">
+                                Um PDT pode simplificamente ser descrito como uma estrutura de dados que visa antecipar a informação necessária por todos os intervenientes envolvidos num determinado produto em todo o seu ciclo de vida. A criação de uma PDT envolve a recolha de dados de fontes como normas harmonizadas, conjuntos de propriedades IFC, Regulamento Ambiental de Produtos, Declaração de Desempenho, COBIE, e outras fontes relevantes.
+                                Uma vez que um PDT é preenchido por um utilizador, torna-se uma Ficha de Dados do Produto (PDS). Uma PDS pode ser utilizada pelo seu criador, como um fabricante, no seu website, objectos BIM, e bibliotecas de objectos online. O formato digital do PDS permite aos seus utilizadores automatizar as suas operações de dados e integrá-los sem problemas nos processos BIM.
+                            </p>
+                        </div>
+                        <div class="col-md-5 order-md-1">
+                            <img class="bd-placeholder-img rectangle" width="500" height="400" src="{{asset('/img/pdtsources.png')}}" alt="PDT">
+                        </div>
+                    </div>
+
+                    {{-- <hr class="featurette-divider"> --}}
 
                     <div class="row featurette">
                         <div class="col-md-7">
@@ -102,22 +113,7 @@
                         </div>
                     </div>
 
-                    <hr class="featurette-divider">
-
-                    <div class="row featurette">
-                        <div class="col-md-7 order-md-2">
-                            <h2 class="featurette-heading fw-normal lh-1">O que são os PDTS? <span class="text-muted"> algo que irá mudar a forma como a indústria funciona</span></h2>
-                            <p class="lead">
-                                Um PDT pode simplificamente ser descrito como uma estrutura de dados que visa antecipar a informação necessária por todos os intervenientes envolvidos num determinado produto em todo o seu ciclo de vida. A criação de uma PDT envolve a recolha de dados de fontes como normas harmonizadas, conjuntos de propriedades IFC, Regulamento Ambiental de Produtos, Declaração de Desempenho, COBIE, e outras fontes relevantes.
-                                Uma vez que um PDT é preenchido por um utilizador, torna-se uma Ficha de Dados do Produto (PDS). Uma PDS pode ser utilizada pelo seu criador, como um fabricante, no seu website, objectos BIM, e bibliotecas de objectos online. O formato digital do PDS permite aos seus utilizadores automatizar as suas operações de dados e integrá-los sem problemas nos processos BIM.
-                            </p>
-                        </div>
-                        <div class="col-md-5 order-md-1">
-                            <img class="bd-placeholder-img rectangle" width="500" height="400" src="{{asset('/img/pdtsources.png')}}" alt="PDT">
-                        </div>
-                    </div>
-
-                    <hr class="featurette-divider">
+                    {{-- <hr class="featurette-divider"> --}}
 
                     <div class="row featurette">
                         <div class="col-md-7">
