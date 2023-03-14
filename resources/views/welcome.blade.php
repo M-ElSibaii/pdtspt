@@ -8,10 +8,6 @@
             
         }
         .container-slider{
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
             padding-bottom: 50px;
         }
         .overlay-image{
