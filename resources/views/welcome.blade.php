@@ -35,7 +35,7 @@
         <div class="carousel-inner">
             <div class="carousel-item active">
                 <div class="container-slider">
-                    <div class="overlay-image" style="backgroung-image: url({{asset('/img/standard.png')}});"></div>  
+                    <div class="overlay-image" style="background-image: url({{asset('/img/standard.png')}});"></div>  
                     <div class="carousel-caption d-none d-md-block">
                         <h3>A normalização dos dados na indústria da contrução está a caminho</h3>
                         <h5>Aqui tem acesso a modelos de dados de produtos normalizados abertos</h5>
@@ -45,7 +45,7 @@
             </div>
             <div class="carousel-item">
                 <div class="container-slider">
-                    <div class="overlay-image" style="backgroung-image: url({{asset('/img/apibackground.png')}});"></div>  
+                    <div class="overlay-image" style="background-image: url({{asset('/img/apibackground.png')}});"></div>  
                     <div class="carousel-caption d-none d-md-block">
                         <h3>As API's são a chave para ligar a indústria</h3>
                         <h5>Obtenha acesso a todos os Modelos de Dados de Produtos através do nosso API</h5>
@@ -55,7 +55,7 @@
             </div>
             <div class="carousel-item">
                 <div class="container-slider">
-                    <div class="overlay-image" style="backgroung-image: url({{asset('/img/pdtpage.png')}});"></div>  
+                    <div class="overlay-image" style="background-image: url({{asset('/img/pdtpage.png')}});"></div>  
                     <div class="carousel-caption d-none d-md-block">
                         <h3>Faz parte da digitalização em construção em Portugal</h3>
                         <h5>Ver, rever, adicionar feedback e descarregar modelos de dados do produto</h5>
