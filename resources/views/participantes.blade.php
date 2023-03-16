@@ -1,70 +1,84 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Participantes ') }}
-        </h2>
-    </x-slot>
-
-    <div class="py-9">
-        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4  mx-auto bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-
-                <!-- Client 1 - HCF Bootstrap 5 Component -->
-
-                <section class="bg-light py-5 py-xl-6">
-                    <div class="container mb-5 mb-md-6">
-                        <div class="row justify-content-md-center">
-                            <div class="col-12 col-md-10 col-lg-8 col-xl-7 col-xxl-6 text-center">
-                                <h2 class="mb-4 display-5" style="color: black;">Instituições envolvidas</h2>
-                                <hr class="w-50 mx-auto mb-0 text-secondary">
-                            </div>
-                        </div>
+    <div style="background-color: white;">
+        <div class="container py-9">
+            <h1>Participantes</h1>
+            <div class="py-10">
+                <h2 class="pb-1.5 border-b">Instituições</h2>
+                <div class="flex flex-row gap-6 py-6">
+                    <div class="basis-1/4">
+                        <a class="content-center" href="https://www.uminho.pt/PT" target="_blank" rel="noopener noreferrer">
+                            <img class="h-[100px] w-auto transition duration-300 ease-in-out hover:shadow-lg" src="img/Uminho.svg" alt="" >
+                        </a>
                     </div>
-                    <div class="container overflow-hidden">
-                        <div class="row gy-5 gy-md-6">
-                            <div class="col-6 col-md-3 align-self-center text-center">
-                                <a href="https://secclass.pt/" target="_blank" rel="noopener noreferrer"><img src="img/SECClasS-Logo-Website.png" alt="" style="height: 90px; "></a>
-                            </div>
-                            <div class="col-6 col-md-3 align-self-center text-center">
-                                <a href="https://revconstruction.pt/" target="_blank" rel="noopener noreferrer"><img src="img/rev-logo-main-horizontal-dark.svg" alt="" style="height: 80px; "></a>
-                            </div>
-                            <div class="col-6 col-md-3 align-self-center text-center">
-                                <a href="http://www.ct197.pt/" target="_blank" rel="noopener noreferrer"><img src="img/ct197-logo.png" alt="" style="height: 100px; "></a>
-                            </div>
-                            <div class="col-6 col-md-3 align-self-center text-center">
-                                <a href="https://www.uminho.pt/PT" target="_blank" rel="noopener noreferrer"><img src="img/Uminho.svg" alt="" style="height: 100px; "></a>
-                            </div>
-                        </div>
-                </section>
-                <section class="bg-light py-5 py-xl-6">
-                    <div class="container mb-5 mb-md-6">
-                        <div class="row justify-content-md-center">
-                            <div class="col-12 col-md-10 col-lg-8 col-xl-7 col-xxl-6 text-center">
-                                <h2 class="mb-4 display-5" style="color: black;">Financiamento</h2>
-                                <hr class="w-50 mx-auto mb-0 text-secondary">
-                            </div>
-                        </div>
+                </div>
+            </div>
+            <div class="py-10">
+
+                <h2 class="pb-1.5 border-b">Associações e iniciativas</h2>
+                <div class="flex flex-row gap-6 py-6">
+                    <div class="basis-1/4">
+                        <a class="content-center" href="http://www.ct197.pt/" target="_blank" rel="noopener noreferrer">
+                            <img class="h-[100px] w-auto transition duration-300 ease-in-out hover:shadow-lg" src="img/ct197-logo.png" alt="" >
+                        </a>
                     </div>
-                    <div class="container overflow-hidden">
-                        <div class="row gy-5 gy-md-6">
-                            <div class="col-6 col-md-3 align-self-center text-center">
-                                <a href="https://www.mitportugal.org/" target="_blank" rel="noopener noreferrer"><img src="img/mitportugal.png" alt="" style="height: 45px; "></a>
-                            </div>
-                            <div class="col-6 col-md-3 align-self-center text-center">
-                                <a href="https://www.fct.pt/en/" target="_blank" rel="noopener noreferrer"><img src="img/fct.svg" alt="" style="height: 60px; "></a>
-                            </div>
-                        </div>
-                </section>
+                </div>
+            </div>
+            <div class="py-10">
+
+                <h2 class="pb-1.5 border-b">Projetos I&D</h2>
+                <div class="flex flex-row gap-6 py-6">
+                    <div class="basis-1/4">
+                        <a class="content-center" href="https://secclass.pt/" target="_blank" rel="noopener noreferrer">
+                            <img class="h-[90px] w-auto transition duration-300 ease-in-out hover:shadow-lg" src="img/SECClasS-Logo-Website.png" alt="" >
+                        </a>
+                    </div>
+                    <div class="basis-1/4">
+                        <a class="content-center" href="https://revconstruction.pt/" target="_blank" rel="noopener noreferrer">
+                            <img class="h-[80px] w-auto transition duration-300 ease-in-out hover:shadow-lg" src="img/rev-logo-main-horizontal-dark.svg" alt="" >
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="py-10">
+                <h2 class="pb-1.5 border-b">Financiamento</h2>
+                <div class="flex flex-row gap-6 py-6">
+                    <div class="basis-1/4">
+                        <a class="content-center" href="https://www.fct.pt/" target="_blank" rel="noopener noreferrer">
+                            <img class="h-[60px] w-auto transition duration-300 ease-in-out hover:shadow-lg" src="img/fct.svg" alt="" >
+                        </a>
+                    </div>
+                    <div class="basis-1/16">
+                        <a class="content-center" href="https://revconstruction.pt/" target="_blank" rel="noopener noreferrer">
+                            <img class="h-[80px] w-auto transition duration-300 ease-in-out hover:shadow-lg" src="img/Lisboa2020.svg" alt="" >
+                        </a>
+                    </div>
+                    <div class="basis-1/16">
+                        <a class="content-center" href="https://revconstruction.pt/" target="_blank" rel="noopener noreferrer">
+                            <img class="h-[80px] w-auto transition duration-300 ease-in-out hover:shadow-lg" src="img/Lisboa2020.svg" alt="" >
+                        </a>
+                    </div>
+                    <div class="basis-1/16">
+                        <a class="content-center" href="https://revconstruction.pt/" target="_blank" rel="noopener noreferrer">
+                            <img class="h-[80px] w-auto transition duration-300 ease-in-out hover:shadow-lg" src="img/Lisboa2020.svg" alt="" >
+                        </a>
+                    </div>
+                    <div class="basis-1/16">
+                        <a class="content-center" href="https://revconstruction.pt/" target="_blank" rel="noopener noreferrer">
+                            <img class="h-[80px] w-auto transition duration-300 ease-in-out hover:shadow-lg" src="img/Lisboa2020.svg" alt="" >
+                        </a>
+                    </div>
+                    <div class="basis-1/4">
+                        <a class="content-center" href="https://eeagrants.org/" target="_blank" rel="noopener noreferrer">
+                            <img class="h-[100px] w-auto transition duration-300 ease-in-out hover:shadow-lg" src="img/EEA_grants.png" alt="" >
+                        </a>
+                    </div>
+                    <div class="basis-1/4">
+                        <a class="content-center" href="https://www.mitportugal.org/" target="_blank" rel="noopener noreferrer">
+                            <img class="h-[45px] w-auto transition duration-300 ease-in-out hover:shadow-lg" src="img/mitportugal.png" alt="" >
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
-
     </div>
-
-
-    <div class="ml-2 text-center text-sm text-gray-500 sm:text-right sm:ml-0">
-        © 2021 UMinho. All rights reserved. <a href="{{route('privacypolicy')}}"> Política de privacidade</a>
-        <p></p>
-    </div>
-
-
 </x-app-layout>
