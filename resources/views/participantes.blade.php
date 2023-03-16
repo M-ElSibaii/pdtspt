@@ -18,7 +18,7 @@
                 <div class="grid grid-cols-6 gap-6 py-6">
                     <div class="content-center">
                         <a class="content-center" href="http://www.ct197.pt/" target="_blank" rel="noopener noreferrer">
-                            <img class="h-auto w-auto max-h-[100px] max-w-[180px] transition duration-300 ease-in-out hover:shadow-lg" src="img/ct197-logo.png" alt="" >
+                            <img class="h-auto w-auto max-h-[100px] max-w-[180px] transition duration-300 ease-in-out hover:shadow-lg" src="img/ct197.png" alt="" >
                         </a>
                     </div>
                 </div>

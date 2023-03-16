@@ -73,15 +73,15 @@
                     <br>
                 </p>
                 <br>
-                <div class="image-container grid-cols-3">
+                <div class="image-container grid-cols-3 content-center">
                     <a href="http://www.ct197.pt/" target="_blank" rel="noopener noreferrer">
-                        <img class="inline-block align-middle" src="img/ct197-logo.png" alt="" style="height: 70px; ">
+                        <img class="inline-block align-middle" src="img/ct197.png" alt="" style="height: 70px; ">
                     </a>
                     <a href="https://secclass.pt/" target="_blank" rel="noopener noreferrer">
                         <img class="inline-block align-middle" src="img/SECClasS-Logo-Website.png" alt="" style="height: 60px; ">
                     </a>
                     <a href="https://revconstruction.pt/" target="_blank" rel="noopener noreferrer">
-                        <img class="inline-block align-middle" src="img/rev-logo-main-horizontal-dark.svg" alt="" style="height: 40px; ">
+                        <img class="inline-block align-middle" src="img/rev-construction-v.png" alt="" style="height: 60px; ">
                     </a>
                 </div>
                 <br>
