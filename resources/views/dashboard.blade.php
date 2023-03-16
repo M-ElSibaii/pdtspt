@@ -1,43 +1,53 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Os Modelos de Dados dos Produtos') }}
-        </h2>
-    </x-slot>
-    <main class="flex-shrink-0">
-        <div class="py-9">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                    <div class="home_content container">
-                        <div class="row row-cols-1 row-cols-md-5 mt-2">
-                            @foreach($latestPDT as $pdt)
-                            <div class="col" style="width: 210px;">
-                                <div class="card text-center border-dark shadow" style="max-width: 12rem;">
-                                    <img style="background-image: url('/img/{{$pdt->pdtNameEn}}.png'); background-size: cover; width:100%; height:190px; background-position:center;" class="card-img-top">
-                                    <div class="card-body">
-                                        <div class="card-title">
-                                            <strong>
-                                                {{ $pdt->pdtNamePt }}
-                                            </strong>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer">
-                                        <form class="mb-3" action="{{ route('pdtsdownload', ['pdtID' => $pdt->Id]) }}">
-
-                                            <button class="btn btn-dark btn-sm" type="submit">Ver e download</button>
-                                        </form>
-                                        <form class="mb-3" action="{{ route('pdtssurvey', ['pdtID' => $pdt->Id])  }}">
-
-                                            <button class="btn btn-dark btn-sm" type="submit">Revisão e comentário</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div style="background-color: white;">
+        <div class="container py-9">
+            <h1>Os Modelos de Dados dos Produtos</h1>
+            <table class="table-auto min-w-full text-left text-sm font-light">
+                <thead class="border-b font-medium dark:border-neutral-500">
+                    <tr>
+                        <th scope="col" class="px-6 py-4">Image</th>
+                        <th scope="col" class="px-6 py-4">pdtNamePt</th>
+                        <th scope="col" class="px-6 py-4">versionNumber</th>
+                        <th scope="col" class="px-6 py-4">dateOfVersion</th>
+                        <th scope="col" class="px-6 py-4">revisionNumber</th>
+                        <th scope="col" class="px-6 py-4">dateOfRevision</th>
+                        <th scope="col" class="px-6 py-4"></th>
+                        <th scope="col" class="px-6 py-4"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($latestPDT as $pdt)
+                    <tr class="border-b dark:border-neutral-500">
+                        <td class="whitespace-nowrap px-6 py-4 font-medium">
+                            <img
+                                class="w-auto max-w-[100px] max-h-14"
+                                {{-- src="{{asset('/img/' . $pdt->pdtNameEn . '.png')}}" --}}
+                                src="{{asset('/img/Master.png')}}"
+                                alt="" />
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4 font-medium">{{ $pdt->pdtNamePt }}</td>
+                        <td class="whitespace-nowrap px-6 py-4 font-medium">{{ $pdt->versionNumber }}</td>
+                        <td class="whitespace-nowrap px-6 py-4 font-medium">{{ $pdt->dateOfVersion }}</td>
+                        <td class="whitespace-nowrap px-6 py-4 font-medium">{{ $pdt->revisionNumber }}</td>
+                        <td class="whitespace-nowrap px-6 py-4 font-medium">{{ $pdt->dateOfRevision }}</td>
+                        <td class="whitespace-nowrap px-6 py-4 font-medium">
+                            <form class="mb-3" action="{{ route('pdtsdownload', ['pdtID' => $pdt->Id]) }}">
+                                <x-button-primary-pdts 
+                                    type="submit"
+                                    title="Ver e download"/>
+                            </form>
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4 font-medium">
+                            <form class="mb-3" action="{{ route('pdtssurvey', ['pdtID' => $pdt->Id])  }}">
+                                <x-button-primary-pdts 
+                                    type="submit"
+                                    title="Revisão e comentário"/>
+                            </form>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </main>
 </x-app-layout>

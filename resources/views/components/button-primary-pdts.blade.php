@@ -1,4 +1,4 @@
-@props(['link', 'title','type' => 'button'])
+@props(['link' => '#', 'title','type' => 'button'])
 <button 
     type="{{ $type }}"
     data-te-ripple-init
