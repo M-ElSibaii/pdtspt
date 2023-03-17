@@ -16,11 +16,23 @@
         @else
         <img class="rounded-circle shadow-1-strong me-3" src="{{ asset('/img/users/default.png') }}" alt="{{ Auth::user()->name }}" style="width: 150px; height: 150px; border-radius: 50%;">
         @endif
-        <div class="form-group">
-            <x-input-label for="photo" :value="__('Photo')" />
-            <input type="file" name="photo" id="photo" class="form-control-file">
+        <div class="flex flex-col gap-4">
+            <div class="">
+                <x-input-label for="photo" :value="__('Photo')" />
+                <input type="file" name="photo" id="photo" class="block w-full text-sm text-slate-500 file:text-xs 
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-md file:uppercase
+                file:text-sm file:text-gray-700 file:font-semibold
+                file:bg-white
+                file:dark:bg-gray-800
+                file:border file:border-gray-300 file:dark:border-gray-500
+                file:tracking-widest file:shadow-sm file:hover:bg-gray-50 file:dark:hover:bg-gray-700 file:focus:outline-none file:focus:ring-2 file:focus:ring-indigo-500 file:focus:ring-offset-2 file:dark:focus:ring-offset-gray-800">
+            </div>
+            <x-button-primary-pdts
+                type="submit"
+                title="Actualizar a foto"
+            />
         </div>
-        <button type="submit" class="btn btn-success">Actualizar a foto</button>
 
         @if (session('status') === 'photo-updated')
         <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)" class="text-sm text-gray-600 dark:text-gray-400">{{ __('Actualizada.') }}</p>
@@ -31,7 +43,11 @@
         @method('DELETE')
         @if ($user->photo)
         <br>
-        <button type="submit" class="btn btn-danger">Apagar foto</button>
+        <x-button-primary-pdts
+            type="submit"
+            class="btn-danger"
+            title="Apagar foto"
+        />
         @endif
     </form>
 </section>

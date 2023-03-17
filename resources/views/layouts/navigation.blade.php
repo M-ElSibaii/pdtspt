@@ -3,7 +3,7 @@
         <div class="flex flex-row justify-between h-16">
             <div class="grow flex flex-row">
                 <!-- Logo -->
-                <div class="space-x-8 sm:-my-px sm:ml-10 ">
+                <div class="space-x-8 -my-px ml-10 ">
                     <a href="{{ route('dashboard') }}">
                         <img src="{{ asset ('img/logoUminhoPdts.svg')}}" alt="Application logo" width="170 px" style="padding-top: 5px; min-width: 170px;" />
                     </a>
@@ -12,38 +12,38 @@
                 <!-- Navigation Links -->
 
                 @if (Route::has('login'))
-                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                <div class="sm:hidden space-x-8 -my-px ml-10 flex">
                     <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
                         {{ __('Home') }}
                     </x-nav-link>
                 </div>
 
-                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                <div class="sm:hidden space-x-8 -my-px ml-10 flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('PDTs') }}
                     </x-nav-link>
                 </div>
                 @auth
-                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                <div class="sm:hidden space-x-8 -my-px ml-10 flex">
                     <x-nav-link :href="route('apidoc')" :active="request()->routeIs('apidoc')">
                         {{ __('Documentação API') }}
                     </x-nav-link>
                 </div>
                 
                 @endauth
-                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                <div class="sm:hidden space-x-8 -my-px ml-10 flex">
                     <x-nav-link :href="route('participantes')" :active="request()->routeIs('participantes')">
                         {{ __('Participantes') }}
                     </x-nav-link>
                 </div>
-                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                <div class="sm:hidden space-x-8 -my-px ml-10 flex">
                     <x-nav-link :href="route('contact.store')" :active="request()->routeIs('contact.store')">
                         {{ __('Contactos') }}
                     </x-nav-link>
                 </div>
                 @auth
                 @if (Auth::user()->isAdmin === 1)
-                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                <div class="sm:hidden space-x-8 -my-px ml-10 flex">
                     <x-nav-link :href="route('admin')" :active="request()->routeIs('admin')">
                         {{ __('Admin') }}
                     </x-nav-link>
@@ -55,31 +55,34 @@
             </div>
             <!-- Login signup -->
             {{-- :class="'inline-flex items-center px-4 py-2 bg-slate-700 dark:bg-slate-200 rounded-md font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-slate-900 dark:hover:bg-white focus:bg-slate-900 dark:focus:bg-white active:bg-slate-900 dark:active:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150'"  --}}
-
-            <div class="flex-none">
-                <div class="flex flex-col">
+            @if (Auth::user())
+            @else
+            <div class="flex items-center ml-6">
+                <div class="grid grid-cols-2">
                     @if (Route::has('login'))            
-                    <div class="basis-1/2 hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                        <x-nav-link 
-                            :href="route('login')" 
-                            :active="request()->routeIs('login')">
-                            {{ __('Login') }}
-                        </x-nav-link>
+                    <div class="sm:hidden flex">
+                        <x-button-primary-pdts
+                            link="{{route('login')}}"
+                            :active="request()->routeIs('login')"
+                            title="{{ __('Login') }}"
+                            >
+                        </x-button-primary-pdts>
                     </div>
                     @if (Route::has('register'))
-                    <div class="basis-1/2 hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                        <x-nav-link 
-                            :href="route('register')" 
-                            :active="request()->routeIs('register')">
-                            {{ __('Registo') }}
-                        </x-nav-link>
+                    <div class="sm:hidden flex">
+                        <x-button-primary-pdts 
+                            link="{{route('register')}}"
+                            :active="request()->routeIs('register')"
+                            title="{{ __('Registo') }}">
+                        </x-button-primary-pdts>
                     </div>
                     @endif
                     @endif
                 </div>
             </div>
+            @endif
             <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ml-6">
+            <div class="sm:hidden flex items-center ml-6">
                 
                 @auth
                 <x-dropdown align="right" width="48">
@@ -125,7 +128,7 @@
             </div>
             
             <!-- Hamburger -->
-            <div class="-mr-2 flex items-center sm:hidden">
+            <div class="-mr-2 flex items-center md:hidden lg:hidden">
                 <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -137,7 +140,7 @@
     </div>
 
     <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
+    <div :class="{'block': open, 'hidden': ! open}" class="hidden">
         @if (Route::has('login'))
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">

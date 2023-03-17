@@ -1,6 +1,6 @@
 <x-app-layout>
     <div style="background-color: white;">
-        <div class="container py-9">
+        <div class="sm:max-w-full px-6 py-9">
             <h1>Os Modelos de Dados dos Produtos</h1>
             <table class="table-auto min-w-full text-left text-sm font-light">
                 <thead class="border-b font-medium dark:border-neutral-500">
@@ -39,9 +39,9 @@
                         </td>
                         <td class="whitespace-nowrap px-6 py-4 font-medium">
                             <form class="mb-3" action="{{ route('pdtssurvey', ['pdtID' => $pdt->Id])  }}">
-                                <x-button-primary-pdts 
-                                    type="submit"
-                                    title="Revisão e comentário"/>
+                                <x-secondary-button type="submit">   
+                                    {{ __('Revisão e comentário') }}
+                                </x-secondary-button>
                             </form>
                         </td>
                     </tr>

@@ -1,11 +1,11 @@
 <x-app-layout>
     <div style="background-color: white;">
-        <div class="container py-9 flex flex-row gap-6">
+        <div class="container sm:max-w-full py-9 flex ls:flex-row md:flex-row sm:flex-col gap-6">
             <div class="basis-1/2 text-current">
                 <h2>Contactos</h2>
                 <p>Para entrar em contacto com a equipa de investigação utilize o formulário a baixo ou contact-nos no nosso email:</p> 
                 <a href="mailto: pdts.portugal@gmail.com">pdts.portugal@gmail.com</a>
-                <img class="h-[500px]" src="{{asset('/img/contact.jpg')}}" alt="contact" >
+                <img class="max-h-[500px] w-auto" src="{{asset('/img/contact.jpg')}}" alt="contact" >
             </div>
             <div class="basis-1/2 flex flex-col">
                 @if (session('success'))

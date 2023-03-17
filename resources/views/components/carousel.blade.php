@@ -39,16 +39,18 @@
                 class="h-[500px] w-full opacity-50 block bg-cover bg-center bg-no-repeat" 
                 style="background-image: url({{asset('/img/standard.png')}});"></div>
             <div
-                class="absolute inset-x-[15%] bottom-5 hidden py-5 text-center text-white md:block">
+                class="absolute inset-x-[15%] bottom-5 hidden py-5 text-center text-white md:block lg:block sm:block">
                 <h1 class="text-white">
                     A normalização dos dados na indústria da contrução está a caminho
                 </h1>
                 <h3 class="my-3">
                     Aqui tem acesso a modelos de dados de produtos normalizados abertos
                 </h3>
-                <x-button-primary-pdts 
-                    link="{{route('dashboard')}}"
-                    title="Ver PDTs"/>
+                <a href="{{route('dashboard')}}">
+                    <x-secondary-button >   
+                        {{ __('Ver PDTs') }}
+                    </x-secondary-button>
+                </a>
             </div>
         </div>
         <div
@@ -59,16 +61,18 @@
                 class="h-[500px] w-full opacity-50 block bg-cover bg-center bg-no-repeat" 
                 style="background-image: url({{asset('/img/apibackground.png')}});"></div>
             <div
-                class="absolute inset-x-[15%] bottom-5 hidden py-5 text-center text-white md:block">
+                class="absolute inset-x-[15%] bottom-5 hidden py-5 text-center text-white md:block lg:block sm:block">
                 <h1 class="text-white">
                     As API's são a chave para ligar a indústria
                 </h1>
                 <h3 class="my-3">
                     Obtenha acesso a todos os Modelos de Dados de Produtos através do nosso API
                 </h3>
-                <x-button-primary-pdts 
-                    link="{{route('apidoc')}}"
-                    title="Documentação"/>
+                <a href="{{route('apidoc')}}">
+                    <x-secondary-button >   
+                        {{ __('Documentação') }}
+                    </x-secondary-button>
+                </a>
             </div>
         </div>
         <div
@@ -79,16 +83,18 @@
                 class="h-[500px] w-full opacity-50 block bg-cover bg-center bg-no-repeat" 
                 style="background-image: url({{asset('/img/pdtpage.png')}});"></div>
             <div
-                class="absolute inset-x-[15%] bottom-5 hidden py-5 text-center text-white md:block">
+                class="absolute inset-x-[15%] bottom-5 hidden py-5 text-center text-white md:block lg:block sm:block">
                 <h1 class="text-white">
                     Faz parte da digitalização em construção em Portugal
                 </h1>
                 <h3 class="my-3">
                     Ver, rever, adicionar feedback e descarregar modelos de dados do produto
                 </h3>
-                <x-button-primary-pdts 
-                    link="{{route('dashboard')}}"
-                    title="Participar"/>
+                <a href="{{route('dashboard')}}">
+                    <x-secondary-button >   
+                        {{ __('Participar') }}
+                    </x-secondary-button>
+                </a>
             </div>
         </div>
     </div>

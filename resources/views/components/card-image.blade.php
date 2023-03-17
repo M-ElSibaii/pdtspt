@@ -17,9 +17,11 @@
                 <p class="mb-4 text-base text-neutral-600 dark:text-neutral-200">
                     {{ $card_description }}
                 </p>
-                <x-button-primary-pdts 
-                    link="{{ $card_link }}"
-                    title="{{ $card_link_title }}"/>
+                <a href="{{ $card_link }}">
+                    <x-secondary-button >   
+                        {{ $card_link_title }}
+                    </x-secondary-button>
+                </a>
             </div>
         </div>
     </div>
