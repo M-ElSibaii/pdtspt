@@ -1,213 +1,268 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Análises e comentários do Modelo de Dados do Produto') }}
-        </h2>
-    </x-slot>
+    <div style="background-color: white;">
+        <div class="container sm:max-w-full py-9">
+            <h1>{{ __('Análises e comentários do Modelo de Dados do Produto') }}</h1>
+            <section class="">
+                @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>Success!</strong> {{ session('success') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                @endif
+                <p>O objetivo deste questionário é apoiar o consenso da indústria rumo a PDTs uniformizados a nível nacional</p>
+                <div class="mb-6">
+                    <h1 class="flex-none inline">{{ $pdt[0]->pdtNamePt }}</h1>
+                    <p class="flex-none inline"> - V{{ $pdt[0]->versionNumber }}.{{ $pdt[0]->revisionNumber }}</p>
+                </div>
+                <form name="form" id="form" method="post" action="{{ route('saveAnswers') }}">
+                    @csrf
+                    <table class="table-auto" id="tblpdts" cellpadding="0" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Propriedade</th>
+                                <th>Unidade</th>
+                                <th>Descrição</th>
+                                <th>Documento de referência</th>
+                                <th>Questão</th>
+                                <th>Comentários</th>
+                            </tr>
+                        </thead>
+                        @csrf
 
-    <body>
-        <main class="flex-shrink-0">
-            <div class="py-12">
-                <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                    <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                        <section class="container">
-                            @if(session('success'))
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                <strong>Success!</strong> {{ session('success') }}
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            @endif
-                            <h2>Análise e comentário de PDTs</h2>
-                            <h6>O objetivo deste questionário é apoiar o consenso da indústria rumo a PDTs uniformizados a nível nacional</h6>
-                            <h3> {{ $pdt[0]->pdtNameEn }} Data Template V{{ $pdt[0]->versionNumber }}.{{ $pdt[0]->revisionNumber }}</h3>
-                            <form name="form" id="form" method="post">
-                                @csrf
-
-                                @foreach($gop as $group)
-
-                                <div class="ac">
-                                    <input class="ac-input" id="ac-{{$group->Id}}" name="ac-{{$group->Id}}" type="checkbox" />
-                                    <label class="ac-label" for="ac-{{$group->Id}}">
-                                        <h3>{{$group->gopNamePt}}
-                                            <h6 class='text-muted'>{{$group->gopNameEn}}</h6>
-                                        </h3>
-                                    </label>
-                                    <article class="ac-text">
-
-                                        @foreach($joined_properties as $property)
-                                        @if($property->gopID == $group->Id)
-                                        <div class="container shadow" style="border: thin solid lightGrey">
-                                            <div class="ac-sub">
-                                                <input class="ac-input" id="ac-{{ $property->GUID }}" name="ac-{{ $property->GUID }}" type="checkbox" />
-                                                <label class="ac-label" for="ac-{{ $property->GUID }}">
-                                                    <a href="{{ route('datadictionaryview', ['propID' => $property->GUID , 'propV' => $property->versionNumber, 'propR' => $property->revisionNumber]) }}" target="_blank">
-                                                        <h4>{{ $property->namePt }}</h4>
-                                                        <h6 class='text-muted'>{{ $property->nameEn }}</h6>
-                                                    </a>
-                                                    <h6 class='text-muted'>Descrição: {{$property->descriptionPt}}<br>
-                                                        Description: {{$property->descriptionEn}}
-
-                                                    </h6>
-
-                                                    <div class="form-group">
-                                                        @csrf
-                                                        @php
-                                                        $answer = $answers->where('properties_Id', $property->Id)->sortByDesc('created_at')->first();
-                                                        $yesChecked = $answer && $answer->answer == 'yes' ? 'checked' : '';
-                                                        $noChecked = $answer && $answer->answer == 'no' ? 'checked' : '';
-                                                        $noOpinionChecked = !$answer || $answer->answer == 'no_opinion' ? 'checked' : '';
-                                                        @endphp
-                                                        <div class="form-check form-check-inline">
-                                                            <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerYes-{{$property->Id}}" value="yes" {{$yesChecked}}>
-                                                            <label class="form-check-label" for="answerYes-{{$property->Id}}">Sim</label>
-                                                        </div>
-                                                        <div class="form-check form-check-inline">
-                                                            <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerNo-{{$property->Id}}" value="no" {{$noChecked}}>
-                                                            <label class="form-check-label" for="answerNo-{{$property->Id}}">Não</label>
-                                                        </div>
-                                                        <div class="form-check form-check-inline">
-                                                            <input class="form-check-input" type="radio" name="{{$property->Id}}" id="answerNoOpinion-{{$property->Id}}" value="no_opinion" {{$noOpinionChecked}}>
-                                                            <label class="form-check-label" for="answerNoOpinion-{{$property->Id}}">Sem opinião</label>
-                                                        </div>
-                                                    </div>
-
-                                                    feedbacks ({{ \App\Models\comments::where('properties_Id', $property->Id)->whereNull('parent_id')->count() }})
-
-                                                </label>
-                                                <article class="ac-sub-text">
-                                                    <section class="gradient-custom">
-                                                        <div class="container">
-                                                            <div class="row d-flex justify-content-left">
-                                                                <div class="col-md-8 col-lg-8 col-xl-8">
-                                                                    <div class="card">
-                                                                        <div class="card-body p-4">
-                                                                            <div class="row">
-                                                                                <div class="col">
-
-                                                                                    <div class="row d-flex justify-content-center">
-                                                                                        <h4> Secção de feedback da propriedade </h4>
-                                                                                    </div>
-                                                                                    <div id="comments-section-{{ $property->Id }}" class="comment-form">
-                                                                                        @foreach ($comments as $comment)
-                                                                                        @if ($comment->properties_Id == $property->Id && $comment->parent_id == null)
-                                                                                        <div id="commentbodysection{{ $comment->id }}" class="d-flex flex-start mt-1">
-                                                                                            <div class="flex-grow-1 flex-shrink-1">
-
-                                                                                                <div class="d-flex">
-                                                                                                    @if ($comment->user->photo)
-                                                                                                    <img src="{{ asset($comment->user->photo) }}" alt="{{ $comment->user->name }}" class="img-fluid rounded-circle mr-3" style="width: 65px; height: 65px;">
-                                                                                                    @else
-                                                                                                    <img src="{{ asset('img/users/default.png') }}" alt="{{ $comment->user->name }}" class="img-fluid rounded-circle mr-3" style="width: 65px; height: 65px;">
-                                                                                                    @endif
-
-                                                                                                    <div class="div-username">
-                                                                                                        <h5>{{$comment->user->name}}</h5>
-                                                                                                        <span class="small d-block">{{$comment->created_at}}
-                                                                                                            @if ($comment->user->name == Auth::user()->name )
-                                                                                                            <button type="button" style="color: red;" onclick="openDeleteModal('{{ $comment->id }}')" class="btn danger">Apagar</button>
-                                                                                                            @endif</span>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                                <div class="div-comment">
-                                                                                                    <h5 style="margin-top: 8px;">&ensp;{{ $comment->body }}</h5>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-
-                                                                                        @endif
-                                                                                        @endforeach
-
-                                                                                    </div>
-                                                                                    <div class="container">
-                                                                                        <div data-property-id="{{ $property->Id }}">
-                                                                                            <button type="button" class="btn btn-primary float-end" onclick="openModal('{{$property->Id}}')">Adicionar Feedback</button>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </section>
-                                                </article>
-                                            </div>
+                        @foreach($gop as $group)
+                        <tbody>
+                            <tr>
+                                <td class="text-left content-start bg-slate-300 p-3" colspan="6">
+                                    <input class="text-left expand" type="checkbox" name="{{ $group->gopNamePt }}" id="{{ $group->gopNamePt }}" data-toggle="toggle">
+                                    <label class="my-auto text-left" for="{{ $group->gopNamePt }}">Grupo de propriedades - {{ $group->gopNamePt }}</label>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tbody class="hide">
+                            @foreach($joined_properties as $property)
+                            @if($property->gopID == $group->Id)
+                            <tr>
+                                <td class="p-1.5">
+                                    <a href="{{ route('datadictionaryview', ['propID' => $property->GUID , 'propV' => $property->versionNumber, 'propR' => $property->revisionNumber]) }}">{{ $property->namePt }}</a>
+                                </td>
+                                <td class="p-1.5">
+                                    {{ $property->units }}
+                                </td>
+                                <td class="p-1.5">
+                                    <div class="flex flex-row">
+                                        <p>{{$property->descriptionPt}}</p>
+                                        @if($property->visualRepresentation == True)
+                                        <div class="col-sm">
+                                            <img src="{{ asset ('img/'.$property->nameEn.'.png')}}" alt='{{$property->nameEn}}' class="property-image">
                                         </div>
-
                                         @endif
-                                        @endforeach
-                                    </article>
-                                </div>
-                                @endforeach
-
-
-                                <button type="button" class="btn btn-primary" id="saveButton">Guardar Respostas</button>
-
-
-                            </form>
-
-
-
-                        </section>
+                                    </div>
+                                </td>
+                                @if ($referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->rdName == 'n/a')
+                                <td class="p-1.5">
+                                    <a>{{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->rdName }}</abbr></a>
+                                </td>
+                                @else
+                                <td class="p-1.5">
+                                    <a href="{{ route('referencedocumentview', ['rdGUID' => $property->referenceDocumentGUID]) }}">
+                                        <abbr title="{{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->title }}">{{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->rdName }}</abbr>
+                                    </a>
+                                </td>
+                                @endif
+                                <td class="p-1.5">
+                                    <div class="flex flex-col">
+                                        @csrf
+                                        @php
+                                        $answer = $answers->where('properties_Id', $property->Id)->sortByDesc('created_at')->first();
+                                        $yesChecked = $answer && $answer->answer == 'yes' ? 'checked' : '';
+                                        $noChecked = $answer && $answer->answer == 'no' ? 'checked' : '';
+                                        $noOpinionChecked = !$answer || $answer->answer == 'no_opinion' ? 'checked' : '';
+                                        @endphp
+                                        <div class="form-check form-check-inline">
+                                            <input class="h-4 w-4 border-gray-300 text-slate-600 focus:ring-slate-600" type="radio" name="{{$property->Id}}" id="answerYes-{{$property->Id}}" value="yes" {{$yesChecked}}>
+                                            <label class="ml-2 my-auto block text-sm font-medium leading-6 text-gray-900" for="answerYes-{{$property->Id}}">Sim</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="h-4 w-4 border-gray-300 text-slate-600 focus:ring-slate-600" type="radio" name="{{$property->Id}}" id="answerNo-{{$property->Id}}" value="no" {{$noChecked}}>
+                                            <label class="ml-2 my-auto block text-sm font-medium leading-6 text-gray-900" for="answerNo-{{$property->Id}}">Não</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="h-4 w-4 border-gray-300 text-slate-600 focus:ring-slate-600" type="radio" name="{{$property->Id}}" id="answerNoOpinion-{{$property->Id}}" value="no_opinion" {{$noOpinionChecked}}>
+                                            <label class="ml-2 my-auto block text-sm font-medium leading-6 text-gray-900" for="answerNoOpinion-{{$property->Id}}">Sem opinião</label>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="p-1.5">
+                                    <x-nav-link type="button" id="loadComments-{{$property->Id}}" onclick="loadComments(this, {{$property->Id}})">
+                                        Comentários ({{ \App\Models\comments::where('properties_Id', $property->Id)->count() }})
+                                    </x-nav-link>
+                                </td>
+                            </tr>
+                            @endif
+                            @endforeach
+                        </tbody>
+                        @endforeach
+                    </table>
+                        
+                    <div class="my-6 text-end">
+                        <a href="/dashboard">
+                            <x-secondary-button
+                                id="backButton"
+                                type="button">
+                                Anterior
+                            </x-secondary-button>
+                        </a>
+                        <x-primary-button
+                            id="saveButton"
+                            type="submit">
+                            Guardar Respostas
+                        </x-primary-button>
                     </div>
-                </div>
-            </div>
-            <!-- Add Modal -->
-            <div class="modal fade" id="AddFeedbackModal" tabindex="-1" aria-labelledby="AddFeedbackModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        @csrf
-                        <div class="modal-header">
-                            <!-- <h5 class="modal-title" id="AddFeedbackModalLabel">Add Feedback</h5> -->
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <!-- <ul id="save_msgList"></ul> -->
-                            <div class="form-group mb-3">
-                                <label for="">Feedback</label>
-                                <input type="text" required id="feedback" class="feedback form-control">
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary " data-bs-dismiss="modal" aria-label="Close">Fechar</button>
-                            <button type="button" id="add_feedback" data-id="" class="btn btn-primary " data-bs-dismiss="modal" aria-label="Close">Guardar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Delete Modal -->
-            <div class="modal fade" id="DeleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        @csrf
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Apagar</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <h4>Tem a certeza de que quer apagar o feedback?</h4>
-                        </div>
-                        <div class="modal-footer">
 
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                            <button type="button" id="delete_feedback" data-id="" class="btn btn-primary" data-bs-dismiss="modal">Sim, Apagar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </main>
-    </body>
-
+                </form>
+            </section>
+        </div>
+    
+        <x-modal-popup />
+        
+    </div>
     <script>
+        $(document).ready(function() {
+            $('[data-toggle="toggle"]').change(function(){
+                $(this).parents().next('.hide').toggle();
+            });
+        });
+        function insertComment(id) {
+
+            var data = {
+                'properties_Id': id,
+                'body': $('#message').val(),
+            };
+            $('#message').val(''),
+
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "pdtssurveystore",
+                dataType: 'json',
+                data: data,
+                success: function(response) {
+                    console.log(response);
+                    if (response.status == 400) {
+                        alert('Nenhum conteúdo no feedback. O campo de feedback é obrigatório')
+
+                    } else {
+                        addComment(response.comment[0]);
+                        
+                    }
+                }
+            });
+
+        };
+
+        function closeModal(id) {
+
+            $("div[id='comments-addbutton-"+id+"']").replaceWith('<div id="comments-addbutton-'+id+'">\
+                        <a data-te-ripple-init data-te-ripple-color="light" \
+                            type="submit" \
+                            class="inline-flex items-center px-4 py-2 bg-slate-700 dark:bg-slate-200 rounded-md font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-slate-900 dark:hover:bg-white focus:bg-slate-900 dark:focus:bg-white active:bg-slate-900 dark:active:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150" \
+                            onclick="openModal('+id+')" \
+                            type="button">\
+                            Adicionar comentário\
+                        </a>\
+                    </div>');
+        }
+
+        function openModal(id) {
+
+            $("div[id='comments-addbutton-"+id+"']").replaceWith('<div id="comments-addbutton-'+id+'" class="flex flex-col addcommentrow">\
+                <lable>Adicionar comentário</lable>\
+                <textarea class="form-control" name="message" id="message"></textarea>\
+                <div class="flex flex-row gap-4 my-2">\
+                    <a type="button" style="float:right" data-te-ripple-init data-te-ripple-color="light" class="inline-flex items-center px-4 py-2 bg-slate-700 dark:bg-slate-200 rounded-md font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-slate-900 dark:hover:bg-white focus:bg-slate-900 dark:focus:bg-white active:bg-slate-900 dark:active:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150" onclick="insertComment('+id+')" id="insertComment">Adicionar comentário</a>\
+                    <a type="button" style="float:right" data-te-ripple-init data-te-ripple-color="light" class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-500 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-25 transition ease-in-out duration-150" onclick="closeModal('+id+')">Cancelar</a>\
+                </div>\
+            </div>');
+        }
+        function unloadComments(id){
+            $("td[id^='comments-line-"+id+"']").remove('');
+            $("a[id^='loadComments-"+id+"']").attr("onclick","loadComments(this, "+id+")");
+        }
+        function loadComments(e, id) {
+
+            $("td[id^='comments-line-']").remove('');
+            $("a[id^='loadComments-"+id+"']").attr("onclick","unloadComments("+id+")");
+            $('<td class="text-left content-start p-6" id="comments-line-'+id+'" colspan="6">\
+                    <h4 class="mb-6">Comentários</h4>\
+                    <div id="comments-section-'+id+'">\
+                    </div>\
+                    <div id="comments-addbutton-'+id+'">\
+                        <a data-te-ripple-init data-te-ripple-color="light" \
+                            type="submit" \
+                            class="inline-flex items-center px-4 py-2 bg-slate-700 dark:bg-slate-200 rounded-md font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-slate-900 dark:hover:bg-white focus:bg-slate-900 dark:focus:bg-white active:bg-slate-900 dark:active:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150" \
+                            onclick="openModal('+id+')" \
+                            type="button">\
+                            Adicionar comentário\
+                        </a>\
+                    </div>\
+                </td>').insertAfter($(e).parent().parent());
+
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $.ajax({
+                type: "POST",
+                url: "/comments/" + id,
+                success: function (response) {
+                    console.log(response.comments)
+                    for (let index = 0; index < response.comments.length; index++) {               
+                        addComment(response.comments[index]);
+                        
+                    }
+                }
+            });
+            
+        }
+
+        function addComment(comment) {
+
+            var section = '';
+            section = '<div id="commentbodysection' + comment.id + '" class="w-full mb-4">\
+                    <div class="flex flex-row">';
+            if (comment.user.photo != null ){
+                section += '<img src="{{ asset(' + comment.user.photo + ') }}" alt="{{ ' + comment.user.name + ' }}" class="img-fluid rounded-circle mr-3" style="width: 40px; height: 40px;">';
+            }
+            else {
+                section += '<img src="{{ asset('img/users/default.png') }}" alt="{{ ' + comment.user.name + ' }}" class="img-fluid rounded-circle mr-3" style="width: 40px; height: 40px;">';
+            }
+            section += '<div class="flex flex-col w-full">\
+                <div class="flex flex-row gap-2 align-bottom">\
+                    <span class="font-bold my-auto">' + comment.user.name + '</span>\
+                    <span class="text-xs font-thin my-auto">' + moment(comment.created_at).fromNow() + '</span>';
+            if (comment.user.name == '{{Auth::user()->name}}' ){
+                section += '<a class="text-xs font-thin my-auto" type="button" data-te-toggle="modal" data-te-target="#DeleteModal" style="color: red;" onclick="openDeleteModal(' + comment.id + ')">Apagar</a>';
+            }
+            section += '</div>\
+                        <div class="div-comment flex-gow">\
+                        <p class="m-1">' + comment.body + '</p>\
+                    </div>\
+                </div>\
+                    </div>\
+            </div>';
+            $('#comments-section-' + comment.properties_Id).append(section);
+        
+        }
+
         function openDeleteModal(id) {
-            // open Modal  
-            var myModal = new bootstrap.Modal(document.getElementById('DeleteModal'))
-            myModal.toggle();
-            // define the ID
             $('#delete_feedback').attr('data-id', id)
         }
 
@@ -228,7 +283,6 @@
                 url: "/deletefeedback",
                 data: data,
                 success: function(response) {
-                    console.log(response);
                     $('#commentbodysection' + response.comment_id).remove();
                     alert("Feedback apagado com sucesso!")
 
@@ -236,112 +290,6 @@
             });
         });
 
-        function openModal(id) {
-            // open Modal  
-            var myModal = new bootstrap.Modal(document.getElementById('AddFeedbackModal'))
-            myModal.toggle();
-            // define the ID
-            $('#add_feedback').attr('data-id', id)
-        }
-
-        $(document).on('click', '#add_feedback', function(e) {
-            e.preventDefault();
-            var id = $(this).attr('data-id');
-            // $(this).text('Adding..');
-
-            var data = {
-                'properties_Id': id,
-                'body': $('#feedback').val(),
-            }
-            $('#feedback').val(""),
-
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
-
-            $.ajax({
-                type: "POST",
-                url: "pdtssurveystore",
-                data: data,
-                success: function(response) {
-                    console.log(response);
-                    if (response.status == 400) {
-                        alert('Nenhum conteúdo no feedback. O campo de feedback é obrigatório')
-                        // $('#save_msgList').html("");
-                        // $('#save_msgList').addClass('alert alert-danger');
-                        // $('#save_msgList').append('<li>The feedback field is required.</li>');
-                        // $('.add_feedback').text('Save');
-                    } else {
-                        $('#comments-section-' + id).append(
-                            '<div class="commentbodysection' + response.comment.id + '">\
-                                <div class="flex-grow-1 flex-shrink-1">\
-                                    <div class="d-flex">\
-                                    @if ($comment->user->photo)\
-                                    <img src="{{ asset($comment->user->photo) }}" alt="{{ $comment->user->name }}" class="img-fluid rounded-circle mr-3" style="width: 65px; height: 65px;">\
-                                    @else\
-                                    <img src="{{ asset("img/users/default.png") }}" alt="{{ $comment->user->name }}" class="img-fluid rounded-circle mr-3" style="width: 65px; height: 65px;">\
-                                    @endif\
-                                        <div class="div-username">\
-                                            <h5>{{$comment->user->name}}</h5>\
-                                            <span class="small d-block">' + "{{ date('Y-m-d H:i:s') }}" + '\
-                                                <button type="button" style="color: red;" onclick="openDeleteModal(' + response.comment.id + ')" class="btn danger">Delete</button>\
-                                            </span>\
-                                        </div>\
-                                    </div>\
-                                    <div class="div-comment">\
-                                        <h5 style="margin-top: 8px;">&ensp;' + response.comment.body + '</h5>\
-                                    </div>\
-                                </div>\
-                            </div>'
-                        );
-                    }
-                }
-            });
-
-        });
+        
     </script>
-    <script>
-        document.getElementById("saveButton").addEventListener("click", function() {
-            // create a form to submit the answers
-            var form = document.createElement("form");
-            form.setAttribute("method", "post");
-            form.setAttribute("action", "{{ route('saveAnswers') }}");
-
-            // collect the answers
-            var answers = [];
-            var inputs = document.querySelectorAll("input[type='radio']:checked");
-            inputs.forEach(function(input) {
-                answers.push({
-                    answer: input.value,
-                    propertyId: input.getAttribute("name"),
-                    user: input.getAttribute("data-user-id")
-                });
-            });
-
-            // add the answers to the form as hidden inputs
-            answers.forEach(function(answer) {
-                var input = document.createElement("input");
-                input.setAttribute("type", "hidden");
-                input.setAttribute("name", "answers[]");
-                input.setAttribute("value", JSON.stringify(answer));
-                form.appendChild(input);
-            });
-
-            // add a CSRF token to the form
-            var csrfInput = document.createElement("input");
-            csrfInput.setAttribute("type", "hidden");
-            csrfInput.setAttribute("name", "csrf_token");
-            csrfInput.setAttribute("value", "{{ csrf_token() }}");
-            form.appendChild(csrfInput);
-
-            // submit the form
-            document.body.appendChild(form);
-            form.submit();
-        });
-    </script>
-
-
-
 </x-app-layout>

@@ -33,7 +33,7 @@
     </div>
 
     <div class="container sm:max-w-full sm:px-2.5 py-5">
-        <div class="card pb-5 pt-5 pl-5 pr-0 border-0" style="background-color: rgb(249,249,249);">
+        <div class="card pb-5 pt-5 pl-5 lg:md:pr-5 sm:pr-0 border-0" style="background-color: rgb(249,249,249);">
             <div class="flex lg:flex-row flex-col">
                 <div class="basis-2/3">
                     <div class="pb-2" style="width:100%;">

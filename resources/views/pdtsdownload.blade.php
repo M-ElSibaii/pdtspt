@@ -1,51 +1,58 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __("Ver e descarregar o Modelo de Dados do Produto baseado na EN ISO 23387") }}
-        </h2>
-    </x-slot>
-
-
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="home_content container">
-                    <div class="row">
-                        <h2> O Modelo de Dados do Produto ({{ $pdt[0]->pdtNamePt }}) V{{ $pdt[0]->versionNumber }}.{{ $pdt[0]->revisionNumber }}
-
-                            <button id="json" class="btn"><i class="fa fa-download"></i> JSON</button>
-                            <button id="csv" class="btn"><i class="fa fa-download"></i> CSV/XLS</button>
-                            <button id="txt" class="btn"><i class="fa fa-download"></i> TXT</button>
-
-                        </h2>
+    <div style="background-color: white;">
+        <div class="container sm:max-w-full py-9">
+            <h1>{{ __("Modelo de Dados do Produto baseado na EN ISO 23387") }}</h1>
+            <div class="py-9">
+                <div class="flex flex-row">
+                    <div class="grow block">
+                        <div class="flex-none inline">
+                            <h1 class="flex-none inline">{{ $pdt[0]->pdtNamePt }}</h1>
+                            <p class="flex-none inline"> - V{{ $pdt[0]->versionNumber }}.{{ $pdt[0]->revisionNumber }}</p>
+                        </div>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table" id="tblpdts" cellpadding="0" cellspacing="0">
+                    <div class="flex flex-row gap-2 py-4">
+                        <x-secondary-button id="json" class="btn" >   
+                            <i class="fa fa-download"></i>&nbsp;JSON
+                        </x-secondary-button>
+                        <x-secondary-button id="csv" class="btn" >   
+                            <i class="fa fa-download"></i>&nbsp;CSV/XLS
+                        </x-secondary-button>
+                        <x-secondary-button id="txt" class="btn" >   
+                            <i class="fa fa-download"></i>&nbsp;TXT
+                        </x-secondary-button>
+                    </div>
+                </div>
+                <div>
+                    <table class="table-auto" id="tblpdts" cellpadding="0" cellspacing="0">
+                        <tr>
+                            <th>Propriedade </th>
+                            <th>Unidade</th>
+                            <th>Descrição</th>
+                            <th>Documento de referência</th>
+                        </tr>
+                        @foreach($gop as $group)
+                        <tbody>
                             <tr>
-                                <th style="width: 15%;">Grupo de propriedades</th>
-                                <th>Propriedade </th>
-                                <th style="width: 7%;">Unidade</th>
-                                <th style="width: 40%;">Descrição</th>
-                                <th style="width: 16%;">Documento de referência</th>
-                            </tr>
-                            @foreach($gop as $group)
-
-                            @foreach($joined_properties as $property)
-
-                            @if($property->gopID == $group->Id)
-
-                            <tr>
-                                <td>
-                                    {{ $group->gopNamePt }}
+                                <td class="text-left content-start bg-slate-300 p-3" colspan="4">
+                                    <input class="text-left expand" type="checkbox" name="{{ $group->gopNamePt }}" id="{{ $group->gopNamePt }}" data-toggle="toggle">
+                                    <label class="my-auto text-left" for="{{ $group->gopNamePt }}">Grupo de propriedades - {{ $group->gopNamePt }}</label>
                                 </td>
-                                <td>
+                            </tr>
+                        </tbody>
+
+                        <tbody class="hide">
+                        @foreach($joined_properties as $property)
+
+                        @if($property->gopID == $group->Id)
+                            <tr>
+                                <td class="p-1.5">
                                     <a href="{{ route('datadictionaryview', ['propID' => $property->GUID , 'propV' => $property->versionNumber, 'propR' => $property->revisionNumber]) }}">{{ $property->namePt }}</a>
                                 </td>
-                                <td>
+                                <td class="p-1.5">
                                     {{ $property->units }}
                                 </td>
-                                <td>
-                                    <div class="row">
+                                <td class="p-1.5">
+                                    <div class="flex flex-row">
                                         <p>{{$property->descriptionPt}}</p>
                                         @if($property->visualRepresentation == True)
                                         <div class="col-sm">
@@ -55,11 +62,11 @@
                                     </div>
                                 </td>
                                 @if ($referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->rdName == 'n/a')
-                                <td>
+                                <td class="p-1.5">
                                     <a>{{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->rdName }}</abbr></a>
                                 </td>
                                 @else
-                                <td>
+                                <td class="p-1.5">
                                     <a href="{{ route('referencedocumentview', ['rdGUID' => $property->referenceDocumentGUID]) }}">
                                         <abbr title="{{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->title }}">{{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->rdName }}</abbr>
                                     </a>
@@ -68,8 +75,17 @@
                             </tr>
                             @endif
                             @endforeach
-                            @endforeach
-                        </table>
+                        </tbody>
+                        @endforeach
+                    </table>
+                    <div class="my-6 text-end">
+                        <a href="/dashboard">
+                            <x-secondary-button
+                                id="backButton"
+                                type="button">
+                                Anterior
+                            </x-secondary-button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -86,6 +102,11 @@
 
 
     <script>
+        $(document).ready(function() {
+            $('[data-toggle="toggle"]').change(function(){
+                $(this).parents().next('.hide').toggle();
+            });
+        });
         $("#json").on("click", function() {
             $("#tblpdts").tableHTMLExport({
                 type: "json",

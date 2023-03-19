@@ -70,11 +70,11 @@
                     </div>
                     @if (Route::has('register'))
                     <div class="sm:hidden flex">
-                        <x-button-primary-pdts 
-                            link="{{route('register')}}"
-                            :active="request()->routeIs('register')"
-                            title="{{ __('Registo') }}">
-                        </x-button-primary-pdts>
+                        <a href="{{route('register')}}">
+                            <x-secondary-button :active="request()->routeIs('register')">   
+                                {{ __('Registo') }}
+                            </x-secondary-button>
+                        </a>
                     </div>
                     @endif
                     @endif
@@ -93,7 +93,7 @@
                             @else
                             <img class="rounded-circle shadow-1-strong me-3" src="{{ asset('/img/users/default.png') }}" alt="{{ Auth::user()->name }}" style="width: 40px; height: 40px; border-radius: 50%;">
                             @endif
-                            <div>{{ Auth::user()->name }}</div>
+                            <div class="ml-2">{{ Auth::user()->name }}</div>
                             <div class="ml-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />

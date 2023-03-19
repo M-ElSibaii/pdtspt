@@ -26,11 +26,11 @@ class GroupofpropertiesController extends Controller
             ->get();
         $gop = DB::table('groupofproperties as gop')->where('pdtId', $pdtID)
             ->join(
-                DB::raw("(SELECT 
+                DB::raw("(SELECT
                 GUID,
                 MAX(versionNumber) as max_versionNumber,
                 MAX(revisionNumber) as max_revisionNumber
-                FROM groupofproperties 
+                FROM groupofproperties
                 GROUP BY GUID) as mx"),
                 function ($join) {
                     $join->on('mx.GUID', '=', 'gop.GUID');
@@ -70,17 +70,25 @@ class GroupofpropertiesController extends Controller
 
         return view('pdtsdownload', compact('gop', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument'));
     }
+    public function getCommentProperty($propID)
+    {
+        $comments = comments::with('user')->where('properties_Id', $propID)->get();
+
+        return response()->json([
+            'comments' => $comments
+        ]);
+    }
     public function getGroupOfProperties2($pdtID)
     {
         $pdt = productdatatemplates::where('Id', $pdtID)
             ->get();
         $gop = DB::table('groupofproperties as gop')->where('pdtId', $pdtID)
             ->join(
-                DB::raw("(SELECT 
+                DB::raw("(SELECT
                 GUID,
                 MAX(versionNumber) as max_versionNumber,
                 MAX(revisionNumber) as max_revisionNumber
-                FROM groupofproperties 
+                FROM groupofproperties
                 GROUP BY GUID) as mx"),
                 function ($join) {
                     $join->on('mx.GUID', '=', 'gop.GUID');
@@ -204,7 +212,11 @@ class GroupofpropertiesController extends Controller
             $comment->users_id = Auth::user()->id;
             $comment->save();
 
-
+            $comment = comments::with('user')
+                ->where('properties_Id', $propertyId)
+                ->orderBy('created_at', 'desc')
+                ->limit(1)
+                ->get();
 
             return response()->json([
                 'status' => 200,
@@ -218,32 +230,30 @@ class GroupofpropertiesController extends Controller
     public function saveAnswers(Request $request)
     {
         $userId = Auth::user()->id;
+        $answers = $request->all();
+        foreach ($answers as $properties_id => $answer) {
+            if ($properties_id != '_token') {
+                $existingAnswer = Answers::where('users_id', $userId)
+                    ->where('properties_id', $properties_id)
+                    ->first();
 
-        foreach ($request->input('answers') as $answerData) {
-            $answer = json_decode($answerData);
-
-            // Check if there are existing answers for this property and user
-            $existingAnswer = Answers::where('users_id', $userId)
-                ->where('properties_id', $answer->propertyId)
-                ->first();
-
-            if ($existingAnswer) {
-                // An answer already exists for this property and user
-                if ($existingAnswer->answer != $answer->answer) {
-                    // The submitted answer is different, so update the existing answer
-                    $existingAnswer->answer = $answer->answer;
-                    $existingAnswer->save();
+                if ($existingAnswer) {
+                    // An answer already exists for this property and user
+                    if ($existingAnswer->answer != $answer) {
+                        // The submitted answer is different, so update the existing answer
+                        $existingAnswer->answer = $answer;
+                        $existingAnswer->save();
+                    }
+                } else {
+                    // No existing answer for this property and user, so create a new answer
+                    $newAnswer = new Answers;
+                    $newAnswer->answer = $answer;
+                    $newAnswer->properties_id = $properties_id;
+                    $newAnswer->users_id = $userId;
+                    $newAnswer->save();
                 }
-            } else {
-                // No existing answer for this property and user, so create a new answer
-                $newAnswer = new Answers;
-                $newAnswer->answer = $answer->answer;
-                $newAnswer->properties_id = $answer->propertyId;
-                $newAnswer->users_id = $userId;
-                $newAnswer->save();
             }
         }
-
         return redirect()->back()->with('success', 'Respostas guardadas com sucesso');
     }
 

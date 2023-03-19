@@ -74,8 +74,9 @@ Route::post('/pdtssurvey/{pdtID}', [GroupofpropertiesController::class, 'store']
 Route::post('/pdtssurvey/store', [GroupofpropertiesController::class, 'store'])
     ->middleware(['auth'])->name('pdtssurveystore');
 
-Route::delete('/deletefeedback', [GroupofpropertiesController::class, 'destroyfeedback']);
+Route::post('/comments/{propID}', [GroupofpropertiesController::class, 'getCommentProperty']);
 
+Route::delete('/deletefeedback', [GroupofpropertiesController::class, 'destroyfeedback']);
 
 
 Route::get(

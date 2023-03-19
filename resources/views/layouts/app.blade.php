@@ -20,8 +20,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
-    
-    
+
+
     {{-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
@@ -29,9 +29,9 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script> --}}
     {{-- <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/carousel/"> --}}
     {{-- <link href="/docs/5.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous"> --}}
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-    
+
+    {{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous"> --}}
+
     <!-- Favicons -->
     <link rel="apple-touch-icon" href="/docs/5.3/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
     <link rel="icon" href="/docs/5.3/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
@@ -42,12 +42,13 @@
     <meta name="theme-color" content="#712cf9">
     <!-- Fonts -->
     <link rel="stylesheet" href="https://fonts.bunny.net/css2?family=Nunito:wght@400;600;700&display=swap">
-
+    <link rel="stylesheet" type="text/css" href="//use.fontawesome.com/releases/v5.7.2/css/all.css">
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     {{-- @vite('resources/css/app.css') --}}
     <!-- Scripts and styles for pdtdownlad tables -->
     {{-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js"></script>
     <script>
         function scrolldown() {
             const element = document.getElementById("content");
@@ -56,6 +57,26 @@
     </script>
 
     <style>
+
+            .expand {
+                display: none;
+            }
+
+            .expand + label:before {
+                font-family: "Font Awesome 5 Free";
+                content: "\f068"; 
+                display: inline-block;
+                font-weight: 800;
+                padding-right: 3px;
+            }
+
+            .expand:checked + label:before {
+                font-family: "Font Awesome 5 Free";
+                content: "\f067"; 
+                display: inline-block;
+                font-weight: 800;
+                padding-right: 3px;
+            }
         .bd-placeholder-img {
             font-size: 1.125rem;
             text-anchor: middle;
@@ -160,12 +181,12 @@
         } */
 
         .div-comment {
-
-            background-color: whitesmoke;
-            border-radius: 5px;
-            border: 1px solid black;
+            /* background-color: whitesmoke; */
+            /* border-radius: 5px; */
+            /* border: 1px solid black; */
             margin-top: 5px;
             margin-bottom: 5px;
+            width: 100%;
         }
 
         .div-username {
@@ -288,23 +309,22 @@
         #tblpdts td,
         #tblpdts th {
             border: 1px solid #ddd;
-            padding: 8px;
             word-wrap: break-word;
         }
 
-        #tblpdts tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
+        /* #tblpdts tr:nth-child(even) {
+            background-color: rgb(248 250 252);
+        } */
 
         #tblpdts tr:hover {
-            background-color: #ddd;
+            background-color: rgb(248 250 252);;
         }
 
         #tblpdts th {
             padding-top: 12px;
             padding-bottom: 12px;
             text-align: center;
-            background-color: #242424;
+            background-color: rgb(100 116 139);
             ;
             color: white;
         }
@@ -315,19 +335,22 @@
             width: 100%;
         }
 
-        #tblprop td,
-        #tblprop th {
+        #tblprop td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding-left: 8px;
+            padding-right: 8px;
+            padding-top: 3px;
+            padding-bottom: 3px;
         }
 
         #tblprop th {
-            padding-top: 12px;
-            padding-bottom: 12px;
+            border: 1px solid #ddd;
+            padding-left: 8px;
+            padding-right: 8px;
+            padding-top: 3px;
+            padding-bottom: 3px;
             text-align: center;
-            background-color: #242424;
-            ;
-            color: white;
+            text-align: right!important;
         }
 
         .carousel-item img {
@@ -380,7 +403,7 @@
 <footer
     class="bg-neutral-200 text-center dark:bg-neutral-700 lg:text-left flex flex-rows">
     <div class="p-4 grow text-center text-neutral-700 dark:text-neutral-200">
-        © 2021 Universidade do Minho. Todos os direitos reservados &middot; 
+        © 2021 Universidade do Minho. Todos os direitos reservados &middot;
         <a
         class="text-neutral-800 dark:text-neutral-400"
         href="{{route('privacypolicy')}}"
