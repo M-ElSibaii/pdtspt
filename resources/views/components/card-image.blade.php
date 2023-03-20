@@ -1,12 +1,12 @@
 @props(['card_image', 'card_title', 'card_description', 'card_link','card_link_title'])
 <div>
-    <div class="flex justify-center">
+    <div class="flex flex-col">
         <div
             class="block max-w-sm rounded-lg bg-white dark:bg-neutral-700">
-            <div class="p-6">
+            <div class="p-3">
                 <a class="content-center" href="{{ $card_link }}" data-te-ripple-init data-te-ripple-color="light">
                     <img
-                        class="w-auto max-w-[100px] max-h-14"
+                        class="w-auto h-auto max-h-14"
                         src="{{ $card_image }}"
                         alt="" />
                 </a>
