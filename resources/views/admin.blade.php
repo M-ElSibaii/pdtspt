@@ -5,7 +5,7 @@
             <h1>Users</h1>
             <form method="POST" action="{{ route('update.users') }}">
                 @csrf
-                <table id="tblpdts">
+                <table class="table-auto" id="tblpdts">
                     <thead>
                         <tr>
                             <th>User ID</th>
@@ -20,22 +20,30 @@
                     <tbody>
                         @foreach ($users as $user)
                         <tr>
-                            <td>{{ $user->id }}</td>
-                            <td>{{ $user->name }}</td>
-                            <td>{{ $user->email }}</td>
-                            <td>{{ $user->profession }}</td>
-                            <td>{{ $user->institute }}</td>
-                            <td>
-                                <input type="radio" name="isAdmin[{{ $user->id }}]" value="1" {{ $user->isAdmin ? 'checked' : '' }}>
-                                <label for="isAdmin_{{ $user->id }}_yes">Yes</label>
-                                <input type="radio" name="isAdmin[{{ $user->id }}]" value="0" {{ !$user->isAdmin ? 'checked' : '' }}>
-                                <label for="isAdmin_{{ $user->id }}_no">No</label>
+                            <td class="p-1.5">{{ $user->id }}</td>
+                            <td class="p-1.5">{{ $user->name }}</td>
+                            <td class="p-1.5">{{ $user->email }}</td>
+                            <td class="p-1.5">{{ $user->profession }}</td>
+                            <td class="p-1.5">{{ $user->institute }}</td>
+                            <td class="p-1.5">
+                                <div class="form-check form-check-inline">
+                                    <input class="h-4 w-4 border-gray-300 text-slate-600 focus:ring-slate-600" type="radio" name="isAdmin[{{ $user->id }}]" value="1" {{ $user->isAdmin ? 'checked' : '' }}>
+                                    <label class="ml-2 my-auto block text-sm font-medium leading-6 text-gray-900" for="isAdmin_{{ $user->id }}_yes">Yes</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="h-4 w-4 border-gray-300 text-slate-600 focus:ring-slate-600" type="radio" name="isAdmin[{{ $user->id }}]" value="0" {{ !$user->isAdmin ? 'checked' : '' }}>
+                                    <label class="ml-2 my-auto block text-sm font-medium leading-6 text-gray-900" for="isAdmin_{{ $user->id }}_no">No</label>
+                                </div>
                             </td>
-                            <td>
-                                <input type="radio" name="subscribe[{{ $user->id }}]" value="1" {{ $user->subscribe ? 'checked' : '' }}>
-                                <label for="subscribe{{ $user->id }}_yes">Yes</label>
-                                <input type="radio" name="subscribe[{{ $user->id }}]" value="0" {{ !$user->subscribe ? 'checked' : '' }}>
-                                <label for="subscribe{{ $user->id }}_no">No</label>
+                            <td class="p-1.5">
+                                <div class="form-check form-check-inline">
+                                    <input class="h-4 w-4 border-gray-300 text-slate-600 focus:ring-slate-600" type="radio" name="subscribe[{{ $user->id }}]" value="1" {{ $user->subscribe ? 'checked' : '' }}>
+                                    <label class="ml-2 my-auto block text-sm font-medium leading-6 text-gray-900" for="subscribe{{ $user->id }}_yes">Yes</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="h-4 w-4 border-gray-300 text-slate-600 focus:ring-slate-600" type="radio" name="subscribe[{{ $user->id }}]" value="0" {{ !$user->subscribe ? 'checked' : '' }}>
+                                    <label class="ml-2 my-auto block text-sm font-medium leading-6 text-gray-900" for="subscribe{{ $user->id }}_no">No</label>
+                                </div>                            
                             </td>
                         </tr>
                         @endforeach

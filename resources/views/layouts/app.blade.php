@@ -298,7 +298,6 @@
             font-family: 'Trebuchet MS', Arial, Helvetica, sans-serif;
             border-collapse: collapse;
             width: 100%;
-            table-layout: fixed;
         }
 
         button.btn-link {
