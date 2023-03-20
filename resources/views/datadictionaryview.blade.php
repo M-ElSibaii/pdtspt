@@ -88,15 +88,15 @@
                             </td>
                         </tr>
                         <tr>
-                            <th>relationToOtherDataDictionaries</th>
+                            <th>Relation to other data dictionaries</th>
                             <td>{{$propdd->relationToOtherDataDictionaries}}</td>
                         </tr>
                         <tr>
-                            <th>creatorsLanguage</th>
+                            <th>Creators language</th>
                             <td>{{$propdd->creatorsLanguage}}</td>
                         </tr>
                         <tr>
-                            <th>visualRepresentation</th>
+                            <th>Visual representation</th>
                             <td>
                                 @if ($propdd->visualRepresentation == 'True')
                                 <div class='col-sm'>
@@ -106,59 +106,59 @@
                             </td>
                         </tr>
                         <tr>
-                            <th>countryOfUse</th>
+                            <th>Country of use</th>
                             <td>{{$propdd->countryOfUse}}</td>
                         </tr>
                         <tr>
-                            <th>countryOfOrigin</th>
+                            <th>Country of origin</th>
                             <td>{{$propdd->countryOfOrigin}}</td>
                         </tr>
                         <tr>
-                            <th>physicalQuantity</th>
+                            <th>Physical quantity</th>
                             <td>{{$propdd->physicalQuantity}}</td>
                         </tr>
                         <tr>
-                            <th>dimension</th>
+                            <th>Dimension</th>
                             <td>{{$propdd->dimension}}</td>
                         </tr>
                         <tr>
-                            <th>dataType</th>
+                            <th>Data type</th>
                             <td>{{$propdd->dataType}}</td>
                         </tr>
                         <tr>
-                            <th>dynamicProperty</th>
+                            <th>Dynamic property</th>
                             <td>{{$propdd->dynamicProperty}}</td>
                         </tr>
                         <tr>
-                            <th>parametersOfTheDynamicProperty</th>
+                            <th>Parameters of the dynamic property</th>
                             <td>{{$propdd->parametersOfTheDynamicProperty}}</td>
                         </tr>
                         <tr>
-                            <th>namesOfDefiningValues</th>
+                            <th>Names of defining values</th>
                             <td>{{$propdd->namesOfDefiningValues}}</td>
                         </tr>
                         <tr>
-                            <th>definingValues</th>
+                            <th>Defining values</th>
                             <td>{{$propdd->definingValues}}</td>
                         </tr>
                         <tr>
-                            <th>tolerance</th>
+                            <th>Tolerance</th>
                             <td>{{$propdd->tolerance}}</td>
                         </tr>
                         <tr>
-                            <th>digitalFormat</th>
+                            <th>Digital format</th>
                             <td>{{$propdd->digitalFormat}}</td>
                         </tr>
                         <tr>
-                            <th>textFormat</th>
+                            <th>Text format</th>
                             <td>{{$propdd->textFormat}}</td>
                         </tr>
                         <tr>
-                            <th>listOfPossibleValuesInLanguageN</th>
+                            <th>List of possible values in language n</th>
                             <td>{{$propdd->listOfPossibleValuesInLanguageN}}</td>
                         </tr>
                         <tr>
-                            <th>boundaryValues</th>
+                            <th>Boundary values</th>
                             <td>{{$propdd->boundaryValues}}</td>
                         </tr>
                     </tbody>
@@ -168,8 +168,8 @@
                 </div>
                 <table id='tblprop' cellpadding='0' cellspacing='0'>
                     <tr>
-                        <th style="text-align: right!important; width:50%">Modelo de dados</th>
-                        <th style="text-align: right!important;">Descrição da propriedade</th>
+                        <th style="text-align: left!important; width:50%">Modelo de dados</th>
+                        <th style="text-align: left!important;">Descrição da propriedade</th>
                     </tr>
 
                     @foreach ($propinpdts as $proppdts)
