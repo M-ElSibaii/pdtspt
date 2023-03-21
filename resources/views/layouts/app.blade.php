@@ -57,26 +57,26 @@
     </script>
 
     <style>
+        .expand {
+            display: none;
+        }
 
-            .expand {
-                display: none;
-            }
+        .expand+label:before {
+            font-family: "Font Awesome 5 Free";
+            content: "\f068";
+            display: inline-block;
+            font-weight: 800;
+            padding-right: 3px;
+        }
 
-            .expand + label:before {
-                font-family: "Font Awesome 5 Free";
-                content: "\f068"; 
-                display: inline-block;
-                font-weight: 800;
-                padding-right: 3px;
-            }
+        .expand:checked+label:before {
+            font-family: "Font Awesome 5 Free";
+            content: "\f067";
+            display: inline-block;
+            font-weight: 800;
+            padding-right: 3px;
+        }
 
-            .expand:checked + label:before {
-                font-family: "Font Awesome 5 Free";
-                content: "\f067"; 
-                display: inline-block;
-                font-weight: 800;
-                padding-right: 3px;
-            }
         .bd-placeholder-img {
             font-size: 1.125rem;
             text-anchor: middle;
@@ -104,10 +104,11 @@
             width: 1.5rem;
             height: 100vh;
         }
-        .card-footer{
-            background-color: transparent!important;
-            border: none!important;
-            padding: 0!important;
+
+        .card-footer {
+            background-color: transparent !important;
+            border: none !important;
+            padding: 0 !important;
         }
 
         .bi {
@@ -159,7 +160,7 @@
 
             width: auto;
             height: 300px;
-
+            margin-top: 10px;
         }
 
         body {
@@ -316,7 +317,8 @@
         } */
 
         #tblpdts tr:hover {
-            background-color: rgb(248 250 252);;
+            background-color: rgb(248 250 252);
+            ;
         }
 
         #tblpdts th {
@@ -349,7 +351,7 @@
             padding-top: 3px;
             padding-bottom: 3px;
             text-align: center;
-            text-align: right!important;
+            text-align: right !important;
         }
 
         .carousel-item img {
@@ -399,16 +401,12 @@
         {{ $slot }}
     </main>
 </body>
-<footer
-    class="bg-neutral-200 text-center dark:bg-neutral-700 lg:text-left flex flex-rows">
+<footer class="bg-neutral-200 text-center dark:bg-neutral-700 lg:text-left flex flex-rows">
     <div class="p-4 grow text-center text-neutral-700 dark:text-neutral-200">
         © 2021 Universidade do Minho. Todos os direitos reservados &middot;
-        <a
-        class="text-neutral-800 dark:text-neutral-400"
-        href="{{route('privacypolicy')}}"
-        >Política de privacidade</a
-        >
+        <a class="text-neutral-800 dark:text-neutral-400" href="{{route('privacypolicy')}}">Política de privacidade</a>
     </div>
     <p class="p-4 flex-none"><a href="#">Back to top</a></p>
 </footer>
+
 </html>

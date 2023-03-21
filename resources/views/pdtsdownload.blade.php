@@ -11,13 +11,13 @@
                         </div>
                     </div>
                     <div class="flex flex-row gap-2 py-4">
-                        <x-secondary-button id="json" class="btn" >   
+                        <x-secondary-button id="json" class="btn">
                             <i class="fa fa-download"></i>&nbsp;JSON
                         </x-secondary-button>
-                        <x-secondary-button id="csv" class="btn" >   
+                        <x-secondary-button id="csv" class="btn">
                             <i class="fa fa-download"></i>&nbsp;CSV/XLS
                         </x-secondary-button>
-                        <x-secondary-button id="txt" class="btn" >   
+                        <x-secondary-button id="txt" class="btn">
                             <i class="fa fa-download"></i>&nbsp;TXT
                         </x-secondary-button>
                     </div>
@@ -25,7 +25,7 @@
                 <div>
                     <table class="table-auto" id="tblpdts" cellpadding="0" cellspacing="0">
                         <tr>
-                            <th>Propriedade </th>
+                            <th>Propriedade</th>
                             <th>Unidade</th>
                             <th>Descrição</th>
                             <th>Documento de referência</th>
@@ -41,9 +41,9 @@
                         </tbody>
 
                         <tbody class="hide">
-                        @foreach($joined_properties as $property)
+                            @foreach($joined_properties as $property)
 
-                        @if($property->gopID == $group->Id)
+                            @if($property->gopID == $group->Id)
                             <tr>
                                 <td class="p-1.5">
                                     <a href="{{ route('datadictionaryview', ['propID' => $property->GUID , 'propV' => $property->versionNumber, 'propR' => $property->revisionNumber]) }}">{{ $property->namePt }}</a>
@@ -52,7 +52,7 @@
                                     {{ $property->units }}
                                 </td>
                                 <td class="p-1.5">
-                                    <div class="flex flex-row">
+                                    <div class="flex flex-col">
                                         <p>{{$property->descriptionPt}}</p>
                                         @if($property->visualRepresentation == True)
                                         <div class="col-sm">
@@ -80,9 +80,7 @@
                     </table>
                     <div class="my-6 text-end">
                         <a href="/dashboard">
-                            <x-secondary-button
-                                id="backButton"
-                                type="button">
+                            <x-secondary-button id="backButton" type="button">
                                 Anterior
                             </x-secondary-button>
                         </a>
@@ -91,9 +89,40 @@
             </div>
         </div>
     </div>
+    <table hidden id="tblpdtsh">
+        <tr>
+            <th style="width: 15%;">Grupo de propriedades</th>
+            <th>Propriedade </th>
+            <th style="width: 7%;">Unidade</th>
+            <th style="width: 40%;">Descrição</th>
+            <th style="width: 16%;">Documento de referência</th>
+        </tr>
+        @foreach($gop as $group)
+        @foreach($joined_properties as $property)
+        @if($property->gopID == $group->Id)
 
+        <tr>
+            <td>
+                {{ $group->gopNamePt }}
+            </td>
+            <td>
+                {{ $property->namePt }}
+            </td>
+            <td>
+                {{ $property->units }}
+            </td>
+            <td>
+                {{$property->descriptionPt}}
+            </td>
+            <td>
+                {{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->rdName }}
+            </td>
 
-
+        </tr>
+        @endif
+        @endforeach
+        @endforeach
+    </table>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.min.js"></script>
@@ -103,25 +132,25 @@
 
     <script>
         $(document).ready(function() {
-            $('[data-toggle="toggle"]').change(function(){
+            $('[data-toggle="toggle"]').change(function() {
                 $(this).parents().next('.hide').toggle();
             });
         });
         $("#json").on("click", function() {
-            $("#tblpdts").tableHTMLExport({
+            $("#tblpdtsh").tableHTMLExport({
                 type: "json",
                 filename: "{{ $pdt[0]->pdtNameEn }} data template.json",
             });
         });
         $("#csv").on("click", function() {
-            $("#tblpdts").tableHTMLExport({
+            $("#tblpdtsh").tableHTMLExport({
                 type: "csv",
                 filename: "{{ $pdt[0]->pdtNameEn }} data template.csv"
             });
         });
 
         $("#txt").on("click", function() {
-            $("#tblpdts").tableHTMLExport({
+            $("#tblpdtsh").tableHTMLExport({
                 type: "txt",
                 filename: "{{ $pdt[0]->pdtNameEn }} data template.txt"
             });

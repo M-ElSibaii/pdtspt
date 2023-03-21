@@ -46,33 +46,33 @@ Route::post('/contact', [ContactController::class, 'store'])->name('contact.stor
 
 Route::get('/dashboard', [ProductdatatemplatesController::class, 'getLatestPDTs'], function () {
     return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/pdtsdownload/{pdtID}', [GroupofpropertiesController::class, 'getGroupOfProperties'])
-    ->middleware(['auth'])->name('pdtsdownload');
+    ->middleware(['auth', 'verified'])->name('pdtsdownload');
 
-Route::middleware('auth')->group(function () {
+Route::middleware('auth', 'verified')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 Route::delete('/profile/photo', [ProfileController::class, 'deletePhoto'])
-    ->middleware(['auth'])->name('profile.deletePhoto');
+    ->middleware(['auth', 'verified'])->name('profile.deletePhoto');
 Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])
-    ->middleware(['auth'])->name('profile.updatePhoto');
+    ->middleware(['auth', 'verified'])->name('profile.updatePhoto');
 Route::post('/updateSubscription', [ProfileController::class, 'updateSubscription'])
-    ->middleware(['auth'])->name('profile.updateSubscription');
+    ->middleware(['auth', 'verified'])->name('profile.updateSubscription');
 
 require __DIR__ . '/auth.php';
 
 Route::get('/pdtssurvey/{pdtID}', [GroupofpropertiesController::class, 'getGroupOfProperties2'])
-    ->middleware(['auth'])->name('pdtssurvey');
+    ->middleware(['auth', 'verified'])->name('pdtssurvey');
 Route::post('/pdtssurvey/saveAnswers', [GroupofpropertiesController::class, 'saveAnswers'])
-    ->middleware(['auth'])->name('saveAnswers');
+    ->middleware(['auth', 'verified'])->name('saveAnswers');
 Route::post('/pdtssurvey/{pdtID}', [GroupofpropertiesController::class, 'store'])
-    ->middleware(['auth']);
+    ->middleware(['auth', 'verified']);
 Route::post('/pdtssurvey/store', [GroupofpropertiesController::class, 'store'])
-    ->middleware(['auth'])->name('pdtssurveystore');
+    ->middleware(['auth', 'verified'])->name('pdtssurveystore');
 
 Route::post('/comments/{propID}', [GroupofpropertiesController::class, 'getCommentProperty']);
 
@@ -82,13 +82,13 @@ Route::delete('/deletefeedback', [GroupofpropertiesController::class, 'destroyfe
 Route::get(
     '/datadictionaryview/{propID}{propV}{propR}',
     [PropertiesdatadictionariesController::class, 'getPropertyDataDictionary']
-)->middleware(['auth'])->name('datadictionaryview');
+)->middleware(['auth', 'verified'])->name('datadictionaryview');
 
 Route::get(
     '/referencedocumentview/{rdGUID}',
     [ReferencedocumentsController::class, 'getReferenceDocument']
-)->middleware(['auth'])->name('referencedocumentview');
+)->middleware(['auth', 'verified'])->name('referencedocumentview');
 
-Route::get('/admin', [UserController::class, 'index'])->middleware(['auth'])->name('admin');
+Route::get('/admin', [UserController::class, 'index'])->middleware(['auth', 'verified'])->name('admin');
 
-Route::post('/admin/update', [UserController::class, 'updateUsers'])->middleware(['auth'])->name('update.users');
+Route::post('/admin/update', [UserController::class, 'updateUsers'])->middleware(['auth', 'verified'])->name('update.users');

@@ -25,8 +25,8 @@ class ReferencedocumentsController extends Controller
             ->where('properties.referenceDocumentGUID', $rdGUID)
             ->select(
                 'propertiesdatadictionaries.GUID',
-                'propertiesdatadictionaries.nameEn',
-                'productdatatemplates.pdtNameEn',
+                'propertiesdatadictionaries.namePt',
+                'productdatatemplates.pdtNamePt',
                 'productdatatemplates.versionNumber',
                 'productdatatemplates.revisionNumber'
             )

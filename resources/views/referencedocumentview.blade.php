@@ -48,7 +48,7 @@
                                 @foreach ($rdinprop as $proprd)
 
                                 <tr>
-                                    <td> {{$proprd->pdtNamePt}}</td>
+                                    <td>{{$proprd->pdtNamePt}}</td>
                                     <td>{{$proprd->versionNumber}}.{{$proprd->revisionNumber}}</td>
                                     <td>{{$proprd->namePt}}</td>
                                     <td>{{$proprd->GUID}}</td>
