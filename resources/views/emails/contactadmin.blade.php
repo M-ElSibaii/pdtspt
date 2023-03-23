@@ -1,13 +1,13 @@
 @component('mail::message')
-# You recieved the following query
+# Recebeu a seguinte pedido de contacto
 <br>
-<strong>Contact request details: </strong><br>
-<strong>Name: </strong>{{ $emailArray['name'] }} <br>
+<strong>Detalhes do pedido de contacto: </strong><br>
+<strong>Nome: </strong>{{ $emailArray['name'] }} <br>
 <strong>Email: </strong>{{ $emailArray['email'] }} <br>
-<strong>Subject: </strong>{{ $emailArray['subject'] }} <br>
-<strong>Message: </strong>{{ $emailArray['message'] }} <br>
+<strong>Assunto: </strong>{{ $emailArray['subject'] }} <br>
+<strong>Mensagem: </strong>{{ $emailArray['message'] }} <br>
 <br>
-<strong>Thank you</strong><br>
-<strong>Best regards</strong>
+<strong>Obrigado</strong><br>
+<strong>Com os melhores cumprimentos</strong>
 
 @endcomponent

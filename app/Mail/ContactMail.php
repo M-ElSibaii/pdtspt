@@ -33,7 +33,7 @@ class ContactMail extends Mailable
     {
         return new Envelope(
             from: new Address('pdts.portugal@gmail.com', 'PDTs.pt'),
-            subject: 'We recieved your query'
+            subject: 'Recebemos o seu pedido'
         );
     }
     /**

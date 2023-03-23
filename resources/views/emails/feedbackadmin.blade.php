@@ -1,13 +1,13 @@
 @component('mail::message')
-# Feedback was added to a PDT
+# foi acrescentado um comentário a um PDT
 <br>
-<strong>Feedback details: </strong><br>
-<strong>user name: </strong>{{ Auth::user()->name }} <br>
+<strong>detalhes dos comentários: </strong><br>
+<strong>Nome: </strong>{{ Auth::user()->name }} <br>
 <strong>PDT: </strong>{{ $pdtName }} <br>
-<strong>property: </strong>{{ $propertyName }} <br>
-<strong>feedback: </strong>{{ $commentbody }} <br>
+<strong>Propriedade: </strong>{{ $propertyName }} <br>
+<strong>Comentários: </strong>{{ $commentbody }} <br>
 <br>
-<strong>Thank you</strong><br>
-<strong>Best regards</strong>
+<strong>Obrigado</strong><br>
+<strong>Com os melhores cumprimentos</strong>
 
 @endcomponent

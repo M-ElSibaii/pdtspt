@@ -1,12 +1,12 @@
 @component('mail::message')
-# Thank you for contacting us
-<strong>We will reply to your message shortly</strong><br>
-<strong>Best regards</strong><br>
+# Obrigado por nos contactar
+<strong>Em breve responderemos à sua mensagem</strong><br>
+<strong>Com os melhores cumprimentos</strong>
 <br>
-<strong>Contact request details: </strong><br>
-<strong>Name: </strong>{{ $emailArray['name'] }} <br>
+<strong>Detalhes do pedido de contacto: </strong><br>
+<strong>Nome: </strong>{{ $emailArray['name'] }} <br>
 <strong>Email: </strong>{{ $emailArray['email'] }} <br>
-<strong>Subject: </strong>{{ $emailArray['subject'] }} <br>
-<strong>Message: </strong>{{ $emailArray['message'] }} <br>
+<strong>Assunto: </strong>{{ $emailArray['subject'] }} <br>
+<strong>Mensagem: </strong>{{ $emailArray['message'] }} <br>
 <br>
 @endcomponent

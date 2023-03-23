@@ -35,7 +35,7 @@ class ContactMailAdmin extends Mailable
     {
         return new Envelope(
             from: new Address('pdts.portugal@gmail.com', 'PDTs.pt'),
-            subject: 'You recieved a PDT query',
+            subject: 'Recebeu um pedido de contacto',
         );
     }
     /**
