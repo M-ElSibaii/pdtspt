@@ -28,10 +28,10 @@
                 <h3 class="py-6">Propriedades que utilizam este documento de referência:</h3>
                 <table id='tblprop' cellpadding='0' cellspacing='0'>
                     <tr>
-                        <th>Modelo de dados</th>
-                        <th>Versão</th>
-                        <th>Propriedade</th>
-                        <th>GUID de propriedade</th>
+                        <th style="text-align: left!important;">Modelo de dados</th>
+                        <th style="text-align: left!important;">Versão</th>
+                        <th style="text-align: left!important;">Propriedade</th>
+                        <th style="text-align: left!important;">GUID de propriedade</th>
                     </tr>
 
                     @foreach ($rdinprop as $proprd)
