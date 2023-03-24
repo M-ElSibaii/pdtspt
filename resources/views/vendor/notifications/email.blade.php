@@ -1,58 +1,29 @@
-<x-mail::message>
-    {{-- Greeting --}}
-    @if (! empty($greeting))
-    # {{ $greeting }}
-    @else
-    @if ($level === 'error')
-    # @lang('Whoops!')
-    @else
-    # @lang('Ola!')
-    @endif
-    @endif
+@component('mail::message')
+# Ola!
+<strong>Por favor clique no botão abaixo para verificar o seu endereço de correio electrónico.</strong><br>
 
-    {{-- Intro Lines --}}
-    @foreach ($introLines as $line)
-    {{ $line }}
+{{-- Action Button --}}
+@isset($actionText)
+<?php
+$color = match ($level) {
+    'success', 'error' => $level,
+    default => 'primary',
+};
+?>
+<x-mail::button :url="$actionUrl" :color="$color">
+    {{ $actionText }}
+</x-mail::button>
+@endisset
 
-    @endforeach
-
-    {{-- Action Button --}}
-    @isset($actionText)
-    <?php
-    $color = match ($level) {
-        'success', 'error' => $level,
-        default => 'primary',
-    };
-    ?>
-    <x-mail::button :url="$actionUrl" :color="$color">
-        {{ $actionText }}
-    </x-mail::button>
-    @endisset
-
-    {{-- Outro Lines --}}
-    @foreach ($outroLines as $line)
-    {{ $line }}
-
-    @endforeach
-
-    {{-- Salutation --}}
-    @if (! empty($salutation))
-    {{ $salutation }}
-    @else
-    @lang('Regards'),<br>
-    @lang('PDTs.pt')
-    @endif
-
-    {{-- Subcopy --}}
-    @isset($actionText)
-    <x-slot:subcopy>
-        @lang(
-        "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\n".
-        'into your web browser:',
-        [
-        'actionText' => $actionText,
-        ]
-        ) <span class="break-all">[{{ $displayableActionUrl }}]({{ $actionUrl }})</span>
-    </x-slot:subcopy>
-    @endisset
-</x-mail::message>
+@isset($actionText)
+<x-slot:subcopy>
+    @lang(
+    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\n".
+    'into your web browser:',
+    [
+    'actionText' => $actionText,
+    ]
+    ) <span class="break-all">[{{ $displayableActionUrl }}]({{ $actionUrl }})</span>
+</x-slot:subcopy>
+@endisset
+@endcomponent

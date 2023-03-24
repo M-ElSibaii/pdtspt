@@ -306,7 +306,16 @@
             word-wrap: break-word;
         }
 
-        #tblpdts td,
+        #tblpdts td {
+            border: 1px solid #ddd;
+            word-wrap: break-word;
+        }
+
+        #tblpdts .property-td {
+            word-wrap: break-word;
+            max-width: 200px;
+        }
+
         #tblpdts th {
             border: 1px solid #ddd;
             word-wrap: break-word;
@@ -329,6 +338,7 @@
             ;
             color: white;
         }
+
 
         #tblprop {
             font-family: 'Trebuchet MS', Arial, Helvetica, sans-serif;

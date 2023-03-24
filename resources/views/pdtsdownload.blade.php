@@ -45,7 +45,7 @@
 
                             @if($property->gopID == $group->Id)
                             <tr>
-                                <td class="p-1.5">
+                                <td class="p-1.5 property-td">
                                     <a href="{{ route('datadictionaryview', ['propID' => $property->GUID , 'propV' => $property->versionNumber, 'propR' => $property->revisionNumber]) }}">{{ $property->namePt }}</a>
                                 </td>
                                 <td class="p-1.5">

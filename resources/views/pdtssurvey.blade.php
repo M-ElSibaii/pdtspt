@@ -44,7 +44,7 @@
                             @foreach($joined_properties as $property)
                             @if($property->gopID == $group->Id)
                             <tr>
-                                <td class="p-1.5">
+                                <td class="p-1.5 property-td">
                                     <a href="{{ route('datadictionaryview', ['propID' => $property->GUID , 'propV' => $property->versionNumber, 'propR' => $property->revisionNumber]) }}">{{ $property->namePt }}</a>
                                 </td>
                                 <td class="p-1.5">
@@ -95,7 +95,7 @@
                                     </div>
                                 </td>
                                 <td class="p-1.5">
-                                    <x-nav-link type="button" id="loadComments-{{$property->Id}}" onclick="loadComments(this, {{$property->Id}})">
+                                    <x-nav-link type="button" id="loadComments-{{$property->Id}}" onclick="loadComments(this, '{{$property->Id}}')">
                                         Comentários ({{ \App\Models\comments::where('properties_Id', $property->Id)->count() }})
                                     </x-nav-link>
                                 </td>
@@ -105,18 +105,14 @@
                         </tbody>
                         @endforeach
                     </table>
-                        
+
                     <div class="my-6 text-end">
                         <a href="/dashboard">
-                            <x-secondary-button
-                                id="backButton"
-                                type="button">
+                            <x-secondary-button id="backButton" type="button">
                                 Anterior
                             </x-secondary-button>
                         </a>
-                        <x-primary-button
-                            id="saveButton"
-                            type="submit">
+                        <x-primary-button id="saveButton" type="submit">
                             Guardar Respostas
                         </x-primary-button>
                     </div>
@@ -124,16 +120,19 @@
                 </form>
             </section>
         </div>
-    
+
         <x-modal-popup />
-        
+
     </div>
     <script>
+        $(".alert").alert();
+
         $(document).ready(function() {
-            $('[data-toggle="toggle"]').change(function(){
+            $('[data-toggle="toggle"]').change(function() {
                 $(this).parents().next('.hide').toggle();
             });
         });
+
         function insertComment(id) {
 
             var data = {
@@ -142,11 +141,11 @@
             };
             $('#message').val(''),
 
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
 
             $.ajax({
                 type: "POST",
@@ -160,7 +159,7 @@
 
                     } else {
                         addComment(response.comment[0]);
-                        
+
                     }
                 }
             });
@@ -169,11 +168,11 @@
 
         function closeModal(id) {
 
-            $("div[id='comments-addbutton-"+id+"']").replaceWith('<div id="comments-addbutton-'+id+'">\
+            $("div[id='comments-addbutton-" + id + "']").replaceWith('<div id="comments-addbutton-' + id + '">\
                         <a data-te-ripple-init data-te-ripple-color="light" \
                             type="submit" \
                             class="inline-flex items-center px-4 py-2 bg-slate-700 dark:bg-slate-200 rounded-md font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-slate-900 dark:hover:bg-white focus:bg-slate-900 dark:focus:bg-white active:bg-slate-900 dark:active:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150" \
-                            onclick="openModal('+id+')" \
+                            onclick="openModal(' + id + ')" \
                             type="button">\
                             Adicionar comentário\
                         </a>\
@@ -182,32 +181,34 @@
 
         function openModal(id) {
 
-            $("div[id='comments-addbutton-"+id+"']").replaceWith('<div id="comments-addbutton-'+id+'" class="flex flex-col addcommentrow">\
+            $("div[id='comments-addbutton-" + id + "']").replaceWith('<div id="comments-addbutton-' + id + '" class="flex flex-col addcommentrow">\
                 <lable>Adicionar comentário</lable>\
                 <textarea class="form-control" name="message" id="message"></textarea>\
                 <div class="flex flex-row gap-4 my-2">\
-                    <a type="button" style="float:right" data-te-ripple-init data-te-ripple-color="light" class="inline-flex items-center px-4 py-2 bg-slate-700 dark:bg-slate-200 rounded-md font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-slate-900 dark:hover:bg-white focus:bg-slate-900 dark:focus:bg-white active:bg-slate-900 dark:active:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150" onclick="insertComment('+id+')" id="insertComment">Adicionar comentário</a>\
-                    <a type="button" style="float:right" data-te-ripple-init data-te-ripple-color="light" class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-500 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-25 transition ease-in-out duration-150" onclick="closeModal('+id+')">Cancelar</a>\
+                    <a type="button" style="float:right" data-te-ripple-init data-te-ripple-color="light" class="inline-flex items-center px-4 py-2 bg-slate-700 dark:bg-slate-200 rounded-md font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-slate-900 dark:hover:bg-white focus:bg-slate-900 dark:focus:bg-white active:bg-slate-900 dark:active:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150" onclick="insertComment(' + id + ')" id="insertComment">Adicionar comentário</a>\
+                    <a type="button" style="float:right" data-te-ripple-init data-te-ripple-color="light" class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-500 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-25 transition ease-in-out duration-150" onclick="closeModal(' + id + ')">Cancelar</a>\
                 </div>\
             </div>');
         }
-        function unloadComments(id){
-            $("td[id^='comments-line-"+id+"']").remove('');
-            $("a[id^='loadComments-"+id+"']").attr("onclick","loadComments(this, "+id+")");
+
+        function unloadComments(id) {
+            $("td[id^='comments-line-" + id + "']").remove('');
+            $("a[id^='loadComments-" + id + "']").attr("onclick", "loadComments(this, " + id + ")");
         }
+
         function loadComments(e, id) {
 
             $("td[id^='comments-line-']").remove('');
-            $("a[id^='loadComments-"+id+"']").attr("onclick","unloadComments("+id+")");
-            $('<td class="text-left content-start p-6" id="comments-line-'+id+'" colspan="6">\
+            $("a[id^='loadComments-" + id + "']").attr("onclick", "unloadComments(" + id + ")");
+            $('<td class="text-left content-start p-6" id="comments-line-' + id + '" colspan="6">\
                     <h4 class="mb-6">Comentários</h4>\
-                    <div id="comments-section-'+id+'">\
+                    <div id="comments-section-' + id + '">\
                     </div>\
-                    <div id="comments-addbutton-'+id+'">\
+                    <div id="comments-addbutton-' + id + '">\
                         <a data-te-ripple-init data-te-ripple-color="light" \
                             type="submit" \
                             class="inline-flex items-center px-4 py-2 bg-slate-700 dark:bg-slate-200 rounded-md font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-slate-900 dark:hover:bg-white focus:bg-slate-900 dark:focus:bg-white active:bg-slate-900 dark:active:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150" \
-                            onclick="openModal('+id+')" \
+                            onclick="openModal(' + id + ')" \
                             type="button">\
                             Adicionar comentário\
                         </a>\
@@ -222,34 +223,33 @@
             $.ajax({
                 type: "POST",
                 url: "/comments/" + id,
-                success: function (response) {
+                success: function(response) {
                     console.log(response.comments)
-                    for (let index = 0; index < response.comments.length; index++) {               
+                    for (let index = 0; index < response.comments.length; index++) {
                         addComment(response.comments[index]);
-                        
+
                     }
                 }
             });
-            
+
         }
 
         function addComment(comment) {
 
             var section = '';
-            section = '<div id="commentbodysection' + comment.id + '" class="w-full mb-4">\
-                    <div class="flex flex-row">';
-            if (comment.user.photo != null ){
-                section += '<img src="{{ asset(' + comment.user.photo + ') }}" alt="{{ ' + comment.user.name + ' }}" class="img-fluid rounded-circle mr-3" style="width: 40px; height: 40px;">';
+            section = "<div id='commentbodysection'" + comment.id + "' class='w-full mb-4'>\
+                    <div class='flex flex-row'>";
+            if (comment.user.photo != null) {
+                section += "<img src='{{ asset(' + comment.user.photo + ') }}' alt='{{ ' + comment.user.name + ' }}' class='img-fluid rounded-circle mr-3' style='width: 40px; height: 40px;'>";
+            } else {
+                section += "<img src='{{ asset('img/users/default.png ') }}' alt='{{ " + comment.user.name + " }}' class='img-fluid rounded-circle mr-3' style='width: 40px; height: 40px;'>";
             }
-            else {
-                section += '<img src="{{ asset('img/users/default.png') }}" alt="{{ ' + comment.user.name + ' }}" class="img-fluid rounded-circle mr-3" style="width: 40px; height: 40px;">';
-            }
-            section += '<div class="flex flex-col w-full">\
-                <div class="flex flex-row gap-2 align-bottom">\
-                    <span class="font-bold my-auto">' + comment.user.name + '</span>\
-                    <span class="text-xs font-thin my-auto">' + moment(comment.created_at).fromNow() + '</span>';
-            if (comment.user.name == '{{Auth::user()->name}}' ){
-                section += '<a class="text-xs font-thin my-auto" type="button" data-te-toggle="modal" data-te-target="#DeleteModal" style="color: red;" onclick="openDeleteModal(' + comment.id + ')">Apagar</a>';
+            section += "<div class='flex flex-col w-full'>\
+                <div class='flex flex-row gap-2 align-bottom'>\
+                    <span class='font-bold my-auto'>" + comment.user.name + "</span>\
+                    <span class='text-xs font-thin my-auto'>" + moment(comment.created_at).fromNow() + "</span>";
+            if (comment.user.name == "{{Auth::user()->name}}") {
+                section += "<a class='text-xs font-thin my-auto' type='button' data-te-toggle='modal' data-te-target='#DeleteModal' style='color: red;' onclick='openDeleteModal(" + comment.id + ")'>Apagar</a>";
             }
             section += '</div>\
                         <div class="div-comment flex-gow">\
@@ -259,7 +259,7 @@
                     </div>\
             </div>';
             $('#comments-section-' + comment.properties_Id).append(section);
-        
+
         }
 
         function openDeleteModal(id) {
@@ -289,7 +289,5 @@
                 }
             });
         });
-
-        
     </script>
 </x-app-layout>
