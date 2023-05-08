@@ -17,19 +17,21 @@
                     <p class="flex-none inline"> - V{{ $pdt[0]->versionNumber }}.{{ $pdt[0]->revisionNumber }}</p>
                 </div>
                 <form name="form" id="form" method="post" action="{{ route('saveAnswers') }}">
+                    <input type="hidden" name="pdtName" value="{{ $pdt[0]->pdtNamePt }}">
+
                     @csrf
                     <table class="table-auto" id="tblpdts" cellpadding="0" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th>Propriedade</th>
-                                <th>Unidade</th>
-                                <th>Descrição</th>
-                                <th>Documento de referência</th>
-                                <th>Questão</th>
-                                <th>Comentários</th>
-                            </tr>
-                        </thead>
-                        @csrf
+
+                        <tr>
+                            <th>Propriedade</th>
+                            <th>Unidade</th>
+                            <th>Descrição</th>
+                            <th>Documento de referência</th>
+                            <th>Questão</th>
+                            <th>Comentários</th>
+                        </tr>
+
+
 
                         @foreach($gop as $group)
                         <tbody>
@@ -51,7 +53,7 @@
                                     {{ $property->units }}
                                 </td>
                                 <td class="p-1.5">
-                                    <div class="flex flex-row">
+                                    <div class="flex flex-col">
                                         <p>{{$property->descriptionPt}}</p>
                                         @if($property->visualRepresentation == True)
                                         <div class="col-sm">
@@ -155,7 +157,7 @@
                 success: function(response) {
                     console.log(response);
                     if (response.status == 400) {
-                        alert('Nenhum conteúdo no feedback. O campo de feedback é obrigatório')
+                        alert('Nenhum conteúdo no feedback. O campo de comentário é obrigatório')
 
                     } else {
                         addComment(response.comment[0]);

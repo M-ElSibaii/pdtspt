@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Mail\FeedbackMailAdmin;
 use App\Mail\FeedbackMailUsers;
+use App\Mail\SurveyMailAdmin;
 use Illuminate\Support\Facades\Mail;
 
 class GroupofpropertiesController extends Controller
@@ -204,7 +205,10 @@ class GroupofpropertiesController extends Controller
             // $userName = User::where('id', Auth::id())->first('name');
             Mail::to('pdts.portugal@gmail.com')->send(new FeedbackMailAdmin($commentbody, $pdtName, $propertyName));
             foreach ($emails as $email) {
-                Mail::to($email)->send(new FeedbackMailUsers($commentbody, $pdtName, $propertyName));
+                // Only send the email if it doesn't belong to the logged in user
+                if ($email !== Auth::user()->email) {
+                    Mail::to($email)->send(new FeedbackMailUsers($commentbody, $pdtName, $propertyName));
+                }
             }
             $comment = new comments;
             $comment->body = $request->input('body');
@@ -220,7 +224,7 @@ class GroupofpropertiesController extends Controller
 
             return response()->json([
                 'status' => 200,
-                'message' => 'Feedback adicionado com sucesso.',
+                'message' => 'Comentário adicionado com sucesso.',
                 'comment' => $comment,
 
             ]);
@@ -230,7 +234,11 @@ class GroupofpropertiesController extends Controller
     public function saveAnswers(Request $request)
     {
         $userId = Auth::user()->id;
-        $answers = $request->all();
+        $pdtName = $request->input('pdtName');
+        Mail::to('pdts.portugal@gmail.com')->send(new SurveyMailAdmin($pdtName));
+
+        $answers = $request->except('pdtName');
+
         foreach ($answers as $properties_id => $answer) {
             if ($properties_id != '_token') {
                 $existingAnswer = Answers::where('users_id', $userId)
@@ -254,6 +262,9 @@ class GroupofpropertiesController extends Controller
                 }
             }
         }
+
+
+
         return redirect()->back()->with('success', 'Respostas guardadas com sucesso');
     }
 
@@ -275,7 +286,7 @@ class GroupofpropertiesController extends Controller
             $comment->delete();
             return response()->json([
                 'status' => 200,
-                'message' => 'Feedback Apagado com Sucesso.',
+                'message' => 'Comentário Apagado com Sucesso.',
                 'comment_id' => $commentId
             ]);
         } else {

@@ -40,7 +40,7 @@ class FeedbackMailAdmin extends Mailable
     {
         return new Envelope(
             from: new Address('pdts.portugal@gmail.com', 'PDTs.pt'),
-            subject: 'Feedback added on a PDT',
+            subject: 'Foi acrescentado um comentário sobre um PDT',
         );
     }
 

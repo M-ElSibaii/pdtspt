@@ -5,30 +5,30 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Mail\Mailables\Address;
 
-class FeedbackMailUsers extends Mailable
+class SurveyMailAdmin extends Mailable
 {
     use Queueable, SerializesModels;
-    public $commentbody;
+
     //public $userName;
     public $pdtName;
-    public $propertyName;
+
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($commentbody, $pdtName, $propertyName)
+    public function __construct($pdtName)
     {
-        $this->commentbody = $commentbody;
+
         $this->pdtName = $pdtName;
-        // $this->userName = $userName;
-        $this->propertyName = $propertyName;
+        //  $this->userName = $userName;
+
     }
 
     /**
@@ -40,15 +40,14 @@ class FeedbackMailUsers extends Mailable
     {
         return new Envelope(
             from: new Address('pdts.portugal@gmail.com', 'PDTs.pt'),
-            subject: 'Foi acrescentado um comentário sobre um PDT comentado por si',
+            subject: 'As respostas foram acrescentadas ao inquérito de um PDT',
         );
     }
 
     public function build()
     {
-        return $this->markdown('emails.feedbackuser');
+        return $this->markdown('emails.surveyadmin');
     }
-
     /**
      * Get the message content definition.
      *
