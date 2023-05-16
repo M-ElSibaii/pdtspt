@@ -13,14 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('depreciatedproperties', function (Blueprint $table) {
-            $table->id();
-            $table->string('propGUID', 255);
-            $table->string('gopGUID', 255);
+        Schema::table('depreciatedpdts', function (Blueprint $table) {
             $table->string('pdtGUID', 255);
             $table->date('depreciationDate');
             $table->text('depreciationExplanation');
-            $table->timestamps();
         });
     }
 
@@ -31,6 +27,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('depreciatedproperties');
+        Schema::table('depreciatedpdts', function (Blueprint $table) {
+            //
+        });
     }
 };

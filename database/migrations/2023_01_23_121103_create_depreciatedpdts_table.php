@@ -15,6 +15,9 @@ return new class extends Migration
     {
         Schema::create('depreciatedpdts', function (Blueprint $table) {
             $table->id();
+            $table->string('pdtGUID', 255);
+            $table->date('depreciationDate');
+            $table->text('depreciationExplanation');
             $table->timestamps();
         });
     }

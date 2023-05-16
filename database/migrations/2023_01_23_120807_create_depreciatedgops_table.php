@@ -15,6 +15,10 @@ return new class extends Migration
     {
         Schema::create('depreciatedgops', function (Blueprint $table) {
             $table->id();
+            $table->string('gopGUID', 255);
+            $table->string('pdtGUID', 255);
+            $table->date('depreciationDate');
+            $table->text('depreciationExplanation');
             $table->timestamps();
         });
     }
