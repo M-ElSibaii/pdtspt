@@ -22,7 +22,9 @@
                         </x-secondary-button>
                     </div>
                 </div>
-                <div class="overflow-scroll">
+                <div class="overflow-scroll" style="
+                overflow: scroll;
+            ">
                     <table class="table-auto" id="tblpdts" cellpadding="0" cellspacing="0">
                         <tr>
                             <th>Propriedade</th>

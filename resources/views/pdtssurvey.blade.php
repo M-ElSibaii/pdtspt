@@ -16,7 +16,9 @@
                     <h1 class="flex-none inline">{{ $pdt[0]->pdtNamePt }}</h1>
                     <p class="flex-none inline"> - V{{ $pdt[0]->versionNumber }}.{{ $pdt[0]->revisionNumber }}</p>
                 </div>
-                <form class="overflow-scroll" name="form" id="form" method="post" action="{{ route('saveAnswers') }}">
+                <form class="overflow-scroll" name="form" id="form" method="post" action="{{ route('saveAnswers') }}" style="
+                overflow: scroll;
+            ">
                     <input type="hidden" name="pdtName" value="{{ $pdt[0]->pdtNamePt }}">
 
                     @csrf
