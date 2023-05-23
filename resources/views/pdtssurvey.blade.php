@@ -297,6 +297,8 @@
                     alert("Feedback apagado com sucesso!")
 
                     console.log($(parent).attr('id'))
+                    console.log($(parent).attr('id').replace('comments-section-', ''))
+                    var id = $(parent).attr('id').replace('comments-section-', '');
 
                     var comments = $('#loadComments-' + id).text();
                     var oldNumberComments = comments.replace(' Comentários (','');
