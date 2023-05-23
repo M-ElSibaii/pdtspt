@@ -4,7 +4,16 @@
             <h1>Atributos de propriedade no dicionário de dados baseado em EN ISO 23386</h1>
             <div class='py-6'>
                 <div class=''>
-                    <h1>{{$propdd->namePt}} </h1>
+                    {{-- <h1>{{$propdd->namePt}} </h1> --}}
+                    <div class="flex-none inline">
+                        <h1 class="flex-none inline">{{ $propdd->namePt }}</h1>
+                        <p class="flex-none inline"> - V{{ $propdd->versionNumber }}.{{ $propdd->revisionNumber }}</p>
+                        @if($propdd->status == 'Active')
+                            <span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">ativa</span>
+                        @else
+                            <span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">deprecada</span>
+                        @endif
+                    </div>
                 </div>
                 <table id='tblprop' cellpadding='0' cellspacing='0'>
                     <tbody>
@@ -12,91 +21,94 @@
                             <th class="lg:w-1/4 md:w-1/4 sm:w-1/2">GUID</th>
                             <td class="lg:w-3/4 md:w-3/4 sm:w-1/2">{{$propdd->GUID}}</td>
                         </tr>
-                        <th>Name En</th>
-                        <td>{{$propdd->nameEn}}</td>
                         <tr>
-                            <th>Name Pt</th>
+                            <th>Nome En</th>
+                            <td>{{$propdd->nameEn}}</td>
+                        </tr>
+                        <tr>
+                            <th>Nome Pt</th>
                             <td>{{$propdd->namePt}}</td>
+                        </tr>
                         <tr>
-                            <th>Description</th>
+                            <th>Descrição En</th>
                             <td>{{$propdd->definitionEn}}</td>
                         </tr>
-                        <th>Description Pt</th>
-                        <td>{{$propdd->definitionPt}}</td>
+                        <tr>
+                            <th>Descrição Pt</th>
+                            <td>{{$propdd->definitionPt}}</td>
                         </tr>
                         <tr>
-                            <th>Unit</th>
+                            <th>Unidades</th>
                             <td>{{$propdd->units}}</td>
                         </tr>
                         <tr>
-                            <th>Status</th>
+                            <th>Estado</th>
                             <td>{{$propdd->status}}</td>
                         </tr>
                         <tr>
-                            <th>Date of creation</th>
+                            <th>Data de criação</th>
                             <td>{{$propdd->dateOfCreation}}</td>
                         </tr>
                         <tr>
-                            <th>Date of activation</th>
+                            <th>Data de ativação</th>
                             <td>{{$propdd->dateofActivation}}</td>
                         </tr>
                         <tr>
-                            <th>Date of last change</th>
+                            <th>Data da última alteração</th>
                             <td>{{$propdd->dateOfLastChange}}</td>
                         </tr>
                         <tr>
-                            <th>Date of revision</th>
+                            <th>Data de revisão</th>
                             <td>{{$propdd->dateOfRevision}}</td>
                         </tr>
                         <tr>
-                            <th>Date of version</th>
+                            <th>Data da versão</th>
                             <td>{{$propdd->dateOfVersion}}</td>
                         </tr>
                         <tr>
-                            <th>Version</th>
+                            <th>Versão</th>
                             <td>{{$propdd->versionNumber}}</td>
                         </tr>
                         <tr>
-                            <th>Revision</th>
+                            <th>Revisão</th>
                             <td>{{$propdd->revisionNumber}}</td>
                         </tr>
                         <tr>
-                            <th>List of replaced properties</th>
+                            <th>Lista de propriedades substituídas</th>
                             <td>
                                 @foreach ($propversions as $version)
                                 @if ($version->dateOfRevision < $propdd->dateOfRevision)
                                     <form class="mb-3" action="{{ route('datadictionaryview', ['propID' => $version->GUID , 'propV' => $version->versionNumber, 'propR' => $version->revisionNumber]) }}">
                                         <button class="btn btn-link" type="submit">{{ $version->versionNumber}}.{{$version->revisionNumber}}, </button>
                                     </form>
-                                    @endif
-                                    @endforeach
-                                    {{$propdd->listOfReplacedProperties}}
+                                @endif
+                                @endforeach
+                                {{$propdd->listOfReplacedProperties}}
                             </td>
                         </tr>
                         <tr>
-                            <th>List of replacing properties</th>
+                            <th>Lista de propriedades de substituição</th>
                             <td>
                                 @foreach ($propversions as $version)
                                 @if ($version->dateOfRevision > $propdd->dateOfRevision)
-                                <form class="mb-3" action="{{ route('datadictionaryview', ['propID' => $version->GUID , 'propV' => $version->versionNumber, 'propR' => $version->revisionNumber]) }}">
-                                    <button class="btn btn-link" type="submit">{{ $version->versionNumber}}.{{$version->revisionNumber}}, </button>
-                                </form>
+                                    <form class="mb-3" action="{{ route('datadictionaryview', ['propID' => $version->GUID , 'propV' => $version->versionNumber, 'propR' => $version->revisionNumber]) }}">
+                                        <button class="btn btn-link" type="submit">{{ $version->versionNumber}}.{{$version->revisionNumber}}, </button>
+                                    </form>
                                 @endif
                                 @endforeach
-    
                                 {{$propdd->listOfReplacingProperties}}
                             </td>
                         </tr>
                         <tr>
-                            <th>Relation to other data dictionaries</th>
+                            <th>Relação com outros dicionários de dados</th>
                             <td>{{$propdd->relationToOtherDataDictionaries}}</td>
                         </tr>
                         <tr>
-                            <th>Creators language</th>
+                            <th>Língua dos criadores</th>
                             <td>{{$propdd->creatorsLanguage}}</td>
                         </tr>
                         <tr>
-                            <th>Visual representation</th>
+                            <th>Representação visual</th>
                             <td>
                                 @if ($propdd->visualRepresentation == 'True')
                                 <div class='col-sm'>
@@ -106,59 +118,59 @@
                             </td>
                         </tr>
                         <tr>
-                            <th>Country of use</th>
+                            <th>País de utilização</th>
                             <td>{{$propdd->countryOfUse}}</td>
                         </tr>
                         <tr>
-                            <th>Country of origin</th>
+                            <th>País de origem</th>
                             <td>{{$propdd->countryOfOrigin}}</td>
                         </tr>
                         <tr>
-                            <th>Physical quantity</th>
+                            <th>Quantidade física</th>
                             <td>{{$propdd->physicalQuantity}}</td>
                         </tr>
                         <tr>
-                            <th>Dimension</th>
+                            <th>Dimensão</th>
                             <td>{{$propdd->dimension}}</td>
                         </tr>
                         <tr>
-                            <th>Data type</th>
+                            <th>Tipo de dados</th>
                             <td>{{$propdd->dataType}}</td>
                         </tr>
                         <tr>
-                            <th>Dynamic property</th>
+                            <th>Propriedade dinâmica</th>
                             <td>{{$propdd->dynamicProperty}}</td>
                         </tr>
                         <tr>
-                            <th>Parameters of the dynamic property</th>
+                            <th>Parametros da propriedade dinâmica</th>
                             <td>{{$propdd->parametersOfTheDynamicProperty}}</td>
                         </tr>
                         <tr>
-                            <th>Names of defining values</th>
+                            <th>Nomes dos valores de definição</th>
                             <td>{{$propdd->namesOfDefiningValues}}</td>
                         </tr>
                         <tr>
-                            <th>Defining values</th>
+                            <th>Valores de definição</th>
                             <td>{{$propdd->definingValues}}</td>
                         </tr>
                         <tr>
-                            <th>Tolerance</th>
+                            <th>Tolerância</th>
                             <td>{{$propdd->tolerance}}</td>
                         </tr>
                         <tr>
-                            <th>Digital format</th>
+                            <th>Formato digital</th>
                             <td>{{$propdd->digitalFormat}}</td>
                         </tr>
                         <tr>
-                            <th>Text format</th>
+                            <th>Formato de texto</th>
                             <td>{{$propdd->textFormat}}</td>
                         </tr>
                         <tr>
-                            <th>List of possible values in language n</th>
+                            <th>Lista de valores possíveis na língua n</th>
                             <td>{{$propdd->listOfPossibleValuesInLanguageN}}</td>
                         </tr>
                         <tr>
-                            <th>Boundary values</th>
+                            <th>Valores-limite</th>
                             <td>{{$propdd->boundaryValues}}</td>
                         </tr>
                     </tbody>
