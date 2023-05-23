@@ -99,9 +99,7 @@
                                     </div>
                                 </td>
                                 <td class="p-1.5">
-                                    <x-nav-link type="button" id="loadComments-{{$property->Id}}" onclick="loadComments(this, '{{$property->Id}}')">
-                                        Comentários ({{ \App\Models\comments::where('properties_Id', $property->Id)->count() }})
-                                    </x-nav-link>
+                                    <x-nav-link type="button" id="loadComments-{{$property->Id}}" onclick="loadComments(this, '{{$property->Id}}')">Comentários ({{ \App\Models\comments::where('properties_Id', $property->Id)->count() }})</x-nav-link>
                                 </td>
                             </tr>
                             @endif
