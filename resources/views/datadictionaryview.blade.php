@@ -175,14 +175,8 @@
                     @foreach ($propinpdts as $proppdts)
                     <tr>
                         <td>
-                            <form class="mb-3" action="{{ route('pdtsdownload', ['pdtID' => $proppdts->pdtID]) }}">
-                                <x-button-primary-pdts 
-                                    type="submit"
-                                    title="{{$pdts->where('Id', $proppdts->pdtID)->first()->pdtNamePt}} V{{$pdts->where('Id', $proppdts->pdtID)->first()->versionNumber}}.{{$pdts->where('Id', $proppdts->pdtID)->first()->revisionNumber}}"/>
-                            </form>
                             <a href="{{ route('pdtsdownload', ['pdtID' => $proppdts->pdtID]) }}">{{$pdts->where('Id', $proppdts->pdtID)->first()->pdtNamePt}} V{{$pdts->where('Id', $proppdts->pdtID)->first()->versionNumber}}.{{$pdts->where('Id', $proppdts->pdtID)->first()->revisionNumber}}</a>
-
-                            </td>
+                        </td>
                         <td>{{$proppdts->descriptionPt}}</td>
                     </tr>
                     @endforeach

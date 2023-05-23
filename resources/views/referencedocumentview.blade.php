@@ -38,12 +38,7 @@
 
                     <tr>
                         <td>
-                            <form class="mb-3" action="{{ route('pdtsdownload', ['pdtID' => $proprd->pdtID]) }}">
-                                <x-button-primary-pdts 
-                                    type="submit"
-                                    title="{{$proprd->pdtNamePt}} V{{$proprd->versionNumber}}.{{$proprd->revisionNumber}}"/>
-                            </form>
-                            <a href="{{ route('pdtsdownload', ['pdtID' => $proprd->pdtID]) }}">{{$proprd->pdtNamePt}} V{{$proprd->versionNumber}}.{{$proprd->revisionNumber}}</a>
+                            <a href="{{ route('pdtsdownload', ['pdtID' => $proprd->Id]) }}">{{$proprd->pdtNamePt}} V{{$proprd->versionNumber}}.{{$proprd->revisionNumber}}</a>
 
                             {{-- {{$proprd->pdtNamePt}} --}}
                         </td>
