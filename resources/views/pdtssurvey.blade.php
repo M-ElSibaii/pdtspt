@@ -127,7 +127,7 @@
 
     </div>
     <script>
-        // $(".alert").alert();
+        //$(".alert").alert();
 
         $(document).ready(function() {
             $('[data-toggle="toggle"]').change(function() {
@@ -163,8 +163,8 @@
                         addComment(response.comment[0]);
 
                         var comments = $('#loadComments-' + id).text();
-                        var oldNumberComments = comments.replace(' Comentários (','');
-                        oldNumberComments = oldNumberComments.replace(')','');
+                        var oldNumberComments = comments.replace(' Comentários (', '');
+                        oldNumberComments = oldNumberComments.replace(')', '');
                         var newNumberComments = parseInt(oldNumberComments) + 1;
                         $('#loadComments-' + id).text('Comentários (' + newNumberComments + ')');
 
@@ -280,7 +280,7 @@
             var data = {
                 'comment_id': $(this).attr('data-id'),
             }
-            
+
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -295,12 +295,12 @@
                     var parent = $('#commentbodysection' + response.comment_id).parent()
                     $('#commentbodysection' + response.comment_id).remove();
                     alert("Feedback apagado com sucesso!")
-                    
+
                     var id = $(parent).attr('id').replace('comments-section-', '');
 
                     var comments = $('#loadComments-' + id).text();
-                    var oldNumberComments = comments.replace(' Comentários (','');
-                    oldNumberComments = oldNumberComments.replace(')','');
+                    var oldNumberComments = comments.replace(' Comentários (', '');
+                    oldNumberComments = oldNumberComments.replace(')', '');
                     var newNumberComments = parseInt(oldNumberComments) - 1;
                     $('#loadComments-' + id).text('Comentários (' + newNumberComments + ')');
 
