@@ -295,15 +295,13 @@
                     var parent = $('#commentbodysection' + response.comment_id).parent()
                     $('#commentbodysection' + response.comment_id).remove();
                     alert("Feedback apagado com sucesso!")
-
-                    console.log($(parent).attr('id'))
-                    console.log($(parent).attr('id').replace('comments-section-', ''))
+                    
                     var id = $(parent).attr('id').replace('comments-section-', '');
 
                     var comments = $('#loadComments-' + id).text();
                     var oldNumberComments = comments.replace(' Comentários (','');
                     oldNumberComments = oldNumberComments.replace(')','');
-                    var newNumberComments = parseInt(oldNumberComments) + 1;
+                    var newNumberComments = parseInt(oldNumberComments) - 1;
                     $('#loadComments-' + id).text('Comentários (' + newNumberComments + ')');
 
 
