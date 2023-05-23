@@ -280,8 +280,7 @@
             var data = {
                 'comment_id': $(this).attr('data-id'),
             }
-            var parent = $(this).parent().parent().parent().parent().parent()
-            console.log($(parent).attr('id'))
+            
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -293,8 +292,11 @@
                 url: "/deletefeedback",
                 data: data,
                 success: function(response) {
+                    var parent = $('#commentbodysection' + response.comment_id).parent()
                     $('#commentbodysection' + response.comment_id).remove();
                     alert("Feedback apagado com sucesso!")
+
+                    console.log($(parent).attr('id'))
 
                     var comments = $('#loadComments-' + id).text();
                     var oldNumberComments = comments.replace(' Comentários (','');
