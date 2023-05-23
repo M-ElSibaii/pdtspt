@@ -11,19 +11,21 @@
                         <td class="lg:w-3/4 md:w-3/4 sm:w-1/2">{{$rd->GUID}}</td>
                     </tr>
                     <tr>
-                        <th>Name</th>
+                        <th>Nome</th>
                         <td>{{$rd->rdName}}</td>
                     </tr>
                     <tr>
-                        <th>Title</th>
+                        <th>Título</th>
                         <td>{{$rd->title}}</td>
+                    </tr>
                     <tr>
-                        <th>Description</th>
+                        <th>Descrição</th>
                         <td>{{$rd->description}}</td>
+                    </tr>
                     <tr>
-                        <th>Status</th>
+                        <th>Estado</th>
                         <td>{{$rd->status}}</td>
-                    <tr>
+                    </tr>
                 </table>
                 <h3 class="py-6">Propriedades que utilizam este documento de referência:</h3>
                 <table id='tblprop' cellpadding='0' cellspacing='0'>
