@@ -7,10 +7,10 @@
             <table class="table-auto min-w-full text-left text-sm font-light">
                 <thead class="border-b font-medium dark:border-neutral-500">
                     <tr>
-                        <th scope="col" class="px-6 py-4">Image</th>
-                        <th scope="col" class="px-6 py-4">Name</th>
-                        <th scope="col" class="px-6 py-4">Version</th>
-                        <th scope="col" class="px-6 py-4">Date</th>
+                        <th scope="col" class="px-6 py-4">Imagem</th>
+                        <th scope="col" class="px-6 py-4">Nome</th>
+                        <th scope="col" class="px-6 py-4">Versão</th>
+                        <th scope="col" class="px-6 py-4">Data</th>
                         <th scope="col" class="px-6 py-4"></th>
                         <th scope="col" class="px-6 py-4"></th>
                     </tr>
