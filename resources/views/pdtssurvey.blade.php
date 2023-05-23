@@ -127,7 +127,7 @@
 
     </div>
     <script>
-        $(".alert").alert();
+        //$(".alert").alert();
 
         $(document).ready(function() {
             $('[data-toggle="toggle"]').change(function() {
