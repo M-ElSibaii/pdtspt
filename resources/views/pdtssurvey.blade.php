@@ -167,7 +167,7 @@
                         // document.getElementById("para");
                         console.log(comments)
                         var oldNumberComments = comments.replace('Comentários (','');
-                        oldNumberComments = comments.replace(')','');
+                        oldNumberComments = oldNumberComments.replace(')','');
                         var newNumberComments = oldNumberComments + 1;
                         console.log(newNumberComments)
 
