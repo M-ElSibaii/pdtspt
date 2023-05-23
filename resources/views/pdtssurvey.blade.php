@@ -280,7 +280,7 @@
             var data = {
                 'comment_id': $(this).attr('data-id'),
             }
-            var parent = $(this).parent().closest('[id^=comments-section-]')
+            var parent = $(this).parent().parent().parent().parent().parent()
             console.log(parent)
             $.ajaxSetup({
                 headers: {
