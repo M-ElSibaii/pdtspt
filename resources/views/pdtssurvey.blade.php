@@ -167,10 +167,10 @@
                         // document.getElementById("para");
                         console.log(comments)
                         var oldNumberComments = comments.replace(' Comentários (','');
-                        oldNumberComments = oldNumberComments.replace(') ','');
+                        oldNumberComments = oldNumberComments.replace(')','');
                         console.log(oldNumberComments)
 
-                        var newNumberComments = oldNumberComments + 1;
+                        var newNumberComments = parseInt(oldNumberComments) + 1;
                         console.log(newNumberComments)
 
                         $('#loadComments-' + id).text('Comentários (' + newNumberComments + ')');
