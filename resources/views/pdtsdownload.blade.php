@@ -37,7 +37,7 @@
                             <tr>
                                 <td class="text-left content-start bg-slate-300 p-3" colspan="4">
                                     <input class="text-left expand" type="checkbox" name="{{ $group->gopNamePt }}" id="{{ $group->gopNamePt }}" data-toggle="toggle">
-                                    <label class="my-auto text-left" for="{{ $group->gopNamePt }}">Grupo de propriedades - {{ $group->gopNamePt }}</label>
+                                    <label class="my-auto text-left cursor-pointer" for="{{ $group->gopNamePt }}">Grupo de propriedades - {{ $group->gopNamePt }}</label>
                                 </td>
                             </tr>
                         </tbody>

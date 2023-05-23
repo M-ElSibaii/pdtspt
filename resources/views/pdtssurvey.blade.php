@@ -40,7 +40,7 @@
                             <tr>
                                 <td class="text-left content-start bg-slate-300 p-3" colspan="6">
                                     <input class="text-left expand" type="checkbox" name="{{ $group->gopNamePt }}" id="{{ $group->gopNamePt }}" data-toggle="toggle">
-                                    <label class="my-auto text-left" for="{{ $group->gopNamePt }}">Grupo de propriedades - {{ $group->gopNamePt }}</label>
+                                    <label class="my-auto text-left cursor-pointer" for="{{ $group->gopNamePt }}">Grupo de propriedades - {{ $group->gopNamePt }}</label>
                                 </td>
                             </tr>
                         </tbody>
@@ -71,7 +71,7 @@
                                 @else
                                 <td class="p-1.5">
                                     <a href="{{ route('referencedocumentview', ['rdGUID' => $property->referenceDocumentGUID]) }}">
-                                        <abbr title="{{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->title }}">{{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->rdName }}</abbr>
+                                        <p title="{{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->title }}">{{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->rdName }}</p>
                                     </a>
                                 </td>
                                 @endif

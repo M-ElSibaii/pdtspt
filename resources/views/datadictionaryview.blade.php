@@ -168,15 +168,19 @@
                 </div>
                 <table id='tblprop' cellpadding='0' cellspacing='0'>
                     <tr>
-                        <th style="text-align: left!important; width:50%">Modelo de dados</th>
+                        <th style="text-align: left!important; width:25%">Modelo de dados</th>
                         <th style="text-align: left!important;">Descrição da propriedade</th>
                     </tr>
 
                     @foreach ($propinpdts as $proppdts)
                     <tr>
-                        <td>{{$pdts->where('Id', $proppdts->pdtID)->first()->pdtNamePt}} V
-                            {{$pdts->where('Id', $proppdts->pdtID)->first()->versionNumber}}.{{$pdts->where('Id', $proppdts->pdtID)->first()->revisionNumber}}
-                        </td>
+                        <td>
+                            <form class="mb-3" action="{{ route('pdtsdownload', ['pdtID' => $proppdts->pdtID]) }}">
+                                <x-button-primary-pdts 
+                                    type="submit"
+                                    title="{{$pdts->where('Id', $proppdts->pdtID)->first()->pdtNamePt}} V{{$pdts->where('Id', $proppdts->pdtID)->first()->versionNumber}}.{{$pdts->where('Id', $proppdts->pdtID)->first()->revisionNumber}}"/>
+                            </form>
+                            </td>
                         <td>{{$proppdts->descriptionPt}}</td>
                     </tr>
                     @endforeach
