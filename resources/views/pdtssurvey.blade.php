@@ -162,7 +162,7 @@
                         alert('Nenhum conteúdo no feedback. O campo de comentário é obrigatório')
 
                     } else {
-                        addComment(response.comment[0]);
+                        addComment(response.comment[0], id);
 
                     }
                 }
@@ -230,7 +230,7 @@
                 success: function(response) {
                     console.log(response.comments)
                     for (let index = 0; index < response.comments.length; index++) {
-                        addComment(response.comments[index]);
+                        addComment(response.comments[index], id);
 
                     }
                 }
@@ -238,7 +238,7 @@
 
         }
 
-        function addComment(comment) {
+        function addComment(comment, lineId) {
 
             var section = '';
             section = "<div id='commentbodysection" + comment.id + "' class='w-full mb-4'>\
@@ -263,6 +263,12 @@
                     </div>\
             </div>';
             $('#comments-section-' + comment.properties_Id).append(section);
+
+            var comments = $('loadComments-' + lineId).text();
+            var oldNumberComments = comments.replace('Comentários (','');
+            oldNumberComments = comments.replace(')','');
+            newNumberComments = oldNumberComments + 1;
+            $('loadComments-' + lineId).text('Comentários (' + newNumberComments + ')');
 
         }
 
