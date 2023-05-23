@@ -241,7 +241,7 @@
         function addComment(comment) {
 
             var section = '';
-            section = "<div id='commentbodysection'" + comment.id + "' class='w-full mb-4'>\
+            section = "<div id='commentbodysection" + comment.id + "' class='w-full mb-4'>\
                     <div class='flex flex-row'>";
             if (comment.user.photo != null) {
                 section += "<img src='{{ asset(' + comment.user.photo + ') }}' alt='{{ ' + comment.user.name + ' }}' class='img-fluid rounded-circle mr-3' style='width: 40px; height: 40px;'>";
