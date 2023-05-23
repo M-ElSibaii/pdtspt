@@ -168,6 +168,8 @@
                         console.log(comments)
                         var oldNumberComments = comments.replace(' Comentários (','');
                         oldNumberComments = oldNumberComments.replace(') ','');
+                        console.log(oldNumberComments)
+
                         var newNumberComments = oldNumberComments + 1;
                         console.log(newNumberComments)
 
