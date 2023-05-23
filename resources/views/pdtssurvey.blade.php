@@ -264,14 +264,15 @@
             </div>';
             $('#comments-section-' + comment.properties_Id).append(section);
 
-            var comments = $('loadComments-' + lineId).text();
+            var comments = $('#loadComments-' + lineId).text();
+            // document.getElementById("para");
             console.log(comments)
             var oldNumberComments = comments.replace('Comentários (','');
             oldNumberComments = comments.replace(')','');
             newNumberComments = oldNumberComments + 1;
             console.log(newNumberComments)
 
-            $('loadComments-' + lineId).text('Comentários (' + newNumberComments + ')');
+            $('#loadComments-' + lineId).text('Comentários (' + newNumberComments + ')');
 
         }
 
