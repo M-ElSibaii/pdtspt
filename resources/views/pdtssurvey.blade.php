@@ -160,7 +160,18 @@
                         alert('Nenhum conteúdo no feedback. O campo de comentário é obrigatório')
 
                     } else {
-                        addComment(response.comment[0], id);
+                        addComment(response.comment[0]);
+
+
+                        var comments = $('#loadComments-' + id).text();
+                        // document.getElementById("para");
+                        console.log(comments)
+                        var oldNumberComments = comments.replace('Comentários (','');
+                        oldNumberComments = comments.replace(')','');
+                        var newNumberComments = oldNumberComments + 1;
+                        console.log(newNumberComments)
+
+                        $('#loadComments-' + id).text('Comentários (' + newNumberComments + ')');
 
                     }
                 }
@@ -228,7 +239,7 @@
                 success: function(response) {
                     console.log(response.comments)
                     for (let index = 0; index < response.comments.length; index++) {
-                        addComment(response.comments[index], id);
+                        addComment(response.comments[index]);
 
                     }
                 }
@@ -236,7 +247,7 @@
 
         }
 
-        function addComment(comment, lineId) {
+        function addComment(comment) {
 
             var section = '';
             section = "<div id='commentbodysection" + comment.id + "' class='w-full mb-4'>\
@@ -261,16 +272,6 @@
                     </div>\
             </div>';
             $('#comments-section-' + comment.properties_Id).append(section);
-
-            var comments = $('#loadComments-' + lineId).text();
-            // document.getElementById("para");
-            console.log(comments)
-            var oldNumberComments = comments.replace('Comentários (','');
-            oldNumberComments = comments.replace(')','');
-            newNumberComments = oldNumberComments + 1;
-            console.log(newNumberComments)
-
-            $('#loadComments-' + lineId).text('Comentários (' + newNumberComments + ')');
 
         }
 
