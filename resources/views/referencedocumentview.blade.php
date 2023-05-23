@@ -43,7 +43,7 @@
                                     type="submit"
                                     title="{{$proprd->pdtNamePt}} V{{$proprd->versionNumber}}.{{$proprd->revisionNumber}}"/>
                             </form>
-                            <a href="{{ route('pdtsdownload', ['propID' => $proprd->pdtID]) }}">{{$proprd->pdtNamePt}} V{{$proprd->versionNumber}}.{{$proprd->revisionNumber}}</a>
+                            <a href="{{ route('pdtsdownload', ['pdtID' => $proprd->pdtID]) }}">{{$proprd->pdtNamePt}} V{{$proprd->versionNumber}}.{{$proprd->revisionNumber}}</a>
 
                             {{-- {{$proprd->pdtNamePt}} --}}
                         </td>
