@@ -162,17 +162,10 @@
                     } else {
                         addComment(response.comment[0]);
 
-
                         var comments = $('#loadComments-' + id).text();
-                        // document.getElementById("para");
-                        console.log(comments)
                         var oldNumberComments = comments.replace(' Comentários (','');
                         oldNumberComments = oldNumberComments.replace(')','');
-                        console.log(oldNumberComments)
-
                         var newNumberComments = parseInt(oldNumberComments) + 1;
-                        console.log(newNumberComments)
-
                         $('#loadComments-' + id).text('Comentários (' + newNumberComments + ')');
 
                     }
@@ -287,6 +280,8 @@
             var data = {
                 'comment_id': $(this).attr('data-id'),
             }
+            var parent = $(this).parent().closest('[id^=comments-section-]')
+            console.log(parent)
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -300,6 +295,13 @@
                 success: function(response) {
                     $('#commentbodysection' + response.comment_id).remove();
                     alert("Feedback apagado com sucesso!")
+
+                    var comments = $('#loadComments-' + id).text();
+                    var oldNumberComments = comments.replace(' Comentários (','');
+                    oldNumberComments = oldNumberComments.replace(')','');
+                    var newNumberComments = parseInt(oldNumberComments) + 1;
+                    $('#loadComments-' + id).text('Comentários (' + newNumberComments + ')');
+
 
                 }
             });
