@@ -1,6 +1,8 @@
 <x-app-layout>
     <div style="background-color: white;">
-        <div class="container sm:max-w-full py-9">
+        <div class="container sm:max-w-full py-9" style="
+        overflow: scroll;
+    ">
             <h1>Os Modelos de Dados dos Produtos</h1>
             <table class="table-auto min-w-full text-left text-sm font-light">
                 <thead class="border-b font-medium dark:border-neutral-500">

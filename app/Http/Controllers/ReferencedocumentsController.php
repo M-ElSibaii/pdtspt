@@ -27,6 +27,7 @@ class ReferencedocumentsController extends Controller
                 'propertiesdatadictionaries.GUID',
                 'propertiesdatadictionaries.namePt',
                 'productdatatemplates.pdtNamePt',
+                'productdatatemplates.Id',
                 'productdatatemplates.versionNumber',
                 'productdatatemplates.revisionNumber'
             )

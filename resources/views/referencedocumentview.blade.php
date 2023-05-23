@@ -29,7 +29,7 @@
                 <table id='tblprop' cellpadding='0' cellspacing='0'>
                     <tr>
                         <th style="text-align: left!important;">Modelo de dados</th>
-                        <th style="text-align: left!important;">Versão</th>
+                        {{-- <th style="text-align: left!important;">Versão</th> --}}
                         <th style="text-align: left!important;">Propriedade</th>
                         <th style="text-align: left!important;">GUID de propriedade</th>
                     </tr>
@@ -37,9 +37,16 @@
                     @foreach ($rdinprop as $proprd)
 
                     <tr>
-                        <td>{{$proprd->pdtNamePt}}</td>
-                        <td>{{$proprd->versionNumber}}.{{$proprd->revisionNumber}}</td>
-                        <td>{{$proprd->namePt}}</td>
+                        <td>
+                            <a href="{{ route('pdtsdownload', ['pdtID' => $proprd->Id]) }}">{{$proprd->pdtNamePt}} V{{$proprd->versionNumber}}.{{$proprd->revisionNumber}}</a>
+
+                            {{-- {{$proprd->pdtNamePt}} --}}
+                        </td>
+                        {{-- <td>{{$proprd->versionNumber}}.{{$proprd->revisionNumber}}</td> --}}
+                        <td>
+                            <a href="{{ route('datadictionaryview', ['propID' => $proprd->GUID , 'propV' => $proprd->versionNumber, 'propR' => $proprd->revisionNumber]) }}">{{ $proprd->namePt }}</a>
+                            {{-- {{$proprd->namePt}} --}}
+                        </td>
                         <td>{{$proprd->GUID}}</td>
                     </tr>
 

@@ -16,7 +16,9 @@
                     <h1 class="flex-none inline">{{ $pdt[0]->pdtNamePt }}</h1>
                     <p class="flex-none inline"> - V{{ $pdt[0]->versionNumber }}.{{ $pdt[0]->revisionNumber }}</p>
                 </div>
-                <form name="form" id="form" method="post" action="{{ route('saveAnswers') }}">
+                <form class="overflow-scroll" name="form" id="form" method="post" action="{{ route('saveAnswers') }}" style="
+                overflow: scroll;
+            ">
                     <input type="hidden" name="pdtName" value="{{ $pdt[0]->pdtNamePt }}">
 
                     @csrf
@@ -38,7 +40,7 @@
                             <tr>
                                 <td class="text-left content-start bg-slate-300 p-3" colspan="6">
                                     <input class="text-left expand" type="checkbox" name="{{ $group->gopNamePt }}" id="{{ $group->gopNamePt }}" data-toggle="toggle">
-                                    <label class="my-auto text-left" for="{{ $group->gopNamePt }}">Grupo de propriedades - {{ $group->gopNamePt }}</label>
+                                    <label class="my-auto text-left cursor-pointer" for="{{ $group->gopNamePt }}">Grupo de propriedades - {{ $group->gopNamePt }}</label>
                                 </td>
                             </tr>
                         </tbody>
@@ -69,7 +71,7 @@
                                 @else
                                 <td class="p-1.5">
                                     <a href="{{ route('referencedocumentview', ['rdGUID' => $property->referenceDocumentGUID]) }}">
-                                        <abbr title="{{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->title }}">{{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->rdName }}</abbr>
+                                        <p title="{{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->title }}">{{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->rdName }}</p>
                                     </a>
                                 </td>
                                 @endif
@@ -97,9 +99,7 @@
                                     </div>
                                 </td>
                                 <td class="p-1.5">
-                                    <x-nav-link type="button" id="loadComments-{{$property->Id}}" onclick="loadComments(this, '{{$property->Id}}')">
-                                        Comentários ({{ \App\Models\comments::where('properties_Id', $property->Id)->count() }})
-                                    </x-nav-link>
+                                    <x-nav-link type="button" id="loadComments-{{$property->Id}}" onclick="loadComments(this, '{{$property->Id}}')">Comentários ({{ \App\Models\comments::where('properties_Id', $property->Id)->count() }})</x-nav-link>
                                 </td>
                             </tr>
                             @endif
@@ -127,7 +127,7 @@
 
     </div>
     <script>
-        //$(".alert").alert();
+        $(".alert").alert();
 
         $(document).ready(function() {
             $('[data-toggle="toggle"]').change(function() {
@@ -161,6 +161,12 @@
 
                     } else {
                         addComment(response.comment[0]);
+
+                        var comments = $('#loadComments-' + id).text();
+                        var oldNumberComments = comments.replace(' Comentários (', '');
+                        oldNumberComments = oldNumberComments.replace(')', '');
+                        var newNumberComments = parseInt(oldNumberComments) + 1;
+                        $('#loadComments-' + id).text('Comentários (' + newNumberComments + ')');
 
                     }
                 }
@@ -239,7 +245,7 @@
         function addComment(comment) {
 
             var section = '';
-            section = "<div id='commentbodysection'" + comment.id + "' class='w-full mb-4'>\
+            section = "<div id='commentbodysection" + comment.id + "' class='w-full mb-4'>\
                     <div class='flex flex-row'>";
             if (comment.user.photo != null) {
                 section += "<img src='{{ asset(' + comment.user.photo + ') }}' alt='{{ ' + comment.user.name + ' }}' class='img-fluid rounded-circle mr-3' style='width: 40px; height: 40px;'>";
@@ -274,6 +280,7 @@
             var data = {
                 'comment_id': $(this).attr('data-id'),
             }
+
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -285,8 +292,18 @@
                 url: "/deletefeedback",
                 data: data,
                 success: function(response) {
+                    var parent = $('#commentbodysection' + response.comment_id).parent()
                     $('#commentbodysection' + response.comment_id).remove();
                     alert("Feedback apagado com sucesso!")
+
+                    var id = $(parent).attr('id').replace('comments-section-', '');
+
+                    var comments = $('#loadComments-' + id).text();
+                    var oldNumberComments = comments.replace(' Comentários (', '');
+                    oldNumberComments = oldNumberComments.replace(')', '');
+                    var newNumberComments = parseInt(oldNumberComments) - 1;
+                    $('#loadComments-' + id).text('Comentários (' + newNumberComments + ')');
+
 
                 }
             });
