@@ -166,8 +166,8 @@
                         var comments = $('#loadComments-' + id).text();
                         // document.getElementById("para");
                         console.log(comments)
-                        var oldNumberComments = comments.replace('Comentários (','');
-                        oldNumberComments = oldNumberComments.replace(')','');
+                        var oldNumberComments = comments.replace(' Comentários (','');
+                        oldNumberComments = oldNumberComments.replace(') ','');
                         var newNumberComments = oldNumberComments + 1;
                         console.log(newNumberComments)
 
