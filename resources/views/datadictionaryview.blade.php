@@ -180,6 +180,8 @@
                                     type="submit"
                                     title="{{$pdts->where('Id', $proppdts->pdtID)->first()->pdtNamePt}} V{{$pdts->where('Id', $proppdts->pdtID)->first()->versionNumber}}.{{$pdts->where('Id', $proppdts->pdtID)->first()->revisionNumber}}"/>
                             </form>
+                            <a href="{{ route('pdtsdownload', ['propID' => $proppdts->pdtID]) }}">{{$proppdts->pdtNamePt}} V{{$proppdts->versionNumber}}.{{$proppdts->revisionNumber}}</a>
+
                             </td>
                         <td>{{$proppdts->descriptionPt}}</td>
                     </tr>
