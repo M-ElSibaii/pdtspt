@@ -281,7 +281,7 @@
                 'comment_id': $(this).attr('data-id'),
             }
             var parent = $(this).parent().parent().parent().parent().parent()
-            console.log(parent)
+            console.log($(parent).attr('id'))
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
