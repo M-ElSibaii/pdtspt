@@ -19,25 +19,19 @@
                     @foreach($latestPDT as $pdt)
                     <tr class="border-b dark:border-neutral-500">
                         <td class="whitespace-nowrap px-6 py-4 font-medium">
-                            <img
-                                class="w-auto max-w-[100px] max-h-14"
-                                src="{{asset('/img/' . $pdt->pdtNameEn . '.png')}}"
-                                {{-- src="{{asset('/img/Master.png')}}" --}}
-                                alt="" />
+                            <img class="w-auto max-w-[100px] max-h-14" src="{{asset('/img/' . $pdt->pdtNameEn . '.png')}}" {{-- src="{{asset('/img/Master.png')}}" --}} alt="" />
                         </td>
                         <td class="whitespace-nowrap px-6 py-4 font-medium">{{ $pdt->pdtNamePt }}</td>
                         <td class="whitespace-nowrap px-6 py-4 font-medium">V{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}</td>
                         <td class="whitespace-nowrap px-6 py-4 font-medium">{{ $pdt->dateOfVersion }}</td>
                         <td class="whitespace-nowrap px-6 py-4 font-medium my-auto ">
                             <form class="mb-3" action="{{ route('pdtsdownload', ['pdtID' => $pdt->Id]) }}">
-                                <x-button-primary-pdts 
-                                    type="submit"
-                                    title="Ver"/>
+                                <x-button-primary-pdts type="submit" title="Ver" />
                             </form>
                         </td>
                         <td class="whitespace-nowrap px-6 py-4 font-medium my-auto">
                             <form class="mb-3" action="{{ route('pdtssurvey', ['pdtID' => $pdt->Id])  }}">
-                                <x-secondary-button type="submit">   
+                                <x-secondary-button type="submit">
                                     {{ __('Revisão') }}
                                 </x-secondary-button>
                             </form>
@@ -47,5 +41,5 @@
                 </tbody>
             </table>
         </div>
-    </main>
+        </main>
 </x-app-layout>

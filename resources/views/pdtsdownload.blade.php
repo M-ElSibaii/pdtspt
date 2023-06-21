@@ -48,7 +48,13 @@
                             @if($property->gopID == $group->Id)
                             <tr>
                                 <td class="p-1.5 property-td">
-                                    <a href="{{ route('datadictionaryview', ['propID' => $property->GUID , 'propV' => $property->versionNumber, 'propR' => $property->revisionNumber]) }}">{{ $property->namePt }}</a>
+                                    <a href="{{ route('datadictionaryview', ['propID' => $property->GUID , 'propV' => $property->versionNumber, 'propR' => $property->revisionNumber]) }}">{{ $property->namePt }}
+                                        @foreach($depreciatedProperties as $dProperty)
+                                        @if($dProperty->id == $property->Id)
+                                        <span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">deprecada</span>
+                                        @endif
+                                        @endforeach
+                                    </a>
                                 </td>
                                 <td class="p-1.5">
                                     {{ $property->units }}

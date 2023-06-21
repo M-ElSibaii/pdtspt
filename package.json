@@ -19,6 +19,7 @@
     "dependencies": {
         "moment": "^2.29.4",
         "tailwind-colors": "^1.1.0",
-        "tw-elements": "^1.0.0-beta1"
+        "tw-elements": "^1.0.0-beta1",
+        "web-ifc-three": "^0.0.125"
     }
 }

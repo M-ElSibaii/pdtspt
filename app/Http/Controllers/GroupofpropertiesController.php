@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\productdatatemplates;
 use App\Models\groupofproperties;
 use App\Models\properties;
+use App\Models\depreciatedproperties;
 use App\Models\comments;
 use App\Models\Answers;
 use App\Models\User;
@@ -21,12 +22,14 @@ use Illuminate\Support\Facades\Mail;
 
 class GroupofpropertiesController extends Controller
 {
+
+    //function for pdtdownload page
     public function getGroupOfProperties($pdtID)
     {
         $pdt = productdatatemplates::where('Id', $pdtID)
             ->get();
         $gop = DB::table('groupofproperties as gop')->where('pdtId', $pdtID)
-            ->join(
+            /*  ->join(
                 DB::raw("(SELECT
                 GUID,
                 MAX(versionNumber) as max_versionNumber,
@@ -38,20 +41,24 @@ class GroupofpropertiesController extends Controller
                     $join->on('mx.max_versionNumber', '=', 'gop.versionNumber');
                     $join->on('mx.max_revisionNumber', '=', 'gop.revisionNumber');
                 }
-            )
+            )*/
             ->get();
         $referenceDocument = referencedocuments::all();
         $properties_dict = propertiesdatadictionaries::all();
         $properties = properties::where('pdtID', $pdtID)->get();
+        $depreciatedProperties = depreciatedproperties::all();
 
         // Join the properties and propertiesdatadictionaries tables
+
         $joined_properties = properties::leftJoin('propertiesdatadictionaries', function ($join) {
             $join->on('properties.GUID', '=', 'propertiesdatadictionaries.GUID');
-            $join->on(
+            $join->on('properties.propertyVersion', '=', 'propertiesdatadictionaries.versionNumber');
+            $join->on('properties.propertyRevision', '=', 'propertiesdatadictionaries.revisionNumber');
+            /* $join->on(
                 DB::raw('(propertiesdatadictionaries.versionNumber, propertiesdatadictionaries.revisionNumber)'),
                 DB::raw('(select max(versionNumber), max(revisionNumber) from propertiesdatadictionaries where GUID = properties.GUID)'),
                 '='
-            );
+            );*/
         })->select(
             'properties.descriptionEn',
             'properties.descriptionPt',
@@ -69,8 +76,9 @@ class GroupofpropertiesController extends Controller
         )
             ->get();
 
-        return view('pdtsdownload', compact('gop', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument'));
+        return view('pdtsdownload', compact('gop', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'depreciatedProperties'));
     }
+    //function for survey page
     public function getCommentProperty($propID)
     {
         $comments = comments::with('user')->where('properties_Id', $propID)->get();
@@ -84,7 +92,7 @@ class GroupofpropertiesController extends Controller
         $pdt = productdatatemplates::where('Id', $pdtID)
             ->get();
         $gop = DB::table('groupofproperties as gop')->where('pdtId', $pdtID)
-            ->join(
+            /* ->join(
                 DB::raw("(SELECT
                 GUID,
                 MAX(versionNumber) as max_versionNumber,
@@ -96,20 +104,23 @@ class GroupofpropertiesController extends Controller
                     $join->on('mx.max_versionNumber', '=', 'gop.versionNumber');
                     $join->on('mx.max_revisionNumber', '=', 'gop.revisionNumber');
                 }
-            )
+            )*/
             ->get();
         $referenceDocument = referencedocuments::all();
         $properties_dict = propertiesdatadictionaries::all();
         $properties = properties::where('pdtID', $pdtID)->get();
+        $depreciatedProperties = depreciatedproperties::all();
 
         // Join the properties and propertiesdatadictionaries tables
         $joined_properties = properties::leftJoin('propertiesdatadictionaries', function ($join) {
             $join->on('properties.GUID', '=', 'propertiesdatadictionaries.GUID');
-            $join->on(
+            $join->on('properties.propertyVersion', '=', 'propertiesdatadictionaries.versionNumber');
+            $join->on('properties.propertyRevision', '=', 'propertiesdatadictionaries.revisionNumber');
+            /* $join->on(
                 DB::raw('(propertiesdatadictionaries.versionNumber, propertiesdatadictionaries.revisionNumber)'),
                 DB::raw('(select max(versionNumber), max(revisionNumber) from propertiesdatadictionaries where GUID = properties.GUID)'),
                 '='
-            );
+            );*/
         })->select(
             'properties.descriptionEn',
             'properties.descriptionPt',
@@ -133,7 +144,7 @@ class GroupofpropertiesController extends Controller
         $answers = Answers::where('users_id', Auth::id())->get();
 
 
-        return view('pdtssurvey', compact('gop', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'comments', 'answers', 'properties'));
+        return view('pdtssurvey', compact('gop', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'comments', 'answers', 'properties', 'depreciatedProperties'));
     }
 
 
