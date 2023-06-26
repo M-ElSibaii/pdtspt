@@ -13,13 +13,16 @@
                 @endif
                 <p>O objetivo deste questionário é apoiar o consenso da indústria rumo a PDTs uniformizados a nível nacional</p>
                 <div class="mb-6">
-                    <h1 class="flex-none inline">{{ $pdt[0]->pdtNamePt }}</h1>
-                    <p class="flex-none inline"> - V{{ $pdt[0]->versionNumber }}.{{ $pdt[0]->revisionNumber }}</p>
+                    <h1 class="flex-none inline">{{ $pdt->pdtNamePt }}</h1>
+                    <p class="flex-none inline"> - V{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}</p>
+                    @if ($pdt->versionNumber == $latestPdt->versionNumber AND $pdt->revisionNumber == $latestPdt->revisionNumber)
+                    <span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">Activa</span>
+                    @else
+                    <span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">InActiva</span>
+                    @endif
                 </div>
-                <form class="overflow-scroll" name="form" id="form" method="post" action="{{ route('saveAnswers') }}" style="
-                overflow: scroll;
-            ">
-                    <input type="hidden" name="pdtName" value="{{ $pdt[0]->pdtNamePt }}">
+                <form class="overflow-scroll" name="form" id="form" method="post" action="{{ route('saveAnswers') }}" style="overflow: scroll;">
+                    <input type="hidden" name="pdtName" value="{{ $pdt->pdtNamePt }}">
 
                     @csrf
                     <table class="table-auto" id="tblpdts" cellpadding="0" cellspacing="0">

@@ -26,8 +26,17 @@ class GroupofpropertiesController extends Controller
     //function for pdtdownload page
     public function getGroupOfProperties($pdtID)
     {
+
         $pdt = productdatatemplates::where('Id', $pdtID)
+            ->first();
+        $pdtGUID = $pdt->GUID;
+        $pdts = productdatatemplates::where('GUID', $pdtGUID)
+            ->orderBy('versionNumber', 'asc')
+            ->orderBy('revisionNumber', 'asc')
             ->get();
+
+        $pdtCount = $pdts->count();
+        $latestPdt = $pdts[$pdtCount - 1];
         $gop = DB::table('groupofproperties as gop')->where('pdtId', $pdtID)
             /*  ->join(
                 DB::raw("(SELECT
@@ -76,7 +85,7 @@ class GroupofpropertiesController extends Controller
         )
             ->get();
 
-        return view('pdtsdownload', compact('gop', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'depreciatedProperties'));
+        return view('pdtsdownload', compact('gop', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'depreciatedProperties', 'latestPdt'));
     }
     //function for survey page
     public function getCommentProperty($propID)
@@ -89,8 +98,16 @@ class GroupofpropertiesController extends Controller
     }
     public function getGroupOfProperties2($pdtID)
     {
+
         $pdt = productdatatemplates::where('Id', $pdtID)
+            ->first();
+        $pdts = productdatatemplates::where('GUID', $pdt->GUID)
+            ->orderBy('versionNumber', 'asc')
+            ->orderBy('revisionNumber', 'asc')
             ->get();
+
+        $pdtCount = $pdts->count();
+        $latestPdt = $pdts[$pdtCount - 1];
         $gop = DB::table('groupofproperties as gop')->where('pdtId', $pdtID)
             /* ->join(
                 DB::raw("(SELECT
@@ -144,7 +161,7 @@ class GroupofpropertiesController extends Controller
         $answers = Answers::where('users_id', Auth::id())->get();
 
 
-        return view('pdtssurvey', compact('gop', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'comments', 'answers', 'properties', 'depreciatedProperties'));
+        return view('pdtssurvey', compact('gop', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'comments', 'answers', 'properties', 'depreciatedProperties', 'latestPdt'));
     }
 
 

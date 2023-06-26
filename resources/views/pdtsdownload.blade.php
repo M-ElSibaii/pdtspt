@@ -6,8 +6,13 @@
                 <div class="flex flex-row">
                     <div class="grow block">
                         <div class="flex-none inline">
-                            <h1 class="flex-none inline">{{ $pdt[0]->pdtNamePt }}</h1>
-                            <p class="flex-none inline"> - V{{ $pdt[0]->versionNumber }}.{{ $pdt[0]->revisionNumber }}</p>
+                            <h1 class="flex-none inline">{{ $pdt->pdtNamePt }}</h1>
+                            <p class="flex-none inline"> - V{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}</p>
+                            @if ($pdt->versionNumber == $latestPdt->versionNumber AND $pdt->revisionNumber == $latestPdt->revisionNumber)
+                            <span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">Activa</span>
+                            @else
+                            <span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">InActiva</span>
+                            @endif
                         </div>
                     </div>
                     <div class="flex flex-row gap-2 py-4">
@@ -147,20 +152,20 @@
         $("#json").on("click", function() {
             $("#tblpdtsh").tableHTMLExport({
                 type: "json",
-                filename: "{{ $pdt[0]->pdtNameEn }} data template.json",
+                filename: "{{ $pdt->pdtNameEn }} data template.json",
             });
         });
         $("#csv").on("click", function() {
             $("#tblpdtsh").tableHTMLExport({
                 type: "csv",
-                filename: "{{ $pdt[0]->pdtNameEn }} data template.csv"
+                filename: "{{ $pdt->pdtNameEn }} data template.csv"
             });
         });
 
         $("#txt").on("click", function() {
             $("#tblpdtsh").tableHTMLExport({
                 type: "txt",
-                filename: "{{ $pdt[0]->pdtNameEn }} data template.txt"
+                filename: "{{ $pdt->pdtNameEn }} data template.txt"
             });
         });
     </script>
