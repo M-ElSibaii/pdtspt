@@ -36,8 +36,14 @@ Route::get('/productDataTemplates', [ProductdatatemplatesController::class, 'pro
 
 Route::get('/dataDictionary', [ProductdatatemplatesController::class, 'dataDictionary']);
 
+Route::get('/dataDictionary/{Id}', [ProductdatatemplatesController::class, 'propertyInDataDictionary']);
+
 Route::get('/referenceDocuments', [ProductdatatemplatesController::class, 'referenceDocuments']);
 
+Route::get('/referenceDocuments/{GUID}', [ProductdatatemplatesController::class, 'referenceDocument']);
+
 Route::get('/groupsOfProperties', [ProductdatatemplatesController::class, 'groupsOfProperties']);
+
+Route::get('/groupsOfProperties/{Id}', [ProductdatatemplatesController::class, 'groupOfProperties']);
 
 Route::get('/{pdtID}', [ProductdatatemplatesController::class, 'productDataTemplate']);

@@ -17,15 +17,30 @@
             <div style="background-color: #F0F4F8;">
                 <pre><code>GET /api/dataDictionary</code></pre>
             </div>
+            <h2 class="my-4">Obter uma propriedade do Dicionário de dados</h2>
+            <p class="mb-4">Retorna uma propriedade e seus atributos do dicionário de dados.</p>
+            <div style="background-color: #F0F4F8;">
+                <pre><code>GET /api/dataDictionary/{Id}</code></pre>
+            </div>
             <h2 class="my-4">Obter Documentos de Referência</h2>
             <p class="mb-4">Retorna os documentos de referência usados nos templates de dados de produtos.</p>
             <div style="background-color: #F0F4F8;">
                 <pre><code>GET /api/referenceDocuments</code></pre>
             </div>
+            <h2 class="my-4">Obter um Documento de Referência</h2>
+            <p class="mb-4">Retorna um documento de referência usado nos templates de dados de produtos.</p>
+            <div style="background-color: #F0F4F8;">
+                <pre><code>GET /api/referenceDocuments/{GUID}</code></pre>
+            </div>
             <h2 class="my-4">Obter Grupos de Propriedades</h2>
             <p class="mb-4">Retorna os grupos de propriedades para os templates de dados de produtos.</p>
             <div style="background-color: #F0F4F8;">
                 <pre><code>GET /api/groupsOfProperties</code></pre>
+            </div>
+            <h2 class="my-4">Obter um Grupo de Propriedades</h2>
+            <p class="mb-4">Retorna um grupo de propriedades e seus atributos para um template de dados de produto.</p>
+            <div style="background-color: #F0F4F8;">
+                <pre><code>GET /api/groupsOfProperties/{Id}</code></pre>
             </div>
         </div>
     </div>

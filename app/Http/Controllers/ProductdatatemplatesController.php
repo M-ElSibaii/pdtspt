@@ -96,9 +96,14 @@ class ProductdatatemplatesController extends Controller
         return productdatatemplates::all();
     }
 
-    public function datadictionary()
+    public function dataDictionary()
     {
         return propertiesdatadictionaries::all();
+    }
+
+    public function propertyInDataDictionary($Id)
+    {
+        return propertiesdatadictionaries::Where("Id", $Id)->first();
     }
 
     public function referenceDocuments()
@@ -106,9 +111,19 @@ class ProductdatatemplatesController extends Controller
         return referenceDocuments::all();
     }
 
+    public function referenceDocument($GUID)
+    {
+        return referenceDocuments::Where("GUID", $GUID)->first();
+    }
+
     public function groupsOfProperties()
     {
         return groupOfProperties::all();
+    }
+
+    public function groupOfProperties($Id)
+    {
+        return groupOfProperties::Where("Id", $Id)->first();
     }
 
     /**
