@@ -14,6 +14,7 @@ class UserController extends Controller
      */
     public function index()
     {
+
         $users = User::paginate(10);
         return view('admin', compact('users'));
     }
@@ -70,6 +71,7 @@ class UserController extends Controller
      */
     public function updateUsers(Request $request)
     {
+
         $isAdmin = $request->input('isAdmin');
 
         foreach ($isAdmin as $userId => $value) {

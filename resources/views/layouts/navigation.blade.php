@@ -29,7 +29,7 @@
                         {{ __('Documentação API') }}
                     </x-nav-link>
                 </div>
-                
+
                 @endauth
                 <div class="sm:hidden space-x-8 -my-px ml-10 flex">
                     <x-nav-link :href="route('participantes')" :active="request()->routeIs('participantes')">
@@ -42,10 +42,19 @@
                     </x-nav-link>
                 </div>
                 @auth
-                @if (Auth::user()->isAdmin === 1)
+                @if (Auth::user()->isAdmin == 1)
                 <div class="sm:hidden space-x-8 -my-px ml-10 flex">
                     <x-nav-link :href="route('admin')" :active="request()->routeIs('admin')">
                         {{ __('Admin') }}
+                    </x-nav-link>
+                </div>
+                @endif
+                @endauth
+                @auth
+                @if (Auth::user()->isAdmin == 1)
+                <div class="sm:hidden space-x-8 -my-px ml-10 flex">
+                    <x-nav-link :href="route('pdtinput')" :active="request()->routeIs('pdtinput')">
+                        {{ __('PDTcreate') }}
                     </x-nav-link>
                 </div>
                 @endif
@@ -59,19 +68,15 @@
             @else
             <div class="flex items-center ml-6">
                 <div class="grid grid-cols-2">
-                    @if (Route::has('login'))            
+                    @if (Route::has('login'))
                     <div class="sm:hidden flex">
-                        <x-button-primary-pdts
-                            link="{{route('login')}}"
-                            :active="request()->routeIs('login')"
-                            title="{{ __('Login') }}"
-                            >
+                        <x-button-primary-pdts link="{{route('login')}}" :active="request()->routeIs('login')" title="{{ __('Login') }}">
                         </x-button-primary-pdts>
                     </div>
                     @if (Route::has('register'))
                     <div class="sm:hidden flex">
                         <a href="{{route('register')}}">
-                            <x-secondary-button :active="request()->routeIs('register')">   
+                            <x-secondary-button :active="request()->routeIs('register')">
                                 {{ __('Registo') }}
                             </x-secondary-button>
                         </a>
@@ -83,7 +88,7 @@
             @endif
             <!-- Settings Dropdown -->
             <div class="sm:hidden flex items-center ml-6">
-                
+
                 @auth
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
@@ -124,9 +129,9 @@
                         @endauth
                     </x-slot>
                 </x-dropdown>
-                
+
             </div>
-            
+
             <!-- Hamburger -->
             <div class="-mr-2 flex items-center md:hidden lg:hidden">
                 <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">
@@ -165,7 +170,7 @@
                 {{ __('Participantes') }}
             </x-responsive-nav-link>
         </div>
-        @if (Route::has('login'))   
+        @if (Route::has('login'))
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('login')" :active="request()->routeIs('login')">
                 {{ __('Login') }}

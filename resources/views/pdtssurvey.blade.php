@@ -15,9 +15,16 @@
                 <div class="mb-6">
                     <h1 class="flex-none inline">{{ $pdt->pdtNamePt }}</h1>
                     <p class="flex-none inline"> - V{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}</p>
-                    @if ($pdt->versionNumber == $latestPdt->versionNumber AND $pdt->revisionNumber == $latestPdt->revisionNumber)
+                    @if ($pdt->status == 'Current')
                     <span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">Activa</span>
-                    @else
+                    @endif
+                    @if ($pdt->status == 'Under Review')
+                    <span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">InActiva</span>
+                    @endif
+                    @if ($pdt->status == 'Outdated')
+                    <span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">InActiva</span>
+                    @endif
+                    @if ($pdt->status == 'Deprecated')
                     <span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">InActiva</span>
                     @endif
                 </div>

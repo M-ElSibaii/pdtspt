@@ -42,6 +42,33 @@ Route::get('/privacypolicy', function () {
 Route::get('/contact',  function () {
     return view('contact');
 });
+
+Route::get('/pdtinput',  function () {
+    return view('pdtinput');
+})->middleware(['auth', 'verified', 'admin'])->name('pdtinput');
+
+// Route for creating data templates
+Route::get('/productdatatemplates/create', [ProductDataTemplatesController::class, 'create'])->middleware(['auth', 'verified', 'admin'])
+    ->name('productdatatemplates.create');
+Route::post('/productdatatemplates/store', [ProductDataTemplatesController::class, 'store'])->middleware(['auth', 'verified', 'admin'])
+    ->name('productdatatemplates.store');
+
+// Route for creating groups of properties
+Route::get('/groupofproperties/create1', [GroupOfPropertiesController::class, 'createStep1'])->middleware(['auth', 'verified', 'admin'])
+    ->name('groupofproperties.create1');
+Route::get('/groupofproperties/create2', [GroupOfPropertiesController::class, 'createStep2'])->middleware(['auth', 'verified', 'admin'])
+    ->name('groupofproperties.create2');
+Route::post('/groupofproperties/create2', [GroupOfPropertiesController::class, 'createStep2'])->middleware(['auth', 'verified', 'admin'])
+    ->name('groupofproperties.create2');
+
+Route::post('/groupofproperties/storegop', [GroupOfPropertiesController::class, 'storegop'])->middleware(['auth', 'verified', 'admin'])
+    ->name('groupofproperties.storegop');
+
+
+// Route for creating properties
+Route::get('/properties/create', [PropertiesdatadictionariesController::class, 'create'])->middleware(['auth', 'verified', 'admin'])->name('properties.create');
+
+
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 Route::get('/dashboard', [ProductdatatemplatesController::class, 'getLatestPDTs'], function () {
@@ -89,6 +116,6 @@ Route::get(
     [ReferencedocumentsController::class, 'getReferenceDocument']
 )->middleware(['auth', 'verified'])->name('referencedocumentview');
 
-Route::get('/admin', [UserController::class, 'index'])->middleware(['auth', 'verified'])->name('admin');
+Route::get('/admin', [UserController::class, 'index'])->middleware(['auth', 'verified', 'admin'])->name('admin');
 
-Route::post('/admin/update', [UserController::class, 'updateUsers'])->middleware(['auth', 'verified'])->name('update.users');
+Route::post('/admin/update', [UserController::class, 'updateUsers'])->middleware(['auth', 'verified', 'admin'])->name('update.users');

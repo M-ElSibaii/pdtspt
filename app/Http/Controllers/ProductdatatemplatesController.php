@@ -133,7 +133,8 @@ class ProductdatatemplatesController extends Controller
      */
     public function create()
     {
-        //
+        $referenceDocuments = ReferenceDocuments::all();
+        return view('productdatatemplates.create', compact('referenceDocuments'));
     }
 
     /**
@@ -144,7 +145,41 @@ class ProductdatatemplatesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Validate the request
+        $request->validate([
+            'GUID' => 'required|string',
+            'referenceDocumentGUID' => 'nullable|string',
+            'pdtNameEn' => 'required|string',
+            'pdtNamePt' => 'required|string',
+            'descriptionEn' => 'nullable|string',
+            'descriptionPt' => 'nullable|string',
+            'dateOfRevision' => 'required|date',
+            'dateOfVersion' => 'required|date',
+            'status' => 'required|string',
+            'versionNumber' => 'required|integer',
+            'revisionNumber' => 'required|integer',
+            // Add other fields validation as needed
+        ]);
+
+        // Create a new PDT
+        $pdt = new productdatatemplates();
+        $pdt->GUID = $request->input('GUID');
+        $pdt->referenceDocumentGUID = $request->input('referenceDocumentGUID');
+        $pdt->pdtNameEn = $request->input('pdtNameEn');
+        $pdt->pdtNamePt = $request->input('pdtNamePt');
+        $pdt->descriptionEn = $request->input('descriptionEn');
+        $pdt->descriptionPt = $request->input('descriptionPt');
+        $pdt->dateOfRevision = now();
+        $pdt->dateOfVersion = now();
+        $pdt->created_at = now();
+        $pdt->updated_at = now();
+        $pdt->status = $request->input('status');
+        $pdt->versionNumber = $request->input('versionNumber');
+        $pdt->revisionNumber = $request->input('revisionNumber');
+        // Set other fields as needed
+        $pdt->save();
+
+        return redirect()->route('pdtinput')->with('successpdt', 'PDT added successfully!');
     }
 
     /**

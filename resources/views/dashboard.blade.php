@@ -22,7 +22,14 @@
                             <img class="w-auto max-w-[100px] max-h-14" src="{{asset('/img/' . $pdt->pdtNameEn . '.png')}}" {{-- src="{{asset('/img/Master.png')}}" --}} alt="" />
                         </td>
                         <td class="whitespace-nowrap px-6 py-4 font-medium">{{ $pdt->pdtNamePt }}</td>
-                        <td class="whitespace-nowrap px-6 py-4 font-medium">V{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}</td>
+                        <td class="whitespace-nowrap px-6 py-4 font-medium">V{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}
+                            @if ($pdt->status == 'Under Review')
+                            <span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">InActiva</span>
+                            @endif
+                            @if ($pdt->status == 'Current')
+                            <span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">Activa</span>
+                            @endif
+                        </td>
                         <td class="whitespace-nowrap px-6 py-4 font-medium">{{ $pdt->dateOfVersion }}</td>
                         <td class="whitespace-nowrap px-6 py-4 font-medium my-auto ">
                             <form class="mb-3" action="{{ route('pdtsdownload', ['pdtID' => $pdt->Id]) }}">

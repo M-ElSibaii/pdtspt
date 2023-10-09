@@ -373,10 +373,79 @@ class GroupofpropertiesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function createStep1()
+    {
+        // Get the latest versions/revisions of PDTs
+        $pdts = productdatatemplates::Where('status', "Under Review")->get();
+
+        return view('groupofproperties.create1', compact('pdts'));
+    }
+
+    public function createStep2(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'pdtId' => 'required|exists:productdatatemplates,Id',
+        ]);
+
+        $pdtId = $request->input('pdtId');
+
+        // Get the selected PDT and its associated groups of properties
+        $selectedPdt = productdatatemplates::find($pdtId);
+        $associatedGroups = GroupOfProperties::where('pdtId', $pdtId)->get();
+
+        return view('groupofproperties.create2', compact('selectedPdt', 'associatedGroups'));
+    }
     public function create()
     {
         //
     }
+
+    public function storegop(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'pdtId' => 'required|exists:productdatatemplates,Id',
+            'gopNameEn' => 'required|string',
+            'gopNamePt' => 'required|string',
+            // Add other fields validation as needed
+        ]);
+
+        // Create a new Group of Properties
+        $groupOfProperties = new GroupOfProperties();
+        $groupOfProperties->pdtId = $request->input('pdtId');
+        $groupOfProperties->gopNameEn = $request->input('gopNameEn');
+        $groupOfProperties->gopNamePt = $request->input('gopNamePt');
+        $groupOfProperties->GUID = $request->input('GUID');
+        // Set other fields as needed
+        $groupOfProperties->definitionEn = $request->input('definitionEn');
+        $groupOfProperties->definitionPt = $request->input('definitionPt');
+        $groupOfProperties->status = $request->input('status');
+        $groupOfProperties->dateOfCreation = $request->input('dateOfCreation');
+        $groupOfProperties->dateofActivation = $request->input('dateofActivation');
+        $groupOfProperties->dateOfLastChange = $request->input('dateOfLastChange');
+        $groupOfProperties->dateOfRevision = $request->input('dateOfRevision');
+        $groupOfProperties->dateOfVersion = $request->input('dateOfVersion');
+        $groupOfProperties->versionNumber = $request->input('versionNumber');
+        $groupOfProperties->revisionNumber = $request->input('revisionNumber');
+        $groupOfProperties->listOfReplacedProperties = $request->input('listOfReplacedProperties');
+        $groupOfProperties->listOfReplacingProperties = $request->input('listOfReplacingProperties');
+        $groupOfProperties->relationToOtherDataDictionaries = $request->input('relationToOtherDataDictionaries');
+        $groupOfProperties->creatorsLanguage = $request->input('creatorsLanguage');
+        $groupOfProperties->visualRepresentation = $request->input('visualRepresentation');
+        $groupOfProperties->countryOfUse = $request->input('countryOfUse');
+        $groupOfProperties->countryOfOrigin = $request->input('countryOfOrigin');
+        $groupOfProperties->categoryOfGroupOfProperties = $request->input('categoryOfGroupOfProperties');
+        $groupOfProperties->parentGroupOfProperties = $request->input('parentGroupOfProperties');
+        // Add other fields as needed
+
+        $groupOfProperties->save();
+
+        return redirect()->route('groupofproperties.create2', ['pdtId' => $request->input('pdtId')])
+            ->with('success', 'Group of Properties added successfully!');
+    }
+
 
 
     /**
