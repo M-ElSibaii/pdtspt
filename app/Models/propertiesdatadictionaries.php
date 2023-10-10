@@ -10,6 +10,11 @@ class propertiesdatadictionaries extends Model
     use HasFactory;
     public function properties()
     {
-        return $this->belongsTo(properties::class);
+        return $this->hasMany(Properties::class, 'GUID', 'GUID');
+    }
+    public function latestVersion()
+    {
+        // Assuming 'versionNumber' is a column in your data dictionary table
+        return $this->where('GUID', $this->GUID)->orderByDesc('versionNumber')->first();
     }
 }

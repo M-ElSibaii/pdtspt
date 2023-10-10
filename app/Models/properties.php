@@ -18,7 +18,7 @@ class properties extends Model
     }
     public function propertiesdatadictionaries()
     {
-        return $this->hasOne(propertiesdatadictionaries::class, 'GUID', 'GUID');
+        return $this->belongsTo(DataDictionary::class, 'GUID', 'GUID');
     }
     public function referencedocuments()
     {

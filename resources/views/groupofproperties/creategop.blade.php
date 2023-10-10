@@ -3,6 +3,11 @@
     <div style="background-color: white;">
         <div class="container sm:max-w-full py-9">
             <div class="container">
+                @if(session('success'))
+                <div class="alert alert-success mt-3">
+                    {{ session('success') }}
+                </div>
+                @endif
                 <h1>{{ __('Add Group of Properties') }}</h1>
 
                 <!-- Display selected PDT and associated groups of properties -->
@@ -62,6 +67,19 @@
                     <div class="form-group">
                         <label for="definitionPt">{{ __('Definition (Portuguese)') }}</label>
                         <textarea class="form-control" id="definitionPt" name="definitionPt" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="referenceDocumentGUID">{{ __('Reference Document GUID') }}</label>
+                        <select class="form-control" id="referenceDocumentGUID" name="referenceDocumentGUID">
+                            <!-- Default 'n/a' option -->
+                            <option value="n/a">n/a</option>
+
+                            <!-- Populate dropdown with reference documents -->
+                            @foreach ($referenceDocuments as $document)
+                            <option value="{{ $document->GUID }}">{{ $document->rdName }}</option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div class="form-group">

@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductdatatemplatesController;
 use App\Http\Controllers\GroupofpropertiesController;
 use App\Http\Controllers\PropertiesdatadictionariesController;
+use App\Http\Controllers\PropertiesController;
 use App\Http\Controllers\ReferencedocumentsController;
 use Illuminate\Support\Facades\Route;
 
@@ -24,8 +25,6 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-
-
 Route::get('/apidoc', function () {
     return view('apidoc');
 })->name('apidoc');
@@ -38,38 +37,14 @@ Route::get('/privacypolicy', function () {
     return view('privacypolicy');
 })->name('privacypolicy');
 
-
 Route::get('/contact',  function () {
     return view('contact');
 });
 
-Route::get('/pdtinput',  function () {
-    return view('pdtinput');
-})->middleware(['auth', 'verified', 'admin'])->name('pdtinput');
-
-// Route for creating data templates
-Route::get('/productdatatemplates/create', [ProductDataTemplatesController::class, 'create'])->middleware(['auth', 'verified', 'admin'])
-    ->name('productdatatemplates.create');
-Route::post('/productdatatemplates/store', [ProductDataTemplatesController::class, 'store'])->middleware(['auth', 'verified', 'admin'])
-    ->name('productdatatemplates.store');
-
-// Route for creating groups of properties
-Route::get('/groupofproperties/create1', [GroupOfPropertiesController::class, 'createStep1'])->middleware(['auth', 'verified', 'admin'])
-    ->name('groupofproperties.create1');
-Route::get('/groupofproperties/create2', [GroupOfPropertiesController::class, 'createStep2'])->middleware(['auth', 'verified', 'admin'])
-    ->name('groupofproperties.create2');
-Route::post('/groupofproperties/create2', [GroupOfPropertiesController::class, 'createStep2'])->middleware(['auth', 'verified', 'admin'])
-    ->name('groupofproperties.create2');
-
-Route::post('/groupofproperties/storegop', [GroupOfPropertiesController::class, 'storegop'])->middleware(['auth', 'verified', 'admin'])
-    ->name('groupofproperties.storegop');
+Route::post('/contact', [ContactController::class, 'store'])
+    ->name('contact.store');
 
 
-// Route for creating properties
-Route::get('/properties/create', [PropertiesdatadictionariesController::class, 'create'])->middleware(['auth', 'verified', 'admin'])->name('properties.create');
-
-
-Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
 
 Route::get('/dashboard', [ProductdatatemplatesController::class, 'getLatestPDTs'], function () {
     return view('dashboard');
@@ -101,11 +76,6 @@ Route::post('/pdtssurvey/{pdtID}', [GroupofpropertiesController::class, 'store']
 Route::post('/pdtssurvey/store', [GroupofpropertiesController::class, 'store'])
     ->middleware(['auth', 'verified'])->name('pdtssurveystore');
 
-Route::post('/comments/{propID}', [GroupofpropertiesController::class, 'getCommentProperty']);
-
-Route::delete('/deletefeedback', [GroupofpropertiesController::class, 'destroyfeedback']);
-
-
 Route::get(
     '/datadictionaryview/{propID}{propV}{propR}',
     [PropertiesdatadictionariesController::class, 'getPropertyDataDictionary']
@@ -116,6 +86,60 @@ Route::get(
     [ReferencedocumentsController::class, 'getReferenceDocument']
 )->middleware(['auth', 'verified'])->name('referencedocumentview');
 
-Route::get('/admin', [UserController::class, 'index'])->middleware(['auth', 'verified', 'admin'])->name('admin');
 
-Route::post('/admin/update', [UserController::class, 'updateUsers'])->middleware(['auth', 'verified', 'admin'])->name('update.users');
+Route::post('/comments/{propID}', [GroupofpropertiesController::class, 'getCommentProperty']);
+
+Route::delete('/deletefeedback', [GroupofpropertiesController::class, 'destroyfeedback']);
+
+
+
+
+
+
+
+// Routes accessible only to admins
+Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
+
+    Route::get('/admin', [UserController::class, 'index'])
+        ->name('admin');
+
+    Route::post('/admin/update', [UserController::class, 'updateUsers'])
+        ->name('update.users');
+
+    Route::get('/pdtinput',  function () {
+        return view('pdtinput');
+    })
+        ->name('pdtinput');
+
+    // Route for creating data templates
+    Route::get('/productdatatemplates/create', [ProductDataTemplatesController::class, 'create'])
+        ->name('productdatatemplates.create');
+    Route::post('/productdatatemplates/store', [ProductDataTemplatesController::class, 'store'])
+        ->name('productdatatemplates.store');
+
+    // Route for creating groups of properties
+    Route::get('/groupofproperties/choose_pdt', [GroupOfPropertiesController::class, 'createStep1'])
+        ->name('groupofproperties.choose_pdt');
+    Route::get('/groupofproperties/creategop', [GroupOfPropertiesController::class, 'createStep2'])
+        ->name('groupofproperties.creategop');
+    Route::post('/groupofproperties/creategop', [GroupOfPropertiesController::class, 'createStep2'])
+        ->name('groupofproperties.creategop');
+    Route::post('/groupofproperties/storegop', [GroupOfPropertiesController::class, 'storegop'])
+        ->name('groupofproperties.storegop');
+
+    // Route for creating properties
+    Route::get('/properties/choose_pdt', [PropertiesController::class, 'choosePDT'])
+        ->name('properties.choose_pdt');
+
+    Route::match(['get', 'post'], '/properties/createprops', [PropertiesController::class, 'createprops'])->name('properties.createprops');
+
+    Route::post('/properties/addNew', [PropertiesController::class, 'NewPropertyAdd'])->name('properties.addNew');
+    Route::post('/properties/addNewProperty', [PropertiesController::class, 'addPropertyManual'])->name('properties.addPropertyManual');
+
+    // Route to add properties from data dictionary
+    /*
+    Route::get('/properties/add_from_dictionary/{pdtId}/{gopId}', [PropertiesController::class, 'showAddFromDictionary'])->name('properties.showAddFromDictionary');
+    Route::post('/properties/add_from-dictionary', [PropertiesController::class, 'addFromDictionary'])->name('properties.addFromDictionary');
+    // Route to add new property manually
+*/
+});

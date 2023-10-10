@@ -5,7 +5,7 @@
             <div class="container">
                 <h1>{{ __('Select PDT') }}</h1>
 
-                <form method="POST" action="{{ route('groupofproperties.create2') }}">
+                <form method="POST" action="{{ route('groupofproperties.creategop') }}">
                     @csrf
                     <div class="form-group">
                         <label for="pdtId">{{ __('Select PDT') }}</label>

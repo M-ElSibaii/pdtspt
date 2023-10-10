@@ -20,14 +20,14 @@
                                 </form>
                             </div>
                             <div class="mb-4">
-                                <form class="mb-3" action="{{ route('groupofproperties.create1') }}">
+                                <form class="mb-3" action="{{ route('groupofproperties.choose_pdt') }}">
                                     <x-secondary-button type="submit">
                                         {{ __('Create Group of Properties') }}
                                     </x-secondary-button>
                                 </form>
                             </div>
                             <div class="mb-4">
-                                <form class="mb-3" action="{{ route('properties.create') }}">
+                                <form class="mb-3" action="{{ route('properties.choose_pdt') }}">
                                     <x-secondary-button type="submit">
                                         {{ __('Create Properties') }}
                                     </x-secondary-button>

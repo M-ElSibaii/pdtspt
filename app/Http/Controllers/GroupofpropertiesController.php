@@ -379,7 +379,8 @@ class GroupofpropertiesController extends Controller
         // Get the latest versions/revisions of PDTs
         $pdts = productdatatemplates::Where('status', "Under Review")->get();
 
-        return view('groupofproperties.create1', compact('pdts'));
+
+        return view('groupofproperties.choose_pdt', compact('pdts'));
     }
 
     public function createStep2(Request $request)
@@ -390,12 +391,12 @@ class GroupofpropertiesController extends Controller
         ]);
 
         $pdtId = $request->input('pdtId');
-
+        $referenceDocuments = ReferenceDocuments::all();
         // Get the selected PDT and its associated groups of properties
         $selectedPdt = productdatatemplates::find($pdtId);
         $associatedGroups = GroupOfProperties::where('pdtId', $pdtId)->get();
 
-        return view('groupofproperties.create2', compact('selectedPdt', 'associatedGroups'));
+        return view('groupofproperties.creategop', compact('selectedPdt', 'associatedGroups', 'referenceDocuments'));
     }
     public function create()
     {
@@ -422,6 +423,7 @@ class GroupofpropertiesController extends Controller
         $groupOfProperties->definitionEn = $request->input('definitionEn');
         $groupOfProperties->definitionPt = $request->input('definitionPt');
         $groupOfProperties->status = $request->input('status');
+        $groupOfProperties->referenceDocumentGUID = $request->input('referenceDocumentGUID');
         $groupOfProperties->dateOfCreation = $request->input('dateOfCreation');
         $groupOfProperties->dateofActivation = $request->input('dateofActivation');
         $groupOfProperties->dateOfLastChange = $request->input('dateOfLastChange');
@@ -442,7 +444,7 @@ class GroupofpropertiesController extends Controller
 
         $groupOfProperties->save();
 
-        return redirect()->route('groupofproperties.create2', ['pdtId' => $request->input('pdtId')])
+        return redirect()->route('groupofproperties.creategop', ['pdtId' => $request->input('pdtId')])
             ->with('success', 'Group of Properties added successfully!');
     }
 
