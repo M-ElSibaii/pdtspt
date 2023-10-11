@@ -132,14 +132,17 @@ Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
         ->name('properties.choose_pdt');
 
     Route::match(['get', 'post'], '/properties/createprops', [PropertiesController::class, 'createprops'])->name('properties.createprops');
-
-    Route::post('/properties/addNew', [PropertiesController::class, 'NewPropertyAdd'])->name('properties.addNew');
+    // Route to add new property manually
+    Route::post('/properties/addNew', [PropertiesController::class, 'PropertiesAdded'])->name('properties.addNew');
     Route::post('/properties/addNewProperty', [PropertiesController::class, 'addPropertyManual'])->name('properties.addPropertyManual');
 
     // Route to add properties from data dictionary
-    /*
-    Route::get('/properties/add_from_dictionary/{pdtId}/{gopId}', [PropertiesController::class, 'showAddFromDictionary'])->name('properties.showAddFromDictionary');
-    Route::post('/properties/add_from-dictionary', [PropertiesController::class, 'addFromDictionary'])->name('properties.addFromDictionary');
-    // Route to add new property manually
-*/
+    Route::post('/properties/addNewPropertyFromDictionary', [PropertiesController::class, 'addFromDictionary'])->name('properties.addFromDataDictionary');
+    Route::post('/properties/addFromDictionary', [PropertiesController::class, 'PropertiesAddedDictionaryPage'])->name('properties.addFromDictionary');
+
+    // edit properties
+
+    Route::post('/properties/edit/{propertyId}', [PropertiesController::class, 'updateProperty'])->name('properties.update');
+
+    Route::get('/properties/edit/{propertyId}', [PropertiesController::class, 'showProperty'])->name('properties.edit');
 });

@@ -8,14 +8,21 @@
                 @foreach($groupofproperties as $group)
                 <h2>Group of property: {{ $group->gopNameEn }}</h2>
                 <br>
-
+                <!-- Button to add new properties manually -->
+                <form method="POST" action="{{ route('properties.addFromDictionary') }}">
+                    @csrf
+                    <input type="hidden" name="pdtId" value="{{ $selectedPdt->Id }}">
+                    <input type="hidden" name="gopId" value="{{ $group->Id }}">
+                    <x-secondary-button type="submit">{{ __('Add Properties From Data Dictionary') }}</x-secondary-button>
+                </form>
+                <br>
 
                 <!-- Button to add new properties manually -->
                 <form method="POST" action="{{ route('properties.addNew') }}">
                     @csrf
                     <input type="hidden" name="pdtId" value="{{ $selectedPdt->Id }}">
                     <input type="hidden" name="gopId" value="{{ $group->Id }}">
-                    <x-secondary-button type="submit">{{ __('Add New Properties') }} {{ $group->Id }} {{ $selectedPdt->Id }}</x-secondary-button>
+                    <x-secondary-button type="submit">{{ __('Add New Properties') }}</x-secondary-button>
                 </form>
                 <br>
 
@@ -33,9 +40,10 @@
                         <th>{{ __('Property Name') }}</th>
                         <th>{{ __('Description') }}</th>
                         <th>{{ __('Unit') }}</th>
+                        <th>{{ __('Actions') }}</th> <!-- New column for buttons -->
                     </tr>
                     <!-- Table rows - Display properties for this group -->
-                    @foreach($properties as $property)
+                    @foreach ($properties as $property)
                     @php
                     $additionalInfo = \App\Models\propertiesDataDictionaries::where('GUID', $property->GUID)
                     ->orderByDesc('versionNumber')
@@ -46,6 +54,9 @@
                         <td>{{ $additionalInfo->nameEn ?? '' }}</td>
                         <td>{{ $property->descriptionEn ?? '' }}</td>
                         <td>{{ $additionalInfo->units ?? '' }}</td>
+                        <td><a href="{{ route('properties.edit', ['propertyId' => $property->Id]) }}" class="btn btn-warning">Properties table</a>
+                            <a href="{{ route('datadictionaryview', ['propID' => $additionalInfo->GUID, 'propV' => $additionalInfo->versionNumber, 'propR' => $additionalInfo->revisionNumber]) }}" class="btn btn-warning">Data dictionary</a>
+                        </td>
                     </tr>
                     @endforeach
                 </table>

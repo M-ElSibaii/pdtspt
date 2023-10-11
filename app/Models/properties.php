@@ -7,6 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class properties extends Model
 {
+    protected $fillable = [
+        'descriptionEn',
+        'descriptionPt',
+
+        // Add other fields as needed
+    ];
     use HasFactory;
     public function groupofproperties()
     {

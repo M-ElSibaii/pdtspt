@@ -43,7 +43,7 @@ class PropertiesController extends Controller
 
     public function createprops(Request $request)
     {
-        Log::info('Entering createprops method');
+        // Log::info('Entering createprops method');
         // Validate the request
         $request->validate([
             'pdtId' => 'required|exists:productdatatemplates,Id',
@@ -64,61 +64,143 @@ class PropertiesController extends Controller
             })
             ->select('Properties.*', 'propertiesDataDictionaries.nameEn', 'propertiesDataDictionaries.units')
             ->get();
-        Log::info('Exiting createprops method');
+        // Log::info('Exiting createprops method');
         return view('properties.createprops', compact('selectedPdt', 'groupofproperties', 'properties'));
     }
-    /*  public function showAddFromDictionary($pdtId, $gopId)
-    {
-        $selectedPdt = ProductDataTemplates::findOrFail($pdtId);
-        $selectedGroup = GroupOfProperties::findOrFail($gopId);
-        $dataDictionary = propertiesDataDictionaries::all();
-        $addedProperties = Properties::where('pdtId', $pdtId)->where('gopId', $gopId)->get();
 
-        return view('properties.add_from_dictionary', compact('selectedPdt', 'selectedGroup', 'dataDictionary', 'addedProperties'));
-    }
-*/
-    /*public function addFromDictionary(Request $request)
+
+    public function showProperty($propertyId)
     {
-        // Validate the request
+        $property = Properties::findOrFail($propertyId);
+        $referenceDocuments = referenceDocuments::all();
+        return view('properties.edit', compact('property', 'referenceDocuments'));
+    }
+
+
+
+    public function updateProperty(Request $request, $propertyId)
+    {
         $request->validate([
-            'pdtId' => 'required|exists:productdatatemplates,Id',
-            'gopId' => 'required|exists:groupofproperties,Id',
-            'selectedProperties' => 'required|array',
-            'selectedProperties.*' => 'exists:data_dictionary,id',
+            'descriptionPt' => 'required|string',
+            'descriptionEn' => 'required|string',
+            // Add validation rules for other fields as needed
         ]);
 
-        // Add selected properties to the Properties table
-        $pdtId = $request->input('pdtId');
-        $gopId = $request->input('gopId');
-        $selectedProperties = $request->input('selectedProperties');
+        try {
+            $property = Properties::findOrFail($propertyId);
 
-        foreach ($selectedProperties as $propertyId) {
-            $property = propertiesDataDictionaries::findOrFail($propertyId);
-
-            // Create a new property in the Properties table
-            $newProperty = new Properties();
-            $newProperty->pdtId = $pdtId;
-            $newProperty->gopId = $gopId;
-            $newProperty->GUID = $property->GUID;
-            $newProperty->referenceDocumentGUID = $property->referenceDocumentGUID;
-            $newProperty->descriptionEn = $property->descriptionEn;
-            $newProperty->descriptionPt = $property->descriptionPt;
-            $newProperty->visualRepresentation = $property->visualRepresentation;
+            // Update property fields based on the form input
+            $property->descriptionEn = $request->input('descriptionEn');
+            $property->descriptionPt = $request->input('descriptionPt');
             // Add other fields as needed
-            $newProperty->save();
-        }
+            $property->save();
 
-        return redirect()->back()->with('success', 'Properties added successfully!');
+            // Log the update
+            Log::info('Property updated successfully.');
+
+
+
+            // Temporary action for testing, you can remove this after testing
+            $this->testActionBeforeRedirect($property);
+
+            // Redirect to the edit page with success message
+            return redirect()->route('properties.edit', ['propertyId' => $property->Id])
+                ->with('success', 'Property updated successfully.');
+        } catch (\Exception $e) {
+            // Log any exception
+            Log::error('Error updating property: ' . $e->getMessage());
+            // Handle the error as needed (you might want to redirect with an error message)
+        }
     }
-*/
-    public function NewPropertyAdd(Request $request)
+
+    // Temporary action for testing, you can remove this after testing
+    private function testActionBeforeRedirect($property)
     {
-        Log::info('Entering newpropadd method');
+        // This is a temporary action for testing, you can perform additional actions here
+        // For example, you can log information or perform other tasks
+        // This will help you identify whether the issue is related to the redirect or something else
+
+        // Example: Log the property data
+        Log::info('Test action - Property data: ' . json_encode($property->toArray()));
+    }
+
+    public function addFromDictionary(Request $request)
+    {
         $pdtId = $request->input('pdtId');
         $gopId = $request->input('gopId');
         $selectedPdt = ProductDataTemplates::findOrFail($pdtId);
         $selectedGroup = GroupOfProperties::findOrFail($gopId);
+        $dataDictionary = PropertiesDataDictionaries::select('GUID', 'nameEn', 'namePt', 'units', 'versionNumber', 'revisionNumber')
+            ->whereIn('versionNumber', function ($query) {
+                $query->selectRaw('MAX(versionNumber)')
+                    ->from('propertiesDataDictionaries')
+                    ->groupBy('GUID');
+            })
+            ->whereIn('revisionNumber', function ($query) {
+                $query->selectRaw('MAX(revisionNumber)')
+                    ->from('propertiesDataDictionaries')
+                    ->groupBy('GUID');
+            })
+            ->get();
 
+        // Get selected property IDs and reference documents from the form
+        $selectedProperties = $request->input('selectedProperties');
+
+        // Loop through selected properties and add them to the database
+        foreach ($selectedProperties as $propertyId => $selectedReferenceDocument) {
+            $selectedProperty = PropertiesDataDictionaries::findOrFail($propertyId);
+
+            // Create a new property in the properties table
+            $property = new Properties();
+            $property->GUID = $selectedProperty->GUID;
+            $property->gopID = $gopId;
+            $property->pdtID = $pdtId;
+            $property->referenceDocumentGUID = $selectedReferenceDocument;
+            $property->descriptionEn = $selectedProperty->definitionEn;
+            $property->descriptionPt = $selectedProperty->definitionPt;
+            $property->visualRepresentation = $selectedProperty->visualRepresentation;
+            $property->propertyVersion = $selectedProperty->versionNumber;
+            $property->propertyRevision = $selectedProperty->revisionNumber;
+            $property->save();
+        }
+        // Fetch properties from the Properties table
+        $addedProperties = Properties::where('pdtId', $pdtId)->where('gopId', $gopId)->get();
+
+        // Fetch additional information from the propertiesDataDictionaries table
+        $selectedProperties = Properties::where('pdtId', $pdtId)->where('gopId', $gopId)
+            ->join('propertiesDataDictionaries', function ($join) {
+                $join->on('Properties.GUID', '=', 'propertiesDataDictionaries.GUID')
+                    ->whereRaw('propertiesDataDictionaries.versionNumber = (SELECT MAX(versionNumber) FROM propertiesDataDictionaries WHERE GUID = Properties.GUID)')
+                    ->whereRaw('propertiesDataDictionaries.revisionNumber = (SELECT MAX(revisionNumber) FROM propertiesDataDictionaries WHERE GUID = Properties.GUID)');
+            })
+            ->select('Properties.*', 'propertiesDataDictionaries.nameEn', 'propertiesDataDictionaries.units')
+            ->get();
+
+        $referenceDocuments = ReferenceDocuments::all();
+
+        return view('properties.addFromDictionary', compact('selectedPdt', 'selectedGroup', 'selectedProperties', 'referenceDocuments', 'dataDictionary'))->with('success', 'Properties added successfully.');
+    }
+
+
+    public function PropertiesAdded(Request $request)
+    {
+        //Log::info('Entering newpropadd method');
+        $pdtId = $request->input('pdtId');
+        $gopId = $request->input('gopId');
+        $selectedPdt = ProductDataTemplates::findOrFail($pdtId);
+        $selectedGroup = GroupOfProperties::findOrFail($gopId);
+        $dataDictionary = PropertiesDataDictionaries::select('GUID', 'nameEn', 'namePt', 'units', 'versionNumber', 'revisionNumber')
+            ->whereIn('versionNumber', function ($query) {
+                $query->selectRaw('MAX(versionNumber)')
+                    ->from('propertiesDataDictionaries')
+                    ->groupBy('GUID');
+            })
+            ->whereIn('revisionNumber', function ($query) {
+                $query->selectRaw('MAX(revisionNumber)')
+                    ->from('propertiesDataDictionaries')
+                    ->groupBy('GUID');
+            })
+            ->get();
         // Fetch properties from the Properties table
         $addedProperties = Properties::where('pdtId', $pdtId)->where('gopId', $gopId)->get();
 
@@ -132,14 +214,39 @@ class PropertiesController extends Controller
             ->select('Properties.*', 'propertiesDataDictionaries.nameEn', 'propertiesDataDictionaries.units')
             ->get();
         $referenceDocuments = ReferenceDocuments::all();
-        Log::info('Entering newpropadd method');
-        return view('properties.addNew', compact('selectedPdt', 'selectedGroup', 'selectedProperties', 'referenceDocuments'));
+        // Log::info('Entering newpropadd method');
+        return view('properties.addNew', compact('selectedPdt', 'selectedGroup', 'selectedProperties', 'referenceDocuments', 'dataDictionary'));
+    }
+
+    public function PropertiesAddedDictionaryPage(Request $request)
+    {
+        //Log::info('Entering newpropadd method');
+        $pdtId = $request->input('pdtId');
+        $gopId = $request->input('gopId');
+        $selectedPdt = ProductDataTemplates::findOrFail($pdtId);
+        $selectedGroup = GroupOfProperties::findOrFail($gopId);
+        $dataDictionary = propertiesdatadictionaries::All();
+        // Fetch properties from the Properties table
+        $addedProperties = Properties::where('pdtId', $pdtId)->where('gopId', $gopId)->get();
+
+        // Fetch additional information from the propertiesDataDictionaries table
+        $selectedProperties = Properties::where('pdtId', $pdtId)->where('gopId', $gopId)
+            ->join('propertiesDataDictionaries', function ($join) {
+                $join->on('Properties.GUID', '=', 'propertiesDataDictionaries.GUID')
+                    ->whereRaw('propertiesDataDictionaries.versionNumber = (SELECT MAX(versionNumber) FROM propertiesDataDictionaries WHERE GUID = Properties.GUID)')
+                    ->whereRaw('propertiesDataDictionaries.revisionNumber = (SELECT MAX(revisionNumber) FROM propertiesDataDictionaries WHERE GUID = Properties.GUID)');
+            })
+            ->select('Properties.*', 'propertiesDataDictionaries.nameEn', 'propertiesDataDictionaries.units')
+            ->get();
+        $referenceDocuments = ReferenceDocuments::all();
+        // Log::info('Entering newpropadd method');
+        return view('properties.addFromDictionary', compact('selectedPdt', 'selectedGroup', 'selectedProperties', 'referenceDocuments', 'dataDictionary'));
     }
 
 
     public function addPropertyManual(Request $request)
     {
-        Log::info('Entering addNewManually method');
+        //Log::info('Entering addNewManually method');
         // Validate the request
         $request->validate([
             'pdtId' => 'required|exists:productdatatemplates,Id',
@@ -229,7 +336,7 @@ class PropertiesController extends Controller
         $property->propertyVersion = $dataDictionaryProperty->versionNumber;
         $property->propertyRevision = $dataDictionaryProperty->revisionNumber;
         $property->save();
-        Log::info('Entering addNewManually method');
+        // Log::info('Entering addNewManually method');
         // Redirect back or to the desired page
 
         $pdtId = $request->input('pdtId');
@@ -251,24 +358,6 @@ class PropertiesController extends Controller
             ->get();
         $referenceDocuments = ReferenceDocuments::all();
         return view('properties.addNew', compact('selectedPdt', 'selectedGroup', 'selectedProperties', 'referenceDocuments'))->with('success', 'Property added successfully.');
-    }
-
-    public function storeFromDictionary(Request $request)
-    {
-        // Logic to store properties from the data dictionary
-        // ...
-
-        return redirect()->route('properties.addFromDictionary', $request->input('groupId'))
-            ->with('success', 'Properties added successfully!');
-    }
-
-    public function storeNew(Request $request)
-    {
-        // Logic to store new properties
-        // ...
-
-        return redirect()->route('properties.addNew', $request->input('groupId'))
-            ->with('success', 'Property added successfully!');
     }
 
 
