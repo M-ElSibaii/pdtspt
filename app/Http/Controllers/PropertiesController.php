@@ -124,6 +124,32 @@ class PropertiesController extends Controller
         Log::info('Test action - Property data: ' . json_encode($property->toArray()));
     }
 
+
+    public function PropertiesAddedDictionaryPage(Request $request)
+    {
+        //Log::info('Entering newpropadd method');
+        $pdtId = $request->input('pdtId');
+        $gopId = $request->input('gopId');
+        $selectedPdt = ProductDataTemplates::findOrFail($pdtId);
+        $selectedGroup = GroupOfProperties::findOrFail($gopId);
+        $dataDictionary = propertiesdatadictionaries::All();
+        // Fetch properties from the Properties table
+        $addedProperties = Properties::where('pdtId', $pdtId)->where('gopId', $gopId)->get();
+
+        // Fetch additional information from the propertiesDataDictionaries table
+        $selectedProperties = Properties::where('pdtId', $pdtId)->where('gopId', $gopId)
+            ->join('propertiesDataDictionaries', function ($join) {
+                $join->on('Properties.GUID', '=', 'propertiesDataDictionaries.GUID')
+                    ->whereRaw('propertiesDataDictionaries.versionNumber = (SELECT MAX(versionNumber) FROM propertiesDataDictionaries WHERE GUID = Properties.GUID)')
+                    ->whereRaw('propertiesDataDictionaries.revisionNumber = (SELECT MAX(revisionNumber) FROM propertiesDataDictionaries WHERE GUID = Properties.GUID)');
+            })
+            ->select('Properties.*', 'propertiesDataDictionaries.nameEn', 'propertiesDataDictionaries.units')
+            ->get();
+        $referenceDocuments = ReferenceDocuments::all();
+        // Log::info('Entering newpropadd method');
+        return view('properties.addFromDictionary', compact('selectedPdt', 'selectedGroup', 'selectedProperties', 'referenceDocuments', 'dataDictionary'));
+    }
+
     public function addFromDictionary(Request $request)
     {
         $pdtId = $request->input('pdtId');
@@ -147,7 +173,7 @@ class PropertiesController extends Controller
         $selectedProperties = $request->input('selectedProperties');
 
         // Loop through selected properties and add them to the database
-        foreach ($selectedProperties as $propertyId => $selectedReferenceDocument) {
+        foreach ($selectedProperties as $propertyId) {
             $selectedProperty = PropertiesDataDictionaries::findOrFail($propertyId);
 
             // Create a new property in the properties table
@@ -155,7 +181,7 @@ class PropertiesController extends Controller
             $property->GUID = $selectedProperty->GUID;
             $property->gopID = $gopId;
             $property->pdtID = $pdtId;
-            $property->referenceDocumentGUID = $selectedReferenceDocument;
+            $property->referenceDocumentGUID = 'n/a';
             $property->descriptionEn = $selectedProperty->definitionEn;
             $property->descriptionPt = $selectedProperty->definitionPt;
             $property->visualRepresentation = $selectedProperty->visualRepresentation;
@@ -217,32 +243,6 @@ class PropertiesController extends Controller
         // Log::info('Entering newpropadd method');
         return view('properties.addNew', compact('selectedPdt', 'selectedGroup', 'selectedProperties', 'referenceDocuments', 'dataDictionary'));
     }
-
-    public function PropertiesAddedDictionaryPage(Request $request)
-    {
-        //Log::info('Entering newpropadd method');
-        $pdtId = $request->input('pdtId');
-        $gopId = $request->input('gopId');
-        $selectedPdt = ProductDataTemplates::findOrFail($pdtId);
-        $selectedGroup = GroupOfProperties::findOrFail($gopId);
-        $dataDictionary = propertiesdatadictionaries::All();
-        // Fetch properties from the Properties table
-        $addedProperties = Properties::where('pdtId', $pdtId)->where('gopId', $gopId)->get();
-
-        // Fetch additional information from the propertiesDataDictionaries table
-        $selectedProperties = Properties::where('pdtId', $pdtId)->where('gopId', $gopId)
-            ->join('propertiesDataDictionaries', function ($join) {
-                $join->on('Properties.GUID', '=', 'propertiesDataDictionaries.GUID')
-                    ->whereRaw('propertiesDataDictionaries.versionNumber = (SELECT MAX(versionNumber) FROM propertiesDataDictionaries WHERE GUID = Properties.GUID)')
-                    ->whereRaw('propertiesDataDictionaries.revisionNumber = (SELECT MAX(revisionNumber) FROM propertiesDataDictionaries WHERE GUID = Properties.GUID)');
-            })
-            ->select('Properties.*', 'propertiesDataDictionaries.nameEn', 'propertiesDataDictionaries.units')
-            ->get();
-        $referenceDocuments = ReferenceDocuments::all();
-        // Log::info('Entering newpropadd method');
-        return view('properties.addFromDictionary', compact('selectedPdt', 'selectedGroup', 'selectedProperties', 'referenceDocuments', 'dataDictionary'));
-    }
-
 
     public function addPropertyManual(Request $request)
     {

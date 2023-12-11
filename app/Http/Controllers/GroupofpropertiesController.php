@@ -37,21 +37,7 @@ class GroupofpropertiesController extends Controller
 
         $pdtCount = $pdts->count();
         $latestPdt = $pdts[$pdtCount - 1];
-        $gop = DB::table('groupofproperties as gop')->where('pdtId', $pdtID)
-            /*  ->join(
-                DB::raw("(SELECT
-                GUID,
-                MAX(versionNumber) as max_versionNumber,
-                MAX(revisionNumber) as max_revisionNumber
-                FROM groupofproperties
-                GROUP BY GUID) as mx"),
-                function ($join) {
-                    $join->on('mx.GUID', '=', 'gop.GUID');
-                    $join->on('mx.max_versionNumber', '=', 'gop.versionNumber');
-                    $join->on('mx.max_revisionNumber', '=', 'gop.revisionNumber');
-                }
-            )*/
-            ->get();
+        $gop = DB::table('groupofproperties as gop')->where('pdtId', $pdtID)->get();
         $referenceDocument = referencedocuments::all();
         $properties_dict = propertiesdatadictionaries::all();
         $properties = properties::where('pdtID', $pdtID)->get();
@@ -63,11 +49,6 @@ class GroupofpropertiesController extends Controller
             $join->on('properties.GUID', '=', 'propertiesdatadictionaries.GUID');
             $join->on('properties.propertyVersion', '=', 'propertiesdatadictionaries.versionNumber');
             $join->on('properties.propertyRevision', '=', 'propertiesdatadictionaries.revisionNumber');
-            /* $join->on(
-                DB::raw('(propertiesdatadictionaries.versionNumber, propertiesdatadictionaries.revisionNumber)'),
-                DB::raw('(select max(versionNumber), max(revisionNumber) from propertiesdatadictionaries where GUID = properties.GUID)'),
-                '='
-            );*/
         })->select(
             'properties.descriptionEn',
             'properties.descriptionPt',
@@ -108,21 +89,7 @@ class GroupofpropertiesController extends Controller
 
         $pdtCount = $pdts->count();
         $latestPdt = $pdts[$pdtCount - 1];
-        $gop = DB::table('groupofproperties as gop')->where('pdtId', $pdtID)
-            /* ->join(
-                DB::raw("(SELECT
-                GUID,
-                MAX(versionNumber) as max_versionNumber,
-                MAX(revisionNumber) as max_revisionNumber
-                FROM groupofproperties
-                GROUP BY GUID) as mx"),
-                function ($join) {
-                    $join->on('mx.GUID', '=', 'gop.GUID');
-                    $join->on('mx.max_versionNumber', '=', 'gop.versionNumber');
-                    $join->on('mx.max_revisionNumber', '=', 'gop.revisionNumber');
-                }
-            )*/
-            ->get();
+        $gop = DB::table('groupofproperties as gop')->where('pdtId', $pdtID)->get();
         $referenceDocument = referencedocuments::all();
         $properties_dict = propertiesdatadictionaries::all();
         $properties = properties::where('pdtID', $pdtID)->get();
@@ -133,11 +100,6 @@ class GroupofpropertiesController extends Controller
             $join->on('properties.GUID', '=', 'propertiesdatadictionaries.GUID');
             $join->on('properties.propertyVersion', '=', 'propertiesdatadictionaries.versionNumber');
             $join->on('properties.propertyRevision', '=', 'propertiesdatadictionaries.revisionNumber');
-            /* $join->on(
-                DB::raw('(propertiesdatadictionaries.versionNumber, propertiesdatadictionaries.revisionNumber)'),
-                DB::raw('(select max(versionNumber), max(revisionNumber) from propertiesdatadictionaries where GUID = properties.GUID)'),
-                '='
-            );*/
         })->select(
             'properties.descriptionEn',
             'properties.descriptionPt',
@@ -163,10 +125,6 @@ class GroupofpropertiesController extends Controller
 
         return view('pdtssurvey', compact('gop', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'comments', 'answers', 'properties', 'depreciatedProperties', 'latestPdt'));
     }
-
-
-
-
 
 
     /**
@@ -290,8 +248,6 @@ class GroupofpropertiesController extends Controller
                 }
             }
         }
-
-
 
         return redirect()->back()->with('success', 'Respostas guardadas com sucesso');
     }

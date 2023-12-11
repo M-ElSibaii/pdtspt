@@ -77,20 +77,19 @@
                             <th>Lista de propriedades substituídas</th>
                             <td>
                                 @foreach ($propversions as $version)
-                                @if ($version->dateOfRevision < $propdd->dateOfRevision)
-                                    <form class="mb-3" action="{{ route('datadictionaryview', ['propID' => $version->GUID , 'propV' => $version->versionNumber, 'propR' => $version->revisionNumber]) }}">
-                                        <button class="btn btn-link" type="submit">{{ $version->versionNumber}}.{{$version->revisionNumber}}, </button>
-                                    </form>
-                                    @endif
-                                    @endforeach
-                                    {{$propdd->listOfReplacedProperties}}
+                                @if ($version->versionNumber < $propdd->versionNumber || ($version->versionNumber == $propdd->versionNumber && $version->revisionNumber < $propdd->revisionNumber)) <form class="mb-3" action="{{ route('datadictionaryview', ['propID' => $version->GUID , 'propV' => $version->versionNumber, 'propR' => $version->revisionNumber]) }}">
+                                            <button class="btn btn-link" type="submit">{{ $version->versionNumber}}.{{$version->revisionNumber}}, </button>
+                                        </form>
+                                        @endif
+                                        @endforeach
+                                        {{$propdd->listOfReplacedProperties}}
                             </td>
                         </tr>
                         <tr>
                             <th>Lista de propriedades de substituição</th>
                             <td>
                                 @foreach ($propversions as $version)
-                                @if ($version->dateOfRevision > $propdd->dateOfRevision)
+                                @if ($version->versionNumber > $propdd->versionNumber || ($version->versionNumber == $propdd->versionNumber && $version->revisionNumber > $propdd->revisionNumber))
                                 <form class="mb-3" action="{{ route('datadictionaryview', ['propID' => $version->GUID , 'propV' => $version->versionNumber, 'propR' => $version->revisionNumber]) }}">
                                     <button class="btn btn-link" type="submit">{{ $version->versionNumber}}.{{$version->revisionNumber}}, </button>
                                 </form>

@@ -74,7 +74,7 @@
                                 <td class="p-1.5">
                                     <div class="flex flex-col">
                                         <p>{{$property->descriptionPt}}</p>
-                                        @if($property->visualRepresentation == True)
+                                        @if($property->visualRepresentation == "TRUE")
                                         <div class="col-sm">
                                             <img src="{{ asset ('img/'.$property->nameEn.'.png')}}" alt='{{$property->nameEn}}' class="property-image">
                                         </div>
