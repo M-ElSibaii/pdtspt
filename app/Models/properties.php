@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class properties extends Model
 {
+    protected $table = 'properties';
+    protected $primaryKey = 'Id';
+    public $timestamps = false;
     protected $fillable = [
         'descriptionEn',
         'descriptionPt',
@@ -16,23 +19,23 @@ class properties extends Model
     use HasFactory;
     public function groupofproperties()
     {
-        return $this->belongsTo(groupofproperties::class, 'gopID', 'Id');
+        return $this->belongsTo(GroupOfProperties::class, 'gopID', 'Id');
     }
     public function productdatatemplates()
     {
-        return $this->belongsTo(productdatatemplates::class, 'pdtID', 'Id');
+        return $this->belongsTo(ProductDataTemplates::class, 'pdtID', 'Id');
     }
     public function propertiesdatadictionaries()
     {
-        return $this->belongsTo(DataDictionary::class, 'GUID', 'GUID');
+        return $this->belongsTo(PropertiesDataDictionaries::class, 'GUID', 'GUID');
     }
     public function referencedocuments()
     {
-        return $this->hasOne(referencedocuments::class, 'referenceDocumentGUID', 'GUID');
+        return $this->hasOne(ReferenceDocuments::class, 'referenceDocumentGUID', 'GUID');
     }
     public function comments()
     {
-        return $this->hasMany(comments::class)->whereNull('parent_id');
+        return $this->hasMany(Comments::class)->whereNull('parent_id');
     }
     public function answers()
     {

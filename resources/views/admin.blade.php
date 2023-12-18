@@ -43,7 +43,7 @@
                                 <div class="form-check form-check-inline">
                                     <input class="h-4 w-4 border-gray-300 text-slate-600 focus:ring-slate-600" type="radio" name="subscribe[{{ $user->id }}]" value="0" {{ !$user->subscribe ? 'checked' : '' }}>
                                     <label class="ml-2 my-auto block text-sm font-medium leading-6 text-gray-900" for="subscribe{{ $user->id }}_no">No</label>
-                                </div>                            
+                                </div>
                             </td>
                         </tr>
                         @endforeach
@@ -53,11 +53,12 @@
                     {{ $users->links() }}
                 </div>
                 <br>
-                <x-button-primary-pdts 
-                    link="{{route('dashboard')}}"
-                    type="submit"
-                    title="Save"/>   
+                <x-button-primary-pdts link="{{route('dashboard')}}" type="submit" title="Save" />
             </form>
+            <br>
+            <a href="{{ route('exportdomainbsdd') }}" class="btn btn-secondary">
+                Export PDTs.pt domain in bsdd JSON format page
+            </a>
         </div>
     </div>
 

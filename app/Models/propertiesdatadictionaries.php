@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class propertiesdatadictionaries extends Model
 {
+    protected $table = 'propertiesdatadictionaries';
+    protected $primaryKey = 'Id';
+    public $timestamps = false;
     use HasFactory;
     public function properties()
     {

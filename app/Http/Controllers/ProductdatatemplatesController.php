@@ -13,6 +13,7 @@ use App\Models\Answers;
 use App\Models\Likes;
 use App\Models\propertiesdatadictionaries;
 use App\Models\referencedocuments;
+use Carbon\Carbon;
 
 class ProductdatatemplatesController extends Controller
 {
@@ -225,5 +226,159 @@ class ProductdatatemplatesController extends Controller
     public function destroy(productdatatemplates $productdatatemplates)
     {
         //
+    }
+
+    // TO DO : 
+    // add remaining properties in each section
+
+    public function exportDataToJson()
+    {
+        // Fetch data using raw SQL queries
+        $productDataTemplates = DB::select('SELECT * FROM productdatatemplates');
+
+        // Fetch properties from propertiesdatadictionary
+        $propertiesData = DB::select('SELECT * FROM propertiesdatadictionaries');
+
+        // Transform data into the desired JSON format
+        $jsonData = $this->transformData($productDataTemplates, $propertiesData);
+
+        // Save JSON data to a temporary file
+        $tempFilePath = tempnam(sys_get_temp_dir(), 'PDTs.pt_Domain_bsdd_');
+        file_put_contents($tempFilePath, json_encode($jsonData, JSON_PRETTY_PRINT));
+
+
+        // Add the current date to the file name
+        $currentDate = Carbon::now()->format('Y-m-d');
+        $fileName = 'PDTs.pt_Domain_bsdd_' . $currentDate . '.json';
+        // Stream download the file to the user
+        $headers = [
+            'Content-Type' => 'application/json',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        ];
+
+        return response()->streamDownload(
+            function () use ($tempFilePath) {
+                readfile($tempFilePath);
+                unlink($tempFilePath); // Delete the temporary file after streaming
+            },
+            $fileName,
+            $headers
+        );
+    }
+
+    private function transformData($productDataTemplates, $propertiesData)
+    {
+        $jsonData = [
+            'ModelVersion' => '2.0',
+            'OrganizationCode' => 'pdtspt',
+            // Add other top-level keys as needed
+            'Classes' => [],
+            'Properties' => [],
+        ];
+
+        foreach ($productDataTemplates as $productDataTemplate) {
+            $jsonData['Classes'][] = $this->transformProductDataTemplate($productDataTemplate);
+        }
+
+        // Transform properties from propertiesdatadictionary
+        foreach ($propertiesData as $property) {
+            $jsonData['Properties'][] = $this->transformPropertyDataDictionary($property);
+        }
+
+        return $jsonData;
+    }
+
+    private function transformProductDataTemplate($productDataTemplate)
+    {
+        // Implement the transformation logic for a product data template
+        // Use $productDataTemplate and its properties to structure the data
+
+        $classData = [
+            'ClassType' => 'Class',
+            'Code' => $productDataTemplate->GUID,
+            'Name' => $productDataTemplate->pdtNameEn, // Adjust based on your schema
+            'Status' => $productDataTemplate->status, // Adjust based on your schema
+            'ActivationDateUtc' => $productDataTemplate->dateOfVersion, // Adjust based on your schema
+            'Classes' => [], // Placeholder for groups of properties
+        ];
+
+        // Fetch related data using another raw SQL query
+        $groupOfProperties = DB::select('SELECT * FROM groupofproperties WHERE pdtId = ?', [$productDataTemplate->Id]);
+
+        foreach ($groupOfProperties as $group) {
+            $classData['Classes'][] = $this->transformGroupOfProperties($group);
+        }
+
+        return $classData;
+    }
+
+    private function transformGroupOfProperties($groupOfProperties)
+    {
+        // Implement the transformation logic for a group of properties
+        // Use $groupOfProperties and its properties to structure the data
+
+        $groupData = [
+            'ClassType' => 'GroupOfProperties',
+            'ParentClassCode' => $groupOfProperties->pdtId, // Assuming PDT is the parent class
+            'Code' => $groupOfProperties->GUID,
+            'Name' => $groupOfProperties->gopNameEn, // Adjust based on your schema
+            'Status' => $groupOfProperties->status, // Adjust based on your schema
+            'ClassProperties' => [],
+        ];
+
+        // Fetch related data using another raw SQL query
+        $classProperties = DB::select('SELECT * FROM properties WHERE gopId = ?', [$groupOfProperties->Id]);
+
+        foreach ($classProperties as $property) {
+            $groupData['ClassProperties'][] = $this->transformProperty($property);
+        }
+
+        return $groupData;
+    }
+
+    private function transformProperty($property)
+    {
+        // Implement the transformation logic for a property
+        // Use $property and its properties to structure the data
+
+        // Fetch data from propertiesdatadictionary based on GUID, version, and revision
+        $propertiesDictionary = DB::select('SELECT * FROM propertiesdatadictionaries WHERE GUID = ? AND versionNumber = ? AND revisionNumber = ?', [$property->GUID, $property->propertyVersion, $property->propertyRevision]);
+
+        // Assuming there is only one matching record, you can use the first() method
+        $propertyDictionary = collect($propertiesDictionary)->first();
+
+        if (!$propertyDictionary) {
+            // Handle the case where no matching record is found
+            return null;
+        }
+
+        $propertyData = [
+            'PropertyValueKind' => 'Single',
+            'Code' => $property->GUID,
+            'Name' => $propertyDictionary->nameEn, // Adjust based on your schema
+            'Description' => $property->descriptionEn, // Adjust based on your schema
+            // Add other properties as needed
+        ];
+
+        return $propertyData;
+    }
+
+    private function transformPropertyDataDictionary($property)
+    {
+        // Implement the transformation logic for a property from propertiesdatadictionary
+        // Use $property and its properties to structure the data
+
+        $propertyData = [
+            'PropertyValueKind' => 'Single',
+            'Code' => $property->GUID,
+            'Name' => $property->nameEn,
+            'Description' => $property->definitionEn,
+            'Status' => $property->status,
+            'ActivationDateUtc' => $property->dateOfVersion,
+            'VersionDateUtc' => $property->dateOfVersion,
+            // Add other properties as needed
+        ];
+
+        return $propertyData;
     }
 }

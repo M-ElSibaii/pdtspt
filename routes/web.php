@@ -103,6 +103,14 @@ Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
     Route::get('/admin', [UserController::class, 'index'])
         ->name('admin');
 
+    // Route for exporting JSON
+    Route::get('/exportdomainbsdd', function () {
+        return view('exportdomainbsdd');
+    })->name('exportdomainbsdd');
+
+    Route::post('/exportdomainbsdd', [ProductDataTemplatesController::class, 'exportDataToJson'])
+        ->name('productdatatemplates.exportJson');
+
     Route::post('/admin/update', [UserController::class, 'updateUsers'])
         ->name('update.users');
 
@@ -143,6 +151,5 @@ Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
     // edit properties
 
     Route::post('/properties/edit/{propertyId}', [PropertiesController::class, 'updateProperty'])->name('properties.update');
-
     Route::get('/properties/edit/{propertyId}', [PropertiesController::class, 'showProperty'])->name('properties.edit');
 });

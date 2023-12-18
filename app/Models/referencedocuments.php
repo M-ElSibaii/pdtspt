@@ -7,17 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class referencedocuments extends Model
 {
+    protected $table = 'referencedocument';
+    protected $primaryKey = 'GUID';
+    public $timestamps = false;
     use HasFactory;
     public function groupofproperties()
     {
-        return $this->belongsTo(groupofproperties::class);
+        return $this->belongsTo(GroupOfProperties::class);
     }
     public function properties()
     {
-        return $this->belongsTo(properties::class);
+        return $this->belongsTo(Properties::class);
     }
     public function productdatatemplates()
     {
-        return $this->belongsTo(productdatatemplates::class);
+        return $this->belongsTo(ProductDataTemplates::class);
     }
 }
