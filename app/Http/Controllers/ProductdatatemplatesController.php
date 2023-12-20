@@ -271,6 +271,11 @@ class ProductdatatemplatesController extends Controller
         $jsonData = [
             'ModelVersion' => '2.0',
             'OrganizationCode' => 'pdtspt',
+            'DictionaryCode' => 'pdtspt',
+            'LanguageIsoCode' => 'pt-PT',
+            'DictionaryName' => 'pdtspt',
+            'DictionaryVersion' => 1.1,
+
             // Add other top-level keys as needed
             'Classes' => [],
             'Properties' => [],
@@ -295,7 +300,7 @@ class ProductdatatemplatesController extends Controller
 
         $classData = [
             'ClassType' => 'Class',
-            'Code' => $productDataTemplate->GUID,
+            'Code' => $productDataTemplate->Id,
             'Name' => $productDataTemplate->pdtNameEn, // Adjust based on your schema
             'Status' => $productDataTemplate->status, // Adjust based on your schema
             'ActivationDateUtc' => $productDataTemplate->dateOfVersion, // Adjust based on your schema
@@ -320,7 +325,7 @@ class ProductdatatemplatesController extends Controller
         $groupData = [
             'ClassType' => 'GroupOfProperties',
             'ParentClassCode' => $groupOfProperties->pdtId, // Assuming PDT is the parent class
-            'Code' => $groupOfProperties->GUID,
+            'Code' => $groupOfProperties->Id,
             'Name' => $groupOfProperties->gopNameEn, // Adjust based on your schema
             'Status' => $groupOfProperties->status, // Adjust based on your schema
             'ClassProperties' => [],
@@ -354,9 +359,9 @@ class ProductdatatemplatesController extends Controller
 
         $propertyData = [
             'PropertyValueKind' => 'Single',
-            'Code' => $property->GUID,
+            'Code' => $property->Id,
             'Name' => $propertyDictionary->nameEn, // Adjust based on your schema
-            'Description' => $property->descriptionEn, // Adjust based on your schema
+            'Definition' => $property->descriptionEn, // Adjust based on your schema
             // Add other properties as needed
         ];
 
@@ -370,9 +375,9 @@ class ProductdatatemplatesController extends Controller
 
         $propertyData = [
             'PropertyValueKind' => 'Single',
-            'Code' => $property->GUID,
+            'Code' => $property->Id,
             'Name' => $property->nameEn,
-            'Description' => $property->definitionEn,
+            'Definition' => $property->definitionEn,
             'Status' => $property->status,
             'ActivationDateUtc' => $property->dateOfVersion,
             'VersionDateUtc' => $property->dateOfVersion,

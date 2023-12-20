@@ -23,10 +23,10 @@
                         </td>
                         <td class="whitespace-nowrap px-6 py-4 font-medium">{{ $pdt->pdtNamePt }}</td>
                         <td class="whitespace-nowrap px-6 py-4 font-medium">V{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}
-                            @if ($pdt->status == 'Under Review')
+                            @if ($pdt->status == 'Inactive')
                             <span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">InActiva</span>
                             @endif
-                            @if ($pdt->status == 'Current')
+                            @if ($pdt->status == 'Active')
                             <span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">Activa</span>
                             @endif
                         </td>
