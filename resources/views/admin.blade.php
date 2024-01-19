@@ -56,6 +56,12 @@
                 <x-button-primary-pdts link="{{route('dashboard')}}" type="submit" title="Save" />
             </form>
             <br>
+            <a href="{{ route('pdtinput') }}" class="btn btn-secondary">
+                Create PDTs
+            </a>
+            <br>
+            <br>
+            <!-- export all the pdts with all versions // next step is to filter only the latest version -->
             <a href="{{ route('exportdomainbsdd') }}" class="btn btn-secondary">
                 Export PDTs.pt domain in bsdd JSON format page
             </a>

@@ -274,7 +274,7 @@ class ProductdatatemplatesController extends Controller
             'DictionaryCode' => 'pdtspt',
             'LanguageIsoCode' => 'pt-PT',
             'DictionaryName' => 'pdtspt',
-            'DictionaryVersion' => 1.1,
+            'DictionaryVersion' => "1.1",
 
             // Add other top-level keys as needed
             'Classes' => [],
@@ -282,8 +282,17 @@ class ProductdatatemplatesController extends Controller
         ];
 
         foreach ($productDataTemplates as $productDataTemplate) {
-            $jsonData['Classes'][] = $this->transformProductDataTemplate($productDataTemplate);
+            $classData = $this->transformProductDataTemplate($productDataTemplate);
+            $jsonData['Classes'][] = $classData;
+            // Fetch related data using another raw SQL query
+            $groupOfProperties = DB::select('SELECT * FROM groupofproperties WHERE pdtId = ?', [$productDataTemplate->Id]);
+
+            foreach ($groupOfProperties as $group) {
+                $groupData = $this->transformGroupOfProperties($group);
+                $jsonData['Classes'][] = $groupData;
+            }
         }
+
 
         // Transform properties from propertiesdatadictionary
         foreach ($propertiesData as $property) {
@@ -300,32 +309,28 @@ class ProductdatatemplatesController extends Controller
 
         $classData = [
             'ClassType' => 'Class',
-            'Code' => $productDataTemplate->Id,
+            'Code' =>  (string) $productDataTemplate->GUID . '-' . (string) $productDataTemplate->Id,
             'Name' => $productDataTemplate->pdtNameEn, // Adjust based on your schema
             'Status' => $productDataTemplate->status, // Adjust based on your schema
             'ActivationDateUtc' => $productDataTemplate->dateOfVersion, // Adjust based on your schema
-            'Classes' => [], // Placeholder for groups of properties
         ];
 
-        // Fetch related data using another raw SQL query
-        $groupOfProperties = DB::select('SELECT * FROM groupofproperties WHERE pdtId = ?', [$productDataTemplate->Id]);
 
-        foreach ($groupOfProperties as $group) {
-            $classData['Classes'][] = $this->transformGroupOfProperties($group);
-        }
 
         return $classData;
     }
+
 
     private function transformGroupOfProperties($groupOfProperties)
     {
         // Implement the transformation logic for a group of properties
         // Use $groupOfProperties and its properties to structure the data
+        $productDataTemplate = productdatatemplates::WHERE("Id", [$groupOfProperties->pdtId])->first();
 
         $groupData = [
             'ClassType' => 'GroupOfProperties',
-            'ParentClassCode' => $groupOfProperties->pdtId, // Assuming PDT is the parent class
-            'Code' => $groupOfProperties->Id,
+            'ParentClassCode' =>   (string) $productDataTemplate->GUID . '-' . (string) $groupOfProperties->pdtId, // Assuming PDT is the parent class
+            'Code' =>  (string) $groupOfProperties->GUID . '-' . (string) $groupOfProperties->Id,
             'Name' => $groupOfProperties->gopNameEn, // Adjust based on your schema
             'Status' => $groupOfProperties->status, // Adjust based on your schema
             'ClassProperties' => [],
@@ -356,12 +361,13 @@ class ProductdatatemplatesController extends Controller
             // Handle the case where no matching record is found
             return null;
         }
-
+        $groupOfProperties = groupofproperties::where("Id", $property->gopID)->first();
         $propertyData = [
-            'PropertyValueKind' => 'Single',
-            'Code' => $property->Id,
-            'Name' => $propertyDictionary->nameEn, // Adjust based on your schema
-            'Definition' => $property->descriptionEn, // Adjust based on your schema
+
+            'PropertyCode' =>  (string) $property->GUID . '-' . (string) $property->Id,
+            'Code' =>  (string) $property->Id,
+            'Description' => $property->descriptionEn, // Adjust based on your schema
+            'PropertySet' => str_replace(' ', '', ucwords(strtolower($groupOfProperties->gopNameEn))),
             // Add other properties as needed
         ];
 
@@ -374,13 +380,13 @@ class ProductdatatemplatesController extends Controller
         // Use $property and its properties to structure the data
 
         $propertyData = [
-            'PropertyValueKind' => 'Single',
-            'Code' => $property->Id,
+
+            'Code' =>  (string) $property->GUID . '-' . (string) $property->Id,
             'Name' => $property->nameEn,
             'Definition' => $property->definitionEn,
             'Status' => $property->status,
-            'ActivationDateUtc' => $property->dateOfVersion,
-            'VersionDateUtc' => $property->dateOfVersion,
+            'ActivationDateUtc' => ($property->dateOfVersion != '0000-00-00') ? $property->dateOfVersion : '9999-99-99',
+            'VersionDateUtc' => ($property->dateOfVersion != '0000-00-00') ? $property->dateOfVersion : '9999-99-99',
             // Add other properties as needed
         ];
 

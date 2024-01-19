@@ -66,8 +66,11 @@ class GroupofpropertiesController extends Controller
         )
             ->get();
 
-        return view('pdtsdownload', compact('gop', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'depreciatedProperties', 'latestPdt'));
+        return view('pdtsdownload', compact('gop', 'joined_properties', 'properties_dict', 'pdt',  'referenceDocument', 'depreciatedProperties', 'latestPdt'));
     }
+
+
+
     //function for survey page
     public function getCommentProperty($propID)
     {

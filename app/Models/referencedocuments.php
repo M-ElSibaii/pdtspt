@@ -7,9 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class referencedocuments extends Model
 {
-    protected $table = 'referencedocument';
-    protected $primaryKey = 'GUID';
-    public $timestamps = false;
+
     use HasFactory;
     public function groupofproperties()
     {

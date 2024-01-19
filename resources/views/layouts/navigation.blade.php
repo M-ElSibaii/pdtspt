@@ -50,15 +50,7 @@
                 </div>
                 @endif
                 @endauth
-                @auth
-                @if (Auth::user()->isAdmin == 1)
-                <div class="sm:hidden space-x-8 -my-px ml-10 flex">
-                    <x-nav-link :href="route('pdtinput')" :active="request()->routeIs('pdtinput')">
-                        {{ __('PDTcreate') }}
-                    </x-nav-link>
-                </div>
-                @endif
-                @endauth
+
                 @endif
 
             </div>

@@ -72,15 +72,19 @@
                                         @endif
                                     </div>
                                 </td>
-                                @if ($referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->rdName == 'n/a')
+                                @php
+                                $referenceDoc = $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first();
+                                @endphp
+
+                                @if ($referenceDoc && $referenceDoc->rdName)
                                 <td class="p-1.5">
-                                    <a>{{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->rdName }}</abbr></a>
+                                    <a href="{{ route('referencedocumentview', ['rdGUID' => $property->referenceDocumentGUID]) }}">
+                                        <p title="{{ $referenceDoc->title }}">{{ $referenceDoc->rdName }}</p>
+                                    </a>
                                 </td>
                                 @else
                                 <td class="p-1.5">
-                                    <a href="{{ route('referencedocumentview', ['rdGUID' => $property->referenceDocumentGUID]) }}">
-                                        <p title="{{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->title }}">{{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->rdName }}</p>
-                                    </a>
+                                    <a>n/a</a>
                                 </td>
                                 @endif
                                 <td class="p-1.5">
