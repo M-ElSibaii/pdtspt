@@ -7,14 +7,14 @@
                     <div class="grow block">
                         <div class="flex-none inline">
                             <h1 class="flex-none inline">{{ $pdt->pdtNamePt }}</h1>
-                            <p class="flex-none inline"> - V{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}</p>
+                            <p class="flex-none inline"> - V{{ $pdt-> editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}</p>
                             @if ($pdt->status == 'Active')
                             <span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">Activa</span>
                             @endif
                             @if ($pdt->status == 'Preview')
                             <span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">InActiva</span>
                             @endif
-                            @if ($pdt->status == 'Inactive')
+                            @if ($pdt->status == 'InActive')
                             <span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">InActiva</span>
                             @endif
 
@@ -58,12 +58,16 @@
                             @if($property->gopID == $group->Id)
                             <tr>
                                 <td class="p-1.5 property-td">
-                                    <a href="{{ route('datadictionaryview', ['propID' => $property->GUID , 'propV' => $property->versionNumber, 'propR' => $property->revisionNumber]) }}">{{ $property->namePt }}
-                                        @foreach($depreciatedProperties as $dProperty)
-                                        @if($dProperty->id == $property->Id)
-                                        <span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">deprecada</span>
-                                        @endif
-                                        @endforeach
+
+
+                                    <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . $property->GUID) }}">
+                                        {{ $property->namePt }}
+                                    </a>
+
+                                    @if($property->status == 'InActive')
+                                    <span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">InActiva</span>
+                                    @endif
+
                                     </a>
                                 </td>
                                 <td class="p-1.5">

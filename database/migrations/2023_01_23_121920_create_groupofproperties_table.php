@@ -39,8 +39,8 @@ return new class extends Migration
             $table->text('countryOfOrigin')->nullable();
             $table->text('categoryOfGroupOfProperties')->nullable();
             $table->text('parentGroupOfProperties')->nullable();
-            $table->date('updated_at');
-            $table->date('created_at');
+            $table->date('updated_at')->default(now());;
+            $table->date('created_at')->default(now());;
             $table->index('pdtId');
             $table->foreign('pdtId')->references('Id')->on('productdatatemplates');
             $table->foreign('referenceDocumentGUID')->references('GUID')->on('referencedocuments');

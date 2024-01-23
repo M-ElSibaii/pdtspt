@@ -48,8 +48,8 @@ return new class extends Migration
             $table->text('textFormat')->nullable();
             $table->text('listOfPossibleValuesInLanguageN')->nullable();
             $table->text('boundaryValues')->nullable();
-            $table->date('updated_at');
-            $table->date('created_at');
+            $table->date('updated_at')->default(now());;
+            $table->date('created_at')->default(now());;
             $table->index('GUID');
         });
     }

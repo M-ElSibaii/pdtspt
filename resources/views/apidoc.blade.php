@@ -42,6 +42,11 @@
             <div style="background-color: #F0F4F8;">
                 <pre><code>GET /api/groupsOfProperties/{Id}</code></pre>
             </div>
+            <h2 class="my-4">Obter Todos os objectos de construção</h2>
+            <p class="mb-4">retorna todos os objectos de construção.</p>
+            <div style="background-color: #F0F4F8;">
+                <pre><code>GET /api/constructionObjects</code></pre>
+            </div>
         </div>
     </div>
 

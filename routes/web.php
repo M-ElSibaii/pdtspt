@@ -77,7 +77,7 @@ Route::post('/pdtssurvey/store', [GroupofpropertiesController::class, 'store'])
     ->middleware(['auth', 'verified'])->name('pdtssurveystore');
 
 Route::get(
-    '/datadictionaryview/{propID}{propV}{propR}',
+    '/datadictionaryview/{propID}-{propGUID}',
     [PropertiesdatadictionariesController::class, 'getPropertyDataDictionary']
 )->middleware(['auth', 'verified'])->name('datadictionaryview');
 

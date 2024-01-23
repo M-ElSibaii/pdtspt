@@ -10,20 +10,18 @@ use Illuminate\Http\Request;
 
 class PropertiesdatadictionariesController extends Controller
 {
-    public function getPropertyDataDictionary($propID, $propV, $propR)
+    public function getPropertyDataDictionary($propID, $propGUID)
     {
-        $propdd = propertiesdatadictionaries::where('GUID', $propID)
-            ->where('versionNumber', $propV)
-            ->where('revisionNumber', $propR)
+
+        $propdd = propertiesdatadictionaries::WHERE('Id', $propID)
             ->first();
-        $propinpdts = properties::where('GUID', $propID)
+        $propinpdts = properties::where('propertyId', $propID)
             ->get();
         $pdts = productdatatemplates::get();
 
-        $propversions = propertiesdatadictionaries::where('GUID', $propID)->get();
-        $properties_dict = propertiesdatadictionaries::where('GUID', $propID)->get();
+        $propversions = propertiesdatadictionaries::where('GUID', $propGUID)->get();
 
-        return view('datadictionaryview', compact('propdd', 'propinpdts', 'pdts', 'propversions', 'properties_dict'));
+        return view('datadictionaryview', compact('propdd', 'propinpdts', 'pdts', 'propversions'));
     }
 
     /**

@@ -22,8 +22,8 @@ return new class extends Migration
             $table->text('descriptionEn');
             $table->text('descriptionPt');
             $table->text('visualRepresentation')->nullable();
-            $table->date('updated_at');
-            $table->date('created_at');
+            $table->date('updated_at')->default(now());;
+            $table->date('created_at')->default(now());;
             $table->foreign('GUID')->references('GUID')->on('propertiesdatadictionaries');
             $table->foreign('gopID')->references('Id')->on('groupofproperties');
             $table->foreign('pdtID')->references('Id')->on('productdatatemplates');

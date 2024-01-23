@@ -13,8 +13,7 @@ class properties extends Model
     protected $fillable = [
         'descriptionEn',
         'descriptionPt',
-
-        // Add other fields as needed
+        'referenceDocumentGUID',
     ];
     use HasFactory;
     public function groupofproperties()

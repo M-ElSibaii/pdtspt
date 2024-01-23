@@ -20,12 +20,17 @@
                     <div class="form-group">
                         <label for="status">{{ __('Status') }}</label>
                         <select class="form-control" id="status" name="status" required>
-                            <option value="Under Review">Under Review</option>
-                            <!--<option value="Current">Current</option>
-                            <option value="Outdated">Outdated</option>
-                            <option value="Depreciated">Depreciated</option>
+                            <option value="Preview">Preview</option>
+                            <!--<option value="Active">Active</option>
+                            <option value="InActive">InActive</option>
+                            
 -->
                         </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="revisionNumber">{{ __('editionNumber') }}</label>
+                        <input type="text" class="form-control" id="editionNumber" name="editionNumber" required>
                     </div>
 
                     <div class="form-group">
@@ -67,6 +72,12 @@
                     </div>
 
                     <!-- Date fields -->
+
+                    <div class="form-group">
+                        <label for="dateOfEdition">{{ __('Date of Edition') }}</label>
+                        <input type="text" class="form-control" id="dateOfEdition" name="dateOfEdition" value="{{ now() }}" readonly>
+                    </div>
+
                     <div class="form-group">
                         <label for="dateOfRevision">{{ __('Date of Revision') }}</label>
                         <input type="text" class="form-control" id="dateOfRevision" name="dateOfRevision" value="{{ now() }}" readonly>

@@ -33,6 +33,7 @@ class GroupofpropertiesController extends Controller
         $pdts = productdatatemplates::where('GUID', $pdtGUID)
             ->orderBy('versionNumber', 'asc')
             ->orderBy('revisionNumber', 'asc')
+            ->orderBy('editionNumber', 'asc')
             ->get();
 
         $pdtCount = $pdts->count();
@@ -41,21 +42,20 @@ class GroupofpropertiesController extends Controller
         $referenceDocument = referencedocuments::all();
         $properties_dict = propertiesdatadictionaries::all();
         $properties = properties::where('pdtID', $pdtID)->get();
-        $depreciatedProperties = depreciatedproperties::all();
 
         // Join the properties and propertiesdatadictionaries tables
 
         $joined_properties = properties::leftJoin('propertiesdatadictionaries', function ($join) {
-            $join->on('properties.GUID', '=', 'propertiesdatadictionaries.GUID');
-            $join->on('properties.propertyVersion', '=', 'propertiesdatadictionaries.versionNumber');
-            $join->on('properties.propertyRevision', '=', 'propertiesdatadictionaries.revisionNumber');
+            $join->on('properties.propertyId', '=', 'propertiesdatadictionaries.Id');
         })->select(
             'properties.descriptionEn',
             'properties.descriptionPt',
             'properties.GUID',
             'properties.Id',
             'properties.pdtID',
+            'properties.propertyId',
             'propertiesdatadictionaries.versionNumber',
+            'propertiesdatadictionaries.status',
             'propertiesdatadictionaries.revisionNumber',
             'properties.gopID',
             'properties.referenceDocumentGUID',
@@ -66,7 +66,7 @@ class GroupofpropertiesController extends Controller
         )
             ->get();
 
-        return view('pdtsdownload', compact('gop', 'joined_properties', 'properties_dict', 'pdt',  'referenceDocument', 'depreciatedProperties', 'latestPdt'));
+        return view('pdtsdownload', compact('gop', 'joined_properties', 'properties_dict', 'pdt',  'referenceDocument', 'latestPdt'));
     }
 
 
@@ -88,6 +88,7 @@ class GroupofpropertiesController extends Controller
         $pdts = productdatatemplates::where('GUID', $pdt->GUID)
             ->orderBy('versionNumber', 'asc')
             ->orderBy('revisionNumber', 'asc')
+            ->orderBy('editionNumber', 'asc')
             ->get();
 
         $pdtCount = $pdts->count();
@@ -96,19 +97,18 @@ class GroupofpropertiesController extends Controller
         $referenceDocument = referencedocuments::all();
         $properties_dict = propertiesdatadictionaries::all();
         $properties = properties::where('pdtID', $pdtID)->get();
-        $depreciatedProperties = depreciatedproperties::all();
 
         // Join the properties and propertiesdatadictionaries tables
         $joined_properties = properties::leftJoin('propertiesdatadictionaries', function ($join) {
-            $join->on('properties.GUID', '=', 'propertiesdatadictionaries.GUID');
-            $join->on('properties.propertyVersion', '=', 'propertiesdatadictionaries.versionNumber');
-            $join->on('properties.propertyRevision', '=', 'propertiesdatadictionaries.revisionNumber');
+            $join->on('properties.propertyId', '=', 'propertiesdatadictionaries.Id');
         })->select(
             'properties.descriptionEn',
             'properties.descriptionPt',
             'properties.GUID',
             'properties.Id',
             'properties.pdtID',
+            'properties.propertyId',
+            'propertiesdatadictionaries.status',
             'propertiesdatadictionaries.versionNumber',
             'propertiesdatadictionaries.revisionNumber',
             'properties.gopID',
@@ -126,7 +126,7 @@ class GroupofpropertiesController extends Controller
         $answers = Answers::where('users_id', Auth::id())->get();
 
 
-        return view('pdtssurvey', compact('gop', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'comments', 'answers', 'properties', 'depreciatedProperties', 'latestPdt'));
+        return view('pdtssurvey', compact('gop', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'comments', 'answers', 'properties', 'latestPdt'));
     }
 
 
@@ -336,7 +336,7 @@ class GroupofpropertiesController extends Controller
     public function createStep1()
     {
         // Get the latest versions/revisions of PDTs
-        $pdts = productdatatemplates::Where('status', "Under Review")->get();
+        $pdts = productdatatemplates::Where('status', "Preview")->get();
 
 
         return view('groupofproperties.choose_pdt', compact('pdts'));
@@ -388,6 +388,8 @@ class GroupofpropertiesController extends Controller
         $groupOfProperties->dateOfLastChange = $request->input('dateOfLastChange');
         $groupOfProperties->dateOfRevision = $request->input('dateOfRevision');
         $groupOfProperties->dateOfVersion = $request->input('dateOfVersion');
+        $groupOfProperties->created_at = $request->input('created_at');
+        $groupOfProperties->updated_at = $request->input('updated_at');
         $groupOfProperties->versionNumber = $request->input('versionNumber');
         $groupOfProperties->revisionNumber = $request->input('revisionNumber');
         $groupOfProperties->listOfReplacedProperties = $request->input('listOfReplacedProperties');

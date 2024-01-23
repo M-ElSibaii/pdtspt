@@ -18,17 +18,19 @@ class ReferencedocumentsController extends Controller
         $pdts = productdatatemplates::get();
 
         $rdinprop = properties::leftJoin('propertiesdatadictionaries', function ($join) {
-            $join->on('properties.GUID', '=', 'propertiesdatadictionaries.GUID');
+            $join->on('properties.propertyId', '=', 'propertiesdatadictionaries.Id');
         })->leftJoin('productdatatemplates', function ($join) {
             $join->on('productdatatemplates.Id', '=', 'properties.pdtID');
         })
             ->where('properties.referenceDocumentGUID', $rdGUID)
             ->select(
+                'propertiesdatadictionaries.Id',
                 'propertiesdatadictionaries.GUID',
                 'propertiesdatadictionaries.namePt',
                 'productdatatemplates.pdtNamePt',
                 'productdatatemplates.Id',
                 'productdatatemplates.versionNumber',
+                'productdatatemplates.editionNumber',
                 'productdatatemplates.revisionNumber'
             )
             ->get();

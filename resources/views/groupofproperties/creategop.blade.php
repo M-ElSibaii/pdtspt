@@ -113,6 +113,17 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="updated_at">{{ __('updated_at') }}</label>
+                        <input type="text" class="form-control" id="updated_at" name="updated_at" required value="{{ now() }}" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="created_at">{{ __('created_at') }}</label>
+                        <input type="text" class="form-control" id="created_at" name="created_at" required value="{{ now() }}" readonly>
+                    </div>
+
+
+                    <div class="form-group">
                         <label for="versionNumber">{{ __('Version Number') }}</label>
                         <input type="text" class="form-control" id="versionNumber" name="versionNumber" required>
                     </div>

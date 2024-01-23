@@ -10,7 +10,7 @@ use App\Models\groupofproperties;
 use App\Models\properties;
 use App\Models\comments;
 use App\Models\Answers;
-use App\Models\Likes;
+use App\Models\constructionobjects;
 use App\Models\propertiesdatadictionaries;
 use App\Models\referencedocuments;
 use Carbon\Carbon;
@@ -19,24 +19,26 @@ class ProductdatatemplatesController extends Controller
 {
     /** Get the latest version of a PDT */
     public function getLatestPDTs()
-
     {
-
         $latestPDT = DB::table('productdatatemplates as pdt')
             ->join(
                 DB::raw("(SELECT 
                 GUID,
                 MAX(versionNumber) as max_versionNumber,
-                MAX(revisionNumber) as max_revisionNumber
+                MAX(revisionNumber) as max_revisionNumber,
+                MAX(editionNumber) as max_editionNumber
+             
                 FROM productdatatemplates 
                 GROUP BY GUID) as mx"),
                 function ($join) {
                     $join->on('mx.GUID', '=', 'pdt.GUID');
                     $join->on('mx.max_versionNumber', '=', 'pdt.versionNumber');
                     $join->on('mx.max_revisionNumber', '=', 'pdt.revisionNumber');
+                    $join->on('mx.max_editionNumber', '=', 'pdt.editionNumber');
                 }
             )
             ->get();
+
         return view('dashboard', compact('latestPDT'));
     }
 
@@ -51,45 +53,62 @@ class ProductdatatemplatesController extends Controller
      */
     public function productDataTemplate($pdtID)
     {
+        $pdt = ProductDataTemplates::where('Id', $pdtID)->first();
+
+        $gops = GroupOfProperties::where('pdtId', $pdtID)->get();
+
+        $allReferenceDocuments = [];
+
+        foreach ($gops as $gop) {
+            $properties = Properties::where('gopID', $gop->Id)->get();
+            foreach ($properties as $property) {
+                $propertyAttributes = PropertiesDataDictionaries::where('Id', $property->propertyId)->first();
+                $property->propertiesAttributesInDataDictionary = $propertyAttributes;
+
+                // Collect reference documents GUID
+                $allReferenceDocuments[] = $property->referenceDocumentGUID;
+            }
+
+            $gop->properties = $properties;
+        }
+
+        // Fetch reference documents based on collected GUIDs
+        $referenceDocuments = ReferenceDocuments::whereIn('GUID', $allReferenceDocuments)->get();
+
+        $pdt->groupOfProperties = $gops;
+        $pdt->referenceDocuments = $referenceDocuments;
+
+        return response()->json(['productDataTemplate' => $pdt]);
+    }
+
+
+    public function productDataTemplateold($pdtID)
+    {
         $pdt = ProductDataTemplates::where('Id', $pdtID)->get();
-        $gop = GroupOfProperties::where('pdtId', $pdtID)
-            ->join(
-                DB::raw("(SELECT 
-                GUID,
-                MAX(versionNumber) as max_versionNumber,
-                MAX(revisionNumber) as max_revisionNumber
-                FROM groupofproperties 
-                GROUP BY GUID) as mx"),
-                function ($join) {
-                    $join->on('mx.GUID', '=', 'groupofproperties.GUID');
-                    $join->on('mx.max_versionNumber', '=', 'groupofproperties.versionNumber');
-                    $join->on('mx.max_revisionNumber', '=', 'groupofproperties.revisionNumber');
-                }
-            )
-            ->get();
+        $gop = GroupOfProperties::where('pdtId', $pdtID)->get();
         $referenceDocument = ReferenceDocuments::all();
 
         $properties = Properties::where('pdtID', $pdtID)->get();
 
         $propertiesInDataDictionary = Properties::leftJoin('propertiesdatadictionaries', function ($join) {
-            $join->on('properties.GUID', '=', 'propertiesdatadictionaries.GUID');
-            $join->on(
-                DB::raw('(propertiesdatadictionaries.versionNumber, propertiesdatadictionaries.revisionNumber)'),
-                DB::raw('(select max(versionNumber), max(revisionNumber) from propertiesdatadictionaries where GUID = properties.GUID)'),
-                '='
-            );
+            $join->on('properties.propertyId', '=', 'propertiesdatadictionaries.Id');
         })->select('propertiesdatadictionaries.*')
             ->get();
 
         $data = [
             'productDataTemplate' => $pdt,
             'groupsOfProperties' => $gop,
-            'referenceDocuments' => $referenceDocument,
             'properties' => $properties,
+            'referenceDocuments' => $referenceDocument,
             'propertiesAttributesInDataDictionary' => $propertiesInDataDictionary,
         ];
 
         return response()->json($data);
+    }
+
+    public function constructionObjects()
+    {
+        return constructionobjects::all();
     }
 
     public function productDataTemplates()
@@ -154,9 +173,11 @@ class ProductdatatemplatesController extends Controller
             'pdtNamePt' => 'required|string',
             'descriptionEn' => 'nullable|string',
             'descriptionPt' => 'nullable|string',
+            'dateOfEdition' => 'required|date',
             'dateOfRevision' => 'required|date',
             'dateOfVersion' => 'required|date',
             'status' => 'required|string',
+            'editionNumber' => 'required|integer',
             'versionNumber' => 'required|integer',
             'revisionNumber' => 'required|integer',
             // Add other fields validation as needed
@@ -170,11 +191,13 @@ class ProductdatatemplatesController extends Controller
         $pdt->pdtNamePt = $request->input('pdtNamePt');
         $pdt->descriptionEn = $request->input('descriptionEn');
         $pdt->descriptionPt = $request->input('descriptionPt');
+        $pdt->dateOfEdition = now();
         $pdt->dateOfRevision = now();
         $pdt->dateOfVersion = now();
         $pdt->created_at = now();
         $pdt->updated_at = now();
         $pdt->status = $request->input('status');
+        $pdt->editionNumber = $request->input('editionNumber');
         $pdt->versionNumber = $request->input('versionNumber');
         $pdt->revisionNumber = $request->input('revisionNumber');
         // Set other fields as needed
@@ -351,16 +374,6 @@ class ProductdatatemplatesController extends Controller
         // Implement the transformation logic for a property
         // Use $property and its properties to structure the data
 
-        // Fetch data from propertiesdatadictionary based on GUID, version, and revision
-        $propertiesDictionary = DB::select('SELECT * FROM propertiesdatadictionaries WHERE GUID = ? AND versionNumber = ? AND revisionNumber = ?', [$property->GUID, $property->propertyVersion, $property->propertyRevision]);
-
-        // Assuming there is only one matching record, you can use the first() method
-        $propertyDictionary = collect($propertiesDictionary)->first();
-
-        if (!$propertyDictionary) {
-            // Handle the case where no matching record is found
-            return null;
-        }
         $groupOfProperties = groupofproperties::where("Id", $property->gopID)->first();
         $propertyData = [
 

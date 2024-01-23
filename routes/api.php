@@ -32,6 +32,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/constructionObjects', [ProductdatatemplatesController::class, 'constructionObjects']);
+
 Route::get('/productDataTemplates', [ProductdatatemplatesController::class, 'productDataTemplates']);
 
 Route::get('/dataDictionary', [ProductdatatemplatesController::class, 'dataDictionary']);

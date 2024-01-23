@@ -13,6 +13,7 @@
                     @csrf
                     <input type="hidden" name="pdtId" value="{{ $selectedPdt->Id }}">
                     <input type="hidden" name="gopId" value="{{ $group->Id }}">
+                    <input type="hidden" name="propertyId" value="{{ $nextIdDataDictionary }}">
                     <x-secondary-button type="submit">{{ __('Add Properties From Data Dictionary') }}</x-secondary-button>
                 </form>
                 <br>
@@ -45,9 +46,7 @@
                     <!-- Table rows - Display properties for this group -->
                     @foreach ($properties as $property)
                     @php
-                    $additionalInfo = \App\Models\propertiesDataDictionaries::where('GUID', $property->GUID)
-                    ->orderByDesc('versionNumber')
-                    ->orderByDesc('revisionNumber')
+                    $additionalInfo = \App\Models\propertiesDataDictionaries::where('Id', $property->propertyId)
                     ->first();
                     @endphp
                     <tr>
@@ -55,7 +54,7 @@
                         <td>{{ $property->descriptionEn ?? '' }}</td>
                         <td>{{ $additionalInfo->units ?? '' }}</td>
                         <td><a href="{{ route('properties.edit', ['propertyId' => $property->Id]) }}" class="btn btn-warning">Properties table</a>
-                            <a href="{{ route('datadictionaryview', ['propID' => $additionalInfo->GUID, 'propV' => $additionalInfo->versionNumber, 'propR' => $additionalInfo->revisionNumber]) }}" class="btn btn-warning">Data dictionary</a>
+                            <a href="{{ url('datadictionaryview/' . $additionalInfo->Id . '-' . $additionalInfo->GUID) }}" class="btn btn-warning">Data dictionary</a>
                         </td>
                     </tr>
                     @endforeach

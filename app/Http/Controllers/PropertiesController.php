@@ -36,7 +36,7 @@ class PropertiesController extends Controller
     public function choosePDT(Request $request)
     {
         // Fetch all PDTs
-        $pdts = productdatatemplates::Where('status', "Under Review")->get();
+        $pdts = productdatatemplates::Where('status', "Preview")->get();
 
         return view('properties.choose_pdt', compact('pdts'));
     }
@@ -57,15 +57,15 @@ class PropertiesController extends Controller
         $properties = Properties::where('pdtId', $pdtId)->get();
         $selectedProperties = Properties::where('pdtId', $pdtId)
             ->join('propertiesDataDictionaries', function ($join) {
-                $join->on('Properties.GUID', '=', 'propertiesDataDictionaries.GUID')
-                    ->orderByDesc('propertiesDataDictionaries.versionNumber')
-                    ->orderByDesc('propertiesDataDictionaries.revisionNumber')
+                $join->on('Properties.propertyId', '=', 'propertiesDataDictionaries.Id')
                     ->limit(1);
             })
             ->select('Properties.*', 'propertiesDataDictionaries.nameEn', 'propertiesDataDictionaries.units')
             ->get();
+        $lastIdDataDictionary =  PropertiesDataDictionaries::latest('Id')->value('Id');
+        $nextIdDataDictionary = $lastIdDataDictionary + 1;
         // Log::info('Exiting createprops method');
-        return view('properties.createprops', compact('selectedPdt', 'groupofproperties', 'properties'));
+        return view('properties.createprops', compact('selectedPdt', 'groupofproperties', 'properties', 'nextIdDataDictionary'));
     }
 
 
@@ -83,6 +83,8 @@ class PropertiesController extends Controller
         $request->validate([
             'descriptionPt' => 'required|string',
             'descriptionEn' => 'required|string',
+            'referenceDocumentGUID' => 'nullable|exists:referencedocuments,GUID',
+
             // Add validation rules for other fields as needed
         ]);
 
@@ -92,6 +94,8 @@ class PropertiesController extends Controller
             // Update property fields based on the form input
             $property->descriptionEn = $request->input('descriptionEn');
             $property->descriptionPt = $request->input('descriptionPt');
+            $property->referenceDocumentGUID = $request->input('referenceDocumentGUID'); // Update the reference document
+
             // Add other fields as needed
             $property->save();
 
@@ -139,9 +143,7 @@ class PropertiesController extends Controller
         // Fetch additional information from the propertiesDataDictionaries table
         $selectedProperties = Properties::where('pdtId', $pdtId)->where('gopId', $gopId)
             ->join('propertiesDataDictionaries', function ($join) {
-                $join->on('Properties.GUID', '=', 'propertiesDataDictionaries.GUID')
-                    ->whereRaw('propertiesDataDictionaries.versionNumber = (SELECT MAX(versionNumber) FROM propertiesDataDictionaries WHERE GUID = Properties.GUID)')
-                    ->whereRaw('propertiesDataDictionaries.revisionNumber = (SELECT MAX(revisionNumber) FROM propertiesDataDictionaries WHERE GUID = Properties.GUID)');
+                $join->on('Properties.propertyId', '=', 'propertiesDataDictionaries.Id');
             })
             ->select('Properties.*', 'propertiesDataDictionaries.nameEn', 'propertiesDataDictionaries.units')
             ->get();
@@ -179,14 +181,13 @@ class PropertiesController extends Controller
             // Create a new property in the properties table
             $property = new Properties();
             $property->GUID = $selectedProperty->GUID;
+            $property->propertyId = $selectedProperty->Id;
             $property->gopID = $gopId;
             $property->pdtID = $pdtId;
             $property->referenceDocumentGUID = 'n/a';
             $property->descriptionEn = $selectedProperty->definitionEn;
             $property->descriptionPt = $selectedProperty->definitionPt;
             $property->visualRepresentation = $selectedProperty->visualRepresentation;
-            $property->propertyVersion = $selectedProperty->versionNumber;
-            $property->propertyRevision = $selectedProperty->revisionNumber;
             $property->save();
         }
         // Fetch properties from the Properties table
@@ -195,9 +196,7 @@ class PropertiesController extends Controller
         // Fetch additional information from the propertiesDataDictionaries table
         $selectedProperties = Properties::where('pdtId', $pdtId)->where('gopId', $gopId)
             ->join('propertiesDataDictionaries', function ($join) {
-                $join->on('Properties.GUID', '=', 'propertiesDataDictionaries.GUID')
-                    ->whereRaw('propertiesDataDictionaries.versionNumber = (SELECT MAX(versionNumber) FROM propertiesDataDictionaries WHERE GUID = Properties.GUID)')
-                    ->whereRaw('propertiesDataDictionaries.revisionNumber = (SELECT MAX(revisionNumber) FROM propertiesDataDictionaries WHERE GUID = Properties.GUID)');
+                $join->on('Properties.propertyId', '=', 'propertiesDataDictionaries.Id');
             })
             ->select('Properties.*', 'propertiesDataDictionaries.nameEn', 'propertiesDataDictionaries.units')
             ->get();
@@ -233,9 +232,7 @@ class PropertiesController extends Controller
         // Fetch additional information from the propertiesDataDictionaries table
         $selectedProperties = Properties::where('pdtId', $pdtId)->where('gopId', $gopId)
             ->join('propertiesDataDictionaries', function ($join) {
-                $join->on('Properties.GUID', '=', 'propertiesDataDictionaries.GUID')
-                    ->whereRaw('propertiesDataDictionaries.versionNumber = (SELECT MAX(versionNumber) FROM propertiesDataDictionaries WHERE GUID = Properties.GUID)')
-                    ->whereRaw('propertiesDataDictionaries.revisionNumber = (SELECT MAX(revisionNumber) FROM propertiesDataDictionaries WHERE GUID = Properties.GUID)');
+                $join->on('Properties.propertyId', '=', 'propertiesDataDictionaries.Id');
             })
             ->select('Properties.*', 'propertiesDataDictionaries.nameEn', 'propertiesDataDictionaries.units')
             ->get();
@@ -329,18 +326,18 @@ class PropertiesController extends Controller
         $property->GUID = $dataDictionaryProperty->GUID;
         $property->gopID = $request->input('gopId');
         $property->pdtID = $request->input('pdtId');
+        $property->propertyId = $request->input('nextIdDataDictionary');
         $property->referenceDocumentGUID = $request->input('referenceDocumentGUID');
         $property->descriptionEn = $dataDictionaryProperty->definitionEn;
         $property->descriptionPt = $dataDictionaryProperty->definitionPt;
         $property->visualRepresentation = $dataDictionaryProperty->visualRepresentation;
-        $property->propertyVersion = $dataDictionaryProperty->versionNumber;
-        $property->propertyRevision = $dataDictionaryProperty->revisionNumber;
         $property->save();
         // Log::info('Entering addNewManually method');
         // Redirect back or to the desired page
 
         $pdtId = $request->input('pdtId');
         $gopId = $request->input('gopId');
+        $propertyId = $request->input('nextIdDataDictionary');
         $selectedPdt = ProductDataTemplates::findOrFail($pdtId);
         $selectedGroup = GroupOfProperties::findOrFail($gopId);
 
@@ -350,9 +347,7 @@ class PropertiesController extends Controller
         // Fetch additional information from the propertiesDataDictionaries table
         $selectedProperties = Properties::where('pdtId', $pdtId)->where('gopId', $gopId)
             ->join('propertiesDataDictionaries', function ($join) {
-                $join->on('Properties.GUID', '=', 'propertiesDataDictionaries.GUID')
-                    ->whereRaw('propertiesDataDictionaries.versionNumber = (SELECT MAX(versionNumber) FROM propertiesDataDictionaries WHERE GUID = Properties.GUID)')
-                    ->whereRaw('propertiesDataDictionaries.revisionNumber = (SELECT MAX(revisionNumber) FROM propertiesDataDictionaries WHERE GUID = Properties.GUID)');
+                $join->on('Properties.propertyId', '=', 'propertiesDataDictionaries.Id');
             })
             ->select('Properties.*', 'propertiesDataDictionaries.nameEn', 'propertiesDataDictionaries.units')
             ->get();

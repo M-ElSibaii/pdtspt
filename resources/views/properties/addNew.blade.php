@@ -16,6 +16,7 @@
                     @csrf
                     <input type="hidden" name="pdtId" value="{{ $selectedPdt->Id }}">
                     <input type="hidden" name="gopId" value="{{ $selectedGroup->Id }}">
+                    <input type="hidden" name="nextIdDataDictionary" value="{{ $nextIdDataDictionary }}">
 
                     <div class="form-group">
                         <label for="nameEn">{{ __('Name (English)') }}</label>

@@ -20,8 +20,8 @@ return new class extends Migration
             $table->Integer('properties_Id')->unsigned();
             $table->text('body');
             $table->timestamp('published_at')->nullable();
-            $table->timestamp('created_at')->nullable();
-            $table->timestamp('updated_at')->nullable();
+            $table->timestamp('created_at')->nullable()->default(now());
+            $table->timestamp('updated_at')->nullable()->default(now());
             $table->foreign('properties_Id')->references('Id')->on('properties');
             $table->foreign('users_id')->references('id')->on('users');
         });

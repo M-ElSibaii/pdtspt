@@ -19,8 +19,8 @@ return new class extends Migration
             $table->text('title')->nullable();
             $table->text('description')->nullable();
             $table->text('status')->nullable();
-            $table->date('updated_at');
-            $table->date('created_at');
+            $table->date('updated_at')->default(now());;
+            $table->date('created_at')->default(now());;
             $table->primary('GUID');
         });
     }
