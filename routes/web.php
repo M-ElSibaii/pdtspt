@@ -108,8 +108,12 @@ Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
         return view('exportdomainbsdd');
     })->name('exportdomainbsdd');
 
-    Route::post('/exportdomainbsdd', [ProductDataTemplatesController::class, 'exportDataToJson'])
+    Route::post('/exportdomainbsdd-groups', [ProductDataTemplatesController::class, 'exportDataToJson'])
         ->name('productdatatemplates.exportJson');
+
+    Route::post('/exportdomainbsdd-psets', [ProductDataTemplatesController::class, 'exportDataToJsonPSETS'])
+        ->name('productdatatemplates.exportJsonPSETS');
+
 
     Route::post('/admin/update', [UserController::class, 'updateUsers'])
         ->name('update.users');

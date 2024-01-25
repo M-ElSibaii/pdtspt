@@ -43,6 +43,8 @@ class UpdateDatabaseStructure extends Migration
             $table->integer('editionNumber')->nullable();
             $table->date('dateOfEdition')->nullable();
             $table->string('constructionObjectGUID', 255)->nullable();
+            $table->text('depreciationExplanation')->nullable();
+            $table->date('depreciationDate')->nullable();
             $table->foreign('constructionObjectGUID')->references('GUID')->on('constructionobjects');
         });
 

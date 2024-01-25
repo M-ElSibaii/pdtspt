@@ -65,6 +65,7 @@
             <a href="{{ route('exportdomainbsdd') }}" class="btn btn-secondary">
                 Export PDTs.pt domain in bsdd JSON format page
             </a>
+
         </div>
     </div>
 

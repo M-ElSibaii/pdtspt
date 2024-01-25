@@ -5,8 +5,15 @@
             <form method="POST" action="{{ route('productdatatemplates.exportJson') }}">
                 @csrf
                 <br>
-                <x-button-primary-pdts type="submit" title="Export in bsdd JSON format" />
+                <x-button-primary-pdts type="submit" title="Export in bsdd JSON format Groups of properties" />
             </form>
+
+            <form method="POST" action="{{ route('productdatatemplates.exportJsonPSETS') }}">
+                @csrf
+                <br>
+                <x-button-primary-pdts type="submit" title="Export in bsdd JSON format PSETS" />
+            </form>
+
         </div>
     </div>
 </x-app-layout>
