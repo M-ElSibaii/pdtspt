@@ -12,8 +12,8 @@
             <div style="background-color: #F0F4F8;">
                 <pre><code>GET /api/productDataTemplates</code></pre>
             </div>
-            <h2 class="my-4">Obter Conteúdo do Dicionário de Dados</h2>
-            <p class="mb-4">Retorna o dicionário de dados para os templates de dados de produtos.</p>
+            <h2 class="my-4">Obter todas as propriedades do Dicionário de Dados</h2>
+            <p class="mb-4"> Retorna todas as propriedades do dicionário de dados dos modelos de dados do produto.</p>
             <div style="background-color: #F0F4F8;">
                 <pre><code>GET /api/dataDictionary</code></pre>
             </div>

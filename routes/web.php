@@ -82,6 +82,11 @@ Route::get(
 )->middleware(['auth', 'verified'])->name('datadictionaryview');
 
 Route::get(
+    '/datadictionaryviewGOP/{gopID}-{gopGUID}',
+    [GroupofpropertiesController::class, 'getGOPDataDictionary']
+)->middleware(['auth', 'verified'])->name('datadictionaryviewGOP');
+
+Route::get(
     '/referencedocumentview/{rdGUID}',
     [ReferencedocumentsController::class, 'getReferenceDocument']
 )->middleware(['auth', 'verified'])->name('referencedocumentview');

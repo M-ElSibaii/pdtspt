@@ -172,6 +172,14 @@
                             <th>Valores-limite</th>
                             <td>{{$propdd->boundaryValues}}</td>
                         </tr>
+                        <tr>
+                            <th>Explicação da depreciação</th>
+                            <td>{{$propdd->depreciationExplanation}}</td>
+                        </tr>
+                        <tr>
+                            <th>Data de depreciação</th>
+                            <td>{{$propdd->depreciationDate}}</td>
+                        </tr>
                     </tbody>
                 </table>
                 <div class='flex py-6'>

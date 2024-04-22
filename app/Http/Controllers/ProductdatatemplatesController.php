@@ -38,8 +38,9 @@ class ProductdatatemplatesController extends Controller
                 }
             )
             ->get();
+        $allpdts = productdatatemplates::all();
 
-        return view('dashboard', compact('latestPDT'));
+        return view('dashboard', compact('latestPDT', 'allpdts'));
     }
 
 

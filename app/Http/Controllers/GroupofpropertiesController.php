@@ -130,6 +130,21 @@ class GroupofpropertiesController extends Controller
     }
 
 
+    public function getGOPDataDictionary($gopID, $gopGUID)
+    {
+
+        $gopdd = groupofproperties::WHERE('Id', $gopID)
+            ->first();
+        $gopinpdts = groupofproperties::where('GUID', $gopGUID)
+            ->get();
+        $pdts = productdatatemplates::get();
+        $gopversions = groupofproperties::where('GUID', $gopGUID)->get();
+
+
+        return view('datadictionaryviewGOP', compact('gopdd', 'gopinpdts', 'pdts', 'gopversions'));
+    }
+
+
     /**
      * Store a newly created resource in storage.
      *

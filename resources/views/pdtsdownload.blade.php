@@ -47,7 +47,10 @@
                             <tr>
                                 <td class="text-left content-start bg-slate-300 p-3" colspan="4">
                                     <input class="text-left expand" type="checkbox" name="{{ $group->gopNamePt }}" id="{{ $group->gopNamePt }}" data-toggle="toggle">
-                                    <label class="my-auto text-left cursor-pointer" for="{{ $group->gopNamePt }}">Grupo de propriedades - {{ $group->gopNamePt }}</label>
+                                    <label class="my-auto text-left cursor-pointer" for="{{ $group->gopNamePt }}">Grupo de propriedades -
+                                        <a href="{{ url('datadictionaryviewGOP/' . $group->Id . '-' . $group->GUID) }}">
+                                            {{ $group->gopNamePt }}
+                                        </a></label>
                                 </td>
                             </tr>
                         </tbody>
@@ -71,7 +74,7 @@
                                     </a>
                                 </td>
                                 <td class="p-1.5">
-                                    {{ $property->units }}
+                                    {{ $property->units ? $property->units : 'Sem unidade' }}
                                 </td>
                                 <td class="p-1.5">
                                     <div class="flex flex-col">
@@ -87,15 +90,15 @@
                                 $referenceDoc = $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first();
                                 @endphp
 
-                                @if ($referenceDoc && $referenceDoc->rdName)
+                                @if ($referenceDoc && ($referenceDoc->rdName == 'n/a' || !$referenceDoc->rdName))
+                                <td class="p-1.5">
+                                    <a>n/a</a>
+                                </td>
+                                @else
                                 <td class="p-1.5">
                                     <a href="{{ route('referencedocumentview', ['rdGUID' => $property->referenceDocumentGUID]) }}">
                                         <p title="{{ $referenceDoc->title }}">{{ $referenceDoc->rdName }}</p>
                                     </a>
-                                </td>
-                                @else
-                                <td class="p-1.5">
-                                    <a>n/a</a>
                                 </td>
                                 @endif
                             </tr>
