@@ -9,9 +9,9 @@
                         <h1 class="flex-none inline">{{ $gopdd->gopNamePt }}</h1>
                         <p class="flex-none inline"> - V{{ $gopdd->versionNumber }}.{{ $gopdd->revisionNumber }}</p>
                         @if($gopdd->status == 'Active')
-                        <span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">Ativa</span>
+                        <span class="status-tag status-tag-active">Ativa</span>
                         @else
-                        <span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">InActiva</span>
+                        <span class="status-tag status-tag-inactive">InActiva</span>
                         @endif
                     </div>
                 </div>
@@ -72,26 +72,55 @@
                         <tr>
                             <th>Lista de grupo de propriedades substituídas</th>
                             <td>
+                                @php
+                                $latestVersion = null;
+                                $latestVersionNumber = null;
+                                $latestRevisionNumber = null;
+                                @endphp
                                 @foreach ($gopversions as $version)
-                                @if ($version->versionNumber < $gopdd->versionNumber || ($version->versionNumber == $gopdd->versionNumber && $version->revisionNumber < $gopdd->revisionNumber)) <form class="mb-3" action="{{ url('datadictionaryviewGOP/' . $version->Id . '-' . $version->GUID) }}">
-                                            <button class="btn btn-link" type="submit">{{ $version->versionNumber}}.{{$version->revisionNumber}}, </button>
-                                        </form>
+                                @if (($version->versionNumber < $gopdd->versionNumber) || ($version->versionNumber == $gopdd->versionNumber && $version->revisionNumber < $gopdd->revisionNumber))
+                                        @if ($version->versionNumber != $latestVersionNumber || $version->revisionNumber != $latestRevisionNumber)
+                                        @php
+                                        $latestVersion = $version;
+                                        $latestVersionNumber = $version->versionNumber;
+                                        $latestRevisionNumber = $version->revisionNumber;
+                                        @endphp
+                                        @endif
                                         @endif
                                         @endforeach
-                                        {{$gopdd->listOfReplacedProperties}}
+                                        @if ($latestVersion)
+                                        <form class="mb-3" action="{{ url('datadictionaryviewGOP/' . $latestVersion->Id . '-' . $latestVersion->GUID) }}">
+                                            <button class="btn btn-link" type="submit">{{ $latestVersion->versionNumber}}.{{$latestVersion->revisionNumber}}, </button>
+                                        </form>
+                                        @endif
+
                             </td>
                         </tr>
                         <tr>
                             <th>Lista de grupo de propriedades de substituição</th>
                             <td>
+                                @php
+                                $latestVersion = null;
+                                $latestVersionNumber = null;
+                                $latestRevisionNumber = null;
+                                @endphp
                                 @foreach ($gopversions as $version)
-                                @if ($version->versionNumber > $gopdd->versionNumber || ($version->versionNumber == $gopdd->versionNumber && $version->revisionNumber > $gopdd->revisionNumber))
-                                <form class="mb-3" action="{{ url('datadictionaryviewGOP/' . $version->Id . '-' . $version->GUID) }}">
-                                    <button class="btn btn-link" type="submit">{{ $version->versionNumber}}.{{$version->revisionNumber}}, </button>
-                                </form>
+                                @if (($version->versionNumber > $gopdd->versionNumber) || ($version->versionNumber == $gopdd->versionNumber && $version->revisionNumber > $gopdd->revisionNumber))
+                                @if ($version->versionNumber != $latestVersionNumber || $version->revisionNumber != $latestRevisionNumber)
+                                @php
+                                $latestVersion = $version;
+                                $latestVersionNumber = $version->versionNumber;
+                                $latestRevisionNumber = $version->revisionNumber;
+                                @endphp
+                                @endif
                                 @endif
                                 @endforeach
-                                {{$gopdd->listOfReplacingProperties}}
+                                @if ($latestVersion)
+                                <form class="mb-3" action="{{ url('datadictionaryviewGOP/' . $latestVersion->Id . '-' . $latestVersion->GUID) }}">
+                                    <button class="btn btn-link" type="submit">{{ $latestVersion->versionNumber}}.{{$latestVersion->revisionNumber}}, </button>
+                                </form>
+                                @endif
+
                             </td>
                         </tr>
                         <tr>

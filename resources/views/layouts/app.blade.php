@@ -57,6 +57,34 @@
     </script>
 
     <style>
+        .status-tag {
+            /* Common styles for both active and inactive */
+            font-size: 12px;
+            /* Adjust font size as needed */
+            font-weight: 500;
+            /* Adjust font weight as needed */
+            margin-right: 5px;
+            /* Adjust margin as needed */
+            padding: 2px 6px;
+            /* Adjust padding as needed */
+            border-radius: 10px;
+            /* Adjust border radius as needed */
+        }
+
+        .status-tag-active {
+            background-color: #d1fae5;
+            /* Green */
+            color: #065f46;
+            /* Dark green */
+        }
+
+        .status-tag-inactive {
+            background-color: #fee2e2;
+            /* Red */
+            color: #7f1d1d;
+            /* Dark red */
+        }
+
         .expand {
             display: none;
         }

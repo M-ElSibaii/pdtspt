@@ -9,9 +9,9 @@
                         <h1 class="flex-none inline">{{ $propdd->namePt }}</h1>
                         <p class="flex-none inline"> - V{{ $propdd->versionNumber }}.{{ $propdd->revisionNumber }}</p>
                         @if($propdd->status == 'Active')
-                        <span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">Ativa</span>
+                        <span class="status-tag status-tag-active">Ativa</span>
                         @else
-                        <span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">InActiva</span>
+                        <span class="status-tag status-tag-inactive">Inactiva</span>
                         @endif
                     </div>
                 </div>
@@ -82,7 +82,7 @@
                                         </form>
                                         @endif
                                         @endforeach
-                                        {{$propdd->listOfReplacedProperties}}
+
                             </td>
                         </tr>
                         <tr>
@@ -95,7 +95,7 @@
                                 </form>
                                 @endif
                                 @endforeach
-                                {{$propdd->listOfReplacingProperties}}
+
                             </td>
                         </tr>
                         <tr>

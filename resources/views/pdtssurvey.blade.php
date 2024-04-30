@@ -16,13 +16,13 @@
                     <h1 class="flex-none inline">{{ $pdt->pdtNamePt }}</h1>
                     <p class="flex-none inline"> - V{{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}</p>
                     @if ($pdt->status == 'Active')
-                    <span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">Activa</span>
+                    <span class="status-tag status-tag-active">Activa</span>
                     @endif
                     @if ($pdt->status == 'Preview')
-                    <span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">InActiva</span>
+                    <span class="status-tag status-tag-inactive">InActiva</span>
                     @endif
                     @if ($pdt->status == 'InActive')
-                    <span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">InActiva</span>
+                    <span class="status-tag status-tag-inactive">InActiva</span>
                     @endif
 
                 </div>
@@ -48,7 +48,9 @@
                             <tr>
                                 <td class="text-left content-start bg-slate-300 p-3" colspan="6">
                                     <input class="text-left expand" type="checkbox" name="{{ $group->gopNamePt }}" id="{{ $group->gopNamePt }}" data-toggle="toggle">
-                                    <label class="my-auto text-left cursor-pointer" for="{{ $group->gopNamePt }}">Grupo de propriedades - {{ $group->gopNamePt }}</label>
+                                    <label class="my-auto text-left cursor-pointer" for="{{ $group->gopNamePt }}">Grupo de propriedades - <a href="{{ url('datadictionaryviewGOP/' . $group->Id . '-' . $group->GUID) }}">
+                                            {{ $group->gopNamePt }}
+                                        </a></label>
                                 </td>
                             </tr>
                         </tbody>

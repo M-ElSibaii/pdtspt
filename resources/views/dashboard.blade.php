@@ -33,13 +33,13 @@
                             <div class="flex items-center">
                                 <span class="mr-1">V{{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}
                                     <br> @if ($pdt->status == 'InActive')
-                                    <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">InActiva</span>
+                                    <span class="status-tag status-tag-inactive">InActiva</span>
                                     @endif
                                     @if ($pdt->status == 'Active')
-                                    <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">Activa</span>
+                                    <span class="status-tag status-tag-active">Activa</span>
                                     @endif
                                     @if ($pdt->status == 'Preview')
-                                    <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">Preview</span>
+                                    <span class="status-tag status-tag-inactive">Preview</span>
                                     @endif</span>
                                 @php
                                 $hasOtherVersions = $allpdts->where('GUID', $pdt->GUID)->where('Id', '!=', $pdt->Id)->isNotEmpty();
@@ -60,13 +60,13 @@
                                             <x-dropdown-link :href="route('pdtsdownload', ['pdtID' => $otherPdt->Id])">
                                                 V{{ $otherPdt->editionNumber }}.{{ $otherPdt->versionNumber }}.{{ $otherPdt->revisionNumber }}
                                                 @if ($otherPdt->status == 'InActive')
-                                                <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">InActiva</span>
+                                                <span class="status-tag status-tag-inactive">InActiva</span>
                                                 @endif
                                                 @if ($otherPdt->status == 'Active')
-                                                <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">Activa</span>
+                                                <span class="status-tag status-tag-active">Activa</span>
                                                 @endif
                                                 @if ($otherPdt->status == 'Preview')
-                                                <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">Preview</span>
+                                                <span class="status-tag status-tag-inactive">Preview</span>
                                                 @endif
 
                                             </x-dropdown-link>
