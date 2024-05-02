@@ -9,13 +9,13 @@
                             <h1 class="flex-none inline">{{ $pdt->pdtNamePt }}</h1>
                             <p class="flex-none inline"> - V{{ $pdt-> editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}</p>
                             @if ($pdt->status == 'Active')
-                            <span class="status-tag status-tag-active">Activa</span>
+                            <span class="status-tag status-tag-active">Ativa</span>
                             @endif
                             @if ($pdt->status == 'Preview')
-                            <span class="status-tag status-tag-inactive">InActiva</span>
+                            <span class="status-tag status-tag-inactive">Inativa</span>
                             @endif
                             @if ($pdt->status == 'InActive')
-                            <span class="status-tag status-tag-inactive">InActiva</span>
+                            <span class="status-tag status-tag-inactive">Inativa</span>
                             @endif
 
                         </div>
@@ -68,7 +68,7 @@
                                     </a>
 
                                     @if($property->status == 'InActive')
-                                    <span class="status-tag status-tag-inactive">InActiva</span>
+                                    <span class="status-tag status-tag-inactive">Inativa</span>
                                     @endif
 
                                     </a>

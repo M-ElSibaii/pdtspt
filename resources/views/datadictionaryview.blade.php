@@ -11,7 +11,7 @@
                         @if($propdd->status == 'Active')
                         <span class="status-tag status-tag-active">Ativa</span>
                         @else
-                        <span class="status-tag status-tag-inactive">Inactiva</span>
+                        <span class="status-tag status-tag-inactive">Inativa</span>
                         @endif
                     </div>
                 </div>

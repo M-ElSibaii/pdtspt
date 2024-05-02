@@ -60,10 +60,10 @@
                                             <x-dropdown-link :href="route('pdtsdownload', ['pdtID' => $otherPdt->Id])">
                                                 V{{ $otherPdt->editionNumber }}.{{ $otherPdt->versionNumber }}.{{ $otherPdt->revisionNumber }}
                                                 @if ($otherPdt->status == 'InActive')
-                                                <span class="status-tag status-tag-inactive">InActiva</span>
+                                                <span class="status-tag status-tag-inactive">Inativa</span>
                                                 @endif
                                                 @if ($otherPdt->status == 'Active')
-                                                <span class="status-tag status-tag-active">Activa</span>
+                                                <span class="status-tag status-tag-active">Ativa</span>
                                                 @endif
                                                 @if ($otherPdt->status == 'Preview')
                                                 <span class="status-tag status-tag-inactive">Preview</span>

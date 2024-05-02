@@ -11,7 +11,7 @@
                         @if($gopdd->status == 'Active')
                         <span class="status-tag status-tag-active">Ativa</span>
                         @else
-                        <span class="status-tag status-tag-inactive">InActiva</span>
+                        <span class="status-tag status-tag-inactive">Inativa</span>
                         @endif
                     </div>
                 </div>
