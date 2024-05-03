@@ -437,12 +437,13 @@ class ProductdatatemplatesController extends Controller
     {
         // Implement the transformation logic for a property
         // Use $property and its properties to structure the data
-
+        $group = groupofproperties::WHERE('Id', $property->gopID)->value('gopNamePt');
         $propertyData = [
 
             'PropertyCode' =>  (string) $property->GUID . '-' . (string) $property->propertyId,
             'Code' =>  (string) $property->Id,
             'Description' => $property->descriptionPt,
+            'PropertySet' => $this->convertToPascalCase($group),
 
         ];
 
@@ -452,7 +453,8 @@ class ProductdatatemplatesController extends Controller
     private function transformPropertyDataDictionary($property)
     {
         // get referencedocument of the property from properties table
-        $propertyRD = properties::where('propertyId', $property->Id)->latest()->first()->value('referenceDocumentGUID');
+        $propertyRD = properties::where('propertyId', $property->Id)->latest()->value('referenceDocumentGUID') ?? "n/a";
+
         //get replacing and replaced properties
         // Assuming $property is an instance of the Property model
         $guid = $property->GUID;
