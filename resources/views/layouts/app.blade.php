@@ -85,6 +85,13 @@
             /* Dark red */
         }
 
+        .status-tag-preview {
+            background-color: #fdf2e9;
+            /* orange */
+            color: #c05621;
+            /* dark orange */
+        }
+
         .expand {
             display: none;
         }

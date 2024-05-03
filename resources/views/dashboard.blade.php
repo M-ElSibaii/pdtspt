@@ -39,7 +39,7 @@
                                     <span class="status-tag status-tag-active">Activa</span>
                                     @endif
                                     @if ($pdt->status == 'Preview')
-                                    <span class="status-tag status-tag-inactive">Preview</span>
+                                    <span class="status-tag status-tag-preview">Preview</span>
                                     @endif</span>
                                 @php
                                 $hasOtherVersions = $allpdts->where('GUID', $pdt->GUID)->where('Id', '!=', $pdt->Id)->isNotEmpty();
@@ -66,7 +66,7 @@
                                                 <span class="status-tag status-tag-active">Ativa</span>
                                                 @endif
                                                 @if ($otherPdt->status == 'Preview')
-                                                <span class="status-tag status-tag-inactive">Preview</span>
+                                                <span class="status-tag status-tag-preview">Preview</span>
                                                 @endif
 
                                             </x-dropdown-link>
