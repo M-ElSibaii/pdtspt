@@ -37,6 +37,11 @@
                     </x-nav-link>
                 </div>
                 <div class="sm:hidden space-x-8 -my-px ml-10 flex">
+                    <x-nav-link :href="route('knowledge')" :active="request()->routeIs('knowledge')">
+                        {{ __('Publicações') }}
+                    </x-nav-link>
+                </div>
+                <div class="sm:hidden space-x-8 -my-px ml-10 flex">
                     <x-nav-link :href="route('contact.store')" :active="request()->routeIs('contact.store')">
                         {{ __('Contactos') }}
                     </x-nav-link>
