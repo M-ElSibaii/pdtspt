@@ -29,6 +29,10 @@ Route::get('/apidoc', function () {
     return view('apidoc');
 })->name('apidoc');
 
+Route::get('/knowledge', function () {
+    return view('knowledge');
+})->name('knowledge');
+
 Route::get('/participantes', function () {
     return view('participantes');
 })->name('participantes');
