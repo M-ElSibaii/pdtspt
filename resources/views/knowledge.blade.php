@@ -9,11 +9,12 @@
                 <!-- Knowledge Containers -->
 
                 <div class="border border-gray-200 rounded-lg p-4">
-                    <a href="https://vimeo.com/945506907/34c5c19e3a?share=copy" target="_blank">
-                        <iframe src="https://vimeo.com/945506907/34c5c19e3a?share=copy" width="100%" height="auto" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
-                    </a>
-                    <a href="https://vimeo.com/945506907/34c5c19e3a?share=copy" target="_blank" class="text-xl font-semibold mt-4 block">
-                        Passaportes Digitais De Produtos E A Iniciativa PDTs.pt, Workshop Da 5ª Edição Do ptBIM 2024</a>
+                    <div style="padding:60% 0 0 0;position:relative;">
+                        <iframe src="https://player.vimeo.com/video/945506907?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="Workshop PDTs - PTBIM 2024">
+                        </iframe>
+                    </div>
+                    <script src="https://player.vimeo.com/api/player.js"></script>
+                    <a>Passaportes Digitais De Produtos E A Iniciativa PDTs.pt, Workshop Da 5ª Edição Do ptBIM 2024</a>
                     <p class="text-gray-500 text-sm mt-2">Date: 09/05/2024</p>
                 </div>
 
@@ -39,7 +40,7 @@
                 <!-- Publication Containers -->
 
                 <div class="border border-gray-200 rounded-lg p-4 flex items-center">
-                    <img src="img/Transformação digital na indústria da construção Capacitando a gestão de dados através de uma plataforma de modelos de dados de produtos.png" alt="Publication Thumbnail" class="w-40 h-40 mr-4 rounded-lg">
+                    <img src="img/Transformação digital na indústria da construção Capacitando a gestão de dados através de uma plataforma de modelos de dados de produtos.png" alt="Publication Thumbnail" class="mr-4 rounded-lg" style="width: 200px; height: 200px;">
                     <div>
                         <a href="https://ebooks.uminho.pt/index.php/uminho/catalog/view/164/203/3287" target="_blank" class="text-xl font-semibold block">
                             Transformação digital na indústria da construção: Capacitando a gestão de dados através de uma plataforma de modelos de dados de produtos (PDT)</a>
@@ -50,7 +51,7 @@
 
 
                 <div class="border border-gray-200 rounded-lg p-4 flex items-center">
-                    <img src="img/Proposta de modelos de dados de produto para túneis ferroviários.png" alt="Publication Thumbnail" class="w-40 h-40 mr-4 rounded-lg">
+                    <img src="img/Proposta de modelos de dados de produto para túneis ferroviários.png" alt="Publication Thumbnail" class="mr-4 rounded-lg" style="width: 200px; height: 200px;">
                     <div>
                         <a href="https://ebooks.uminho.pt/index.php/uminho/catalog/view/164/203/3289" target="_blank" class="text-xl font-semibold block">
                             Proposta de modelos de dados de produto para túneis ferroviários</a>
@@ -60,7 +61,7 @@
                 </div>
 
                 <div class="border border-gray-200 rounded-lg p-4 flex items-center">
-                    <img src="img/Nível de informação necessário para a circularidade dos materiais de construção no âmbito do projeto RecycleBIM.png" alt="Publication Thumbnail" class="w-40 h-40 mr-4 rounded-lg">
+                    <img src="img/Nível de informação necessário para a circularidade dos materiais de construção no âmbito do projeto RecycleBIM.png" alt="Publication Thumbnail" class="mr-4 rounded-lg" style="width: 200px; height: 200px;">
                     <div>
                         <a href="https://ebooks.uminho.pt/index.php/uminho/catalog/view/164/203/3305" target="_blank" class="text-xl font-semibold block">
                             Nível de informação necessário para a circularidade dos materiais de construção no âmbito do projeto RecycleBIM</a>
@@ -70,7 +71,7 @@
                 </div>
 
                 <div class="border border-gray-200 rounded-lg p-4 flex items-center">
-                    <img src="img/Towards Standardization of Data for Structural Concrete Product Data Templates.png" alt="Publication Thumbnail" class="w-40 h-40 mr-4 rounded-lg">
+                    <img src="img/Towards Standardization of Data for Structural Concrete Product Data Templates.png" alt="Publication Thumbnail" class="mr-4 rounded-lg" style="width: 200px; height: 200px;">
                     <div>
                         <a href="https://link.springer.com/chapter/10.1007/978-3-031-33211-1_24" target="_blank" class="text-xl font-semibold block">
                             Towards Standardization of Data for Structural Concrete: Product Data Templates</a>
@@ -80,7 +81,7 @@
                 </div>
 
                 <div class="border border-gray-200 rounded-lg p-4 flex items-center">
-                    <img src="img/Rumo à definição de Product Data Templates nacionais para aplicação generalizada em contexto BIM Esforços da CT197.png" alt="Publication Thumbnail" class="w-40 h-40 mr-4 rounded-lg">
+                    <img src="img/Rumo à definição de Product Data Templates nacionais para aplicação generalizada em contexto BIM Esforços da CT197.png" alt="Publication Thumbnail" class="mr-4 rounded-lg" style="width: 200px; height: 200px;">
                     <div>
                         <a href="https://repositorium.sdum.uminho.pt/bitstream/1822/82007/1/2022_Rumo-a-definicao-de-Product-Data-Templates.pdf" target="_blank" class="text-xl font-semibold block">
                             Rumo à definição de Product Data Templates nacionais para aplicação generalizada em contexto BIM: Esforços da CT197</a>
@@ -90,7 +91,7 @@
                 </div>
 
                 <div class="border border-gray-200 rounded-lg p-4 flex items-center">
-                    <img src="img/Towards efficient BIM use of geotechnical data from geotechnical investigations.png" alt="Publication Thumbnail" class="w-40 h-40 mr-4 rounded-lg">
+                    <img src="img/Towards efficient BIM use of geotechnical data from geotechnical investigations.png" alt="Publication Thumbnail" class="mr-4 rounded-lg" style="width: 200px; height: 200px;">
                     <div>
                         <a href="https://www.itcon.org/papers/2022_19-ITcon-ElSibaii.pdf" target="_blank" class="text-xl font-semibold block">
                             Towards efficient BIM use of geotechnical data from geotechnical investigations</a>
@@ -100,7 +101,7 @@
                 </div>
 
                 <div class="border border-gray-200 rounded-lg p-4 flex items-center">
-                    <img src="img/RUMO À MODELAÇÃO EFICIENTE DE PARÂMETROS GEOTÉCNICOS EM BIM.png" alt="Publication Thumbnail" class="w-40 h-40 mr-4 rounded-lg">
+                    <img src="img/RUMO À MODELAÇÃO EFICIENTE DE PARÂMETROS GEOTÉCNICOS EM BIM.png" alt="Publication Thumbnail" class="mr-4 rounded-lg" style="width: 200px; height: 200px;">
                     <div>
                         <a href="https://repositorium.sdum.uminho.pt/bitstream/1822/70621/1/%5b76%5d.pdf" target="_blank" class="text-xl font-semibold block">
                             RUMO À MODELAÇÃO EFICIENTE DE PARÂMETROS GEOTÉCNICOS EM BIM</a>
