@@ -10,6 +10,7 @@ use App\Mail\ContactMailAdmin;
 use App\Models\Contact;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use GuzzleHttp\Client;
 
 class ContactController extends Controller
 {
@@ -35,10 +36,27 @@ class ContactController extends Controller
             'email' => 'required|email',
             'phone' => 'nullable|numeric',
             'subject' => 'required',
-            'message' => 'required'
+            'message' => 'required',
+            'g-recaptcha-response' => 'required'
         ]);
 
-        $email = $request->all()['email'];
+        // Verify reCAPTCHA
+        $client = new Client();
+        $response = $client->post('https://www.google.com/recaptcha/api/siteverify', [
+            'form_params' => [
+                'secret' => config('services.recaptcha.secret_key'),
+                'response' => $request->input('g-recaptcha-response'),
+            ]
+        ]);
+
+        $body = json_decode((string)$response->getBody());
+
+        if (!$body->success) {
+            return back()->withErrors(['captcha' => 'ReCAPTCHA verification failed. Please try again.'])->withInput();
+        }
+
+        // If reCAPTCHA is successful
+        $email = $request->input('email');
         $emailArray = $request->only(['name', 'email', 'phone', 'subject', 'message']);
         $contact = Contact::create($request->all());
 
@@ -47,11 +65,5 @@ class ContactController extends Controller
         session()->flash('success', 'Mensagem enviada com sucesso.');
 
         return redirect()->back();
-        // );
-        //  Contact::create($request->all());
-
-        //  return redirect()->back()
-        //     ->with(['success' => 'Thank you for contacting us. we will contact you shortly.']);
-
     }
 }
