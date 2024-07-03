@@ -60,9 +60,9 @@
                             <x-input-error :messages="$errors->get('message')" class="mt-2" />
                         </div>
 
-                        <!-- reCAPTCHA -->
                         <div class="mt-2">
-                            <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+                            <input type="checkbox" name="human_check" id="human_check" required />
+                            <label for="human_check">Não sou um robot</label>
                         </div>
 
                         <div class="flex items-center justify-end mt-2">
@@ -70,6 +70,7 @@
                                 Enviar mensagem
                             </x-primary-button>
                         </div>
+
                     </form>
                 </div>
             </div>

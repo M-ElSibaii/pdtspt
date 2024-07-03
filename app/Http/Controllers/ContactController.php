@@ -37,25 +37,10 @@ class ContactController extends Controller
             'phone' => 'nullable|numeric',
             'subject' => 'required',
             'message' => 'required',
-            'g-recaptcha-response' => 'required'
+            'human_check' => 'accepted'
         ]);
 
-        // Verify reCAPTCHA
-        $client = new Client();
-        $response = $client->post('https://www.google.com/recaptcha/api/siteverify', [
-            'form_params' => [
-                'secret' => config('services.recaptcha.secret_key'),
-                'response' => $request->input('g-recaptcha-response'),
-            ]
-        ]);
 
-        $body = json_decode((string)$response->getBody());
-
-        if (!$body->success) {
-            return back()->withErrors(['captcha' => 'ReCAPTCHA verification failed. Please try again.'])->withInput();
-        }
-
-        // If reCAPTCHA is successful
         $email = $request->input('email');
         $emailArray = $request->only(['name', 'email', 'phone', 'subject', 'message']);
         $contact = Contact::create($request->all());
@@ -64,6 +49,6 @@ class ContactController extends Controller
         Mail::to('pdts.portugal@gmail.com')->send(new ContactMailAdmin($emailArray));
         session()->flash('success', 'Mensagem enviada com sucesso.');
 
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Mensagem enviada com sucesso');
     }
 }
