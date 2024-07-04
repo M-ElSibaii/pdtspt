@@ -60,9 +60,14 @@
                             <x-input-error :messages="$errors->get('message')" class="mt-2" />
                         </div>
 
-                        <div class="mt-2">
-                            <input type="checkbox" name="human_check" id="human_check" required />
-                            <label for="human_check">Não sou um robot</label>
+                        <!-- Captcha -->
+                        <div class="form-group">
+                            <label for="captcha">Por favor escreva as cartas que vê abaixo</label>
+                            {!! captcha_img() !!}
+                            <input type="text" id="captcha" name="captcha">
+                            @if ($errors->has('captcha'))
+                            <span class="text-danger">{{ $errors->first('captcha') }}</span>
+                            @endif
                         </div>
 
                         <div class="flex items-center justify-end mt-2">

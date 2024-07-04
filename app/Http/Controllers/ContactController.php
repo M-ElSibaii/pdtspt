@@ -37,7 +37,7 @@ class ContactController extends Controller
             'phone' => 'nullable|numeric',
             'subject' => 'required',
             'message' => 'required',
-            'human_check' => 'accepted'
+            'captcha' => 'required|captcha',
         ]);
 
 
