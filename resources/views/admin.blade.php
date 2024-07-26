@@ -57,7 +57,7 @@
             </form>
             <br>
             <a href="{{ route('pdtinput') }}" class="btn btn-secondary">
-                Create PDTs
+                Create / Edit PDTs
             </a>
             <br>
             <br>

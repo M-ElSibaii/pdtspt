@@ -12,7 +12,7 @@
                         <label for="pdtId">{{ __('Select PDT') }}</label>
                         <select class="form-control" id="pdtId" name="pdtId" required>
                             @foreach ($pdts as $pdt)
-                            <option value="{{ $pdt->Id }}">{{ $pdt->pdtNameEn }}</option>
+                            <option value="{{ $pdt->Id }}">{{ $pdt->pdtNameEn }} V{{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}</option>
                             @endforeach
                         </select>
                     </div>

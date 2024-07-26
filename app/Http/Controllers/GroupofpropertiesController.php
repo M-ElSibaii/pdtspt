@@ -351,7 +351,7 @@ class GroupofpropertiesController extends Controller
     public function createStep1()
     {
         // Get the latest versions/revisions of PDTs
-        $pdts = productdatatemplates::Where('status', "Preview")->get();
+        $pdts = productdatatemplates::get();
 
 
         return view('groupofproperties.choose_pdt', compact('pdts'));

@@ -167,6 +167,11 @@
                 {{ __('Participantes') }}
             </x-responsive-nav-link>
         </div>
+        <div class="pt-2 pb-3 space-y-1">
+            <x-responsive-nav-link :href="route('knowledge')" :active="request()->routeIs('knowledge')">
+                {{ __('Publicações') }}
+            </x-responsive-nav-link>
+        </div>
         @if (Route::has('login'))
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('login')" :active="request()->routeIs('login')">

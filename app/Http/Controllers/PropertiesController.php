@@ -36,7 +36,7 @@ class PropertiesController extends Controller
     public function choosePDT(Request $request)
     {
         // Fetch all PDTs
-        $pdts = productdatatemplates::Where('status', "Preview")->get();
+        $pdts = productdatatemplates::get();
 
         return view('properties.choose_pdt', compact('pdts'));
     }

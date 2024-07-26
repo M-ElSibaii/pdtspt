@@ -53,8 +53,9 @@
                         <td>{{ $additionalInfo->nameEn ?? '' }}</td>
                         <td>{{ $property->descriptionEn ?? '' }}</td>
                         <td>{{ $additionalInfo->units ?? '' }}</td>
-                        <td><a href="{{ route('properties.edit', ['propertyId' => $property->Id]) }}" class="btn btn-warning">Properties table</a>
-                            <a href="{{ url('datadictionaryview/' . $additionalInfo->Id . '-' . $additionalInfo->GUID) }}" class="btn btn-warning">Data dictionary</a>
+                        <td><a href="{{ route('properties.edit', ['propertyId' => $property->Id]) }}" class="btn btn-warning">Edit Properties table</a>
+                            <a href="{{ route('properties.editdd', ['propertyddId' => $property->propertyId]) }}" class="btn btn-warning"> Edit Dictionary table</a>
+                            <a href="{{ url('datadictionaryview/' . $additionalInfo->Id . '-' . $additionalInfo->GUID) }}" class="btn btn-warning">Data dictionary view</a>
                         </td>
                     </tr>
                     @endforeach
