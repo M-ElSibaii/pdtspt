@@ -182,6 +182,8 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         Mews\Captcha\CaptchaServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
+
 
         /*
          * Package Service Providers...
@@ -212,6 +214,7 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
         'Captcha' => Mews\Captcha\Facades\Captcha::class,
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
     ])->toArray(),
 
 ];

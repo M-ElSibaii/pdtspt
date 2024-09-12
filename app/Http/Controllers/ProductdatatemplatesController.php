@@ -14,6 +14,9 @@ use App\Models\constructionobjects;
 use App\Models\propertiesdatadictionaries;
 use App\Models\referencedocuments;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 
 class ProductdatatemplatesController extends Controller
 {
@@ -44,14 +47,12 @@ class ProductdatatemplatesController extends Controller
     }
 
 
-
-
-
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
+
     public function productDataTemplate($pdtID)
     {
         $pdt = ProductDataTemplates::where('Id', $pdtID)->first();
@@ -106,7 +107,6 @@ class ProductdatatemplatesController extends Controller
 
         return response()->json($data);
     }
-
     public function constructionObjects()
     {
         return constructionobjects::all();

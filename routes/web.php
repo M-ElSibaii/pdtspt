@@ -9,6 +9,7 @@ use App\Http\Controllers\PropertiesdatadictionariesController;
 use App\Http\Controllers\PropertiesController;
 use App\Http\Controllers\ReferencedocumentsController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LoinsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,14 +49,23 @@ Route::get('/contact',  function () {
 Route::post('/contact', [ContactController::class, 'store'])
     ->name('contact.store');
 
-
-
 Route::get('/dashboard', [ProductdatatemplatesController::class, 'getLatestPDTs'], function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/pdtsdownload/{pdtID}', [GroupofpropertiesController::class, 'getGroupOfProperties'])
-    ->middleware(['auth', 'verified'])->name('pdtsdownload');
+Route::get('/pdtsdownload/{pdtID}', [GroupofpropertiesController::class, 'getGroupOfProperties'])->middleware(['auth', 'verified'])->name('pdtsdownload');
+
+
+Route::post('/loin1/store', [LoinsController::class, 'store'])->middleware(['auth', 'verified'])->name('loin.store');
+Route::get('/loin', [LoinsController::class, 'dataforloin'])->middleware(['auth', 'verified'])->name('loin');
+Route::match(['get', 'post'], '/loin1',  [LoinsController::class, 'dataforloin1'])->middleware(['auth', 'verified'])->name('loin1');
+Route::get('/loinView/{loinId}', [LoinsController::class, 'loinInstance'])->middleware(['auth', 'verified'])->name('loinView');
+Route::delete('/loinDelete/{loinId}', [LoinsController::class, 'destroyLoin'])->middleware(['auth', 'verified'])->name('loinDelete');
+Route::get('/loinViewProject/{projectName}', [LoinsController::class, 'showLoinsByProject'])->middleware(['auth', 'verified'])->name('loinViewProject');
+Route::get('/loinDownloadJSON/{id}', [LoinsController::class, 'downloadJSON'])->middleware(['auth', 'verified'])->name('loinDownloadJSON');
+Route::get('/loinDownloadExcel/{id}/{objectName}', [LoinsController::class, 'downloadExcel'])->middleware(['auth', 'verified'])->name('loinDownloadExcel');
+Route::get('/projectLoinsExcel/{projectName}', [LoinsController::class, 'exportProjectLoinsExcel'])->name('exportProjectLoinsExcel');
+Route::get('/projectLoinsJson/{projectName}', [LoinsController::class, 'exportProjectLoinsJson'])->name('exportProjectLoinsJson');
 
 Route::middleware('auth', 'verified')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

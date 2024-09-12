@@ -8,6 +8,8 @@
 
     <title>{{ config('PDTs', 'PDTs') }}</title>
 
+
+
     <!-- links for card styles -->
     <link href="https://unpkg.com/@coreui/coreui@3.2/dist/css/coreui.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet" />
@@ -20,6 +22,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
+
+
 
 
     {{-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" />
@@ -57,6 +61,28 @@
     </script>
 
     <style>
+        .scrollable-container {
+            max-height: 200px;
+            /* Adjust height as needed */
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+
+        .property-item {
+            margin-bottom: 8px;
+        }
+
+        .loin-container {
+            border: 2px solid #000;
+            /* Contour line */
+            border-radius: 5px;
+            /* Rounded corners */
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+
         .status-tag {
             /* Common styles for both active and inactive */
             font-size: 12px;
@@ -396,7 +422,7 @@
             padding-top: 3px;
             padding-bottom: 3px;
             text-align: center;
-            text-align: right !important;
+            text-align: right;
         }
 
         .carousel-item img {
