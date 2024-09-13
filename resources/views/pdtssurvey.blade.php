@@ -1,7 +1,7 @@
 <x-app-layout>
     <div style="background-color: white;">
-        <div class="container sm:max-w-full py-9">
-            <h1>{{ __('Análises e comentários do Modelo de Dados do Produto') }}</h1>
+        <div class="container sm:max-w-full py-4">
+            <h3>{{ __('Análises e comentários do Modelo de Dados do Produto') }}</h3>
             <section class="">
                 @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -26,9 +26,10 @@
                     @endif
 
                 </div>
-                <div class="overflow-auto" style="overflow-y: auto; max-height: calc(100vh - 300px);">
+                <div >
 
-                    <form class="overflow-auto" style="overflow-y: auto; max-height: calc(100vh - 300px);" name="form" id="form" method="post" action="{{ route('saveAnswers') }}">
+                    <form name="form" id="form" method="post" action="{{ route('saveAnswers') }}">
+                        <div class="overflow-auto" style="overflow-y: auto; max-height: calc(100vh - 300px); border: #cbd5e1 1px Solid;">
                         <input type="hidden" name="pdtName" value="{{ $pdt->pdtNamePt }}">
 
                         @csrf
@@ -156,6 +157,7 @@
                             </tbody>
                             @endforeach
                         </table>
+                        </div>
 
                         <div class="my-6 text-end">
                             <a href="/dashboard">
