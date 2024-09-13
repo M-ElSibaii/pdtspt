@@ -1,6 +1,6 @@
 <x-app-layout>
     <div style="background-color: white;">
-        <div class="container sm:max-w-full py-9">
+        <div class="container sm:max-w-full py-4">
             <h3>{{ __("Modelo de Dados do Produto baseado na EN ISO 23387") }}</h3>
             <div>
                 <div class="flex flex-row">
