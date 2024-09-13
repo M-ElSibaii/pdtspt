@@ -100,7 +100,39 @@
                         </tr>
                         <tr>
                             <th>Relação com outros dicionários de dados</th>
-                            <td>{{$propdd->relationToOtherDataDictionaries}}</td>
+                            <td>{{$propdd->relationToOtherDataDictionaries}}
+                                {{-- Check if the relationToOtherDataDictionaries attribute exists and is not null --}}
+                                @if(!is_null($propdd->relationToOtherDataDictionaries))
+                                @php
+                                // Remove parentheses and split by ',' to get individual elements
+                                $relations = explode('),(', trim($propdd->relationToOtherDataDictionaries, '()'));
+
+                                // Initialize variables for storing URLs
+                                $propertyUrl = null;
+                                $domainUrl = null;
+
+                                // Iterate through each relation to check for bsdd.buildingsmart.org
+                                foreach ($relations as $relation) {
+                                // Split each relation into property URL and domain URL
+                                $parts = explode(', ', $relation);
+
+                                // If the second part (domain URL) matches bsdd.buildingsmart.org, store the property URL
+                                if (isset($parts[1]) && trim($parts[1]) === 'bsdd.buildingsmart.org') {
+                                $propertyUrl = trim($parts[0]); // Store the property URL
+                                $domainUrl = trim($parts[1]); // Store the domain URL
+                                break; // Stop the loop once we find the correct domain
+                                }
+                                }
+                                @endphp
+
+                                {{-- Only show the logo if the domain matches --}}
+                                @if($domainUrl === 'bsdd.buildingsmart.org')
+                                <a href="{{ $propertyUrl }}" target="_blank">
+                                    <img src="{{ asset('img/IFC.png') }}" alt="IFC Logo" style="width:20px; height:auto; margin-left:10px;">
+                                </a>
+                                @endif
+                                @endif
+                            </td>
                         </tr>
                         <tr>
                             <th>Língua dos criadores</th>

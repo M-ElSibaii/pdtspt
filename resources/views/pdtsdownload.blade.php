@@ -32,9 +32,7 @@
                         </x-secondary-button>
                     </div>
                 </div>
-                <div class="overflow-scroll" style="
-                overflow: scroll;
-            ">
+                <div class="overflow-auto" style="overflow-y: auto; max-height: calc(100vh - 300px);">
                     <table class="table-auto" id="tblpdts" cellpadding="0" cellspacing="0">
                         <tr>
                             <th>Propriedade</th>
