@@ -1,20 +1,21 @@
 <x-app-layout>
     <div style="background-color: white;">
         <div class="container sm:max-w-full py-9">
-            <h1>Atributos de grupo de propriedades no dicionário de dados baseado em EN ISO 23386</h1>
-            <div class='py-6'>
-                <div class=''>
-                    {{-- <h1>{{$gopdd->gopNamePt}} </h1> --}}
-                    <div class="flex-none inline">
-                        <h1 class="flex-none inline">{{ $gopdd->gopNamePt }}</h1>
-                        <p class="flex-none inline"> - V{{ $gopdd->versionNumber }}.{{ $gopdd->revisionNumber }}</p>
-                        @if($gopdd->status == 'Active')
-                        <span class="status-tag status-tag-active">Ativa</span>
-                        @else
-                        <span class="status-tag status-tag-inactive">Inativa</span>
-                        @endif
-                    </div>
+            <div class=''>
+                {{-- <h1>{{$gopdd->gopNamePt}} </h1> --}}
+                <div class="flex-none inline">
+                    <h1 class="flex-none inline">{{ $gopdd->gopNamePt }}</h1>
+                    <p class="flex-none inline"> - V{{ $gopdd->versionNumber }}.{{ $gopdd->revisionNumber }}</p>
+                    @if($gopdd->status == 'Active')
+                    <span class="status-tag status-tag-active">Ativa</span>
+                    @else
+                    <span class="status-tag status-tag-inactive">Inativa</span>
+                    @endif
                 </div>
+            </div>
+            <div class='py-2'>
+                <h3 class='py-2'>Atributos de grupo de propriedades no dicionário de dados baseado em EN ISO 23386</h3>
+                
                 <table id='tblprop' cellpadding='0' cellspacing='0'>
                     <tbody>
                         <tr>
@@ -71,7 +72,7 @@
                         </tr>
                         <tr>
                             <th>Lista de grupo de propriedades substituídas</th>
-                            <td>
+                            <td style="display: flex; border: none;">
                                 @php
                                 $latestVersion = null;
                                 $latestVersionNumber = null;
@@ -90,7 +91,7 @@
                                         @endforeach
                                         @if ($latestVersion)
                                         <form class="mb-3" action="{{ url('datadictionaryviewGOP/' . $latestVersion->Id . '-' . $latestVersion->GUID) }}">
-                                            <button class="btn btn-link" type="submit">{{ $latestVersion->versionNumber}}.{{$latestVersion->revisionNumber}}, </button>
+                                            <button class="btn-link" type="submit" style="margin-right: 5px;" >{{ $latestVersion->versionNumber}}.{{$latestVersion->revisionNumber}}, </button>
                                         </form>
                                         @endif
 
@@ -98,7 +99,7 @@
                         </tr>
                         <tr>
                             <th>Lista de grupo de propriedades de substituição</th>
-                            <td>
+                            <td style="display: flex; border: none;">
                                 @php
                                 $latestVersion = null;
                                 $latestVersionNumber = null;
@@ -117,7 +118,7 @@
                                 @endforeach
                                 @if ($latestVersion)
                                 <form class="mb-3" action="{{ url('datadictionaryviewGOP/' . $latestVersion->Id . '-' . $latestVersion->GUID) }}">
-                                    <button class="btn btn-link" type="submit">{{ $latestVersion->versionNumber}}.{{$latestVersion->revisionNumber}}, </button>
+                                    <button class="btn-link" type="submit" style="margin-right: 5px;" >{{ $latestVersion->versionNumber}}.{{$latestVersion->revisionNumber}}, </button>
                                 </form>
                                 @endif
 
@@ -163,7 +164,7 @@
                         </tr>
                     </tbody>
                 </table>
-                <div class='flex py-6'>
+                <div class='flex py-2'>
                     <h4><strong>Grupo de Propriedades presente em:</strong></h4>
                 </div>
                 <table id='tblprop' cellpadding='0' cellspacing='0'>
