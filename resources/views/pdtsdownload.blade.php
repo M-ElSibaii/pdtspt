@@ -1,10 +1,10 @@
 <x-app-layout>
     <div style="background-color: white;">
         <div class="container sm:max-w-full py-9">
-            <h1>{{ __("Modelo de Dados do Produto baseado na EN ISO 23387") }}</h1>
-            <div class="py-9">
+            <h3>{{ __("Modelo de Dados do Produto baseado na EN ISO 23387") }}</h3>
+            <div>
                 <div class="flex flex-row">
-                    <div class="grow block">
+                    <div class="grow block py-2">
                         <div class="flex-none inline">
                             <h1 class="flex-none inline">{{ $pdt->pdtNamePt }}</h1>
                             <p class="flex-none inline"> - V{{ $pdt-> editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}</p>
@@ -20,7 +20,7 @@
 
                         </div>
                     </div>
-                    <div class="flex flex-row gap-2 py-4">
+                    <div class="flex flex-row gap-2 py-2">
                         <x-secondary-button id="json" class="btn">
                             <i class="fa fa-download"></i>&nbsp;JSON
                         </x-secondary-button>
@@ -32,7 +32,7 @@
                         </x-secondary-button>
                     </div>
                 </div>
-                <div class="overflow-auto" style="overflow-y: auto; max-height: calc(100vh - 300px);">
+                <div class="overflow-auto" style="overflow-y: auto; max-height: calc(100vh - 300px); border: #cbd5e1 1px Solid;">
                     <table class="table-auto" id="tblpdts" cellpadding="0" cellspacing="0">
                         <tr>
                             <th>Propriedade</th>
@@ -134,16 +134,17 @@
                         </tbody>
                         @endforeach
                     </table>
-                    <div class="my-6 text-end">
+                    
+                </div>
+            </div>
+        </div>
+        <div class="my-6 text-end">
                         <a href="/dashboard">
                             <x-secondary-button id="backButton" type="button">
                                 Anterior
                             </x-secondary-button>
                         </a>
                     </div>
-                </div>
-            </div>
-        </div>
     </div>
     <table hidden id="tblpdtsh">
         <tr>
