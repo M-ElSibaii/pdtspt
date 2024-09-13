@@ -89,7 +89,7 @@
                                             {{-- Only show the logo if the domain matches --}}
                                             @if($domainUrl === 'bsdd.buildingsmart.org')
                                             <a href="{{ $propertyUrl }}" target="_blank">
-                                                <img src="{{ asset('img/IFC.png') }}" alt="IFC Logo" style="width:20px; height:auto; margin-left:10px;">
+                                                <img src="{{ asset('img/IFCBSDD.png') }}" alt="IFC Logo" style="width:40px; height:auto; margin-left:10px;">
                                             </a>
                                             @endif
                                             @endif

@@ -21,6 +21,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
 
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 
     {{-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
@@ -105,7 +106,7 @@
         }
 
         .expand:checked+label:before {
-            font-family: "Font Awesome 5 Free";
+            font-family: "Open Sans";
             content: "\f067";
             display: inline-block;
             font-weight: 800;
@@ -198,12 +199,7 @@
             margin-top: 10px;
         }
 
-        body {
 
-            font-family: 'Source Sans Pro', sans-serif;
-
-
-        }
 
 
         /* h1 {
@@ -331,7 +327,7 @@
         }
 
         #tblpdts {
-            font-family: 'Trebuchet MS', Arial, Helvetica, sans-serif;
+            font-family: 'Open Sans', Arial, Helvetica, sans-serif;
             border-collapse: collapse;
             width: 100%;
         }
@@ -376,7 +372,7 @@
 
 
         #tblprop {
-            font-family: 'Trebuchet MS', Arial, Helvetica, sans-serif;
+            font-family: 'Open Sans', Arial, Helvetica, sans-serif;
             border-collapse: collapse;
             width: 100%;
         }
@@ -419,6 +415,10 @@
             align-items: center;
             justify-content: center;
             text-align: center;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
         }
     </style>
     {{-- <link href="carousel.css" rel="stylesheet"> --}}

@@ -47,6 +47,11 @@
                             <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/ecp.png" alt="">
                         </a>
                     </div>
+                    <div class="content-center">
+                        <a class="content-center" href="https://r2utechnologies.pt/" target="_blank" rel="noopener noreferrer">
+                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/r2u.png" alt="">
+                        </a>
+                    </div>
                 </div>
             </div>
             <div class="py-10">
@@ -85,6 +90,11 @@
                     <div class="content-center">
                         <a class="content-center" href="https://www.mitportugal.org/" target="_blank" rel="noopener noreferrer">
                             <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/mitportugal.png" alt="">
+                        </a>
+                    </div>
+                    <div class="content-center">
+                        <a class="content-center" href="https://recuperarportugal.gov.pt/" target="_blank" rel="noopener noreferrer">
+                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/prr.png" alt="">
                         </a>
                     </div>
                 </div>
