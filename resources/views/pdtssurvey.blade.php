@@ -34,7 +34,7 @@
 
                         @csrf
                         <table class="table-auto" id="tblpdts" cellpadding="0" cellspacing="0">
-
+                            <thead class="sticky top-0 z-50">
                             <tr>
                                 <th>Propriedade</th>
                                 <th>Unidade</th>
@@ -43,12 +43,12 @@
                                 <th>Questão</th>
                                 <th>Comentários</th>
                             </tr>
-
+                            </thead>
 
 
                             @foreach($gop as $group)
                             <tbody>
-                                <tr>
+                                <tr class="sticky top-[88px] z-50">
                                     <td class="text-left content-start bg-slate-300 p-3" colspan="6">
                                         <input class="text-left expand" type="checkbox" name="{{ $group->gopNamePt }}" id="{{ $group->gopNamePt }}" data-toggle="toggle">
                                         <label class="my-auto text-left cursor-pointer" for="{{ $group->gopNamePt }}">Grupo de propriedades - <a href="{{ url('datadictionaryviewGOP/' . $group->Id . '-' . $group->GUID) }}">

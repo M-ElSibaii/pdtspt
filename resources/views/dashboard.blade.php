@@ -11,7 +11,7 @@
                     <col style="width: 15%">
                     <col style="width: 15%">
                 </colgroup>
-                <thead class="border-b font-medium dark:border-neutral-500">
+                <thead class="sticky top-0 z-50 border-b bg-white font-medium dark:border-neutral-500">
                     <tr>
                         <th scope="col" class="px-6 py-4">Imagem</th>
                         <th scope="col" class="px-6 py-4">Nome</th>
