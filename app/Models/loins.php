@@ -11,14 +11,18 @@ class loins extends Model
 
     protected $fillable = [
         'userId',
+        'projectId',
         'projectName',
         'objectName',
-        'name',
         'actorProviding',
         'actorRequesting',
         'pdtName',
-        'ifcElement',
-        'projectPhase',
+        'ifcClass',
+        'ifcClassName',
+        'ifcClassDescription',
+        'ifcClassPredefinedType',
+        'materialName',
+        'milestone',
         'purpose',
         'detail',
         'dimension',
@@ -31,4 +35,9 @@ class loins extends Model
         'classificationTable',
         'classificationCode',
     ];
+
+    public function project()
+    {
+        return $this->belongsTo(Projects::class);
+    }
 }

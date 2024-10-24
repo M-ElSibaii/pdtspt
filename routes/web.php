@@ -55,15 +55,25 @@ Route::get('/dashboard', [ProductdatatemplatesController::class, 'getLatestPDTs'
 
 Route::get('/pdtsdownload/{pdtID}', [GroupofpropertiesController::class, 'getGroupOfProperties'])->middleware(['auth', 'verified'])->name('pdtsdownload');
 
+Route::get('/loinproject', [LoinsController::class, 'projectsindex'])->name('loinproject');
+Route::get('/loinproject/create', [LoinsController::class, 'projectscreate'])->name('projectscreate');
+Route::post('/loinproject/store', [LoinsController::class, 'projectsstore'])->name('projectsstore');
+Route::delete('/loinproject/{project}', [LoinsController::class, 'destroyproject'])->name('projectsdestroy');
+Route::delete('/loinattributes/{project}/{type}/{id}', [LoinsController::class, 'destroyattribute'])->name('loinsattributedestroy');
+Route::get('/loinattributes/{project}', [LoinsController::class, 'loinattributes'])->name('loinattributes');
+Route::post('/loinattributes/{project}', [LoinsController::class, 'loinattributesstore'])->name('loinattributesstore');
+Route::get('/loincreate1/{project}', [LoinsController::class, 'createLoin'])->name('loincreate1');
 
-Route::post('/loin1/store', [LoinsController::class, 'store'])->middleware(['auth', 'verified'])->name('loin.store');
-Route::get('/loin', [LoinsController::class, 'dataforloin'])->middleware(['auth', 'verified'])->name('loin');
-Route::match(['get', 'post'], '/loin1',  [LoinsController::class, 'dataforloin1'])->middleware(['auth', 'verified'])->name('loin1');
+Route::post('/loincreate2/store', [LoinsController::class, 'createLoin2store'])->middleware(['auth', 'verified'])->name('createLoin2store');
+Route::match(['get', 'post'], '/createLoin2',  [LoinsController::class, 'createloin2'])->middleware(['auth', 'verified'])->name('loincreate2');
+
 Route::get('/loinView/{loinId}', [LoinsController::class, 'loinInstance'])->middleware(['auth', 'verified'])->name('loinView');
 Route::delete('/loinDelete/{loinId}', [LoinsController::class, 'destroyLoin'])->middleware(['auth', 'verified'])->name('loinDelete');
-Route::get('/loinViewProject/{projectName}', [LoinsController::class, 'showLoinsByProject'])->middleware(['auth', 'verified'])->name('loinViewProject');
+Route::get('/loinViewProject/{projectId}', [LoinsController::class, 'showLoinsByProject'])->middleware(['auth', 'verified'])->name('loinViewProject');
+
 Route::get('/loinDownloadJSON/{id}', [LoinsController::class, 'downloadJSON'])->middleware(['auth', 'verified'])->name('loinDownloadJSON');
 Route::get('/loinDownloadExcel/{id}/{objectName}', [LoinsController::class, 'downloadExcel'])->middleware(['auth', 'verified'])->name('loinDownloadExcel');
+
 Route::get('/projectLoinsExcel/{projectName}', [LoinsController::class, 'exportProjectLoinsExcel'])->name('exportProjectLoinsExcel');
 Route::get('/projectLoinsJson/{projectName}', [LoinsController::class, 'exportProjectLoinsJson'])->name('exportProjectLoinsJson');
 

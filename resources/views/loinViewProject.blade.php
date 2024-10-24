@@ -1,13 +1,13 @@
 <x-app-layout>
     <div style="background-color: white;">
         <div class="container sm:max-w-full py-9">
-            <h1>{{ __('Níveis de Necessidade de Informação para o Projeto: ') }}{{ $projectName }}</h1>
+            <h1>{{ __('Níveis de Necessidade de Informação para o Projeto: ') }}{{ $project->projectName }}</h1>
             <div class='py-6'>
                 <div class="flex flex-row gap-2 py-4">
-                    <a href="{{ route('exportProjectLoinsJson', $projectName) }}" class="btn btn-secondary" style="color: black;">
+                    <a href="{{ route('exportProjectLoinsJson', $project) }}" class="btn btn-secondary" style="color: black;">
                         <i class="fa fa-download"></i>&nbsp; Download todos os LOINs (JSON)
                     </a>
-                    <a href="{{ route('exportProjectLoinsExcel', $projectName) }}" class="btn btn-secondary" style="color: black;">
+                    <a href="{{ route('exportProjectLoinsExcel', $project) }}" class="btn btn-secondary" style="color: black;">
                         <i class="fa fa-download"></i>&nbsp; Download todos os LOINs (CSV/XLS)
                     </a>
                 </div>
@@ -31,9 +31,9 @@
                             <td>{{ $loin->purpose }}</td>
                             <td>{{ $loin->actorProviding }}</td>
                             <td>{{ $loin->actorRequesting }}</td>
-                            <td>{{ $loin->projectPhase }}</td>
+                            <td>{{ $loin->milestone }}</td>
                             <td>
-                                <a href="{{ route('loinView', $loin->id) }}" class="btn btn-secondary">{{ __('Ver/Download/Apagar') }}</a>
+                                <a href="{{ route('loinView', $loin->id) }}" class="btn btn-secondary">{{ __('Ver/Descarregar/Apagar') }}</a>
                             </td>
                         </tr>
                         @endforeach
