@@ -1,7 +1,7 @@
 <x-app-layout>
+
     <div class="container sm:max-w-full py-9">
         <h1>{{ __('Criar Nível de Necessidade de Informação') }}</h1>
-
         <!-- Display Existing LOIN Fields -->
         <div class="summary-section mb-4">
             <h2>{{ __('Attributos') }}</h2>
@@ -13,7 +13,7 @@
                     <p><strong>{{ __('Actor Fornecedor:') }}</strong> {{ $atorFornecedor }}</p>
                 </div>
                 <div class="col-md-4">
-                    <p><strong>{{ __('PDT Nome:') }}</strong>{{ $pdts ? $pdts->pdtNameEn : ' n/a' }}</p>
+                    <p><strong>{{ __('phase:') }}</strong> {{ $phase}}</p>
                 </div>
             </div>
             <div class="row">
@@ -24,16 +24,7 @@
                     <p><strong>{{ __('Actor Requerente:') }}</strong> {{ $atorRequerente }}</p>
                 </div>
                 <div class="col-md-4">
-                    <p><strong>{{ __('IFC Class:') }}</strong> {{ $ifcClass }}</p>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-4">
                     <p><strong>{{ __('Proposito:') }}</strong> {{ $proposito }}</p>
-                </div>
-                <div class="col-md-4">
-                    <p><strong>{{ __('phase:') }}</strong> {{ $phase}}</p>
                 </div>
             </div>
         </div>
@@ -179,38 +170,26 @@
 
                     <div id="alphanumerical" class="tabcontent">
                         <!-- Alphanumeric Information -->
-                        <div class="text-center">
-                            <h2>{{ __('Attributos') }}</h2>
-                        </div>
-                        <br>
 
-                        <div class="row">
-                            <div class="col-md-4">
-                                <strong>{{ __('Sistema de classificação:') }}</strong>
-                                <p>{{ $sistemaClassificacao }}</p>
-                            </div>
-                            <div class="col-md-4">
-                                <strong>{{ __('Tabela de classificação:') }}</strong>
-                                <p>{{ $tabelaClassificacao }}</p>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="codigoClassificacao"><strong>{{ __('codigoClassificacao') }}</strong></label>
-                                <select name="codigoClassificacao" id="codigoClassificacao" class="form-control" required>
-                                    <option value="Requerido">Requerido</option>
-                                    <option value="Não requerido">Não requerido</option>
-                                </select>
-                            </div>
+                        <div class="text-center">
+                            <h2>{{ __('Definições do objeto') }}</h2>
                         </div>
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
+                                <label for="ifcClassName"><strong>{{ __('IFC Class:') }}</strong></label>
+                                <p>{{ $ifcClass }}</p>
+                            </div>
+                            <div class="col-md-6">
                                 <label for="ifcClassName"><strong>{{ __('Nome da Classe IFC:') }}</strong></label>
                                 <select name="ifcClassName" id="ifcClassName" class="form-control">
                                     <option value="Requerido">Requerido</option>
                                     <option value="Não requerido" selected>Não requerido</option> <!-- Default to Não requerido -->
                                 </select>
                             </div>
+                        </div>
+                        <div class="row">
 
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <label for="ifcClassDescription"><strong>{{ __('Descrição da Classe IFC:') }}</strong></label>
                                 <select name="ifcClassDescription" id="ifcClassDescription" class="form-control">
                                     <option value="Requerido">Requerido</option>
@@ -225,19 +204,49 @@
                                     <option value="Não requerido" selected>Não requerido</option> <!-- Default to Não requerido -->
                                 </select>
                             </div>
-
                         </div>
+                        <div id="all-properties" data-properties='@json(session("allProperties"))'></div>
 
-                        <div>
-                            <label for="materialName"><strong>{{ __('Nome do IfcMaterial:') }}</strong></label>
-                            <select name="materialName" id="materialName" class="form-control" required>
-                                <option value="Requerido">Requerido</option>
-                                <option value="Não requerido" selected>Não requerido</option> <!-- Default to Não requerido -->
-                            </select>
-                        </div>
+
                         <br>
                         <div class="text-center">
-                            <h2>{{ __('Propriedades') }}</h2>
+                            <h2>{{ __('Grupos de Propriedades') }}</h2>
+                        </div>
+                        <br>
+                        <div class="text-center mb-2">
+                            <h4>{{ __('Procurar e adicionar propriedades a partir da lista ou adicionar novas propriedades manualmente') }}</h4>
+                        </div>
+                        <br>
+                        <div class="input-container" style="width: 100%; position: relative;">
+                            <input type="text" style="width: 100%; position: relative;" id="property_search_input" placeholder="Procurar propriedades">
+                            <div id="property_search_dropdown" style="display: none; position: absolute; background: white; border: 1px solid #e0e0e0; max-height: 200px; overflow-y: auto; width: 100%;">
+                                <!-- Search results will be appended here -->
+                            </div>
+                        </div>
+
+                        <!-- Table for Properties -->
+                        <div class="table-container mt-3">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>{{ __('Propriedades') }}</th>
+                                        <th>{{ __('Grupos de propriedades') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="properties_table_body">
+                                    <!-- Properties and groups will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Input and Button for Adding Properties -->
+                        <div class="input-container">
+                            <input type="text" id="property_input" placeholder="{{ __('Enter Property') }}" style="margin-right: 130px">
+                            <input type="text" id="group_input" placeholder="{{ __('Enter Group of Properties') }}" style="margin-right: 25px">
+                            <button type="button" id="add_property_button" class="btn btn-secondary">{{ __('Adicionar propriedade manualmente') }}</button>
+
+                            <!-- Hidden input to store properties with source information -->
+                            <input type="hidden" name="manual_properties" id="manual_properties">
                         </div>
                         <br>
                         <!-- IFC Properties -->
@@ -284,6 +293,13 @@
                             @endforeach
 
                         </div>
+
+                        @php
+                        // Create an array of IFC property names for comparison
+                        $ifcPropertyNames = array_column($ifcProperties, 'propertyName');
+                        @endphp
+
+
                         <!-- PDT Properties -->
                         @if($pdts)
                         <div class="container mt-3" id="pdt_properties_container">
@@ -299,26 +315,32 @@
                             <div class="gop-group" style="border: 1px solid #e0e0e0; border-radius: 5px; padding: 5px; background-color: #f9f9f9;">
                                 <div class="d-flex align-items-center">
                                     <div class="gop-header d-flex align-items-center" style="cursor: pointer;" onclick="toggleProperties('pdtproperties-{{ $gop->Id }}')">
-                                        <span class="clickable-indicator">▼</span> <!-- Clickable indicator -->
-                                        <h4 class="mr-2 mb-0">{{ $gop->gopNameEn }}</h4> <!-- Remove bottom margin for alignment -->
+                                        <span class="clickable-indicator">▼</span>
+                                        <h4 class="mr-2 mb-0">{{ $gop->gopNameEn }}</h4>
                                     </div>
                                     <button type="button" class="btn btn-sm btn-link select-all" data-gop="{{ $gop->Id }}" data-state="select">Select All</button>
                                 </div>
 
-                                <!-- Scrollable container for properties -->
-                                <div class="scrollable-container" id="pdtproperties-{{ $gop->Id }}" style="display: none;"> <!-- Ensure this id matches the toggle -->
+                                <div class="scrollable-container" id="pdtproperties-{{ $gop->Id }}" style="display: none;">
                                     @foreach($groupedProperties as $property)
                                     @php
-                                    $PDTPropertyName = $propertiesindd->firstWhere('Id', $property->propertyId)->nameEn ?? 'N/A';
-                                    $PDTPropertyDescription = $propertiesindd->firstWhere('Id', $property->propertyId)->definitionEn ?? 'N/A';
+                                    // Get the corresponding property details from propertiesindd
+                                    $PDTPropertyDetails = $propertiesindd->firstWhere('Id', $property->propertyId);
+
+                                    // Get the property name
+                                    $PDTPropertyName = $PDTPropertyDetails->nameEn ?? 'N/A';
+
+                                    // Check if the property name is in the array of IFC property names
+                                    if (in_array($PDTPropertyName, $ifcPropertyNames)) {
+                                    continue; // Skip this property if it matches an IFC property name
+                                    }
                                     @endphp
                                     <div class="property-item" style="display: flex; align-items: center; margin-bottom: 5px;">
                                         <input type="checkbox" name="selected_pdt_properties[]" value="{{ $PDTPropertyName }},{{ $gop->gopNameEn }}" id="pdt_property_{{ $loop->parent->index }}_{{ $loop->index }}" data-gop="{{ $gop->Id }}" style="margin-right: 10px;">
                                         <label for="pdt_property_{{ $loop->parent->index }}_{{ $loop->index }}" style="cursor: pointer; display: flex; align-items: center;">
-                                            <span class="property-description" title="{{ $PDTPropertyDescription }}" style="margin-right: 5px;">{{ $PDTPropertyName }}</span>
+                                            <span class="property-description" title="{{ $PDTPropertyDetails->definitionEn ?? 'N/A' }}" style="margin-right: 5px;">{{ $PDTPropertyName }}</span>
                                         </label>
                                     </div>
-
                                     @endforeach
                                 </div>
                             </div>
@@ -326,6 +348,9 @@
                             @endforeach
                         </div>
                         @endif
+
+
+
 
 
                         <!-- Master PDT Properties -->
@@ -340,29 +365,35 @@
                             $groupedProperties = $MasterProperties->where('gopID', $gop->Id);
                             @endphp
                             @if($groupedProperties->count() > 0)
-                            <div class="gop-group" class="container mt-3" style="border: 1px solid #e0e0e0; border-radius: 5px; padding: 5px; background-color: #f9f9f9;">
+                            <div class="gop-group" style="border: 1px solid #e0e0e0; border-radius: 5px; padding: 5px; background-color: #f9f9f9;">
                                 <div class="d-flex align-items-center">
                                     <div class="gop-header d-flex align-items-center" style="cursor: pointer;" onclick="toggleProperties('master_properties_group_{{ $gop->Id }}')">
-                                        <span class="clickable-indicator">▼</span> <!-- Clickable indicator -->
-                                        <h4 class="mr-2 mb-0">{{ $gop->gopNameEn }}</h4> <!-- Remove bottom margin for alignment -->
+                                        <span class="clickable-indicator">▼</span>
+                                        <h4 class="mr-2 mb-0">{{ $gop->gopNameEn }}</h4>
                                     </div>
                                     <button type="button" class="btn btn-sm btn-link select-all" data-gop="{{ $gop->Id }}" data-state="select">Select All</button>
                                 </div>
 
-                                <!-- Scrollable container for properties -->
-                                <div class="scrollable-container" id="master_properties_group_{{ $gop->Id }}" style="display: none;"> <!-- Initially hidden -->
+                                <div class="scrollable-container" id="master_properties_group_{{ $gop->Id }}" style="display: none;">
                                     @foreach($groupedProperties as $property)
                                     @php
-                                    $PDTPropertyName = $propertiesindd->firstWhere('Id', $property->propertyId)->nameEn ?? 'N/A';
-                                    $PDTPropertyDescription = $propertiesindd->firstWhere('Id', $property->propertyId)->definitionEn ?? 'N/A';
+                                    // Get the corresponding property details from propertiesindd
+                                    $PDTPropertyDetails = $propertiesindd->firstWhere('Id', $property->propertyId);
+
+                                    // Get the property name
+                                    $PDTPropertyName = $PDTPropertyDetails->nameEn ?? 'N/A';
+
+                                    // Check if the property name is in the array of IFC property names
+                                    if (in_array($PDTPropertyName, $ifcPropertyNames)) {
+                                    continue; // Skip this property if it matches an IFC property name
+                                    }
                                     @endphp
                                     <div class="property-item" style="display: flex; align-items: center; margin-bottom: 5px;">
                                         <input type="checkbox" name="selected_master_pdt_properties[]" value="{{ $PDTPropertyName }},{{ $gop->gopNameEn }}" id="master_property_{{ $loop->parent->index }}_{{ $loop->index }}" data-gop="{{ $gop->Id }}" style="margin-right: 10px;">
                                         <label for="master_property_{{ $loop->parent->index }}_{{ $loop->index }}" style="cursor: pointer; display: flex; align-items: center;">
-                                            <span class="property-description" title="{{ $PDTPropertyDescription }}" style="margin-right: 5px;">{{ $PDTPropertyName }}</span>
+                                            <span class="property-description" title="{{ $PDTPropertyDetails->definitionEn ?? 'N/A' }}" style="margin-right: 5px;">{{ $PDTPropertyName }}</span>
                                         </label>
                                     </div>
-
                                     @endforeach
                                 </div>
                             </div>
@@ -370,31 +401,40 @@
                             @endforeach
                         </div>
 
-                        <!-- Table for Properties -->
-                        <div class="table-container mt-3">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>{{ __('Propriedades') }}</th>
-                                        <th>{{ __('Grupos de propriedades') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="properties_table_body">
-                                    <!-- Properties and groups will be populated here -->
-                                </tbody>
-                            </table>
+                        <br>
+                        <div class="text-center">
+                            <h2>{{ __('Materiais') }}</h2>
                         </div>
-
-                        <!-- Input and Button for Adding Properties -->
-                        <div class="input-container">
-                            <input type="text" id="property_input" placeholder="{{ __('Enter Property') }}" style="margin-right: 130px">
-                            <input type="text" id="group_input" placeholder="{{ __('Enter Group of Properties') }}" style="margin-right: 25px">
-                            <button type="button" id="add_property_button" class="btn btn-secondary">{{ __('Adicionar propriedade manualmente') }}</button>
-
-                            <!-- Hidden input to store properties with source information -->
-                            <input type="hidden" name="manual_properties" id="manual_properties">
+                        <div>
+                            <label for="materialName"><strong>{{ __('Nome do IfcMaterial:') }}</strong></label>
+                            <select name="materialName" id="materialName" class="form-control" required>
+                                <option value="Requerido">Requerido</option>
+                                <option value="Não requerido" selected>Não requerido</option> <!-- Default to Não requerido -->
+                            </select>
                         </div>
+                        <br>
+                        <div class="text-center">
+                            <h2>{{ __('Classificação') }}</h2>
+                        </div>
+                        <br>
 
+                        <div class="row">
+                            <div class="col-md-4">
+                                <strong>{{ __('Sistema de classificação:') }}</strong>
+                                <p>{{ $sistemaClassificacao }}</p>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>{{ __('Tabela de classificação:') }}</strong>
+                                <p>{{ $tabelaClassificacao }}</p>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="codigoClassificacao"><strong>{{ __('codigoClassificacao') }}</strong></label>
+                                <select name="codigoClassificacao" id="codigoClassificacao" class="form-control" required>
+                                    <option value="Requerido">Requerido</option>
+                                    <option value="Não requerido">Não requerido</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- Submit Button -->
@@ -439,8 +479,82 @@
     <p>{{ __('Não foram encontradas entradas para Níveis de Necessidade de Informação.') }}</p>
     @endif
 
+
     <!-- JavaScript -->
     <script>
+        const allProperties = JSON.parse(document.getElementById('all-properties').getAttribute('data-properties'));
+
+        document.getElementById('property_search_input').addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            const dropdown = document.getElementById('property_search_dropdown');
+            dropdown.innerHTML = ''; // Clear previous results
+
+            if (query.length === 0) {
+                dropdown.style.display = 'none'; // Hide dropdown if input is empty
+                return; // Exit early if there is no query
+            }
+
+            const searchResults = allProperties.filter(property =>
+                property.name.toLowerCase().includes(query)
+            );
+
+            if (searchResults.length > 0) {
+                dropdown.style.display = 'block';
+                searchResults.forEach(property => {
+                    const resultItem = document.createElement('div');
+                    resultItem.classList.add('dropdown-item');
+                    resultItem.textContent = `${property.name} (${property.group})`; // Show group next to name
+
+                    // Show the description on hover
+                    resultItem.title = property.description; // Using title attribute for tooltip effect
+
+                    resultItem.addEventListener('click', function() {
+                        addPropertyToTable(property);
+                        dropdown.style.display = 'none';
+                    });
+                    dropdown.appendChild(resultItem);
+                });
+            } else {
+                dropdown.style.display = 'none'; // Hide dropdown if no results found
+            }
+        });
+
+        function addPropertyToTable(property) {
+            const tableBody = document.getElementById('properties_table_body');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+            <td>${property.name}</td>
+            <td>${property.group}</td>
+        `;
+            tableBody.appendChild(row);
+        }
+
+
+        // Function to add selected property to the table and hidden input
+        function addSelectedProperty(property, group) {
+            // Update manualProperties array
+            manualProperties.push({
+                property: property,
+                group: group
+            });
+
+            // Update hidden input
+            document.getElementById('manual_properties').value = JSON.stringify(manualProperties);
+
+            // Append new row to the properties table
+            const tableBody = document.getElementById('properties_table_body');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `<td>${property}</td><td>${group}</td>`;
+            tableBody.appendChild(newRow);
+        }
+
+        // Close dropdown if clicking outside
+        document.addEventListener('click', function(e) {
+            if (!propertySearchInput.contains(e.target) && !propertySearchDropdown.contains(e.target)) {
+                propertySearchDropdown.style.display = 'none';
+            }
+        });
+
         //toggle visibility of gops
 
         function toggleProperties(containerId) {
@@ -538,9 +652,9 @@
             document.getElementById('property_input').value = '';
             document.getElementById('group_input').value = '';
         });
-    </script>
-    <!-- Add Documents Script -->
-    <script>
+
+        // Add Documents Script
+
         const documents = [];
         document.getElementById('add_document_button').addEventListener('click', function() {
             const docName = document.getElementById('document_input').value;
@@ -566,10 +680,10 @@
                 document.getElementById('format_input').value = '';
             }
         });
-    </script>
 
-    <!-- Group Checkbox Script -->
-    <script>
+
+        // Group Checkbox Script 
+
         document.querySelectorAll('.property-group-checkbox').forEach(function(groupCheckbox) {
             groupCheckbox.addEventListener('change', function() {
                 const groupId = this.getAttribute('data-group-id');

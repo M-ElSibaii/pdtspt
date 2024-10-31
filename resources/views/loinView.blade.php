@@ -26,10 +26,6 @@
                             <td>{{$loindata->pdtName}}</td>
                         </tr>
                         <tr>
-                            <th>IFC Class</th>
-                            <td>{{$loindata->ifcElement}}</td>
-                        </tr>
-                        <tr>
                             <th>Ator Fornecedor</th>
                             <td>{{$loindata->actorProviding}}</td>
                         </tr>
@@ -41,7 +37,7 @@
 
                         <tr>
                             <th>Fase de Projeto</th>
-                            <td>{{$loindata->projectPhase}}</td>
+                            <td>{{$loindata->milestone}}</td>
                         </tr>
                         <tr>
                             <th>Propósito</th>
@@ -50,7 +46,7 @@
 
                         <!-- Add Geometrical Properties Section Header -->
                         <tr style="background-color: #f0f0f0; font-weight: bold;">
-                            <th colspan="2" style="font-weight: bold;text-align: center;">Geometrical Properties</th>
+                            <th colspan="2" style="font-weight: bold;text-align: center;">Geometrical data</th>
                         </tr>
                         <tr>
                             <th>Detalhe</th>
@@ -75,13 +71,21 @@
 
                         <!-- Add Alphanumerical Properties Section Header -->
                         <tr style="background-color: #f0f0f0; ">
-                            <th colspan="2" style="font-weight: bold;text-align: center;">Alphanumerical Properties</th>
+                            <th colspan="2" style="font-weight: bold;text-align: center;">Alphanumerical data</th>
                         </tr>
                         <tr>
-                        <tr>
-                            <th>Nome</th>
-                            <td>{{$loindata->name}}</td>
+                            <th>IFC Class Name</th>
+                            <td>{{$loindata->ifcClassName}}</td>
                         </tr>
+                        <tr>
+                            <th>IFC Class Description</th>
+                            <td>{{$loindata->ifcClassDescription}}</td>
+                        </tr>
+                        <tr>
+                            <th>IFC Class PredefinedType</th>
+                            <td>{{$loindata->ifcClassPredefinedType}}</td>
+                        </tr>
+
                         <tr>
                             <th>Sistema de classificação</th>
                             <td>{{$loindata->classificationSystem}}</td>
@@ -93,6 +97,10 @@
                         <tr>
                             <th>Código de classificação</th>
                             <td>{{$loindata->classificationCode}}</td>
+                        </tr>
+                        <tr>
+                            <th>IfcMaterial Name</th>
+                            <td>{{$loindata->materialName}}</td>
                         </tr>
                         <tr>
                             <th>Propriedades</th>
@@ -121,21 +129,52 @@
                             </td>
                         </tr>
                         <tr>
-                            <th style="background-color: #f0f0f0; ">Documentação</th>
-                            <td>{{$loindata->documentation}}</td>
+                        <tr style="background-color: #f0f0f0; ">
+                            <th colspan="2" style="font-weight: bold;text-align: center;">Documentacao</th>
                         </tr>
-                    </tbody>
-                </table>
+                        <table class="table table-bordered" style="border: 1px solid black;">
 
-                <div class="mt-4">
-                    <form action="{{ route('loinDelete', $loindata->id) }}" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger" style="color: black;">
-                            {{ __('Delete LOIN') }}
-                        </button>
-                    </form>
-                </div>
+                            @php
+                            // Decode the JSON document field
+                            $documents = json_decode($loindata->documentation, true);
+                            @endphp
+
+                            @if (is_array($documents))
+                            <!-- If documents is an array, display the table -->
+                            <thead>
+                                <tr style="border: 1px solid black;">
+                                    <th style="text-align: left;background-color: #f0f0f0;">{{ ('Document') }}</th>
+                                    <th style="text-align: left;background-color: #f0f0f0;">{{ ('Format') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($documents as $document)
+
+                                <tr style="border: 1px solid black;">
+                                    <td>{{ $document['document'] }}</td>
+                                    <td>{{ $document['format'] }}</td>
+                                </tr>
+                                @endforeach
+                                @else
+                                <!-- If documents is not an array, just show the string "Não requerido" -->
+                                <tr>
+                                    <td>{{ $loindata->documentation }}</td>
+                                </tr>
+                                @endif
+
+                            </tbody>
+
+                        </table>
+
+                        <div class="mt-4">
+                            <form action="{{ route('loinDelete', $loindata->id) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger" style="color: black;">
+                                    {{ __('Delete LOIN') }}
+                                </button>
+                            </form>
+                        </div>
             </div>
         </div>
     </div>

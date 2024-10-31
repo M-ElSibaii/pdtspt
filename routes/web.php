@@ -66,6 +66,7 @@ Route::get('/loincreate1/{project}', [LoinsController::class, 'createLoin'])->na
 
 Route::post('/loincreate2/store', [LoinsController::class, 'createLoin2store'])->middleware(['auth', 'verified'])->name('createLoin2store');
 Route::match(['get', 'post'], '/createLoin2',  [LoinsController::class, 'createloin2'])->middleware(['auth', 'verified'])->name('loincreate2');
+Route::get('/search-properties', [LoinsController::class, 'searchProperties'])->name('searchProperties');
 
 Route::get('/loinView/{loinId}', [LoinsController::class, 'loinInstance'])->middleware(['auth', 'verified'])->name('loinView');
 Route::delete('/loinDelete/{loinId}', [LoinsController::class, 'destroyLoin'])->middleware(['auth', 'verified'])->name('loinDelete');

@@ -289,7 +289,24 @@ class LoinsController extends Controller
         return view('loincreate1', compact('project', 'milestones', 'actors', 'purposes', 'objects', 'pdts', 'loins'));
     }
 
+    public function searchProperties(Request $request)
+    {
+        $query = $request->query('query');
 
+        // Retrieve all properties from the session
+        $allProperties = session('allProperties');
+
+        if (!$allProperties) {
+            return response()->json([]); // Return an empty array if no properties found
+        }
+
+        // Filter properties based on the query
+        $filteredProperties = collect($allProperties)->filter(function ($property) use ($query) {
+            return stripos($property['name'], $query) !== false; // Case-insensitive search
+        })->values(); // Reset the keys
+
+        return response()->json($filteredProperties);
+    }
     public function createloin2(Request $request)
     {
         // Retrieve selected options from the form
@@ -337,7 +354,48 @@ class LoinsController extends Controller
         $Mastergops = groupofproperties::where('pdtId', ($MasterDataTemplate->Id))->get();
         $MasterProperties = properties::where('pdtId', ($MasterDataTemplate->Id))->get();
 
+        $formattedMasterProperties = $MasterProperties->map(function ($property) {
+            // Fetch the name, description, and group separately
+            $propertyName = propertiesdatadictionaries::where('Id', $property->propertyId)->value('nameEn');
+            $propertyDescription = propertiesdatadictionaries::where('Id', $property->propertyId)->value('definitionEn');
+            $groupName = groupofproperties::where('Id', $property->gopID)->value('gopNameEn');
 
+            // Return standardized structure
+            return [
+                'name' => $propertyName ?? 'N/A',           // Ensure default if null
+                'description' => $propertyDescription ?? 'N/A',
+                'group' => $groupName ?? 'N/A'
+            ];
+        });
+
+        $formattedProperties = $properties->map(function ($property) {
+            // Fetch the name, description, and group separately
+            $propertyName = propertiesdatadictionaries::where('Id', $property->propertyId)->value('nameEn');
+            $propertyDescription = propertiesdatadictionaries::where('Id', $property->propertyId)->value('definitionEn');
+            $groupName = groupofproperties::where('Id', $property->gopID)->value('gopNameEn');
+
+            // Return standardized structure
+            return [
+                'name' => $propertyName ?? 'N/A',           // Ensure default if null
+                'description' => $propertyDescription ?? 'N/A',
+                'group' => $groupName ?? 'N/A'
+            ];
+        });
+
+        $formattedIfcProperties = collect($ifcProperties)->map(function ($property) {
+            return [
+                'name' => $property['propertyName'],
+                'description' => $property['propertyDescription'],
+                'group' => $property['propertySet']
+            ];
+        });
+        $allProperties = $formattedMasterProperties
+            ->merge($formattedProperties)
+            ->merge($formattedIfcProperties)
+            ->values(); // Ensures a continuous index
+
+        // Store allProperties in session for later use
+        session(['allProperties' => $allProperties]);
 
         // Return the view with the IFC properties and other necessary data (remove name, remove classification code.)
         return view('loincreate2', [
@@ -360,6 +418,7 @@ class LoinsController extends Controller
             'MasterDataTemplate' => $MasterDataTemplate,
             'Mastergops' => $Mastergops,
             'MasterProperties' => $MasterProperties,
+
             'loins' => $loins,
         ]);
     }
@@ -581,20 +640,20 @@ class LoinsController extends Controller
     public function downloadJSON($id)
     {
         $loin = Loins::findOrFail($id);
+        $documentation = json_decode($loin->documentation, true);
+        if (is_null($documentation)) {
+            $documentation = $loin->documentation; // Set as raw string if not valid JSON
+        }
 
         $jsonData = [
             'Nome de Projeto' => $loin->projectName,
             'Objeto' => $loin->objectName,
-            'IFC Class' => $loin->ifcClass,
             'PDT Nome' => $loin->pdtName,
             'Ator Fornecedor' => $loin->actorProviding,
             'Ator Requerente' => $loin->actorRequesting,
             'Fase de Projeto' => $loin->milestone,
             'Propósito' => $loin->purpose,
-            'Sistema de Classificação' => $loin->classificationSystem,
-            'Tabela de Classificação' => $loin->classificationTable,
-            'Código de Classificação' => $loin->classificationCode,
-            'Documentação' => $loin->documentation,
+            'Documentação' => $documentation,
             'Geometrical Data' => [
                 'Detalhe' => $loin->detail,
                 'Dimensão' => $loin->dimension,
@@ -603,9 +662,14 @@ class LoinsController extends Controller
                 'Comportamento Paramétrico' => $loin->parametricBehaviour,
             ],
             'Alphanumerical Data' => [
+                'IFC Class' => $loin->ifcClass,
                 'IFC class name' => $loin->ifcClassName,
                 'IFC class description' => $loin->ifcClassDescription,
                 'IFC class PredefinedType' => $loin->ifcClassPredefinedType,
+                'Sistema de Classificação' => $loin->classificationSystem,
+                'Tabela de Classificação' => $loin->classificationTable,
+                'Código de Classificação' => $loin->classificationCode,
+                'IfcMaterial Name' => $loin->materialName,
                 'Propriedades' => json_decode($loin->properties, true)
             ]
         ];
@@ -633,20 +697,23 @@ class LoinsController extends Controller
     {
         $loins = Loins::where('projectId', $project->id)->get();
 
+
+
         $jsonData = $loins->map(function ($loin) {
+            // Decode the documentation for each LOIN
+            $documentation = json_decode($loin->documentation, true);
+            if (is_null($documentation)) {
+                $documentation = $loin->documentation; // Set as raw string if not valid JSON
+            }
             return [
                 'Nome de Projeto' => $loin->projectName,
                 'Objeto' => $loin->objectName,
-                'IFC Class' => $loin->ifcClass,
                 'PDT Nome' => $loin->pdtName,
                 'Ator Fornecedor' => $loin->actorProviding,
                 'Ator Requerente' => $loin->actorRequesting,
                 'Fase de Projeto' => $loin->milestone,
                 'Propósito' => $loin->purpose,
-                'Sistema de Classificação' => $loin->classificationSystem,
-                'Tabela de Classificação' => $loin->classificationTable,
-                'Código de Classificação' => $loin->classificationCode,
-                'Documentação' => $loin->documentation,
+                'Documentação' => $documentation,
                 'Geometrical Data' => [
                     'Detalhe' => $loin->detail,
                     'Dimensão' => $loin->dimension,
@@ -655,9 +722,14 @@ class LoinsController extends Controller
                     'Comportamento Paramétrico' => $loin->parametricBehaviour,
                 ],
                 'Alphanumerical Data' => [
+                    'IFC Class' => $loin->ifcClass,
                     'IFC class name' => $loin->ifcClassName,
                     'IFC class description' => $loin->ifcClassDescription,
                     'IFC class PredefinedType' => $loin->ifcClassPredefinedType,
+                    'Sistema de Classificação' => $loin->classificationSystem,
+                    'Tabela de Classificação' => $loin->classificationTable,
+                    'Código de Classificação' => $loin->classificationCode,
+                    'IfcMaterial Name' => $loin->materialName,
                     'Propriedades' => json_decode($loin->properties, true)
                 ]
             ];
