@@ -203,6 +203,7 @@ class LoinsController extends Controller
 
     public function loinattributesstore(Request $request, $project)
     {
+
         // Filter out empty milestones, actors, purposes, and objects
         $milestones = array_filter($request->input('milestones', []), fn($value) => !is_null($value) && $value !== '');
         $actors = array_filter($request->input('actors', []), fn($value) => !is_null($value) && $value !== '');
@@ -213,54 +214,77 @@ class LoinsController extends Controller
         // Get the project ID from the request
         $project = Projects::find($project);
         $projectId = $project->id;
-        foreach ($milestones as $milestone) {
-            Milestones::create(['projectId' => $projectId, 'milestone' => $milestone]);
+
+        // Create entries only for non-empty attributes
+        if (!empty($milestones)) {
+            foreach ($milestones as $milestone) {
+                Milestones::create(['projectId' => $projectId, 'milestone' => $milestone]);
+            }
         }
 
-        foreach ($actors as $actor) {
-            Actors::create(['projectId' => $projectId, 'actor' => $actor]);
+        if (!empty($actors)) {
+            foreach ($actors as $actor) {
+                Actors::create(['projectId' => $projectId, 'actor' => $actor]);
+            }
         }
 
-        foreach ($purposes as $purpose) {
-            Purposes::create(['projectId' => $projectId, 'purpose' => $purpose]);
+        if (!empty($purposes)) {
+            foreach ($purposes as $purpose) {
+                Purposes::create(['projectId' => $projectId, 'purpose' => $purpose]);
+            }
         }
 
-        foreach ($objects as $key => $object) {
-            $ifcClass = $ifcClasses[$key] ?? null;
-            if (!is_null($object) && $object !== '' && !is_null($ifcClass) && $ifcClass !== '') {
+        if (!empty($objects)) {
+            foreach ($objects as $key => $object) {
+                // Get the corresponding ifcClass or set to 'ifcElement' if not defined
+                $ifcClass = $ifcClasses[$key] ?? 'ifcElement'; // Default value if no class is specified
 
-                Objects::create([
-                    'projectId' => $projectId,
-                    'object' => $object,
-                    'ifcClass' => $request->ifcClasses[$key]  // Ensure the correct IFC class is linked with the object
-                ]);
+                if (!is_null($object) && $object !== '') {
+                    Objects::create([
+                        'projectId' => $projectId,
+                        'object' => $object,
+                        'ifcClass' => $ifcClass // Use the default ifcClass if not defined
+                    ]);
+                }
             }
         }
 
         return redirect()->route('loinattributes', ['project' => $projectId])->with('success', 'Attributes stored successfully.');
     }
 
-    public function destroyattribute($project, $type, $id)
+    public function deleteAttribute(Request $request, $projectId)
     {
+        $attributeType = $request->input('attributeType');
+        $id = $request->input('id');
 
-        $model = $this->getModelFromType($type);
-        $model::find($id)->delete();
-        return redirect()->route('loinattributes', ['project' => $project])->with('success', 'Attributes deleted successfully.');
-    }
-
-    private function getModelFromType($type)
-    {
-        switch ($type) {
+        // Determine the model to use based on the attribute type
+        switch ($attributeType) {
             case 'milestone':
-                return Milestones::class;
+                $attribute = Milestones::where('projectId', $projectId)->find($id);
+                break;
             case 'actor':
-                return Actors::class;
+                $attribute = Actors::where('projectId', $projectId)->find($id);
+                break;
             case 'purpose':
-                return Purposes::class;
+                $attribute = Purposes::where('projectId', $projectId)->find($id);
+                break;
             case 'object':
-                return Objects::class;
+                $attribute = Objects::where('projectId', $projectId)->find($id);
+                break;
+            default:
+                return response()->json(['error' => 'Invalid attribute type.'], 400);
+        }
+
+        // Check if the attribute exists and delete it
+        if ($attribute) {
+            $attribute->delete();
+            return response()->json(['success' => 'Attribute deleted successfully.']);
+        } else {
+            return response()->json(['error' => 'Attribute not found.'], 404);
         }
     }
+
+
 
     public function createLoin($project)
     {
@@ -418,7 +442,6 @@ class LoinsController extends Controller
             'MasterDataTemplate' => $MasterDataTemplate,
             'Mastergops' => $Mastergops,
             'MasterProperties' => $MasterProperties,
-
             'loins' => $loins,
         ]);
     }

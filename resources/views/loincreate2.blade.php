@@ -444,13 +444,12 @@
         </form>
     </div>
     <!-- Existing LOIN Records -->
-    <h2>{{ __('Níveis de Necessidade de Informação do projeto') }}</h2>
+    <h2>{{ __('Níveis de Necessidade de Informação do projeto :') }}{{ $nomeProjeto }}</h2> <a href="{{ route('loinViewProject', $projectId) }}" class="btn btn-primary" style="color: black;">{{ __('Ver/discarregar LOINs do projeto') }}</a>
     @if($loins->count() > 0)
 
     <table class="table table-bordered mt-3">
         <thead>
             <tr>
-                <th>{{ __('Nome de Projeto') }}</th>
                 <th>{{ __('Nome de objeto') }}</th>
                 <th>{{ __('Proposito') }}</th>
                 <th>{{ __('Actor Fornecedor') }}</th>
@@ -462,7 +461,6 @@
         <tbody>
             @foreach($loins as $loin)
             <tr>
-                <td>{{ $loin->projectName }}</td>
                 <td>{{ $loin->objectName }}</td>
                 <td>{{ $loin->purpose }}</td>
                 <td>{{ $loin->actorProviding }}</td>
@@ -478,7 +476,6 @@
     @else
     <p>{{ __('Não foram encontradas entradas para Níveis de Necessidade de Informação.') }}</p>
     @endif
-
 
     <!-- JavaScript -->
     <script>

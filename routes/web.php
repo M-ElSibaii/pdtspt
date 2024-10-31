@@ -59,14 +59,15 @@ Route::get('/loinproject', [LoinsController::class, 'projectsindex'])->name('loi
 Route::get('/loinproject/create', [LoinsController::class, 'projectscreate'])->name('projectscreate');
 Route::post('/loinproject/store', [LoinsController::class, 'projectsstore'])->name('projectsstore');
 Route::delete('/loinproject/{project}', [LoinsController::class, 'destroyproject'])->name('projectsdestroy');
-Route::delete('/loinattributes/{project}/{type}/{id}', [LoinsController::class, 'destroyattribute'])->name('loinsattributedestroy');
+//Route::delete('/loinattributes/{projectId}/{type}/{id}', [LoinsController::class, 'destroyattribute'])->name('loinsattributedestroy');
+Route::post('/loinattributes/{projectId}/delete', [LoinsController::class, 'deleteAttribute'])->name('loinattributesdelete');
 Route::get('/loinattributes/{project}', [LoinsController::class, 'loinattributes'])->name('loinattributes');
 Route::post('/loinattributes/{project}', [LoinsController::class, 'loinattributesstore'])->name('loinattributesstore');
 Route::get('/loincreate1/{project}', [LoinsController::class, 'createLoin'])->name('loincreate1');
 
 Route::post('/loincreate2/store', [LoinsController::class, 'createLoin2store'])->middleware(['auth', 'verified'])->name('createLoin2store');
 Route::match(['get', 'post'], '/createLoin2',  [LoinsController::class, 'createloin2'])->middleware(['auth', 'verified'])->name('loincreate2');
-Route::get('/search-properties', [LoinsController::class, 'searchProperties'])->name('searchProperties');
+Route::get('/search-properties', [LoinsController::class, 'searchProperties'])->middleware(['auth', 'verified'])->name('searchProperties');
 
 Route::get('/loinView/{loinId}', [LoinsController::class, 'loinInstance'])->middleware(['auth', 'verified'])->name('loinView');
 Route::delete('/loinDelete/{loinId}', [LoinsController::class, 'destroyLoin'])->middleware(['auth', 'verified'])->name('loinDelete');

@@ -26,14 +26,11 @@
                     <!-- List Milestones -->
                     <ul>
                         @foreach($milestones as $milestone)
-                        <li>{{ $milestone->milestone }}
-                            <form action="{{ route('loinsattributedestroy', ['project' => $project->id,'type' => 'milestones', 'id' => $milestone->id]) }}" method="POST" style="display:inline;">
-                                @csrf
+                        <div class="attribute" data-id="{{ $milestone->id }}" data-type="milestone">
+                            {{ $milestone->milestone }}
+                            <button class="delete-attribute" style="border: none; background: none; color: red; font-size: 1.2em; cursor: pointer;">&times;</button>
 
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-link text-danger" onclick="return confirm('Are you sure you want to delete this item?')">Excluir</button>
-                            </form>
-                        </li>
+                        </div>
                         @endforeach
                     </ul>
                 </div>
@@ -50,14 +47,10 @@
                     <!-- List Actors -->
                     <ul>
                         @foreach($actors as $actor)
-                        <li>{{ $actor->actor }}
-                            <form action="{{ route('loinsattributedestroy', ['project' => $project->id,'type' => 'actors', 'id' => $actor->id]) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-link text-danger" onclick="return confirm('Are you sure you want to delete this item?')">Excluir</button>
-                            </form>
-
-                        </li>
+                        <div class="attribute" data-id="{{ $actor->id }}" data-type="actor">
+                            {{ $actor->actor }}
+                            <button class="delete-attribute" style="border: none; background: none; color: red; font-size: 1.2em; cursor: pointer;">&times;</button>
+                        </div>
                         @endforeach
                     </ul>
                 </div>
@@ -74,14 +67,10 @@
                     <!-- List Purposes -->
                     <ul>
                         @foreach($purposes as $purpose)
-                        <li>{{ $purpose->purpose }}
-                            <form action="{{ route('loinsattributedestroy', ['project' => $project->id,'type' => 'purposes', 'id' => $purpose->id]) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-link text-danger" onclick="return confirm('Are you sure you want to delete this item?')">Excluir</button>
-                            </form>
-
-                        </li>
+                        <div class="attribute" data-id="{{ $purpose->id }}" data-type="purpose">
+                            {{ $purpose->purpose }}
+                            <button class="delete-attribute" style="border: none; background: none; color: red; font-size: 1.2em; cursor: pointer;">&times;</button>
+                        </div>
                         @endforeach
                     </ul>
                 </div>
@@ -108,24 +97,56 @@
                     <!-- List objects with IFC Class -->
                     <ul>
                         @foreach($objects as $object)
-                        <li>{{ $object->object }} (IFC Class: {{ $object->ifcClass }})
-                            <form action="{{ route('loinsattributedestroy', ['project' => $project->id,'type' => 'objects', 'id' => $object->id]) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-link text-danger" onclick="return confirm('Are you sure you want to delete this item?')">Excluir</button>
-                            </form>
-
-                        </li>
+                        <div class="attribute" data-id="{{ $object->id }}" data-type="object">
+                            {{ $object->object }} - {{ $object->ifcClass }}
+                            <button class="delete-attribute" style="border: none; background: none; color: red; font-size: 1.2em; cursor: pointer;">&times;</button>
+                        </div>
                         @endforeach
                     </ul>
                 </div>
 
-                <button type="submit" class="btn btn-secondary">{{ __('Salvar Attributes') }}</button>
-                <a href="{{ route('loincreate1', $project->id) }}" class="btn btn-primary" style="color: black;">{{ __('Criar LOINs') }}</a>
-            </div>
+                <div>
+                    <!-- Green "Salvar Attributes" Button -->
+                    <button type="submit" class="btn btn-success text-black">
+                        {{ __('Salvar Attributes') }}
+                    </button>
+
+                    <!-- Blue "Criar LOINs" Button -->
+                    <a href="{{ route('loincreate1', $project->id) }}" class="btn btn-primary text-black">
+                        {{ __('Criar LOINs') }}
+                    </a>
+
+                </div>
         </form>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).on('click', '.delete-attribute', function(e) {
+            e.preventDefault();
+            const attributeDiv = $(this).closest('.attribute');
+            const attributeId = attributeDiv.data('id');
+            const attributeType = attributeDiv.data('type');
 
+            if (confirm('Are you sure you want to delete this attribute?')) {
+                $.ajax({
+                    url: '{{ route("loinattributesdelete", ["projectId" => $project->id]) }}', // Update this route as needed
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}', // Include CSRF token for security
+                        attributeType: attributeType,
+                        id: attributeId,
+                    },
+                    success: function(response) {
+                        attributeDiv.remove();
+                        alert(response.success || 'Attribute deleted successfully.');
+                    },
+                    error: function(xhr) {
+                        alert(xhr.responseJSON.error || 'An error occurred while deleting the attribute.');
+                    }
+                });
+            }
+        });
+    </script>
     <script>
         // Add new milestone field
         function addMilestoneField() {
@@ -213,36 +234,6 @@
         function removeField(button) {
             const fieldContainer = button.parentElement;
             fieldContainer.remove();
-        }
-
-        // Validate form before submission
-        function validateForm() {
-            const fieldsToValidate = [
-                'milestones[]',
-                'actors[]',
-                'purposes[]',
-                'objects[]'
-            ];
-
-            let isValid = true;
-
-            fieldsToValidate.forEach(field => {
-                const inputs = document.getElementsByName(field);
-                inputs.forEach(input => {
-                    if (!input.value.trim()) {
-                        isValid = false;
-                        input.classList.add('is-invalid'); // Bootstrap invalid class
-                        input.addEventListener('input', () => input.classList.remove('is-invalid'));
-                    } else {
-                        input.classList.remove('is-invalid');
-                    }
-                });
-            });
-
-            if (!isValid) {
-                alert('Please fill in all required fields.');
-            }
-            return isValid;
         }
     </script>
 </x-app-layout>

@@ -27,31 +27,64 @@ class LoinExport implements FromArray, WithTitle, WithStyles, WithColumnWidths
         $data = [
             ['Nome de Projeto', $loin->projectName],
             ['Objeto', $loin->objectName],
-            ['IFC Class', $loin->ifcElement],
             ['PDT Nome', $loin->pdtName],
             ['Ator Fornecedor', $loin->actorProviding],
             ['Ator Requerente', $loin->actorRequesting],
-            ['Fase de Projeto', $loin->projectPhase],
+            ['Fase de Projeto', $loin->milestone],
             ['Propósito', $loin->purpose],
-            ['Sistema de Classificação', $loin->classificationSystem],
-            ['Tabela de Classificação', $loin->classificationTable],
-            ['Código de Classificação', $loin->classificationCode],
-            ['Documentação', $loin->documentation],
-            ['Informação Geométrica'],
+
+            // Geometrical Data section
+            ['Geometrical Data'],
             ['Detalhe', $loin->detail],
             ['Dimensão', $loin->dimension],
             ['Localização', $loin->location],
             ['Aparência', $loin->appearance],
             ['Comportamento Paramétrico', $loin->parametricBehaviour],
-            ['Informação Alfanumérica'],
-            ['Nome', $loin->name],
+
+            // Alphanumerical Data section
+            ['Alphanumerical Data'],
+            ['IFC Class', $loin->ifcClass],
+            ['IFC class name', $loin->ifcClassName],
+            ['IFC class description', $loin->ifcClassDescription],
+            ['IFC class PredefinedType', $loin->ifcClassPredefinedType],
+            ['Sistema de Classificação', $loin->classificationSystem],
+            ['Tabela de Classificação', $loin->classificationTable],
+            ['Código de Classificação', $loin->classificationCode],
+            ['IfcMaterial Name', $loin->materialName],
+
+            // Properties header
+            ['Propriedades', 'Grupo de propriedade', 'Fonte'],
         ];
 
-        // Add properties as alphanumerical data
+        // Add properties if available
         $properties = json_decode($loin->properties, true);
-        $data[] = ['Propriedades', 'Grupo de propriedade', 'Fonte'];
         foreach ($properties as $property) {
-            $data[] = [$property['property'], $property['group'], $property['source']];
+            $data[] = [
+                $property['property'] ?? '',
+                $property['group'] ?? '',
+                $property['source'] ?? ''
+            ];
+        }
+
+        $propertiesCount = count($properties);
+        $documentationStartRow = 23 + $propertiesCount;
+
+        // Documentation section
+        $data[] = ['Documentação'];
+        $documentation = json_decode($loin->documentation, true);
+
+        // Handle if documentation is a JSON object with 'document' and 'format'
+        if (is_array($documentation) && isset($documentation[0]['document'], $documentation[0]['format'])) {
+            $data[] = ['Document', 'Format'];
+            foreach ($documentation as $doc) {
+                $data[] = [
+                    $doc['document'] ?? '',
+                    $doc['format'] ?? '',
+                ];
+            }
+        } else {
+            // If documentation is a string or a single JSON field, add it as a single row
+            $data[] = [$loin->documentation];
         }
 
         return $data;
@@ -63,68 +96,82 @@ class LoinExport implements FromArray, WithTitle, WithStyles, WithColumnWidths
         return $loin->objectName; // Set the sheet name as the object name or any other unique identifier
     }
 
-
     public function styles(Worksheet $sheet)
     {
-
-        // Style Geometrical Properties and Alphanumerical Properties sections
-        $sheet->getStyle('A13')->applyFromArray([
+        $loin = Loins::where("id", $this->loinId)->first();
+        $propertiesCount = count(json_decode($loin->properties, true));
+        $documentationStartRow = 24 + $propertiesCount;
+        $documentationStartRow2 = 25 + $propertiesCount;
+        // Style sections (Geometrical Data, Alphanumerical Data, and Properties)
+        $sheet->getStyle('A8')->applyFromArray([
             'font' => ['bold' => true],
             'fill' => [
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                'startColor' => ['argb' => 'FFF2CC'], // Light orange
+                'startColor' => ['argb' => 'FFF2CC'], // Light orange for Geometrical Data
             ],
         ]);
 
-        $sheet->getStyle('A19')->applyFromArray([
+        $sheet->getStyle('A14')->applyFromArray([
             'font' => ['bold' => true],
             'fill' => [
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                'startColor' => ['argb' => 'FFF2CC'], // Light orange
+                'startColor' => ['argb' => 'FFF2CC'], // Light orange for Alphanumerical Data
             ],
         ]);
 
-        $sheet->getStyle('A21:C21')->applyFromArray([
+
+        // Apply style to Documentation header based on dynamic row number
+        $sheet->getStyle("A{$documentationStartRow}:A{$documentationStartRow}")->applyFromArray([
             'font' => ['bold' => true],
             'fill' => [
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                'startColor' => ['argb' => 'cbeff5'], // Light blue
+                'startColor' => ['argb' => 'FFF2CC'], // Light orange for documentation
             ],
         ]);
 
-        $sheet->getStyle('A12')->applyFromArray([
+        $sheet->getStyle('A23:C23')->applyFromArray([
             'font' => ['bold' => true],
             'fill' => [
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                'startColor' => ['argb' => 'FFF2CC'], // Light orange
+                'startColor' => ['argb' => 'cbeff5'], // Light blue for Properties
             ],
         ]);
 
-        // Define the style array
+        $sheet->getStyle("A{$documentationStartRow2}:B{$documentationStartRow2}")->applyFromArray([
+            'font' => ['bold' => true],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['argb' => 'cbeff5'], // Light blue for docs
+            ],
+        ]);
+
+        // Define styles for other headers
         $styleArray = [
             'font' => ['bold' => true],
             'fill' => [
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                'startColor' => ['argb' => 'D0E0F0'], // Light blue background
+                'startColor' => ['argb' => 'D0E0F0'], // blue background
             ],
         ];
 
-        // Apply styles to each range
-        $sheet->getStyle('A1:A12')->applyFromArray($styleArray);
-        $sheet->getStyle('A14:A18')->applyFromArray($styleArray);
-        $sheet->getStyle('A20')->applyFromArray($styleArray);
 
-        // Merge cells for Geometrical Properties and Alphanumerical Properties headers
-        $sheet->mergeCells('A13:B13'); // Merge cells A14 and B14
-        $sheet->mergeCells('A19:C19'); // Merge cells A20, B20, and C20
+        // Apply styles to each main header range
+        $sheet->getStyle('A1:A7')->applyFromArray($styleArray);
+        $sheet->getStyle('A9:A13')->applyFromArray($styleArray);
+        $sheet->getStyle('A15:A22')->applyFromArray($styleArray);
+
+        // Merge cells for Geometrical and Alphanumerical Data headers
+        $sheet->mergeCells('A8:B8');
+        $sheet->mergeCells('A14:C14');
+        $sheet->mergeCells("A{$documentationStartRow}:C{$documentationStartRow}");
     }
 
     public function columnWidths(): array
     {
         return [
-            'A' => 40, // Column A width
-            'B' => 50, // Column B width
-            'C' => 30, // Column C width
+            'A' => 40,
+            'B' => 50,
+            'C' => 30,
         ];
     }
 }
