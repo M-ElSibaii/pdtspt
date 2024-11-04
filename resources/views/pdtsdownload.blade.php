@@ -35,16 +35,16 @@
                 <div class="overflow-auto" style="overflow-y: auto; max-height: calc(100vh - 300px); border: #cbd5e1 1px Solid;">
                     <table class="table-auto" id="tblpdts" cellpadding="0" cellspacing="0">
                         <thead class="sticky top-0 z-50">
-                        <tr>
-                            <th>Propriedade</th>
-                            <th>Unidade</th>
-                            <th>Descrição</th>
-                            <th>Documento de referência</th>
-                        </tr>
+                            <tr>
+                                <th>Propriedade</th>
+                                <th>Unidade</th>
+                                <th>Descrição</th>
+                                <th>Documento de referência</th>
+                            </tr>
                         </thead>
                         @foreach($gop as $group)
                         <tbody>
-                            <tr class="sticky top-[88px] z-50">
+                            <tr>
                                 <td class="text-left content-start bg-slate-300 p-3" colspan="4">
                                     <input class="text-left expand" type="checkbox" name="{{ $group->gopNamePt }}" id="{{ $group->gopNamePt }}" data-toggle="toggle">
                                     <label class="my-auto text-left cursor-pointer" for="{{ $group->gopNamePt }}">Grupo de propriedades -
@@ -136,17 +136,17 @@
                         </tbody>
                         @endforeach
                     </table>
-                    
+
                 </div>
             </div>
         </div>
         <div class="my-6 text-end">
-                        <a href="/dashboard">
-                            <x-secondary-button id="backButton" type="button">
-                                Anterior
-                            </x-secondary-button>
-                        </a>
-                    </div>
+            <a href="/dashboard">
+                <x-secondary-button id="backButton" type="button">
+                    Anterior
+                </x-secondary-button>
+            </a>
+        </div>
     </div>
     <table hidden id="tblpdtsh">
         <tr>
