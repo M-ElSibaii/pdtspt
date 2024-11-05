@@ -52,10 +52,10 @@ Route::post('/contact', [ContactController::class, 'store'])
 
 Route::get('/dashboard', [ProductdatatemplatesController::class, 'getLatestPDTs'], function () {
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->name('dashboard');
 
 Route::get('/pdtsdownload/{pdtID}', [GroupofpropertiesController::class, 'getGroupOfProperties'])
-    ->middleware(['auth', 'verified'])->name('pdtsdownload');
+    ->name('pdtsdownload');
 
 Route::middleware('auth', 'verified')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -83,17 +83,17 @@ Route::post('/pdtssurvey/store', [GroupofpropertiesController::class, 'store'])
 Route::get(
     '/datadictionaryview/{propID}-{propGUID}',
     [PropertiesdatadictionariesController::class, 'getPropertyDataDictionary']
-)->middleware(['auth', 'verified'])->name('datadictionaryview');
+)->name('datadictionaryview');
 
 Route::get(
     '/datadictionaryviewGOP/{gopID}-{gopGUID}',
     [GroupofpropertiesController::class, 'getGOPDataDictionary']
-)->middleware(['auth', 'verified'])->name('datadictionaryviewGOP');
+)->name('datadictionaryviewGOP');
 
 Route::get(
     '/referencedocumentview/{rdGUID}',
     [ReferencedocumentsController::class, 'getReferenceDocument']
-)->middleware(['auth', 'verified'])->name('referencedocumentview');
+)->name('referencedocumentview');
 
 
 Route::post('/comments/{propID}', [GroupofpropertiesController::class, 'getCommentProperty']);
