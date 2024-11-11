@@ -21,7 +21,7 @@ return new class extends Migration
                 'Escavação e Estabilização',
                 'Fundação e Estacas',
                 'Estruturas de Retenção de Terra',
-                'Concreto',
+                'Betão',
                 'Aço',
                 'Estruturas de Madeira',
                 'Alvenaria e Tijolo',
