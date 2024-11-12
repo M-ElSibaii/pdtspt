@@ -15,7 +15,7 @@
             </div>
             <div class='py-2'>
                 <h3 class='py-2'>Atributos de propriedade no dicionário de dados baseado em EN ISO 23386</h3>
-                
+
                 <table id='tblprop' cellpadding='0' cellspacing='0'>
                     <tbody>
                         <tr>
@@ -45,6 +45,24 @@
                         <tr>
                             <th>Estado</th>
                             <td>{{$propdd->status}}</td>
+                        </tr>
+                        <tr>
+                            <th>Documento de referência</th>
+                            @if ($referencedocument && ($referencedocument->rdName === 'n/a' || !$referencedocument->rdName))
+                            <td class="p-1.5">
+                                <a>n/a</a>
+                            </td>
+                            @elseif ($referencedocument)
+                            <td class="p-1.5">
+                                <a href="{{ route('referencedocumentview', ['rdGUID' => $referencedocument->GUID]) }}">
+                                    <p title="{{ $referencedocument->title }}">{{ $referencedocument->rdName }}</p>
+                                </a>
+                            </td>
+                            @else
+                            <td class="p-1.5">
+                                <span>n/a</span>
+                            </td>
+                            @endif
                         </tr>
                         <tr>
                             <th>Data de criação</th>
@@ -79,7 +97,7 @@
                             <td style="display: flex; border: none;">
                                 @foreach ($propversions as $version)
                                 @if ($version->versionNumber < $propdd->versionNumber || ($version->versionNumber == $propdd->versionNumber && $version->revisionNumber < $propdd->revisionNumber)) <form class="mb-3" action="{{ url('datadictionaryview/' . $version->Id . '-' . $version->GUID) }}">
-                                            <button class="btn-link" type="submit" style="margin-right: 5px;" >{{ $version->versionNumber}}.{{$version->revisionNumber}}, </button>
+                                            <button class="btn-link" type="submit" style="margin-right: 5px;">{{ $version->versionNumber}}.{{$version->revisionNumber}}, </button>
                                         </form>
                                         @endif
                                         @endforeach
@@ -92,7 +110,7 @@
                                 @foreach ($propversions as $version)
                                 @if ($version->versionNumber > $propdd->versionNumber || ($version->versionNumber == $propdd->versionNumber && $version->revisionNumber > $propdd->revisionNumber))
                                 <form class="mb-3" action="{{ url('datadictionaryview/' . $version->Id . '-' . $version->GUID) }}">
-                                    <button class="btn-link" type="submit" style="margin-right: 5px;" >{{ $version->versionNumber}}.{{$version->revisionNumber}}, </button>
+                                    <button class="btn-link" type="submit" style="margin-right: 5px;">{{ $version->versionNumber}}.{{$version->revisionNumber}}, </button>
                                 </form>
                                 @endif
                                 @endforeach

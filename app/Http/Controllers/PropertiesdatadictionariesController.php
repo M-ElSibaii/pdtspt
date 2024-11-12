@@ -15,17 +15,24 @@ class PropertiesdatadictionariesController extends Controller
 {
     public function getPropertyDataDictionary($propID, $propGUID)
     {
-
-        $propdd = propertiesdatadictionaries::WHERE('Id', $propID)
-            ->first();
-        $propinpdts = properties::where('propertyId', $propID)
-            ->get();
+        $propdd = propertiesdatadictionaries::where('Id', $propID)->first();
+        $propinpdts = properties::where('propertyId', $propID)->get();
         $pdts = productdatatemplates::get();
 
         $propversions = propertiesdatadictionaries::where('GUID', $propGUID)->get();
 
-        return view('datadictionaryview', compact('propdd', 'propinpdts', 'pdts', 'propversions'));
+        // Retrieve the latest referenceDocumentGUID
+        $referenceDocumentData = properties::where('propertyId', $propID)->latest()->first('referenceDocumentGUID');
+
+        // If referenceDocumentData is not null, extract GUID; otherwise, set as null
+        $referencedocumentGUID = $referenceDocumentData ? $referenceDocumentData->referenceDocumentGUID : null;
+
+        // Fetch the reference document only if a GUID was found
+        $referencedocument = $referencedocumentGUID ? referencedocuments::where('GUID', $referencedocumentGUID)->first() : null;
+
+        return view('datadictionaryview', compact('propdd', 'propinpdts', 'pdts', 'propversions', 'referencedocument'));
     }
+
 
     public function showddProperty($propertyddId)
     {
