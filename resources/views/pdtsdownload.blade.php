@@ -42,33 +42,34 @@
                                 <th>Documento de referência</th>
                             </tr>
                         </thead>
-                        @foreach($gop as $group)
+                        @foreach($sorted_combined_groups as $group)
                         <tbody>
                             <tr>
                                 <td class="text-left content-start bg-slate-300 p-3" colspan="4">
-                                    <input class="text-left expand" type="checkbox" name="{{ $group->gopNamePt }}" id="{{ $group->gopNamePt }}" data-toggle="toggle">
-                                    <label class="my-auto text-left cursor-pointer" for="{{ $group->gopNamePt }}">Grupo de propriedades -
-                                        <a href="{{ url('datadictionaryviewGOP/' . $group->Id . '-' . $group->GUID) }}">
-                                            {{ $group->gopNamePt }}
-                                        </a></label>
+                                    <input class="text-left expand" type="checkbox" name="{{ $group[0]->gopNamePt }}" id="{{ $group[0]->gopNamePt }}" data-toggle="toggle">
+                                    <label class="my-auto text-left cursor-pointer" for="{{ $group[0]->gopNamePt }}">Grupo de propriedades -
+                                        <a href="{{ url('datadictionaryviewGOP/' . $group[0]->Id . '-' . $group[0]->GUID) }}">
+                                            {{ $group[0]->gopNamePt }}
+                                        </a>
+                                    </label>
                                 </td>
                             </tr>
                         </tbody>
 
                         <tbody class="hide">
+                            @foreach($group as $propertyGroup)
                             @foreach($joined_properties as $property)
-
-                            @if($property->gopID == $group->Id)
-                            <tr>
-
+                            @if($property->gopID == $propertyGroup->Id)
+                            <!-- Apply the 'master-template-row' class if the property is from master template -->
+                            <tr class="{{ $property->from_master ? 'master-template-row' : '' }}">
                                 <td class="p-1.5 property-td">
                                     <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . $property->GUID) }}">
                                         {{ $property->namePt }}
                                     </a>
-
                                     @if($property->status == 'InActive')
                                     <span class="status-tag status-tag-inactive">Inativa</span>
                                     @endif
+
 
                                     {{-- Check if the relationToOtherDataDictionaries attribute exists and is not null --}}
                                     @if(!is_null($property->relationToOtherDataDictionaries))
@@ -102,12 +103,10 @@
                                     @endif
                                     @endif
                                 </td>
-                                <td class="p-1.5">
-                                    {{ $property->units ? $property->units : 'Sem unidade' }}
-                                </td>
+                                <td class="p-1.5">{{ $property->units ? $property->units : 'Sem unidade' }}</td>
                                 <td class="p-1.5">
                                     <div class="flex flex-col">
-                                        <p>{{$property->descriptionPt}}</p>
+                                        <p>{{ $property->descriptionPt }}</p>
                                         @if($property->visualRepresentation == "TRUE")
                                         <div class="col-sm">
                                             <img src="{{ asset ('img/'.$property->nameEn.'.png')}}" alt='{{$property->nameEn}}' class="property-image">
@@ -118,7 +117,6 @@
                                 @php
                                 $referenceDoc = $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first();
                                 @endphp
-
                                 @if ($referenceDoc && ($referenceDoc->rdName == 'n/a' || !$referenceDoc->rdName))
                                 <td class="p-1.5">
                                     <a>n/a</a>
@@ -133,92 +131,129 @@
                             </tr>
                             @endif
                             @endforeach
+                            @endforeach
                         </tbody>
                         @endforeach
                     </table>
+                </div>
+                <h6 style="padding-top: 5px"> Nota: As propriedades do modelo de dados mestre são destacadas a cinzento </h6>
 
+                <div class="my-6 text-end">
+                    <a href="/dashboard">
+                        <x-secondary-button id="backButton" type="button">
+                            Anterior
+                        </x-secondary-button>
+                    </a>
                 </div>
             </div>
         </div>
-        <div class="my-6 text-end">
-            <a href="/dashboard">
-                <x-secondary-button id="backButton" type="button">
-                    Anterior
-                </x-secondary-button>
-            </a>
-        </div>
-    </div>
-    <table hidden id="tblpdtsh">
-        <tr>
-            <th style="width: 15%;">Grupo de propriedades</th>
-            <th>Propriedade </th>
-            <th style="width: 7%;">Unidade</th>
-            <th style="width: 40%;">Descrição</th>
-            <th style="width: 16%;">Documento de referência</th>
-        </tr>
-        @foreach($gop as $group)
-        @foreach($joined_properties as $property)
-        @if($property->gopID == $group->Id)
 
-        <tr>
-            <td>
-                {{ $group->gopNamePt }}
-            </td>
-            <td>
-                {{ $property->namePt }}
-            </td>
-            <td>
-                {{ $property->units }}
-            </td>
-            <td>
-                {{$property->descriptionPt}}
-            </td>
-            <td>
-                @if ($referenceDocument->where('GUID', $property->referenceDocumentGUID)->first())
-                {{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->rdName }}
-                @else
-                n/a
-                @endif
-            </td>
+        <table hidden id="tblpdtsh">
+            <tr>
+                <th style="width: 15%;">Grupo de propriedades</th>
+                <th>Propriedade </th>
+                <th style="width: 7%;">Unidade</th>
+                <th style="width: 40%;">Descrição</th>
+                <th style="width: 16%;">Documento de referência</th>
+            </tr>
+            @foreach($sorted_combined_groups as $group)
+            @foreach($group as $propertyGroup)
+            @foreach($joined_properties as $property)
+            @if($property->gopID == $propertyGroup->Id)
 
-        </tr>
-        @endif
-        @endforeach
-        @endforeach
-    </table>
+            <tr>
+                <td>
+                    {{ $propertyGroup->gopNamePt }}
+                </td>
+                <td>
+                    {{ $property->namePt }}
+                </td>
+                <td>
+                    {{ $property->units }}
+                </td>
+                <td>
+                    {{$property->descriptionPt}}
+                </td>
+                <td>
+                    @if ($referenceDocument->where('GUID', $property->referenceDocumentGUID)->first())
+                    {{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->rdName }}
+                    @else
+                    n/a
+                    @endif
+                </td>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.6/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://rawcdn.githack.com/FuriosoJack/TableHTMLExport/v2.0.0/src/tableHTMLExport.js"></script>
+            </tr>
+            @endif
+            @endforeach
+            @endforeach
+            @endforeach
+        </table>
 
 
-    <script>
-        $(document).ready(function() {
-            $('[data-toggle="toggle"]').change(function() {
-                $(this).parents().next('.hide').toggle();
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.6/jspdf.plugin.autotable.min.js"></script>
+        <script src="https://rawcdn.githack.com/FuriosoJack/TableHTMLExport/v2.0.0/src/tableHTMLExport.js"></script>
+
+
+        <script>
+            $(document).ready(function() {
+                $('[data-toggle="toggle"]').change(function() {
+                    $(this).parents().next('.hide').toggle();
+                });
             });
-        });
-        $("#json").on("click", function() {
-            $("#tblpdtsh").tableHTMLExport({
-                type: "json",
-                filename: "{{ $pdt->pdtNameEn }} data template.json",
-            });
-        });
-        $("#csv").on("click", function() {
-            $("#tblpdtsh").tableHTMLExport({
-                type: "csv",
-                filename: "{{ $pdt->pdtNameEn }} data template.csv"
-            });
-        });
 
-        $("#txt").on("click", function() {
-            $("#tblpdtsh").tableHTMLExport({
-                type: "txt",
-                filename: "{{ $pdt->pdtNameEn }} data template.txt"
+            //export json
+            $("#json").on("click", function() {
+                const tableData = {};
+
+                // Iterate over each row in the table to build JSON structure
+                $("#tblpdtsh tr").each(function() {
+                    const row = $(this).find("td");
+                    if (row.length > 0) {
+                        const group = row.eq(0).text().trim();
+                        const propertyData = {
+                            "Propriedade": row.eq(1).text().trim(),
+                            "Unidade": row.eq(2).text().trim(),
+                            "Descrição": row.eq(3).text().trim(),
+                            "Documento de referência": row.eq(4).text().trim()
+                        };
+
+                        // Initialize group if it doesn't exist, then add property data to it
+                        if (!tableData[group]) {
+                            tableData[group] = [];
+                        }
+                        tableData[group].push(propertyData);
+                    }
+                });
+
+                // Create a JSON string and format it for readability
+                const jsonString = JSON.stringify(tableData, null, 4);
+
+                // Create a Blob for the JSON data
+                const blob = new Blob([jsonString], {
+                    type: "application/json"
+                });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = "{{ $pdt->pdtNameEn }}_data_template.json";
+                link.click();
             });
-        });
-    </script>
+            //export csv
+            $("#csv").on("click", function() {
+                $("#tblpdtsh").tableHTMLExport({
+                    type: "csv",
+                    filename: "{{ $pdt->pdtNameEn }} data template.csv"
+                });
+            });
+            //export text
+            $("#txt").on("click", function() {
+                $("#tblpdtsh").tableHTMLExport({
+                    type: "txt",
+                    filename: "{{ $pdt->pdtNameEn }} data template.txt"
+                });
+            });
+        </script>
 
 
 </x-app-layout>

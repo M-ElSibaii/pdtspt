@@ -58,6 +58,11 @@
     </script>
 
     <style>
+        .master-template-row {
+            background-color: #f9f9f9;
+            /* light grey */
+        }
+
         .status-tag {
             /* Common styles for both active and inactive */
             font-size: 12px;

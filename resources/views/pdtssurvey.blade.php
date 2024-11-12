@@ -46,21 +46,27 @@
                                 </thead>
 
 
-                                @foreach($gop as $group)
+                                @foreach($combined_groups as $group)
                                 <tbody>
                                     <tr>
                                         <td class="text-left content-start bg-slate-300 p-3" colspan="6">
-                                            <input class="text-left expand" type="checkbox" name="{{ $group->gopNamePt }}" id="{{ $group->gopNamePt }}" data-toggle="toggle">
-                                            <label class="my-auto text-left cursor-pointer" for="{{ $group->gopNamePt }}">Grupo de propriedades - <a href="{{ url('datadictionaryviewGOP/' . $group->Id . '-' . $group->GUID) }}">
-                                                    {{ $group->gopNamePt }}
-                                                </a></label>
+                                            <input class="text-left expand" type="checkbox" name="{{ $group[0]->gopNamePt }}" id="{{ $group[0]->gopNamePt }}" data-toggle="toggle">
+                                            <label class="my-auto text-left cursor-pointer" for="{{ $group[0]->gopNamePt }}">Grupo de propriedades -
+                                                <a href="{{ url('datadictionaryviewGOP/' . $group[0]->Id . '-' . $group[0]->GUID) }}">
+                                                    {{ $group[0]->gopNamePt }}
+                                                </a>
+                                            </label>
                                         </td>
                                     </tr>
                                 </tbody>
+
                                 <tbody class="hide">
+
+                                    @foreach($group as $propertyGroup)
                                     @foreach($joined_properties as $property)
-                                    @if($property->gopID == $group->Id)
-                                    <tr>
+                                    @if($property->gopID == $propertyGroup->Id)
+                                    <!-- Apply the 'master-template-row' class if the property is from master template -->
+                                    <tr class="{{ $property->from_master ? 'master-template-row' : '' }}">
                                         <td class="p-1.5 property-td">
                                             <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . $property->GUID) }}">{{ $property->namePt }}
                                                 {{-- Check if the relationToOtherDataDictionaries attribute exists and is not null --}}
@@ -154,11 +160,12 @@
                                     </tr>
                                     @endif
                                     @endforeach
+                                    @endforeach
                                 </tbody>
                                 @endforeach
                             </table>
                         </div>
-
+                        <h6 style="padding-top: 5px"> Nota: As propriedades do modelo de dados mestre são destacadas a cinzento </h6>
                         <div class="my-6 text-end">
                             <a href="/dashboard">
                                 <x-secondary-button id="backButton" type="button">
