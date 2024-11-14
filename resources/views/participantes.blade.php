@@ -7,7 +7,7 @@
                 <div class="grid lg:grid-cols-6 md:grid-cols-4 sm:grid-cols-2 gap-6 py-6">
                     <div class="content-center">
                         <a class="content-center" href="https://www.uminho.pt/PT" target="_blank" rel="noopener noreferrer">
-                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/UMinho_Logo-01.png" alt="" >
+                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/UMinho_Logo-01.png" alt="">
                         </a>
                     </div>
                 </div>
@@ -18,7 +18,12 @@
                 <div class="grid lg:grid-cols-6 md:grid-cols-4 sm:grid-cols-2 gap-6 py-6">
                     <div class="content-center">
                         <a class="content-center" href="http://www.ct197.pt/" target="_blank" rel="noopener noreferrer">
-                            <img class="h-auto w-auto lg:max-h-[100px] lg:max-w-[180px] md:max-h-[100px] md:max-w-[180px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/ct197.png" alt="" >
+                            <img class="h-auto w-auto lg:max-h-[100px] lg:max-w-[180px] md:max-h-[100px] md:max-w-[180px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/ct197.png" alt="">
+                        </a>
+                    </div>
+                    <div class="content-center">
+                        <a class="content-center" href="http://www.buildingsmart.pt/" target="_blank" rel="noopener noreferrer">
+                            <img class="h-auto w-auto lg:max-h-[100px] lg:max-w-[180px] md:max-h-[100px] md:max-w-[180px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/buildingsmartpt.png" alt="">
                         </a>
                     </div>
                 </div>
@@ -29,12 +34,22 @@
                 <div class="grid lg:grid-cols-6 md:grid-cols-4 sm:grid-cols-2 gap-6 py-6">
                     <div class="content-center">
                         <a class="content-center" href="https://secclass.pt/" target="_blank" rel="noopener noreferrer">
-                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/SECClasS-Logo-Website.png" alt="" >
+                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/SECClasS-Logo-Website.png" alt="">
                         </a>
                     </div>
                     <div class="content-center">
                         <a class="content-center" href="https://revconstruction.pt/" target="_blank" rel="noopener noreferrer">
-                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/rev-construction-v.png" alt="" >
+                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/rev-construction-v.png" alt="">
+                        </a>
+                    </div>
+                    <div class="content-center">
+                        <a class="content-center" href="https://agendaecp.pt/en" target="_blank" rel="noopener noreferrer">
+                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/ecp.png" alt="">
+                        </a>
+                    </div>
+                    <div class="content-center">
+                        <a class="content-center" href="https://r2utechnologies.pt/" target="_blank" rel="noopener noreferrer">
+                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/r2u.png" alt="">
                         </a>
                     </div>
                 </div>
@@ -44,37 +59,42 @@
                 <div class="grid lg:grid-cols-6 md:grid-cols-4 sm:grid-cols-2 gap-6 py-6">
                     <div class="content-center">
                         <a class="content-center" href="https://www.fct.pt/" target="_blank" rel="noopener noreferrer">
-                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/fct.svg" alt="" >
+                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/fct.svg" alt="">
                         </a>
                     </div>
                     <div class="content-center">
                         <a class="content-center" href="https://revconstruction.pt/" target="_blank" rel="noopener noreferrer">
-                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/lisboa2020.png" alt="" >
+                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/lisboa2020.png" alt="">
                         </a>
                     </div>
                     <div class="content-center">
                         <a class="content-center" href="https://revconstruction.pt/" target="_blank" rel="noopener noreferrer">
-                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/compete2020.png" alt="" >
+                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/compete2020.png" alt="">
                         </a>
                     </div>
                     <div class="content-center">
                         <a class="content-center" href="https://revconstruction.pt/" target="_blank" rel="noopener noreferrer">
-                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/portugal2020.png" alt="" >
+                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/portugal2020.png" alt="">
                         </a>
                     </div>
                     <div class="content-center">
                         <a class="content-center" href="https://revconstruction.pt/" target="_blank" rel="noopener noreferrer">
-                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/feder.png" alt="" >
+                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/feder.png" alt="">
                         </a>
                     </div>
                     <div class="content-center">
                         <a class="content-center" href="https://eeagrants.org/" target="_blank" rel="noopener noreferrer">
-                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/EEA_grants.png" alt="" >
+                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/EEA_grants.png" alt="">
                         </a>
                     </div>
                     <div class="content-center">
                         <a class="content-center" href="https://www.mitportugal.org/" target="_blank" rel="noopener noreferrer">
-                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/mitportugal.png" alt="" >
+                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/mitportugal.png" alt="">
+                        </a>
+                    </div>
+                    <div class="content-center">
+                        <a class="content-center" href="https://recuperarportugal.gov.pt/" target="_blank" rel="noopener noreferrer">
+                            <img class="h-auto w-auto lg:max-h-[90px] lg:max-w-[160px] md:max-h-[90px] md:max-w-[160px] sm:max-h-[50px] sm:max-w-[120px] transition duration-300 ease-in-out hover:shadow-lg" src="img/prr.png" alt="">
                         </a>
                     </div>
                 </div>

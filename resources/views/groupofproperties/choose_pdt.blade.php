@@ -12,7 +12,7 @@
                         <select class="form-control" id="pdtId" name="pdtId" required>
                             <!-- Populate dropdown with PDTs -->
                             @foreach ($pdts as $pdt)
-                            <option value="{{ $pdt->Id }}">{{ $pdt->pdtNameEn }}</option>
+                            <option value="{{ $pdt->Id }}">{{ $pdt->pdtNameEn }} V{{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}</option>
                             @endforeach
                         </select>
                     </div>

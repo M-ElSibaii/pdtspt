@@ -51,7 +51,7 @@ Route::post('/contact', [ContactController::class, 'store'])
 
 Route::get('/dashboard', [ProductdatatemplatesController::class, 'getLatestPDTs'], function () {
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->name('dashboard');
 
 Route::get('/pdtsdownload/{pdtID}', [GroupofpropertiesController::class, 'getGroupOfProperties'])->middleware(['auth', 'verified'])->name('pdtsdownload');
 
@@ -78,6 +78,8 @@ Route::get('/loinDownloadExcel/{id}/{objectName}', [LoinsController::class, 'dow
 
 Route::get('/projectLoinsExcel/{projectName}', [LoinsController::class, 'exportProjectLoinsExcel'])->name('exportProjectLoinsExcel');
 Route::get('/projectLoinsJson/{projectName}', [LoinsController::class, 'exportProjectLoinsJson'])->name('exportProjectLoinsJson');
+Route::get('/pdtsdownload/{pdtID}', [GroupofpropertiesController::class, 'getGroupOfProperties'])
+    ->name('pdtsdownload');
 
 Route::middleware('auth', 'verified')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -105,17 +107,17 @@ Route::post('/pdtssurvey/store', [GroupofpropertiesController::class, 'store'])
 Route::get(
     '/datadictionaryview/{propID}-{propGUID}',
     [PropertiesdatadictionariesController::class, 'getPropertyDataDictionary']
-)->middleware(['auth', 'verified'])->name('datadictionaryview');
+)->name('datadictionaryview');
 
 Route::get(
     '/datadictionaryviewGOP/{gopID}-{gopGUID}',
     [GroupofpropertiesController::class, 'getGOPDataDictionary']
-)->middleware(['auth', 'verified'])->name('datadictionaryviewGOP');
+)->name('datadictionaryviewGOP');
 
 Route::get(
     '/referencedocumentview/{rdGUID}',
     [ReferencedocumentsController::class, 'getReferenceDocument']
-)->middleware(['auth', 'verified'])->name('referencedocumentview');
+)->name('referencedocumentview');
 
 
 Route::post('/comments/{propID}', [GroupofpropertiesController::class, 'getCommentProperty']);
@@ -187,4 +189,9 @@ Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
 
     Route::post('/properties/edit/{propertyId}', [PropertiesController::class, 'updateProperty'])->name('properties.update');
     Route::get('/properties/edit/{propertyId}', [PropertiesController::class, 'showProperty'])->name('properties.edit');
+
+    // edit properties in data dictionary
+
+    Route::post('/properties/editdd/{propertyddId}', [PropertiesdatadictionariesController::class, 'updateddProperty'])->name('properties.updatedd');
+    Route::get('/properties/editdd/{propertyddId}', [PropertiesdatadictionariesController::class, 'showddProperty'])->name('properties.editdd');
 });

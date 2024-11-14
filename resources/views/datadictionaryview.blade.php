@@ -1,20 +1,21 @@
 <x-app-layout>
     <div style="background-color: white;">
         <div class="container sm:max-w-full py-9">
-            <h1>Atributos de propriedade no dicionário de dados baseado em EN ISO 23386</h1>
-            <div class='py-6'>
-                <div class=''>
-                    {{-- <h1>{{$propdd->namePt}} </h1> --}}
-                    <div class="flex-none inline">
-                        <h1 class="flex-none inline">{{ $propdd->namePt }}</h1>
-                        <p class="flex-none inline"> - V{{ $propdd->versionNumber }}.{{ $propdd->revisionNumber }}</p>
-                        @if($propdd->status == 'Active')
-                        <span class="status-tag status-tag-active">Ativa</span>
-                        @else
-                        <span class="status-tag status-tag-inactive">Inativa</span>
-                        @endif
-                    </div>
+            <div class=''>
+                {{-- <h1>{{$propdd->namePt}} </h1> --}}
+                <div class="flex-none inline">
+                    <h1 class="flex-none inline">{{ $propdd->namePt }}</h1>
+                    <p class="flex-none inline"> - V{{ $propdd->versionNumber }}.{{ $propdd->revisionNumber }}</p>
+                    @if($propdd->status == 'Active')
+                    <span class="status-tag status-tag-active">Ativa</span>
+                    @else
+                    <span class="status-tag status-tag-inactive">Inativa</span>
+                    @endif
                 </div>
+            </div>
+            <div class='py-2'>
+                <h3 class='py-2'>Atributos de propriedade no dicionário de dados baseado em EN ISO 23386</h3>
+
                 <table id='tblprop' cellpadding='0' cellspacing='0'>
                     <tbody>
                         <tr>
@@ -46,6 +47,24 @@
                             <td>{{$propdd->status}}</td>
                         </tr>
                         <tr>
+                            <th>Documento de referência</th>
+                            @if ($referencedocument && ($referencedocument->rdName === 'n/a' || !$referencedocument->rdName))
+                            <td class="p-1.5">
+                                <a>n/a</a>
+                            </td>
+                            @elseif ($referencedocument)
+                            <td class="p-1.5">
+                                <a href="{{ route('referencedocumentview', ['rdGUID' => $referencedocument->GUID]) }}">
+                                    <p title="{{ $referencedocument->title }}">{{ $referencedocument->rdName }}</p>
+                                </a>
+                            </td>
+                            @else
+                            <td class="p-1.5">
+                                <span>n/a</span>
+                            </td>
+                            @endif
+                        </tr>
+                        <tr>
                             <th>Data de criação</th>
                             <td>{{$propdd->dateOfCreation}}</td>
                         </tr>
@@ -75,10 +94,10 @@
                         </tr>
                         <tr>
                             <th>Lista de propriedades substituídas</th>
-                            <td>
+                            <td style="display: flex; border: none;">
                                 @foreach ($propversions as $version)
                                 @if ($version->versionNumber < $propdd->versionNumber || ($version->versionNumber == $propdd->versionNumber && $version->revisionNumber < $propdd->revisionNumber)) <form class="mb-3" action="{{ url('datadictionaryview/' . $version->Id . '-' . $version->GUID) }}">
-                                            <button class="btn btn-link" type="submit">{{ $version->versionNumber}}.{{$version->revisionNumber}}, </button>
+                                            <button class="btn-link" type="submit" style="margin-right: 5px;">{{ $version->versionNumber}}.{{$version->revisionNumber}}, </button>
                                         </form>
                                         @endif
                                         @endforeach
@@ -91,7 +110,7 @@
                                 @foreach ($propversions as $version)
                                 @if ($version->versionNumber > $propdd->versionNumber || ($version->versionNumber == $propdd->versionNumber && $version->revisionNumber > $propdd->revisionNumber))
                                 <form class="mb-3" action="{{ url('datadictionaryview/' . $version->Id . '-' . $version->GUID) }}">
-                                    <button class="btn btn-link" type="submit">{{ $version->versionNumber}}.{{$version->revisionNumber}}, </button>
+                                    <button class="btn-link" type="submit" style="margin-right: 5px;">{{ $version->versionNumber}}.{{$version->revisionNumber}}, </button>
                                 </form>
                                 @endif
                                 @endforeach
@@ -100,7 +119,39 @@
                         </tr>
                         <tr>
                             <th>Relação com outros dicionários de dados</th>
-                            <td>{{$propdd->relationToOtherDataDictionaries}}</td>
+                            <td>{{$propdd->relationToOtherDataDictionaries}}
+                                {{-- Check if the relationToOtherDataDictionaries attribute exists and is not null --}}
+                                @if(!is_null($propdd->relationToOtherDataDictionaries))
+                                @php
+                                // Remove parentheses and split by ',' to get individual elements
+                                $relations = explode('),(', trim($propdd->relationToOtherDataDictionaries, '()'));
+
+                                // Initialize variables for storing URLs
+                                $propertyUrl = null;
+                                $domainUrl = null;
+
+                                // Iterate through each relation to check for bsdd.buildingsmart.org
+                                foreach ($relations as $relation) {
+                                // Split each relation into property URL and domain URL
+                                $parts = explode(', ', $relation);
+
+                                // If the second part (domain URL) matches bsdd.buildingsmart.org, store the property URL
+                                if (isset($parts[1]) && trim($parts[1]) === 'bsdd.buildingsmart.org') {
+                                $propertyUrl = trim($parts[0]); // Store the property URL
+                                $domainUrl = trim($parts[1]); // Store the domain URL
+                                break; // Stop the loop once we find the correct domain
+                                }
+                                }
+                                @endphp
+
+                                {{-- Only show the logo if the domain matches --}}
+                                @if($domainUrl === 'bsdd.buildingsmart.org')
+                                <a href="{{ $propertyUrl }}" target="_blank">
+                                    <img src="{{ asset('img/IFCBSDD.png') }}" alt="IFC Logo" style="width:40px; height:auto; margin-left:10px;">
+                                </a>
+                                @endif
+                                @endif
+                            </td>
                         </tr>
                         <tr>
                             <th>Língua dos criadores</th>
@@ -182,7 +233,7 @@
                         </tr>
                     </tbody>
                 </table>
-                <div class='flex py-6'>
+                <div class='flex py-2'>
                     <h4><strong>Propriedade presente em:</strong></h4>
                 </div>
                 <table id='tblprop' cellpadding='0' cellspacing='0'>

@@ -10,7 +10,6 @@
                 </div>
 
                 <!-- Navigation Links -->
-
                 @if (Route::has('login'))
                 <div class="sm:hidden space-x-8 -my-px ml-10 flex">
                     <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
@@ -23,29 +22,33 @@
                         {{ __('PDTs') }}
                     </x-nav-link>
                 </div>
-                @auth
+
+
                 <div class="sm:hidden space-x-8 -my-px ml-10 flex">
                     <x-nav-link :href="route('apidoc')" :active="request()->routeIs('apidoc')">
                         {{ __('Documentação API') }}
                     </x-nav-link>
                 </div>
 
-                @endauth
+
                 <div class="sm:hidden space-x-8 -my-px ml-10 flex">
                     <x-nav-link :href="route('participantes')" :active="request()->routeIs('participantes')">
                         {{ __('Participantes') }}
                     </x-nav-link>
                 </div>
+
                 <div class="sm:hidden space-x-8 -my-px ml-10 flex">
                     <x-nav-link :href="route('knowledge')" :active="request()->routeIs('knowledge')">
                         {{ __('Publicações') }}
                     </x-nav-link>
                 </div>
+
                 <div class="sm:hidden space-x-8 -my-px ml-10 flex">
                     <x-nav-link :href="route('contact.store')" :active="request()->routeIs('contact.store')">
                         {{ __('Contactos') }}
                     </x-nav-link>
                 </div>
+
                 @auth
                 @if (Auth::user()->isAdmin == 1)
                 <div class="sm:hidden space-x-8 -my-px ml-10 flex">
@@ -55,38 +58,36 @@
                 </div>
                 @endif
                 @endauth
-
                 @endif
-
             </div>
-            <!-- Login signup -->
-            {{-- :class="'inline-flex items-center px-4 py-2 bg-slate-700 dark:bg-slate-200 rounded-md font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-slate-900 dark:hover:bg-white focus:bg-slate-900 dark:focus:bg-white active:bg-slate-900 dark:active:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150'"  --}}
-            @if (Auth::user())
-            @else
+
+            <!-- Login/Signup -->
+            @guest
             <div class="flex items-center ml-6">
                 <div class="grid grid-cols-2">
                     @if (Route::has('login'))
                     <div class="sm:hidden flex">
-                        <x-button-primary-pdts link="{{route('login')}}" :active="request()->routeIs('login')" title="{{ __('Login') }}">
+                        <x-button-primary-pdts link="{{ route('login') }}" :active="request()->routeIs('login')" title="{{ __('Login') }}">
                         </x-button-primary-pdts>
                     </div>
+                    @endif
+
                     @if (Route::has('register'))
                     <div class="sm:hidden flex">
-                        <a href="{{route('register')}}">
+                        <a href="{{ route('register') }}">
                             <x-secondary-button :active="request()->routeIs('register')">
                                 {{ __('Registo') }}
                             </x-secondary-button>
                         </a>
                     </div>
                     @endif
-                    @endif
                 </div>
             </div>
-            @endif
-            <!-- Settings Dropdown -->
-            <div class="sm:hidden flex items-center ml-6">
+            @endguest
 
-                @auth
+            <!-- Settings Dropdown -->
+            @auth
+            <div class="sm:hidden flex items-center ml-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
@@ -101,35 +102,24 @@
                                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                 </svg>
                             </div>
-
                         </button>
                     </x-slot>
-                    @endauth
                     <x-slot name="content">
-                        @auth
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Perfil') }}
                         </x-dropdown-link>
-                        <x-dropdown-link :href="route('privacypolicy')">
-                            {{ __('Política de privacidade') }}
-                        </x-dropdown-link>
-
-                        <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-
-                            <x-dropdown-link :href="route('logout')" onclick="event.preventDefault();
-                                                this.closest('form').submit();">
+                            <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
                                 {{ __('Logout') }}
                             </x-dropdown-link>
                         </form>
-                        @endauth
                     </x-slot>
                 </x-dropdown>
-
             </div>
+            @endauth
 
-            <!-- Hamburger -->
+            <!-- Hamburger Menu (responsive) -->
             <div class="-mr-2 flex items-center md:hidden lg:hidden">
                 <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
@@ -143,72 +133,63 @@
 
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden">
-        @if (Route::has('login'))
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">
                 {{ __('Home') }}
             </x-responsive-nav-link>
-        </div>
-        @auth
-        <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('PDTs') }}
             </x-responsive-nav-link>
-        </div>
-        @endif
-        @endauth
-        <div class="pt-2 pb-3 space-y-1">
+            <x-responsive-nav-link :href="route('apidoc')" :active="request()->routeIs('apidoc')">
+                {{ __('Documentação API') }}
+            </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('contact.store')" :active="request()->routeIs('contact.store')">
                 {{ __('Contactos') }}
             </x-responsive-nav-link>
-        </div>
-        <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('participantes')" :active="request()->routeIs('participantes')">
                 {{ __('Participantes') }}
             </x-responsive-nav-link>
-        </div>
-        @if (Route::has('login'))
-        <div class="pt-2 pb-3 space-y-1">
+            <x-responsive-nav-link :href="route('knowledge')" :active="request()->routeIs('knowledge')">
+                {{ __('Publicações') }}
+            </x-responsive-nav-link>
+            @guest
+            @if (Route::has('login'))
             <x-responsive-nav-link :href="route('login')" :active="request()->routeIs('login')">
                 {{ __('Login') }}
             </x-responsive-nav-link>
-        </div>
-        @if (Route::has('register'))
-        <div class="pt-2 pb-3 space-y-1">
+            @endif
+            @if (Route::has('register'))
             <x-responsive-nav-link :href="route('register')" :active="request()->routeIs('register')">
                 {{ __('Registo') }}
             </x-responsive-nav-link>
+            @endif
+            @endguest
+            @auth
+            @if (Auth::user()->isAdmin == 1)
+            <x-responsive-nav-link :href="route('admin')" :active="request()->routeIs('admin')">
+                {{ __('Admin') }}
+            </x-responsive-nav-link>
+            @endif
+            @endauth
         </div>
-        @endif
-        @endif
 
         <!-- Responsive Settings Options -->
         @auth
         <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
-
             <div class="px-4">
                 <div class="font-medium text-base text-gray-800 dark:text-gray-200">{{ Auth::user()->name }}</div>
                 <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
             </div>
-
             <div class="mt-3 space-y-1">
-
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Perfil') }}
                 </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('privacypolicy')">
-                    {{ __('Política de privacidade') }}
-                </x-responsive-nav-link>
-                <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-
-                    <x-responsive-nav-link :href="route('logout')" onclick="event.preventDefault();
-                                        this.closest('form').submit();">
-                        {{ __('Log Out') }}
+                    <x-responsive-nav-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
+                        {{ __('Logout') }}
                     </x-responsive-nav-link>
                 </form>
-
             </div>
         </div>
         @endauth

@@ -26,9 +26,7 @@ class GroupofpropertiesController extends Controller
     //function for pdtdownload page
     public function getGroupOfProperties($pdtID)
     {
-
-        $pdt = productdatatemplates::where('Id', $pdtID)
-            ->first();
+        $pdt = productdatatemplates::where('Id', $pdtID)->first();
         $pdtGUID = $pdt->GUID;
         $pdts = productdatatemplates::where('GUID', $pdtGUID)
             ->orderBy('versionNumber', 'asc')
@@ -36,14 +34,15 @@ class GroupofpropertiesController extends Controller
             ->orderBy('editionNumber', 'asc')
             ->get();
 
-        $pdtCount = $pdts->count();
-        $latestPdt = $pdts[$pdtCount - 1];
-        $gop = DB::table('groupofproperties as gop')->where('pdtId', $pdtID)->get();
-        $referenceDocument = referencedocuments::all();
-        $properties_dict = propertiesdatadictionaries::all();
-        $properties = properties::where('pdtID', $pdtID)->get();
+        $latestPdt = $pdts->last();
 
-        // Join the properties and propertiesdatadictionaries tables
+        $masterpdt = productdatatemplates::where('GUID', '230d9954097541b793f2a1fddb8bd0ad')->latest()->first();
+        $pdt_groups = groupofproperties::where('pdtId', $pdtID)->get();
+        $master_groups = groupofproperties::where('pdtId', $masterpdt->Id)->get();
+
+        $properties = properties::where('pdtID', $pdtID)->get();
+        $properties_dict = propertiesdatadictionaries::all();
+        $referenceDocument = referencedocuments::all();
 
         $joined_properties = properties::leftJoin('propertiesdatadictionaries', function ($join) {
             $join->on('properties.propertyId', '=', 'propertiesdatadictionaries.Id');
@@ -56,19 +55,50 @@ class GroupofpropertiesController extends Controller
             'properties.propertyId',
             'propertiesdatadictionaries.versionNumber',
             'propertiesdatadictionaries.status',
-            'propertiesdatadictionaries.revisionNumber',
+            'propertiesdatadictionaries.relationToOtherDataDictionaries',
             'properties.gopID',
             'properties.referenceDocumentGUID',
             'propertiesdatadictionaries.units',
             'propertiesdatadictionaries.nameEn',
             'propertiesdatadictionaries.namePt',
             'properties.visualRepresentation'
-        )
-            ->get();
+        )->get();
 
-        return view('pdtsdownload', compact('gop', 'joined_properties', 'properties_dict', 'pdt',  'referenceDocument', 'latestPdt'));
+        $joined_properties->each(function ($property) use ($masterpdt) {
+            $property->from_master = ($property->pdtID == $masterpdt->Id);
+        });
+
+        $merged_groups = $pdt_groups->merge($master_groups);
+        $combined_groups = $merged_groups->groupBy('gopNamePt');
+
+        $group_order = [
+            'Dados de classificação',
+            'Dados gerais',
+            'Dados do fabricante',
+            'Dados de desempenho',
+            'Dados de especificação',
+            'Dados geométricos'
+        ];
+
+        // Sort groups based on the specified order, placing unmatched ones after the specified ones
+        $sorted_combined_groups = $combined_groups->sortBy(function ($_, $key) use ($group_order) {
+            $index = array_search($key, $group_order);
+            return $index === false ? count($group_order) : $index;
+        });
+
+        // Move 'Dados de gestão de instalações' and 'Dados de sustentabilidade' to the end
+        $sorted_combined_groups = $sorted_combined_groups->sortBy(function ($_, $key) {
+            if ($key === 'Dados de gestão de instalações') {
+                return PHP_INT_MAX - 1; // Second to last position
+            }
+            if ($key === 'Dados de sustentabilidade') {
+                return PHP_INT_MAX; // Last position
+            }
+            return 0; // Default ordering for others
+        });
+
+        return view('pdtsdownload', compact('sorted_combined_groups', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'latestPdt'));
     }
-
 
 
     //function for survey page
@@ -83,9 +113,9 @@ class GroupofpropertiesController extends Controller
     public function getGroupOfProperties2($pdtID)
     {
 
-        $pdt = productdatatemplates::where('Id', $pdtID)
-            ->first();
-        $pdts = productdatatemplates::where('GUID', $pdt->GUID)
+        $pdt = productdatatemplates::where('Id', $pdtID)->first();
+        $pdtGUID = $pdt->GUID;
+        $pdts = productdatatemplates::where('GUID', $pdtGUID)
             ->orderBy('versionNumber', 'asc')
             ->orderBy('revisionNumber', 'asc')
             ->orderBy('editionNumber', 'asc')
@@ -93,12 +123,18 @@ class GroupofpropertiesController extends Controller
 
         $pdtCount = $pdts->count();
         $latestPdt = $pdts[$pdtCount - 1];
-        $gop = DB::table('groupofproperties as gop')->where('pdtId', $pdtID)->get();
-        $referenceDocument = referencedocuments::all();
-        $properties_dict = propertiesdatadictionaries::all();
-        $properties = properties::where('pdtID', $pdtID)->get();
 
-        // Join the properties and propertiesdatadictionaries tables
+        // Fetch the groups for PDT properties and Master properties
+        $masterpdt = productdatatemplates::where('GUID', '230d9954097541b793f2a1fddb8bd0ad')->latest()->first();
+        $pdt_groups = groupofproperties::where('pdtId', $pdtID)->get();
+        $master_groups = groupofproperties::where('pdtId', $masterpdt->Id)->get();
+
+        // Get all properties linked to the PDT
+        $properties = properties::where('pdtID', $pdtID)->get();
+        $properties_dict = propertiesdatadictionaries::all();
+        $referenceDocument = referencedocuments::all();
+
+        // Join properties and propertiesdatadictionaries
         $joined_properties = properties::leftJoin('propertiesdatadictionaries', function ($join) {
             $join->on('properties.propertyId', '=', 'propertiesdatadictionaries.Id');
         })->select(
@@ -108,9 +144,9 @@ class GroupofpropertiesController extends Controller
             'properties.Id',
             'properties.pdtID',
             'properties.propertyId',
-            'propertiesdatadictionaries.status',
             'propertiesdatadictionaries.versionNumber',
-            'propertiesdatadictionaries.revisionNumber',
+            'propertiesdatadictionaries.status',
+            'propertiesdatadictionaries.relationToOtherDataDictionaries',
             'properties.gopID',
             'properties.referenceDocumentGUID',
             'propertiesdatadictionaries.units',
@@ -120,13 +156,50 @@ class GroupofpropertiesController extends Controller
         )
             ->get();
 
+        // Mark properties from the master template with `from_master` flag
+        $joined_properties->each(function ($property) use ($masterpdt) {
+            $property->from_master = ($property->pdtID == $masterpdt->Id); // Set true if from master, false otherwise
+        });
+
+        // Merge PDT and Master Groups
+        $merged_groups = $pdt_groups->merge($master_groups);
+
+        // Combine groups with similar names by grouping by gopNamePt
+        $combinedGroups = $merged_groups->groupBy('gopNamePt');
+
+        $group_order = [
+            'Dados de classificação',
+            'Dados gerais',
+            'Dados do fabricante',
+            'Dados de desempenho',
+            'Dados de especificação',
+            'Dados geométricos'
+        ];
+
+        // Sort groups based on the specified order, placing unmatched ones after the specified ones
+        $sorted_combined_groups = $combinedGroups->sortBy(function ($_, $key) use ($group_order) {
+            $index = array_search($key, $group_order);
+            return $index === false ? count($group_order) : $index;
+        });
+
+        // Move 'Dados de gestão de instalações' and 'Dados de sustentabilidade' to the end
+        $combined_groups = $sorted_combined_groups->sortBy(function ($_, $key) {
+            if ($key === 'Dados de gestão de instalações') {
+                return PHP_INT_MAX - 1; // Second to last position
+            }
+            if ($key === 'Dados de sustentabilidade') {
+                return PHP_INT_MAX; // Last position
+            }
+            return 0; // Default ordering for others
+        });
+
         $comments = comments::with('user')->get();
 
 
         $answers = Answers::where('users_id', Auth::id())->get();
 
 
-        return view('pdtssurvey', compact('gop', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'comments', 'answers', 'properties', 'latestPdt'));
+        return view('pdtssurvey', compact('combined_groups', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'comments', 'answers', 'properties', 'latestPdt'));
     }
 
 
@@ -351,7 +424,7 @@ class GroupofpropertiesController extends Controller
     public function createStep1()
     {
         // Get the latest versions/revisions of PDTs
-        $pdts = productdatatemplates::Where('status', "Preview")->get();
+        $pdts = productdatatemplates::get();
 
 
         return view('groupofproperties.choose_pdt', compact('pdts'));

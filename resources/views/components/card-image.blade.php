@@ -5,7 +5,7 @@
             <div class="p-3 flex flex-col justify-between">
                 <a class="content-center" href="{{ $card_link }}" data-te-ripple-init data-te-ripple-color="light">
                     <div class="h-10">
-                        <img class="w-full h-full" src="{{ $card_image }}" alt="" />
+                        <img class="w-full" src="{{ $card_image }}" alt="" />
                     </div>
                 </a>
                 <div>

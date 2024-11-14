@@ -41,9 +41,31 @@ class ProductdatatemplatesController extends Controller
                 }
             )
             ->get();
+
+        $categories = DB::table('productdatatemplates as pdt')
+            ->join(
+                DB::raw("(SELECT 
+                    GUID,
+                    MAX(versionNumber) as max_versionNumber,
+                    MAX(revisionNumber) as max_revisionNumber,
+                    MAX(editionNumber) as max_editionNumber
+                  FROM productdatatemplates 
+                  GROUP BY GUID) as mx"),
+                function ($join) {
+                    $join->on('mx.GUID', '=', 'pdt.GUID');
+                    $join->on('mx.max_versionNumber', '=', 'pdt.versionNumber');
+                    $join->on('mx.max_revisionNumber', '=', 'pdt.revisionNumber');
+                    $join->on('mx.max_editionNumber', '=', 'pdt.editionNumber');
+                }
+            )
+            ->select('pdt.category')
+            ->groupBy('pdt.category')
+            ->selectRaw('count(*) as count')
+            ->get();
+
         $allpdts = productdatatemplates::all();
 
-        return view('dashboard', compact('latestPDT', 'allpdts'));
+        return view('dashboard', compact('latestPDT', 'categories', 'allpdts'));
     }
 
 

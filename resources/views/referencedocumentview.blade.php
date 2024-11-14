@@ -1,9 +1,9 @@
 <x-app-layout>
     <div style="background-color: white;">
         <div class="container sm:max-w-full py-9">
-            <h1>Atributos do documento de referência</h1>
+            <h1>{{$rd->rdName}}</h1>
             <div class='flex flex-col'>
-                <h1 class="py-6">{{$rd->rdName}}</h1>
+                <h3 class="py-2">Atributos do documento de referência:</h3>
 
                 <table class="" id='tblprop' cellpadding='0' cellspacing='0'>
                     <tr>
@@ -27,7 +27,7 @@
                         <td>{{$rd->status}}</td>
                     </tr>
                 </table>
-                <h3 class="py-6">Propriedades que utilizam este documento de referência:</h3>
+                <h3 class="py-2">Propriedades que utilizam este documento de referência:</h3>
                 <table id='tblprop' cellpadding='0' cellspacing='0'>
                     <tr>
                         <th style="text-align: left!important;">Modelo de dados</th>

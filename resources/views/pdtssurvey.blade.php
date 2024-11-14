@@ -1,7 +1,7 @@
 <x-app-layout>
     <div style="background-color: white;">
-        <div class="container sm:max-w-full py-9">
-            <h1>{{ __('Análises e comentários do Modelo de Dados do Produto') }}</h1>
+        <div class="container sm:max-w-full py-4">
+            <h3>{{ __('Análises e comentários do Modelo de Dados do Produto') }}</h3>
             <section class="">
                 @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -26,114 +26,158 @@
                     @endif
 
                 </div>
-                <form class="overflow-scroll" name="form" id="form" method="post" action="{{ route('saveAnswers') }}" style="overflow: scroll;">
-                    <input type="hidden" name="pdtName" value="{{ $pdt->pdtNamePt }}">
+                <div>
 
-                    @csrf
-                    <table class="table-auto" id="tblpdts" cellpadding="0" cellspacing="0">
+                    <form name="form" id="form" method="post" action="{{ route('saveAnswers') }}">
+                        <div class="overflow-auto" style="overflow-y: auto; max-height: calc(100vh - 300px); border: #cbd5e1 1px Solid;">
+                            <input type="hidden" name="pdtName" value="{{ $pdt->pdtNamePt }}">
 
-                        <tr>
-                            <th>Propriedade</th>
-                            <th>Unidade</th>
-                            <th>Descrição</th>
-                            <th>Documento de referência</th>
-                            <th>Questão</th>
-                            <th>Comentários</th>
-                        </tr>
+                            @csrf
+                            <table class="table-auto" id="tblpdts" cellpadding="0" cellspacing="0">
+                                <thead class="sticky top-0 z-50">
+                                    <tr>
+                                        <th>Propriedade</th>
+                                        <th>Unidade</th>
+                                        <th>Descrição</th>
+                                        <th>Documento de referência</th>
+                                        <th>Questão</th>
+                                        <th>Comentários</th>
+                                    </tr>
+                                </thead>
 
 
+                                @foreach($combined_groups as $group)
+                                <tbody>
+                                    <tr>
+                                        <td class="text-left content-start bg-slate-300 p-3" colspan="6">
+                                            <input class="text-left expand" type="checkbox" name="{{ $group[0]->gopNamePt }}" id="{{ $group[0]->gopNamePt }}" data-toggle="toggle">
+                                            <label class="my-auto text-left cursor-pointer" for="{{ $group[0]->gopNamePt }}">Grupo de propriedades -
+                                                <a href="{{ url('datadictionaryviewGOP/' . $group[0]->Id . '-' . $group[0]->GUID) }}">
+                                                    {{ $group[0]->gopNamePt }}
+                                                </a>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </tbody>
 
-                        @foreach($gop as $group)
-                        <tbody>
-                            <tr>
-                                <td class="text-left content-start bg-slate-300 p-3" colspan="6">
-                                    <input class="text-left expand" type="checkbox" name="{{ $group->gopNamePt }}" id="{{ $group->gopNamePt }}" data-toggle="toggle">
-                                    <label class="my-auto text-left cursor-pointer" for="{{ $group->gopNamePt }}">Grupo de propriedades - <a href="{{ url('datadictionaryviewGOP/' . $group->Id . '-' . $group->GUID) }}">
-                                            {{ $group->gopNamePt }}
-                                        </a></label>
-                                </td>
-                            </tr>
-                        </tbody>
-                        <tbody class="hide">
-                            @foreach($joined_properties as $property)
-                            @if($property->gopID == $group->Id)
-                            <tr>
-                                <td class="p-1.5 property-td">
-                                    <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . $property->GUID) }}">{{ $property->namePt }}
-                                </td>
-                                <td class="p-1.5">
-                                    {{ $property->units ? $property->units : 'Sem unidade' }}
-                                </td>
-                                <td class="p-1.5">
-                                    <div class="flex flex-col">
-                                        <p>{{$property->descriptionPt}}</p>
-                                        @if($property->visualRepresentation == True)
-                                        <div class="col-sm">
-                                            <img src="{{ asset ('img/'.$property->nameEn.'.png')}}" alt='{{$property->nameEn}}' class="property-image">
-                                        </div>
-                                        @endif
-                                    </div>
-                                </td>
-                                @php
-                                $referenceDoc = $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first();
-                                @endphp
+                                <tbody class="hide">
 
-                                @if ($referenceDoc && ($referenceDoc->rdName == 'n/a' || !$referenceDoc->rdName))
-                                <td class="p-1.5">
-                                    <a>n/a</a>
-                                </td>
-                                @else
-                                <td class="p-1.5">
-                                    <a href="{{ route('referencedocumentview', ['rdGUID' => $property->referenceDocumentGUID]) }}">
-                                        <p title="{{ $referenceDoc->title }}">{{ $referenceDoc->rdName }}</p>
-                                    </a>
-                                </td>
-                                @endif
-                                <td class="p-1.5">
-                                    <div class="flex flex-col">
-                                        @csrf
+                                    @foreach($group as $propertyGroup)
+                                    @foreach($joined_properties as $property)
+                                    @if($property->gopID == $propertyGroup->Id)
+                                    <!-- Apply the 'master-template-row' class if the property is from master template -->
+                                    <tr class="{{ $property->from_master ? 'master-template-row' : '' }}">
+                                        <td class="p-1.5 property-td">
+                                            <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . $property->GUID) }}">{{ $property->namePt }}
+                                                {{-- Check if the relationToOtherDataDictionaries attribute exists and is not null --}}
+                                                @if(!is_null($property->relationToOtherDataDictionaries))
+                                                @php
+                                                // Remove parentheses and split by ',' to get individual elements
+                                                $relations = explode('),(', trim($property->relationToOtherDataDictionaries, '()'));
+
+                                                // Initialize variables for storing URLs
+                                                $propertyUrl = null;
+                                                $domainUrl = null;
+
+                                                // Iterate through each relation to check for bsdd.buildingsmart.org
+                                                foreach ($relations as $relation) {
+                                                // Split each relation into property URL and domain URL
+                                                $parts = explode(', ', $relation);
+
+                                                // If the second part (domain URL) matches bsdd.buildingsmart.org, store the property URL
+                                                if (isset($parts[1]) && trim($parts[1]) === 'bsdd.buildingsmart.org') {
+                                                $propertyUrl = trim($parts[0]); // Store the property URL
+                                                $domainUrl = trim($parts[1]); // Store the domain URL
+                                                break; // Stop the loop once we find the correct domain
+                                                }
+                                                }
+                                                @endphp
+
+                                                {{-- Only show the logo if the domain matches --}}
+                                                @if($domainUrl === 'bsdd.buildingsmart.org')
+                                                <a href="{{ $propertyUrl }}" target="_blank">
+                                                    <img src="{{ asset('img/IFCBSDD.png') }}" alt="IFC Logo" style="width:40px; height:auto; margin-left:10px;">
+                                                </a>
+                                                @endif
+                                                @endif
+                                            </a>
+
+                                        </td>
+                                        <td class="p-1.5">
+                                            {{ $property->units ? $property->units : 'Sem unidade' }}
+                                        </td>
+                                        <td class="p-1.5">
+                                            <div class="flex flex-col">
+                                                <p>{{$property->descriptionPt}}</p>
+                                                @if($property->visualRepresentation == True)
+                                                <div class="col-sm">
+                                                    <img src="{{ asset ('img/'.$property->nameEn.'.png')}}" alt='{{$property->nameEn}}' class="property-image">
+                                                </div>
+                                                @endif
+                                            </div>
+                                        </td>
                                         @php
-                                        $answer = $answers->where('properties_Id', $property->Id)->sortByDesc('created_at')->first();
-                                        $yesChecked = $answer && $answer->answer == 'yes' ? 'checked' : '';
-                                        $noChecked = $answer && $answer->answer == 'no' ? 'checked' : '';
-                                        $noOpinionChecked = !$answer || $answer->answer == 'no_opinion' ? 'checked' : '';
+                                        $referenceDoc = $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first();
                                         @endphp
-                                        <div class="form-check form-check-inline">
-                                            <input class="h-4 w-4 border-gray-300 text-slate-600 focus:ring-slate-600" type="radio" name="{{$property->Id}}" id="answerYes-{{$property->Id}}" value="yes" {{$yesChecked}}>
-                                            <label class="ml-2 my-auto block text-sm font-medium leading-6 text-gray-900" for="answerYes-{{$property->Id}}">Sim</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="h-4 w-4 border-gray-300 text-slate-600 focus:ring-slate-600" type="radio" name="{{$property->Id}}" id="answerNo-{{$property->Id}}" value="no" {{$noChecked}}>
-                                            <label class="ml-2 my-auto block text-sm font-medium leading-6 text-gray-900" for="answerNo-{{$property->Id}}">Não</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="h-4 w-4 border-gray-300 text-slate-600 focus:ring-slate-600" type="radio" name="{{$property->Id}}" id="answerNoOpinion-{{$property->Id}}" value="no_opinion" {{$noOpinionChecked}}>
-                                            <label class="ml-2 my-auto block text-sm font-medium leading-6 text-gray-900" for="answerNoOpinion-{{$property->Id}}">Sem opinião</label>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="p-1.5">
-                                    <x-nav-link type="button" id="loadComments-{{$property->Id}}" onclick="loadComments(this, '{{$property->Id}}')">Comentários ({{ \App\Models\comments::where('properties_Id', $property->Id)->count() }})</x-nav-link>
-                                </td>
-                            </tr>
-                            @endif
-                            @endforeach
-                        </tbody>
-                        @endforeach
-                    </table>
 
-                    <div class="my-6 text-end">
-                        <a href="/dashboard">
-                            <x-secondary-button id="backButton" type="button">
-                                Anterior
-                            </x-secondary-button>
-                        </a>
-                        <x-primary-button id="saveButton" type="submit">
-                            Guardar Respostas
-                        </x-primary-button>
-                    </div>
+                                        @if ($referenceDoc && ($referenceDoc->rdName == 'n/a' || !$referenceDoc->rdName))
+                                        <td class="p-1.5">
+                                            <a>n/a</a>
+                                        </td>
+                                        @else
+                                        <td class="p-1.5">
+                                            <a href="{{ route('referencedocumentview', ['rdGUID' => $property->referenceDocumentGUID]) }}">
+                                                <p title="{{ $referenceDoc->title }}">{{ $referenceDoc->rdName }}</p>
+                                            </a>
+                                        </td>
+                                        @endif
+                                        <td class="p-1.5">
+                                            <div class="flex flex-col">
+                                                @csrf
+                                                @php
+                                                $answer = $answers->where('properties_Id', $property->Id)->sortByDesc('created_at')->first();
+                                                $yesChecked = $answer && $answer->answer == 'yes' ? 'checked' : '';
+                                                $noChecked = $answer && $answer->answer == 'no' ? 'checked' : '';
+                                                $noOpinionChecked = !$answer || $answer->answer == 'no_opinion' ? 'checked' : '';
+                                                @endphp
+                                                <div class="form-check form-check-inline">
+                                                    <input class="h-4 w-4 border-gray-300 text-slate-600 focus:ring-slate-600" type="radio" name="{{$property->Id}}" id="answerYes-{{$property->Id}}" value="yes" {{$yesChecked}}>
+                                                    <label class="ml-2 my-auto block text-sm font-medium leading-6 text-gray-900" for="answerYes-{{$property->Id}}">Sim</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="h-4 w-4 border-gray-300 text-slate-600 focus:ring-slate-600" type="radio" name="{{$property->Id}}" id="answerNo-{{$property->Id}}" value="no" {{$noChecked}}>
+                                                    <label class="ml-2 my-auto block text-sm font-medium leading-6 text-gray-900" for="answerNo-{{$property->Id}}">Não</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="h-4 w-4 border-gray-300 text-slate-600 focus:ring-slate-600" type="radio" name="{{$property->Id}}" id="answerNoOpinion-{{$property->Id}}" value="no_opinion" {{$noOpinionChecked}}>
+                                                    <label class="ml-2 my-auto block text-sm font-medium leading-6 text-gray-900" for="answerNoOpinion-{{$property->Id}}">Sem opinião</label>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="p-1.5">
+                                            <x-nav-link type="button" id="loadComments-{{$property->Id}}" onclick="loadComments(this, '{{$property->Id}}')">Comentários ({{ \App\Models\comments::where('properties_Id', $property->Id)->count() }})</x-nav-link>
+                                        </td>
+                                    </tr>
+                                    @endif
+                                    @endforeach
+                                    @endforeach
+                                </tbody>
+                                @endforeach
+                            </table>
+                        </div>
+                        <h6 style="padding-top: 5px"> Nota: As propriedades do modelo de dados mestre são destacadas a cinzento </h6>
+                        <div class="my-6 text-end">
+                            <a href="/dashboard">
+                                <x-secondary-button id="backButton" type="button">
+                                    Anterior
+                                </x-secondary-button>
+                            </a>
+                            <x-primary-button id="saveButton" type="submit">
+                                Guardar Respostas
+                            </x-primary-button>
+                        </div>
 
-                </form>
+                    </form>
             </section>
         </div>
 
