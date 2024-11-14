@@ -53,7 +53,7 @@ Route::get('/dashboard', [ProductdatatemplatesController::class, 'getLatestPDTs'
     return view('dashboard');
 })->name('dashboard');
 
-Route::get('/pdtsdownload/{pdtID}', [GroupofpropertiesController::class, 'getGroupOfProperties'])->middleware(['auth', 'verified'])->name('pdtsdownload');
+Route::get('/pdtsdownload/{pdtID}', [GroupofpropertiesController::class, 'getGroupOfProperties'])->name('pdtsdownload');
 
 Route::get('/loinproject', [LoinsController::class, 'projectsindex'])->name('loinproject');
 Route::get('/loinproject/create', [LoinsController::class, 'projectscreate'])->name('projectscreate');
@@ -78,8 +78,7 @@ Route::get('/loinDownloadExcel/{id}/{objectName}', [LoinsController::class, 'dow
 
 Route::get('/projectLoinsExcel/{projectName}', [LoinsController::class, 'exportProjectLoinsExcel'])->name('exportProjectLoinsExcel');
 Route::get('/projectLoinsJson/{projectName}', [LoinsController::class, 'exportProjectLoinsJson'])->name('exportProjectLoinsJson');
-Route::get('/pdtsdownload/{pdtID}', [GroupofpropertiesController::class, 'getGroupOfProperties'])
-    ->name('pdtsdownload');
+
 
 Route::middleware('auth', 'verified')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
