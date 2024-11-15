@@ -12,16 +12,16 @@
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg" />
             </div>
 
-            <!-- Scrollable Container -->
+
             <div style="height: 500px; overflow-y: auto;">
                 <table class="table-auto min-w-full text-left text-sm font-light">
                     <colgroup>
-                        <col style="width: 100px"> <!-- Fixed width for the image -->
-                        <col style="width: 300px"> <!-- Fixed width for the name -->
-                        <col style="width: 100px"> <!-- Fixed width for the versions -->
-                        <col style="width: 100px"> <!-- Fixed width for category name -->
-                        <col style="width: 100px"> <!-- Fixed width for action buttons -->
-                        <col style="width: 100px"> <!-- Fixed width for survey button -->
+                        <col style="width: 100px">
+                        <col style="width: 300px">
+                        <col style="width: 100px">
+                        <col style="width: 100px">
+                        <col style="width: 100px">
+                        <col style="width: 100px">
                     </colgroup>
                     <thead class="sticky top-0 z-50 border-b bg-white font-medium dark:border-neutral-500">
                         <tr>

@@ -201,10 +201,10 @@
 
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
-            removeBtn.classList.add('btn', 'btn-danger');
+            removeBtn.classList.add('text-danger');
             removeBtn.textContent = 'X';
             removeBtn.onclick = function() {
-                removeField(removeBtn);
+                removeField(newRow); // Pass the entire row container
             };
 
             objectCol.appendChild(objectField);
@@ -217,11 +217,11 @@
             ifcField.name = 'ifcClasses[]';
             ifcField.classList.add('form-control');
             ifcField.innerHTML = `
-                <option value="" disabled selected>{{ __('Selecionar IFC Class') }}</option>
-                @foreach($ifcClasses as $ifcClass)
-                    <option value="{{ $ifcClass['id'] }}">{{ $ifcClass['name'] }}</option>
-                @endforeach
-            `;
+        <option value="" disabled selected>{{ __('Selecionar IFC Class') }}</option>
+        @foreach($ifcClasses as $ifcClass)
+            <option value="{{ $ifcClass['id'] }}">{{ $ifcClass['name'] }}</option>
+        @endforeach
+    `;
             ifcCol.appendChild(ifcField);
 
             // Append new row with object and IFC class select
@@ -231,9 +231,8 @@
         }
 
         // Remove field function
-        function removeField(button) {
-            const fieldContainer = button.parentElement;
-            fieldContainer.remove();
+        function removeField(row) {
+            row.remove(); // Remove the entire row container
         }
     </script>
 </x-app-layout>
