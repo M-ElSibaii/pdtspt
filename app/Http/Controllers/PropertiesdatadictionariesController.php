@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\properties;
 use App\Models\productdatatemplates;
 use App\Models\groupofproperties;
-use App\Models\referenceDocuments;
+use App\Models\referencedocuments;
 use App\Models\propertiesdatadictionaries;
 use Illuminate\Support\Facades\Log;
 
@@ -28,7 +28,7 @@ class PropertiesdatadictionariesController extends Controller
         $referencedocumentGUID = $referenceDocumentData ? $referenceDocumentData->referenceDocumentGUID : null;
 
         // Fetch the reference document only if a GUID was found
-        $referencedocument = $referencedocumentGUID ? referencedocuments::where('GUID', $referencedocumentGUID)->first() : null;
+        $referencedocument = $referencedocumentGUID ? referencedocuments::where('GUID', $referencedocumentGUID)->first() : 'n/a';
 
         return view('datadictionaryview', compact('propdd', 'propinpdts', 'pdts', 'propversions', 'referencedocument'));
     }
