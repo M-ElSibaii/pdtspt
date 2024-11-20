@@ -48,21 +48,15 @@
                         </tr>
                         <tr>
                             <th>Documento de referência</th>
-                            @if ($referencedocument && ($referencedocument->rdName === 'n/a' || !$referencedocument->rdName))
                             <td class="p-1.5">
-                                <a>n/a</a>
-                            </td>
-                            @elseif ($referencedocument)
-                            <td class="p-1.5">
+                                @if ($referencedocument->rdName === 'n/a')
+                                <span>n/a</span>
+                                @else
                                 <a href="{{ route('referencedocumentview', ['rdGUID' => $referencedocument->GUID]) }}">
                                     <p title="{{ $referencedocument->title }}">{{ $referencedocument->rdName }}</p>
                                 </a>
+                                @endif
                             </td>
-                            @else
-                            <td class="p-1.5">
-                                <span>n/a</span>
-                            </td>
-                            @endif
                         </tr>
                         <tr>
                             <th>Data de criação</th>
