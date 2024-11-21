@@ -45,6 +45,10 @@ Route::get('/contact',  function () {
     return view('contact');
 });
 
+Route::get('/manifestobuildingsmartpt', function () {
+    return view('manifestobuildingsmartpt');
+})->name('manifestobuildingsmartpt');
+
 Route::post('/contact', [ContactController::class, 'store'])
     ->name('contact.store');
 
