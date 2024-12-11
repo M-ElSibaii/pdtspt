@@ -12,6 +12,7 @@ use App\Models\properties;
 use App\Models\propertiesdatadictionaries;
 use App\Models\Projects;
 use App\Models\Milestones;
+use App\Models\Classification;
 use App\Models\Actors;
 use App\Models\Purposes;
 use App\Models\Objects;
@@ -30,33 +31,47 @@ class LoinsController extends Controller
     private function fetchIfcClasses()
     {
         $ifcClasses = [];
+        $offset = 0;
+        $limit = 1000; // API's maximum limit
 
         try {
-            $response = Http::withHeaders([
-                'Accept' => 'application/json',
-                'User-Agent' => 'pdtspt/1.0',
-            ])->get('https://api.bsdd.buildingsmart.org/api/Dictionary/v1/Classes', [
-                'Uri' => 'https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3',
-                'ClassType' => 'Class',
-            ]);
+            do {
+                $response = Http::withHeaders([
+                    'Accept' => 'application/json',
+                    'User-Agent' => 'pdtspt/1.0',
+                ])->get('https://api.bsdd.buildingsmart.org/api/Dictionary/v1/Classes', [
+                    'Uri' => 'https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3',
+                    'ClassType' => 'Class',
+                    'Offset' => $offset,
+                    'Limit' => $limit,
+                ]);
 
-            if ($response->successful()) {
-                $data = $response->json();
-                if (isset($data['classes'])) {
-                    foreach ($data['classes'] as $class) {
-                        $ifcClasses[] = [
-                            'id' => $class['code'] ?? $class['id'],
-                            'name' => $class['code'],
-                        ];
+                if ($response->successful()) {
+                    $data = $response->json();
+                    if (isset($data['classes']) && is_array($data['classes'])) {
+                        foreach ($data['classes'] as $class) {
+                            $ifcClasses[] = [
+                                'id' => $class['code'] ?? $class['id'],
+                                'name' => $class['code'] ?? $class['id'], // Ensure 'code' is used when available
+                            ];
+                        }
                     }
+                    // Increase offset for next batch
+                    $offset += $limit;
+                } else {
+                    Log::error("Error fetching IFC classes: API response unsuccessful. Status: " . $response->status());
+                    break;
                 }
-            }
+            } while (!empty($data['classes']) && count($data['classes']) === $limit); // Continue fetching until fewer than limit
+
         } catch (\Exception $e) {
             Log::error("Error fetching IFC classes: " . $e->getMessage());
         }
 
         return $ifcClasses;
     }
+
+
 
     private function fetchIfcProperties($ifcClass)
     {
@@ -104,6 +119,13 @@ class LoinsController extends Controller
         return $ifcProperties;
     }
 
+    public function fetchIfcPropertiesAjax($ifcClass)
+    {
+        $ifcProperties = $this->fetchIfcProperties($ifcClass);
+
+        return response()->json($ifcProperties);
+    }
+
     //projects loin functions
     public function projectsindex()
     {
@@ -121,7 +143,6 @@ class LoinsController extends Controller
 
     public function projectsstore(Request $request)
     {
-
         // Define custom error messages
         $messages = [
             'projectName.unique' => 'O nome do projeto deve ser único para o usuário.',
@@ -129,22 +150,36 @@ class LoinsController extends Controller
             'projectName.string' => 'O nome do projeto deve ser uma string.',
             'projectName.max' => 'O nome do projeto não pode exceder 255 caracteres.',
         ];
-        // Validate the incoming request data
+
+        // Validate the request
         $request->validate([
             'projectName' => 'required|string|max:255|unique:projects,projectName,NULL,id,userId,' . Auth::id(),
             'description' => 'nullable|string',
+            'classificationSystem' => 'nullable|string|max:255',
+            'customClassificationSystem' => 'nullable|string|max:255',
         ], $messages);
+
         $userId = auth()->id();
-        // Create a new project
-        Projects::create([
+
+        // Create the project
+        $project = Projects::create([
             'projectName' => $request->projectName,
             'description' => $request->description,
             'userId' => $userId,
         ]);
 
+        // Save classification only if provided
+        if ($request->classificationSystem || $request->customClassificationSystem) {
+            Classification::create([
+                'classification_system' => $request->customClassificationSystem ?: $request->classificationSystem,
+                'project_id' => $project->id,
+            ]);
+        }
+
         // Redirect back with success message
         return redirect()->route('loinproject')->with('success', __('Projeto criado com sucesso.'));
     }
+
 
     public function destroyproject($id)
     {
@@ -249,7 +284,7 @@ class LoinsController extends Controller
             }
         }
 
-        return redirect()->route('loinattributes', ['project' => $projectId])->with('success', 'Attributes stored successfully.');
+        return redirect()->route('loinattributes', ['project' => $projectId])->with('success', 'pré-requisitos guardados com sucesso.');
     }
 
     public function deleteAttribute(Request $request, $projectId)
@@ -331,6 +366,42 @@ class LoinsController extends Controller
 
         return response()->json($filteredProperties);
     }
+
+    public function fetchProperties($pdtId)
+    {
+        try {
+            $pdt = productdatatemplates::find($pdtId);
+            if (!$pdt) {
+                return response()->json(['success' => false, 'message' => 'PDT not found.']);
+            }
+
+            $gops = groupofproperties::where('pdtId', $pdtId)->get();
+            $properties = properties::where('pdtID', $pdtId)->get();
+            $propertiesindd = propertiesdatadictionaries::all();
+
+            // Group properties by their respective groups
+            $groupedProperties = [];
+            foreach ($gops as $gop) {
+                $grouped = $properties->where('gopID', $gop->Id)->map(function ($property) use ($propertiesindd, $gop) {
+                    $propertyDetails = $propertiesindd->firstWhere('Id', $property->propertyId);
+                    return [
+                        'name' => $propertyDetails->nameEn ?? 'N/A',
+                        'description' => $propertyDetails->definitionEn ?? 'N/A',
+                        'group' => $gop->gopNameEn ?? 'N/A'
+                    ];
+                });
+                $groupedProperties[$gop->gopNameEn] = $grouped->toArray();
+            }
+
+            return response()->json(['success' => true, 'groupedProperties' => $groupedProperties]);
+        } catch (\Exception $e) {
+            Log::error("Error fetching PDT properties: " . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'An error occurred while fetching properties.']);
+        }
+    }
+
+
+
     public function createloin2(Request $request)
     {
         // Retrieve selected options from the form
@@ -338,37 +409,19 @@ class LoinsController extends Controller
         $actorRequiring = Actors::find($request->actor_requiring);
         $actorProviding = Actors::find($request->actor_providing);
         $purpose = Purposes::find($request->purpose);
-        $object = Objects::find($request->object);
-        $ifcClass = $object->ifcClass;
-        $pdt = productdatatemplates::find($request->pdt);
         $projectId = $request->projectId;
         $project = projects::where("id", $projectId)->first();
         $projectName = $project->projectName;
+        $objects = Objects::where('projectId', $projectId)->get();
 
+        // Fetch IFC classes
+        $ifcClasses = $this->fetchIfcClasses();
 
         $userId = auth()->id(); // Get the current authenticated user's ID
 
 
         // Fetch LOIN entries submitted by the current user
         $loins = Loins::where('userId', $userId)->where('projectId', $projectId)->get();
-
-        // fetch ifc properties
-        $ifcProperties = $this->fetchIfcProperties($ifcClass);
-
-        // Initialize variables for PDT and its related data
-        $pdts = null;
-        $gops = collect(); // Initialize as an empty collection
-        $properties = collect(); // Initialize as an empty collection
-
-        // Check if a PDT is selected
-        if ($request->has('pdt') && !empty($request->pdt)) {
-            $pdt = productdatatemplates::find($request->pdt);
-            if ($pdt) {
-                $pdts = productdatatemplates::where('Id', $pdt->Id)->first();
-                $gops = groupofproperties::where('pdtId', $pdt->Id)->get();
-                $properties = properties::where('pdtID', $pdt->Id)->get();
-            }
-        }
 
         // Fetch  properties from dd
         $propertiesindd = propertiesdatadictionaries::all();
@@ -378,7 +431,20 @@ class LoinsController extends Controller
         $Mastergops = groupofproperties::where('pdtId', ($MasterDataTemplate->Id))->get();
         $MasterProperties = properties::where('pdtId', ($MasterDataTemplate->Id))->get();
 
-        $formattedMasterProperties = $MasterProperties->map(function ($property) {
+
+        // get classification information
+        $classificationsystem = Classification::where('projectId', $projectId)->first();
+
+        //fetch all pdts
+
+        $pdtsall = productdatatemplates::All();
+        $pdtslatest = $pdtsall->groupBy('GUID')->map(function ($group) {
+            return $group->sortByDesc(function ($item) {
+                return sprintf('%d.%010d.%010d', $item->editionNumber, $item->versionNumber, $item->revisionNumber);
+            })->first();
+        });
+        // Prepare Master Properties for the search bar
+        $masterPropertiesArray = $MasterProperties->map(function ($property) {
             // Fetch the name, description, and group separately
             $propertyName = propertiesdatadictionaries::where('Id', $property->propertyId)->value('nameEn');
             $propertyDescription = propertiesdatadictionaries::where('Id', $property->propertyId)->value('definitionEn');
@@ -392,57 +458,28 @@ class LoinsController extends Controller
             ];
         });
 
-        $formattedProperties = $properties->map(function ($property) {
-            // Fetch the name, description, and group separately
-            $propertyName = propertiesdatadictionaries::where('Id', $property->propertyId)->value('nameEn');
-            $propertyDescription = propertiesdatadictionaries::where('Id', $property->propertyId)->value('definitionEn');
-            $groupName = groupofproperties::where('Id', $property->gopID)->value('gopNameEn');
+        // Prepare data for the view
 
-            // Return standardized structure
-            return [
-                'name' => $propertyName ?? 'N/A',           // Ensure default if null
-                'description' => $propertyDescription ?? 'N/A',
-                'group' => $groupName ?? 'N/A'
-            ];
-        });
+        $pdtslatestversions = $pdtslatest->values(); // Convert to collection
 
-        $formattedIfcProperties = collect($ifcProperties)->map(function ($property) {
-            return [
-                'name' => $property['propertyName'],
-                'description' => $property['propertyDescription'],
-                'group' => $property['propertySet']
-            ];
-        });
-        $allProperties = $formattedMasterProperties
-            ->merge($formattedProperties)
-            ->merge($formattedIfcProperties)
-            ->values(); // Ensures a continuous index
-
-        // Store allProperties in session for later use
-        session(['allProperties' => $allProperties]);
-
-        // Return the view with the IFC properties and other necessary data (remove name, remove classification code.)
+        // Return the view with the IFC properties and other necessary data
         return view('loincreate2', [
             'projectId' =>  $projectId,
             'nomeProjeto' =>  $projectName,
-            'ifcClass' => $object->ifcClass,
-            'objeto' => $object->object,
+            'objects' => $objects,
             'proposito' => $purpose->purpose,
             'phase' => $milestone->milestone,
             'atorRequerente' => $actorRequiring->actor,
             'atorFornecedor' => $actorProviding->actor,
-            'codigoClassificacao' => "code",
-            'sistemaClassificacao' => "system",
-            'tabelaClassificacao' => "table",
-            'ifcProperties' => $ifcProperties,
-            'pdts' => $pdts,
-            'gops' => $gops,
-            'properties' => $properties,
+            'sistemaClassificacao' => $classificationsystem->classificationSystem,
+            'pdtslatestversions' => $pdtslatestversions,
             'propertiesindd' => $propertiesindd,
             'MasterDataTemplate' => $MasterDataTemplate,
             'Mastergops' => $Mastergops,
             'MasterProperties' => $MasterProperties,
+            'masterPropertiesArray' => $masterPropertiesArray,
             'loins' => $loins,
+            'ifcClasses' => $ifcClasses,
         ]);
     }
 

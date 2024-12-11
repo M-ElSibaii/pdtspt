@@ -12,7 +12,7 @@
             @csrf
             <input type="hidden" name="projectId" value="{{ $project->id }}">
             <div class="loin-container">
-                <h2>{{ __('Atributos de Nível de Necessidade de Informação') }}</h2>
+                <h2>{{ __('Pré-requisitos de Nível de Necessidade de Informação') }}</h2>
                 <br>
 
                 <!-- Milestones Section -->
@@ -81,10 +81,9 @@
                     <div id="object-container" class="row mb-2">
                         <div class="col-md-6">
                             <input type="text" name="objects[]" class="form-control" placeholder="Object">
-
                         </div>
                         <div class="col-md-6">
-                            <select name="ifcClasses[]" class="form-control">
+                            <select name="ifcClasses[]" class="form-control ifc-class-select" style="width: 100%;">
                                 <option value="" disabled selected>{{ __('Selecionar IFC Class') }}</option>
                                 @foreach($ifcClasses as $ifcClass)
                                 <option value="{{ $ifcClass['id'] }}">{{ $ifcClass['name'] }}</option>
@@ -93,7 +92,6 @@
                         </div>
                     </div>
                     <button type="button" class="btn btn-secondary" onclick="addObjectField()">Add More Objects</button>
-
                     <!-- List objects with IFC Class -->
                     <ul>
                         @foreach($objects as $object)
@@ -104,6 +102,7 @@
                         @endforeach
                     </ul>
                 </div>
+
 
                 <div>
                     <!-- Green "Salvar Attributes" Button -->
@@ -120,6 +119,9 @@
         </form>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script>
         $(document).on('click', '.delete-attribute', function(e) {
             e.preventDefault();
@@ -183,8 +185,16 @@
             `;
             container.appendChild(newField);
         }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Select2 on page load
+            $('.ifc-class-select').select2({
+                placeholder: "{{ __('Selecionar IFC Class') }}",
+                allowClear: true,
+                width: '100%'
+            });
+        });
 
-        // Add new object field with IFC class select
+        // Dynamically add new fields and reinitialize Select2
         function addObjectField() {
             const container = document.getElementById('object-container');
             const newRow = document.createElement('div');
@@ -192,43 +202,42 @@
 
             // Object input
             const objectCol = document.createElement('div');
-            objectCol.classList.add('col-md-6', 'input-group');
-            const objectField = document.createElement('input');
-            objectField.type = 'text';
-            objectField.name = 'objects[]';
-            objectField.classList.add('form-control');
-            objectField.placeholder = 'Object';
+            objectCol.classList.add('col-md-6');
+            const objectInput = document.createElement('input');
+            objectInput.type = 'text';
+            objectInput.name = 'objects[]';
+            objectInput.classList.add('form-control');
+            objectInput.placeholder = 'Object';
+            objectCol.appendChild(objectInput);
 
-            const removeBtn = document.createElement('button');
-            removeBtn.type = 'button';
-            removeBtn.classList.add('text-danger');
-            removeBtn.textContent = 'X';
-            removeBtn.onclick = function() {
-                removeField(newRow); // Pass the entire row container
-            };
-
-            objectCol.appendChild(objectField);
-            objectCol.appendChild(removeBtn);
-
-            // IFC class select
+            // IFC Class select
             const ifcCol = document.createElement('div');
             ifcCol.classList.add('col-md-6');
-            const ifcField = document.createElement('select');
-            ifcField.name = 'ifcClasses[]';
-            ifcField.classList.add('form-control');
-            ifcField.innerHTML = `
+            const ifcSelect = document.createElement('select');
+            ifcSelect.name = 'ifcClasses[]';
+            ifcSelect.classList.add('form-control', 'ifc-class-select');
+            ifcSelect.innerHTML = `
         <option value="" disabled selected>{{ __('Selecionar IFC Class') }}</option>
         @foreach($ifcClasses as $ifcClass)
-            <option value="{{ $ifcClass['id'] }}">{{ $ifcClass['name'] }}</option>
+        <option value="{{ $ifcClass['id'] }}">{{ $ifcClass['name'] }}</option>
         @endforeach
     `;
-            ifcCol.appendChild(ifcField);
+            ifcCol.appendChild(ifcSelect);
 
-            // Append new row with object and IFC class select
             newRow.appendChild(objectCol);
             newRow.appendChild(ifcCol);
             container.appendChild(newRow);
+
+            // Reinitialize Select2 for dynamically added dropdowns
+            $(ifcSelect).select2({
+                placeholder: "{{ __('Selecionar IFC Class') }}",
+                allowClear: true,
+                width: '100%'
+            });
         }
+
+
+
 
         // Remove field function
         function removeField(row) {

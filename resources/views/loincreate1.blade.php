@@ -52,31 +52,8 @@
                 </select>
             </div>
 
-            <!-- Select Objects -->
-            <div class="form-group">
-                <label for="object">{{ __('Select Object') }}</label>
-                <select name="object" class="form-control" required>
-                    <option value="" disabled selected>Select Object</option>
-                    @foreach($objects as $object)
-                    <option value="{{ $object->id }}">{{ $object->object }} ({{ $object->ifcClass }})</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <!-- Select PDT -->
-            <div class="form-group">
-                <label for="pdt">{{ __('Select relevant Product Data Template (PDT) from platform') }}</label>
-                <select name="pdt" class="form-control">
-                    <option value="" disabled selected>Select PDT</option>
-                    @foreach($pdts as $pdt)
-                    @if($pdt['pdtNameEn'] !== 'Master')
-                    <option value="{{ $pdt->Id }}">{{ $pdt->pdtNamePt }} ( {{ $pdt->pdtNameEn }} ) V {{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}</option>
-                    @endif
-                    @endforeach
-                </select>
-            </div>
-
-            <button type="submit" class="btn btn-secondary">{{ __('Create LOIN with selected attributes') }}</button>
+            <button type="submit" class="btn btn-primary" style="color: black">{{ __('Create LOIN with selected attributes') }}</button>
+            <a href="{{ route('loinattributes', $project->id) }}" class="btn btn-primary" style="color: black">{{ __('Adicionar/Editar pré-requisitos') }}</a>
         </form>
         <br>
         <!-- Existing LOIN Records -->

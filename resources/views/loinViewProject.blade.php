@@ -14,7 +14,7 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th style="background-color: #f0f0f0;">{{ __('Nome de Projeto') }}</th>
+
                             <th style="background-color: #f0f0f0;">{{ __('Nome de objeto') }}</th>
                             <th style="background-color: #f0f0f0;">{{ __('Proposito') }}</th>
                             <th style="background-color: #f0f0f0;">{{ __('Actor Fornecedor') }}</th>
@@ -26,7 +26,7 @@
                     <tbody>
                         @foreach($loins as $loin)
                         <tr>
-                            <td>{{ $loin->projectName }}</td>
+
                             <td>{{ $loin->objectName }}</td>
                             <td>{{ $loin->purpose }}</td>
                             <td>{{ $loin->actorProviding }}</td>

@@ -18,7 +18,13 @@
             </div>
             <div class="row">
                 <div class="col-md-4">
-                    <p><strong>{{ __('Objeto:') }}</strong> {{ $objeto }}</p>
+                    <label for="objectDropdown"><strong>{{ __('Select Object:') }}</strong></label>
+                    <select name="object" id="objectDropdown" class="form-control" required>
+                        <option value="">{{ __('-- Select an Object --') }}</option>
+                        @foreach ($objects as $object)
+                        <option value="{{ $object->id }}">{{ $object->object }}</option>
+                        @endforeach
+                    </select>
                 </div>
                 <div class="col-md-4">
                     <p><strong>{{ __('Actor Requerente:') }}</strong> {{ $atorRequerente }}</p>
@@ -27,6 +33,7 @@
                     <p><strong>{{ __('Proposito:') }}</strong> {{ $proposito }}</p>
                 </div>
             </div>
+
         </div>
 
         <form method="POST" action="{{ route('createLoin2store') }}" id="loin-form">
@@ -35,14 +42,17 @@
             <div class="loin-container" id="loin-instances">
                 <div class="tab">
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <button class="tablinks" onclick="openData(event, 'geometrical')">Informações Geométrica</button>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <button class="tablinks" onclick="openData(event, 'documentation')">Documentações</button>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <button class="tablinks" onclick="openData(event, 'alphanumerical')">Informações Alfanuméricas</button>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="tablinks" onclick="openData(event, 'classification')">Classificação</button>
                         </div>
                     </div>
                 </div>
@@ -51,17 +61,27 @@
                 <input type="hidden" id="nomeProjeto" name="nomeProjeto" value="{{ $nomeProjeto }}">
                 <input type="hidden" id="atorFornecedor" name="atorFornecedor" value="{{ $atorFornecedor }}">
                 <input type="hidden" id="atorRequerente" name="atorRequerente" value="{{ $atorRequerente }}">
-                <input type="hidden" id="ifcClass" name="ifcClass" value="{{ $ifcClass }}">
-                <input type="hidden" id="objeto" name="objeto" value="{{ $objeto }}">
                 <input type="hidden" id="proposito" name="proposito" value="{{ $proposito }}">
                 <input type="hidden" id="phase" name="phase" value="{{ $phase }}">
-                <input type="hidden" id="pdtName" name="pdtName" value="{{ $pdts ? $pdts->pdtNameEn : 'n/a' }}">
                 <input type="hidden" name="userId" value="{{ auth()->id() }}">
                 <input type="hidden" name="sistemaClassificacao" value="{{ $sistemaClassificacao }}">
-                <input type="hidden" name="tabelaClassificacao" value="{{ $tabelaClassificacao }}">
 
 
                 <div class="loin-instance">
+                    <div id="classification" class="tabcontent">
+                        <h3>{{ __('Classificação') }}</h3>
+                        <p><strong>{{ __('Sistema de Classificação:') }}</strong> {{ $sistemaClassificacao }}</p>
+
+                        <div class="form-group">
+                            <label for="classificationTable"><strong>{{ __('Tabela de Classificação (opcional):') }}</strong></label>
+                            <input type="text" id="classificationTable" name="classificationTable" class="form-control" placeholder="Inserir tabela de classificação">
+                        </div>
+                        <div class="form-group">
+                            <label for="classificationCode"><strong>{{ __('Código de Classificação:') }}</strong></label>
+                            <input type="text" id="classificationCode" name="classificationCode" class="form-control" placeholder="Inserir código OU (Requerido / Não requerido)">
+                        </div>
+                    </div>
+
 
                     <div id="geometrical" class="tabcontent">
 
@@ -171,46 +191,9 @@
                     <div id="alphanumerical" class="tabcontent">
                         <!-- Alphanumeric Information -->
 
-                        <div class="text-center">
-                            <h2>{{ __('Definições do objeto') }}</h2>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label for="ifcClassName"><strong>{{ __('IFC Class:') }}</strong></label>
-                                <p>{{ $ifcClass }}</p>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="ifcClassName"><strong>{{ __('Nome da Classe IFC:') }}</strong></label>
-                                <select name="ifcClassName" id="ifcClassName" class="form-control">
-                                    <option value="Requerido">Requerido</option>
-                                    <option value="Não requerido" selected>Não requerido</option> <!-- Default to Não requerido -->
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row">
-
-                            <div class="col-md-6">
-                                <label for="ifcClassDescription"><strong>{{ __('Descrição da Classe IFC:') }}</strong></label>
-                                <select name="ifcClassDescription" id="ifcClassDescription" class="form-control">
-                                    <option value="Requerido">Requerido</option>
-                                    <option value="Não requerido" selected>Não requerido</option> <!-- Default to Não requerido -->
-                                </select>
-                            </div>
-
-                            <div class="col-md-4">
-                                <label for="ifcClassPredefinedType"><strong>{{ __('Tipo Predefinido da Classe IFC:') }}</strong></label>
-                                <select name="ifcClassPredefinedType" id="ifcClassPredefinedType" class="form-control">
-                                    <option value="Requerido">Requerido</option>
-                                    <option value="Não requerido" selected>Não requerido</option> <!-- Default to Não requerido -->
-                                </select>
-                            </div>
-                        </div>
-                        <div id="all-properties" data-properties='@json(session("allProperties"))'></div>
-
-
                         <br>
                         <div class="text-center">
-                            <h2>{{ __('Grupos de Propriedades') }}</h2>
+                            <h2>{{ __('Propriedades') }}</h2>
                         </div>
                         <br>
                         <div class="text-center mb-2">
@@ -249,109 +232,28 @@
                             <input type="hidden" name="manual_properties" id="manual_properties">
                         </div>
                         <br>
-                        <!-- IFC Properties -->
-                        <div class="container mt-1" id="ifc_properties_container">
-
-                            <div class="text-center mb-2">
-                                <h4>{{ __('Propriedades IFC') }}</h4>
-                            </div>
-
-
-                            @php
-                            // Group IFC properties by their property set
-                            $groupedIfcProperties = [];
-                            foreach ($ifcProperties as $property) {
-                            $groupedIfcProperties[$property['propertySet']][] = $property;
-                            }
-                            @endphp
-
-                            @foreach ($groupedIfcProperties as $propertySet => $propertiesinclass)
-                            <div class="gop-group" style="border: 1px solid #e0e0e0; border-radius: 5px; padding: 5px; background-color: #f9f9f9;">
-                                <div class="d-flex align-items-center">
-                                    <div class="d-flex align-items-center" style="cursor: pointer;" onclick="toggleProperties('ifc_group_{{ $propertySet }}')">
-                                        <span class="clickable-indicator">▼</span>
-                                        <h4 class="mr-2 mb-0">{{ $propertySet }}</h4>
-                                    </div>
-                                    <!-- Corrected data-gop here -->
-                                    <button type="button" class="btn btn-sm btn-link select-all" data-gop="{{ $propertySet }}" data-state="select">Select All</button>
-                                </div>
-
-                                <!-- Scrollable container for properties -->
-                                <div class="scrollable-container" id="ifc_group_{{ $propertySet }}" style="display: none;">
-                                    @foreach($propertiesinclass as $property)
-                                    <div class="property-item" style="display: flex; align-items: center; margin-bottom: 5px;">
-                                        <input type="checkbox" name="selected_ifc_properties[]" value="{{ $property['propertyName'] }},{{ $property['propertySet'] }}" id="ifc_property_{{ $loop->index }}" data-gop="{{ $propertySet }}">
-                                        <label for="ifc_property_{{ $loop->index }}" style="cursor: pointer; display: flex; align-items: center;">
-                                            <span title="{{ $property['propertyDescription'] }}" style="margin-right: 5px;">
-                                                {{ $property['propertyName'] }} --- ({{ $property['propertySet'] }})
-                                            </span>
-                                        </label>
-                                    </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                            @endforeach
-
-                        </div>
-
-                        @php
-                        // Create an array of IFC property names for comparison
-                        $ifcPropertyNames = array_column($ifcProperties, 'propertyName');
-                        @endphp
 
 
                         <!-- PDT Properties -->
-                        @if($pdts)
                         <div class="container mt-3" id="pdt_properties_container">
                             <div class="text-center mb-2">
-                                <h4>{{ __('Propriedades de "') }}{{ $pdts->pdtNameEn }}{{ __(' Data Template"') }}</h4>
-                            </div>
-                            @foreach($gops as $gop)
-                            @php
-                            // Filter the properties by group of property (gopID)
-                            $groupedProperties = $properties->where('gopID', $gop->Id);
-                            @endphp
-                            @if($groupedProperties->count() > 0)
-                            <div class="gop-group" style="border: 1px solid #e0e0e0; border-radius: 5px; padding: 5px; background-color: #f9f9f9;">
-                                <div class="d-flex align-items-center">
-                                    <div class="gop-header d-flex align-items-center" style="cursor: pointer;" onclick="toggleProperties('pdtproperties-{{ $gop->Id }}')">
-                                        <span class="clickable-indicator">▼</span>
-                                        <h4 class="mr-2 mb-0">{{ $gop->gopNameEn }}</h4>
-                                    </div>
-                                    <button type="button" class="btn btn-sm btn-link select-all" data-gop="{{ $gop->Id }}" data-state="select">Select All</button>
-                                </div>
-
-                                <div class="scrollable-container" id="pdtproperties-{{ $gop->Id }}" style="display: none;">
-                                    @foreach($groupedProperties as $property)
-                                    @php
-                                    // Get the corresponding property details from propertiesindd
-                                    $PDTPropertyDetails = $propertiesindd->firstWhere('Id', $property->propertyId);
-
-                                    // Get the property name
-                                    $PDTPropertyName = $PDTPropertyDetails->nameEn ?? 'N/A';
-
-                                    // Check if the property name is in the array of IFC property names
-                                    if (in_array($PDTPropertyName, $ifcPropertyNames)) {
-                                    continue; // Skip this property if it matches an IFC property name
-                                    }
-                                    @endphp
-                                    <div class="property-item" style="display: flex; align-items: center; margin-bottom: 5px;">
-                                        <input type="checkbox" name="selected_pdt_properties[]" value="{{ $PDTPropertyName }},{{ $gop->gopNameEn }}" id="pdt_property_{{ $loop->parent->index }}_{{ $loop->index }}" data-gop="{{ $gop->Id }}" style="margin-right: 10px;">
-                                        <label for="pdt_property_{{ $loop->parent->index }}_{{ $loop->index }}" style="cursor: pointer; display: flex; align-items: center;">
-                                            <span class="property-description" title="{{ $PDTPropertyDetails->definitionEn ?? 'N/A' }}" style="margin-right: 5px;">{{ $PDTPropertyName }}</span>
-                                        </label>
-                                    </div>
+                                <h4>
+                                    {{ __('Propriedades de PDT: ') }}
+                                </h4>
+                                <select name="pdt" class="form-control" id="pdt-select" onchange="fetchPdtProperties(this.value)">
+                                    <option value="" disabled selected>{{ __('Select a PDT') }}</option>
+                                    @foreach($pdtslatestversions as $pdt)
+                                    @if($pdt['pdtNameEn'] !== 'Master')
+                                    <option value="{{ $pdt->Id }}">{{ $pdt->pdtNamePt }} ( {{ $pdt->pdtNameEn }} ) V {{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}</option>
+                                    @endif
                                     @endforeach
-                                </div>
+                                </select>
                             </div>
-                            @endif
-                            @endforeach
+
+
+                            <!-- Dynamic properties container -->
+                            <div id="dynamic_pdt_properties"></div>
                         </div>
-                        @endif
-
-
-
-
 
                         <!-- Master PDT Properties -->
                         <div class="container mt-3" id="master_properties_container">
@@ -383,10 +285,7 @@
                                     // Get the property name
                                     $PDTPropertyName = $PDTPropertyDetails->nameEn ?? 'N/A';
 
-                                    // Check if the property name is in the array of IFC property names
-                                    if (in_array($PDTPropertyName, $ifcPropertyNames)) {
-                                    continue; // Skip this property if it matches an IFC property name
-                                    }
+
                                     @endphp
                                     <div class="property-item" style="display: flex; align-items: center; margin-bottom: 5px;">
                                         <input type="checkbox" name="selected_master_pdt_properties[]" value="{{ $PDTPropertyName }},{{ $gop->gopNameEn }}" id="master_property_{{ $loop->parent->index }}_{{ $loop->index }}" data-gop="{{ $gop->Id }}" style="margin-right: 10px;">
@@ -394,53 +293,85 @@
                                             <span class="property-description" title="{{ $PDTPropertyDetails->definitionEn ?? 'N/A' }}" style="margin-right: 5px;">{{ $PDTPropertyName }}</span>
                                         </label>
                                     </div>
+
                                     @endforeach
                                 </div>
                             </div>
                             @endif
                             @endforeach
                         </div>
-
                         <br>
+                        <!-- IFC Properties -->
                         <div class="text-center">
-                            <h2>{{ __('Materiais') }}</h2>
+                            <h2>{{ __('Definições do objeto em IFC') }}</h2>
+                            <br>
                         </div>
-                        <div>
-                            <label for="materialName"><strong>{{ __('Nome do IfcMaterial:') }}</strong></label>
-                            <select name="materialName" id="materialName" class="form-control" required>
-                                <option value="Requerido">Requerido</option>
-                                <option value="Não requerido" selected>Não requerido</option> <!-- Default to Não requerido -->
-                            </select>
-                        </div>
-                        <br>
-                        <div class="text-center">
-                            <h2>{{ __('Classificação') }}</h2>
-                        </div>
-                        <br>
-
                         <div class="row">
-                            <div class="col-md-4">
-                                <strong>{{ __('Sistema de classificação:') }}</strong>
-                                <p>{{ $sistemaClassificacao }}</p>
+
+                            <div class="col-md-6">
+                                <label for="ifcClassName"><strong>{{ __('Selecionar Classe IFC:') }}</strong></label>
+                                <select name="ifcClasses[]" class="form-control ifc-class-select" style="width: 100%;" onchange="fetchIfcProperties(this.value)">
+                                    <option value="" disabled selected>{{ __('Selecionar Classe IFC') }}</option>
+                                    @foreach($ifcClasses as $ifcClass)
+                                    <option value="{{ $ifcClass['id'] }}">{{ $ifcClass['name'] }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-                            <div class="col-md-4">
-                                <strong>{{ __('Tabela de classificação:') }}</strong>
-                                <p>{{ $tabelaClassificacao }}</p>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="codigoClassificacao"><strong>{{ __('codigoClassificacao') }}</strong></label>
-                                <select name="codigoClassificacao" id="codigoClassificacao" class="form-control" required>
+
+                            <div class="col-md-6">
+                                <label for="ifcClassName"><strong>{{ __('Nome da Classe IFC:') }}</strong></label>
+                                <select name="ifcClassName" id="ifcClassName" class="form-control">
                                     <option value="Requerido">Requerido</option>
-                                    <option value="Não requerido">Não requerido</option>
+                                    <option value="Não requerido" selected>Não requerido</option> <!-- Default to Não requerido -->
                                 </select>
                             </div>
                         </div>
+                        <br>
+                        <div class="row">
+
+                            <div class="col-md-6">
+                                <label for="ifcClassDescription"><strong>{{ __('Descrição da Classe IFC:') }}</strong></label>
+                                <select name="ifcClassDescription" id="ifcClassDescription" class="form-control">
+                                    <option value="Requerido">Requerido</option>
+                                    <option value="Não requerido" selected>Não requerido</option> <!-- Default to Não requerido -->
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="ifcClassPredefinedType"><strong>{{ __('Tipo Predefinido da Classe IFC:') }}</strong></label>
+                                <select name="ifcClassPredefinedType" id="ifcClassPredefinedType" class="form-control">
+                                    <option value="Requerido">Requerido</option>
+                                    <option value="Não requerido" selected>Não requerido</option> <!-- Default to Não requerido -->
+                                </select>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="container mt-1" id="ifc_properties_container">
+
+
+                            <div id="dynamic_ifc_properties">
+
+                            </div>
+
+
+                            <br>
+                            <div class="text-center">
+                                <h2>{{ __('Materiais') }}</h2>
+                            </div>
+                            <div>
+                                <label for="materialName"><strong>{{ __('Nome do IfcMaterial:') }}</strong></label>
+                                <select name="materialName" id="materialName" class="form-control" required>
+                                    <option value="Requerido">Requerido</option>
+                                    <option value="Não requerido" selected>Não requerido</option> <!-- Default to Não requerido -->
+                                </select>
+                            </div>
+
+                        </div>
                     </div>
-                </div>
-                <!-- Submit Button -->
-                <div class="form-group mt-3">
-                    <button type="submit" class="btn btn-primary" style="color: black;">{{ __('Guardar LOIN e adicionar outra instância para o mesmo projeto') }}</button>
-                </div>
+                    <!-- Submit Button -->
+                    <div class="form-group mt-3">
+                        <button type="submit" class="btn btn-primary" style="color: black;">{{ __('Guardar LOIN') }}</button>
+                    </div>
         </form>
     </div>
     <!-- Existing LOIN Records -->
@@ -476,45 +407,34 @@
     @else
     <p>{{ __('Não foram encontradas entradas para Níveis de Necessidade de Informação.') }}</p>
     @endif
+    <!-- Blade template -->
+    <input type="hidden" id="masterPropertiesData" value="{{ json_encode($masterPropertiesArray) }}">
 
     <!-- JavaScript -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
-        const allProperties = JSON.parse(document.getElementById('all-properties').getAttribute('data-properties'));
+        //start array for properties for search bar and add Master data
+        let allPropertiesInPage = [];
 
-        document.getElementById('property_search_input').addEventListener('input', function() {
-            const query = this.value.toLowerCase();
-            const dropdown = document.getElementById('property_search_dropdown');
-            dropdown.innerHTML = ''; // Clear previous results
+        function addMasterProperties() {
 
-            if (query.length === 0) {
-                dropdown.style.display = 'none'; // Hide dropdown if input is empty
-                return; // Exit early if there is no query
-            }
+            const hiddenInput = document.getElementById('masterPropertiesData');
+            const masterPropertiesArray = JSON.parse(hiddenInput.value);
 
-            const searchResults = allProperties.filter(property =>
-                property.name.toLowerCase().includes(query)
-            );
-
-            if (searchResults.length > 0) {
-                dropdown.style.display = 'block';
-                searchResults.forEach(property => {
-                    const resultItem = document.createElement('div');
-                    resultItem.classList.add('dropdown-item');
-                    resultItem.textContent = `${property.name} (${property.group})`; // Show group next to name
-
-                    // Show the description on hover
-                    resultItem.title = property.description; // Using title attribute for tooltip effect
-
-                    resultItem.addEventListener('click', function() {
-                        addPropertyToTable(property);
-                        dropdown.style.display = 'none';
+            masterPropertiesArray.forEach(property => {
+                if (!allPropertiesInPage.some(p => p.name === property.name && p.group === property.group)) {
+                    allPropertiesInPage.push({
+                        name: property.name,
+                        group: property.group,
+                        description: property.description,
                     });
-                    dropdown.appendChild(resultItem);
-                });
-            } else {
-                dropdown.style.display = 'none'; // Hide dropdown if no results found
-            }
-        });
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', addMasterProperties);
+
 
         function addPropertyToTable(property) {
             const tableBody = document.getElementById('properties_table_body');
@@ -567,32 +487,37 @@
         }
 
         // group properties
-        document.addEventListener('DOMContentLoaded', function() {
+        // Generic function to handle "Select All" functionality
+        function initializeSelectAllButtons() {
             const selectAllButtons = document.querySelectorAll('.select-all');
 
             selectAllButtons.forEach(function(button) {
-                button.addEventListener('click', function() {
-                    const gopId = this.getAttribute('data-gop'); // Get the correct data-gop ID
-                    const checkboxes = document.querySelectorAll(`input[type="checkbox"][data-gop="${gopId}"]`);
-                    const state = this.getAttribute('data-state');
-
-                    // Toggle between select all and deselect all
-                    if (state === 'select') {
-                        checkboxes.forEach(function(checkbox) {
-                            checkbox.checked = true;
-                        });
-                        this.setAttribute('data-state', 'deselect');
-                        this.textContent = 'Deselect All';
-                    } else {
-                        checkboxes.forEach(function(checkbox) {
-                            checkbox.checked = false;
-                        });
-                        this.setAttribute('data-state', 'select');
-                        this.textContent = 'Select All';
-                    }
-                });
+                button.removeEventListener('click', handleSelectAll); // Ensure no duplicate listeners
+                button.addEventListener('click', handleSelectAll); // Attach event listener
             });
-        });
+        }
+
+        // Handler function for "Select All"
+        function handleSelectAll() {
+            const gopId = this.getAttribute('data-gop');
+            const checkboxes = document.querySelectorAll(`input[type="checkbox"][data-gop="${gopId}"]`);
+            const state = this.getAttribute('data-state');
+
+            if (state === 'select') {
+                checkboxes.forEach(function(checkbox) {
+                    checkbox.checked = true;
+                });
+                this.setAttribute('data-state', 'deselect');
+                this.textContent = 'Deselect All';
+            } else {
+                checkboxes.forEach(function(checkbox) {
+                    checkbox.checked = false;
+                });
+                this.setAttribute('data-state', 'select');
+                this.textContent = 'Select All';
+            }
+        }
+
 
 
 
@@ -678,7 +603,10 @@
             }
         });
 
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSelectAllButtons(); // Initialize for static content
 
+        });
         // Group Checkbox Script 
 
         document.querySelectorAll('.property-group-checkbox').forEach(function(groupCheckbox) {
@@ -689,6 +617,219 @@
                     checkbox.checked = groupCheckbox.checked;
                 });
             });
+        });
+        //IFC and pdt search
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Select2 for IFC class dropdown
+            $('.ifc-class-select').select2({
+                placeholder: "{{ __('Selecionar IFC Class') }}",
+                allowClear: true,
+                width: '100%'
+            });
+
+            // Initialize Select2 for PDT dropdown
+            $('#pdt-select').select2({
+                placeholder: "{{ __('Selecionar PDT') }}",
+                allowClear: true,
+                width: '100%'
+            });
+        });
+
+        //fetch pdt data
+        function fetchPdtProperties(pdtId) {
+            if (!pdtId) {
+                console.error('Invalid PDT ID');
+                return;
+            }
+
+            const container = document.getElementById('dynamic_pdt_properties');
+            container.innerHTML = '<p>Loading properties...</p>';
+
+            fetch(`/fetch-pdt-properties/${pdtId}`)
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    container.innerHTML = ''; // Clear existing content
+
+                    if (data.success && data.groupedProperties && Object.keys(data.groupedProperties).length > 0) {
+                        for (const [propertyGroup, properties] of Object.entries(data.groupedProperties)) {
+                            const safePropertyGroup = propertyGroup.replace(/[^a-zA-Z0-9_-]/g, '_');
+                            const propertiesArray = Object.values(properties);
+
+                            const groupHTML = `
+                        <div class="pdt-group" id="group_${safePropertyGroup}" style="border: 1px solid #e0e0e0; border-radius: 5px; padding: 5px; background-color: #f9f9f9;">
+                            <div class="d-flex align-items-center">
+                                <div class="d-flex align-items-center" style="cursor: pointer;" onclick="toggleProperties('pdt_group_${safePropertyGroup}')">
+                                    <span class="clickable-indicator">▼</span>
+                                    <h4 class="mr-2 mb-0">${propertyGroup}</h4>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-link select-all" data-gop="${safePropertyGroup}" data-state="select">Select All</button>
+                            </div>
+                            <div class="scrollable-container" id="pdt_group_${safePropertyGroup}" style="display: none;">
+                                ${propertiesArray.map(property => `
+                                    <div class="property-item" style="display: flex; align-items: center; margin-bottom: 5px;">
+                                        <input type="checkbox" name="selected_pdt_properties[]" value="${property.name},${property.group}" id="pdt_property_${property.name}_${safePropertyGroup}" data-gop="${safePropertyGroup}">
+                                        <label for="pdt_property_${property.name}_${safePropertyGroup}" style="cursor: pointer; display: flex; align-items: center;">
+                                            <span title="${property.description || 'No description'}" style="margin-right: 5px;">
+                                                ${property.name}
+                                            </span>
+                                        </label>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+
+                            container.innerHTML += groupHTML;
+
+                            // Add properties to the global array without duplicates
+                            if (Array.isArray(properties)) {
+                                properties.forEach(property => {
+                                    {
+                                        allPropertiesInPage.push({
+                                            name: property.name,
+                                            group: property.group,
+                                            description: property.description || 'No description',
+                                        });
+                                    }
+                                });
+                            }
+                        }
+                    } else {
+                        container.innerHTML = '<p>No properties found for this PDT.</p>';
+                    }
+
+                    initializeSelectAllButtons(); // Reinitialize the buttons
+                    console.log('Updated allPropertiesInPage:', allPropertiesInPage); // Debugging log
+                })
+                .catch(error => {
+                    console.error('Error fetching PDT properties:', error);
+                    container.innerHTML = '<p>Error fetching properties. Please try again later.</p>';
+                });
+        }
+
+
+
+        // fetch ifc properties
+        function fetchIfcProperties(ifcClass) {
+            if (!ifcClass) return;
+
+            // Show a loading indicator (optional)
+            const container = document.getElementById('dynamic_ifc_properties');
+            container.innerHTML = `
+              <div class="text-center mb-2">
+              <h4>{{ __('Propriedades IFC') }}</h4>
+              </div>
+              <p>Loading properties...</p>`;
+            // Make an AJAX request to fetch properties for the selected IFC class
+            fetch(`/fetch-ifc-properties/${ifcClass}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Clear existing content
+                    container.innerHTML = '';
+
+                    if (data.length > 0) {
+                        // Group properties by Property Set
+                        const groupedProperties = data.reduce((groups, property) => {
+                            const group = property.propertySet || 'N/A';
+                            if (!groups[group]) {
+                                groups[group] = [];
+                            }
+                            groups[group].push(property);
+                            return groups;
+                        }, {});
+
+                        // Generate the HTML dynamically
+                        for (const [propertySet, properties] of Object.entries(groupedProperties)) {
+                            const groupHTML = `
+                        <div class="gop-group" style="border: 1px solid #e0e0e0; border-radius: 5px; padding: 5px; background-color: #f9f9f9;">
+                            <div class="d-flex align-items-center">
+                            <div class="d-flex align-items-center" style="cursor: pointer;" onclick="toggleProperties('ifc_group_${propertySet}')">
+                                <span class="clickable-indicator">▼</span>
+                                <h4 class="mr-2 mb-0">${propertySet}</h4>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-link select-all" data-gop="${propertySet}" data-state="select">Select All</button>
+                        </div>
+                               
+                            <div class="scrollable-container" id="ifc_group_${propertySet}" style="display: none;">
+                                ${properties.map(property => `
+                                    <div class="property-item" style="display: flex; align-items: center; margin-bottom: 5px;">
+                                        <input type="checkbox" name="selected_ifc_properties[]" value="${property.propertyName},${property.propertySet}" id="ifc_property_${property.propertyName}" data-gop="${propertySet}">
+                                        <label for="ifc_property_${property.propertyName}" style="cursor: pointer; display: flex; align-items: center;">
+                                            <span title="${property.propertyDescription}" style="margin-right: 5px;">
+                                                ${property.propertyName}
+                                            </span>
+                                        </label>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                            container.innerHTML += groupHTML;
+                            // Add properties to `allPropertiesInPage`
+                            properties.forEach(property => {
+                                allPropertiesInPage.push({
+                                    name: property.propertyName,
+                                    group: property.propertySet,
+                                    description: property.propertyDescription,
+                                });
+                            });
+                        }
+                    }
+
+
+                    initializeSelectAllButtons(); // Reinitialize the "Select All" buttons
+
+                })
+
+                .catch(error => {
+                    console.error('Error fetching IFC properties:', error);
+                    container.innerHTML = `
+                <div class="text-center mb-2">
+                    <h4>{{ __('Propriedades IFC') }}</h4>
+                </div>
+                <p>Error fetching properties. Please try again later.</p>
+            `;
+                });
+        }
+
+        //search bar
+        document.getElementById('property_search_input').addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            const dropdown = document.getElementById('property_search_dropdown');
+            dropdown.innerHTML = ''; // Clear previous results
+
+            if (query.length === 0) {
+                dropdown.style.display = 'none'; // Hide dropdown if input is empty
+                return; // Exit early if there is no query
+            }
+
+            const searchResults = allPropertiesInPage.filter(property =>
+                property.name.toLowerCase().includes(query)
+            );
+
+            if (searchResults.length > 0) {
+                dropdown.style.display = 'block';
+                searchResults.forEach(property => {
+                    const resultItem = document.createElement('div');
+                    resultItem.classList.add('dropdown-item');
+                    resultItem.textContent = `${property.name} (${property.group})`; // Show group next to name
+
+                    // Show the description on hover
+                    resultItem.title = property.description; // Using title attribute for tooltip effect
+
+                    resultItem.addEventListener('click', function() {
+                        addPropertyToTable(property);
+                        dropdown.style.display = 'none';
+                    });
+                    dropdown.appendChild(resultItem);
+                });
+            } else {
+                dropdown.style.display = 'none'; // Hide dropdown if no results found
+            }
         });
     </script>
 

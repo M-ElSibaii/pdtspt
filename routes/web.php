@@ -67,6 +67,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::match(['get', 'post'], '/createLoin2', [LoinsController::class, 'createloin2'])->name('loincreate2');
     Route::post('/loincreate2/store', [LoinsController::class, 'createLoin2store'])->name('createLoin2store');
     Route::get('/search-properties', [LoinsController::class, 'searchProperties'])->name('searchProperties');
+    Route::get('/fetch-ifc-properties/{ifcClass}', [LoinsController::class, 'fetchIfcPropertiesAjax']);
+    Route::get('/fetch-pdt-properties/{pdtId}', [LoinsController::class, 'fetchProperties']);
+
+
+
 
     Route::get('/loinView/{loinId}', [LoinsController::class, 'loinInstance'])->name('loinView');
     Route::delete('/loinDelete/{loinId}', [LoinsController::class, 'destroyLoin'])->name('loinDelete');
