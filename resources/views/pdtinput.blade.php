@@ -33,6 +33,14 @@
                                     </x-secondary-button>
                                 </form>
                             </div>
+                            <div class="mb-4">
+                                <form class="mb-3" action="{{ route('referencedocuments.list') }}">
+                                    <x-secondary-button type="submit">
+                                        {{ __('Add reference documents') }}
+                                    </x-secondary-button>
+                                </form>
+                            </div>
+
                         </div>
                     </div>
                 </div>

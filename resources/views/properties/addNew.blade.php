@@ -7,7 +7,7 @@
                     {{ session('success') }}
                 </div>
                 @endif
-                <h1>{{ __('Add New Properties') }}</h1>
+                <h1>{{ __('Add New Properties to data dictionary and to group of property in selected PDT') }}</h1>
 
                 <h2>{{ $selectedPdt->pdtNameEn }}</h2>
                 <h3>{{ $selectedGroup->gopNameEn }}</h3>
@@ -55,7 +55,7 @@
 
                     <div class="form-group">
                         <label for="status">{{ __('Status') }}</label>
-                        <input type="text" class="form-control" id="status" name="status">
+                        <input type="text" class="form-control" id="status" name="status" value="Active">
                     </div>
 
                     <div class="form-group">
@@ -111,7 +111,7 @@
 
                     <div class="form-group">
                         <label for="creatorsLanguage">{{ __('Creators Language') }}</label>
-                        <input type="text" class="form-control" id="creatorsLanguage" name="creatorsLanguage">
+                        <input type="text" class="form-control" id="creatorsLanguage" name="creatorsLanguage" value="pt-PT">
                     </div>
 
                     <div class="form-group">
@@ -121,12 +121,12 @@
 
                     <div class="form-group">
                         <label for="countryOfUse">{{ __('Country of Use') }}</label>
-                        <input type="text" class="form-control" id="countryOfUse" name="countryOfUse">
+                        <input type="text" class="form-control" id="countryOfUse" name="countryOfUse" value="PT">
                     </div>
 
                     <div class="form-group">
                         <label for="countryOfOrigin">{{ __('Country of Origin') }}</label>
-                        <input type="text" class="form-control" id="countryOfOrigin" name="countryOfOrigin">
+                        <input type="text" class="form-control" id="countryOfOrigin" name="countryOfOrigin" value="PT">
                     </div>
 
                     <div class="form-group">
@@ -142,12 +142,12 @@
 
                     <div class="form-group">
                         <label for="dataType">{{ __('Data Type') }}</label>
-                        <input type="text" class="form-control" id="dataType" name="dataType">
+                        <input type="text" class="form-control" id="dataType" name="dataType" value="String">
                     </div>
 
                     <div class="form-group">
                         <label for="dynamicProperty">{{ __('Dynamic Property') }}</label>
-                        <input type="text" class="form-control" id="dynamicProperty" name="dynamicProperty">
+                        <input type="text" class="form-control" id="dynamicProperty" name="dynamicProperty" value="False">
                     </div>
 
                     <div class="form-group">
@@ -182,7 +182,7 @@
 
                     <div class="form-group">
                         <label for="textFormat">{{ __('Text Format') }}</label>
-                        <input type="text" class="form-control" id="textFormat" name="textFormat">
+                        <input type="text" class="form-control" id="textFormat" name="textFormat" value="(UTF-8, 32)" readonly>
                     </div>
 
                     <div class="form-group">

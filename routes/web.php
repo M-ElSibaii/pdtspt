@@ -175,4 +175,8 @@ Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
 
     Route::post('/properties/editdd/{propertyddId}', [PropertiesdatadictionariesController::class, 'updateddProperty'])->name('properties.updatedd');
     Route::get('/properties/editdd/{propertyddId}', [PropertiesdatadictionariesController::class, 'showddProperty'])->name('properties.editdd');
+
+    // add reference documents
+    Route::get('/referencedocuments/list', [ReferenceDocumentsController::class, 'getReferenceDocuments'])->name('referencedocuments.list');
+    Route::post('/referencedocuments/create', [ReferenceDocumentsController::class, 'referenceDocumentCreate'])->name('referencedocuments.create');
 });

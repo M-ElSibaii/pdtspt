@@ -4,7 +4,7 @@
     <div style="background-color: white;">
         <div class="container sm:max-w-full py-9">
             <div class="container">
-                <h1>{{ __('Choose PDT') }}</h1>
+                <h1>{{ __('Choose PDT to add Properties') }}</h1>
 
                 <form method="POST" action="{{ route('properties.createprops') }}">
                     @csrf
@@ -21,6 +21,8 @@
                         {{ __('Next') }}
                     </x-primary-button>
                 </form>
+
+
             </div>
         </div>
     </div>

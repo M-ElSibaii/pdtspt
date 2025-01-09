@@ -239,7 +239,11 @@ class PropertiesController extends Controller
             ->get();
         $referenceDocuments = ReferenceDocuments::all();
         // Log::info('Entering newpropadd method');
-        return view('properties.addNew', compact('selectedPdt', 'selectedGroup', 'selectedProperties', 'referenceDocuments', 'dataDictionary'));
+
+        $lastIdDataDictionary =  PropertiesDataDictionaries::latest('Id')->value('Id');
+        $nextIdDataDictionary = $lastIdDataDictionary + 1;
+
+        return view('properties.addNew', compact('selectedPdt', 'selectedGroup', 'selectedProperties', 'referenceDocuments', 'dataDictionary', 'nextIdDataDictionary'));
     }
 
     public function addPropertyManual(Request $request)

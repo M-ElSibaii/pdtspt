@@ -38,6 +38,13 @@ class ReferencedocumentsController extends Controller
 
         return view('referencedocumentview', compact('rd', 'rdinprop', 'pdts'));
     }
+
+    public function getReferenceDocuments()
+    {
+        $rds = referencedocuments::All();
+
+        return view('referencedocuments.list', compact('rds'));
+    }
     /**
      * Display a listing of the resource.
      *
@@ -53,9 +60,28 @@ class ReferencedocumentsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function referenceDocumentCreate(Request $request)
     {
-        //
+        // Validate incoming request data
+        $validated = $request->validate([
+            'GUID' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'status' => 'required|string|max:50',
+        ]);
+
+        // Create a new reference document in the database
+        ReferenceDocuments::create([
+            'GUID' => $validated['GUID'],
+            'rdName' => $validated['name'],
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'status' => $validated['status'],
+        ]);
+        $rds = referencedocuments::All();
+
+        return view('referencedocuments.list', compact('rds'))->with('success', 'Property added successfully.');
     }
 
     /**
