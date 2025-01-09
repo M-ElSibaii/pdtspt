@@ -61,6 +61,8 @@ class GroupofpropertiesController extends Controller
             'propertiesdatadictionaries.units',
             'propertiesdatadictionaries.nameEn',
             'propertiesdatadictionaries.namePt',
+            'propertiesdatadictionaries.nameEnSc',
+            'propertiesdatadictionaries.namePtSc',
             'properties.visualRepresentation'
         )->get();
 
@@ -152,6 +154,8 @@ class GroupofpropertiesController extends Controller
             'propertiesdatadictionaries.units',
             'propertiesdatadictionaries.nameEn',
             'propertiesdatadictionaries.namePt',
+            'propertiesdatadictionaries.nameEnSc',
+            'propertiesdatadictionaries.namePtSc',
             'properties.visualRepresentation'
         )
             ->get();

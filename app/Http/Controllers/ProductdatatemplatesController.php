@@ -200,6 +200,7 @@ class ProductdatatemplatesController extends Controller
             'dateOfRevision' => 'required|date',
             'dateOfVersion' => 'required|date',
             'status' => 'required|string',
+            'category' => 'required|string',
             'editionNumber' => 'required|integer',
             'versionNumber' => 'required|integer',
             'revisionNumber' => 'required|integer',
@@ -220,6 +221,7 @@ class ProductdatatemplatesController extends Controller
         $pdt->created_at = now();
         $pdt->updated_at = now();
         $pdt->status = $request->input('status');
+        $pdt->category = $request->input('category');
         $pdt->editionNumber = $request->input('editionNumber');
         $pdt->versionNumber = $request->input('versionNumber');
         $pdt->revisionNumber = $request->input('revisionNumber');

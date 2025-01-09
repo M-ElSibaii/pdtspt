@@ -24,10 +24,18 @@
                         </tr>
                         <tr>
                             <th>Nome En</th>
+                            <td>{{$propdd->nameEnSc}}</td>
+                        </tr>
+                        <tr>
+                            <th>Nome En Código</th>
                             <td>{{$propdd->nameEn}}</td>
                         </tr>
                         <tr>
                             <th>Nome Pt</th>
+                            <td>{{$propdd->namePtSc}}</td>
+                        </tr>
+                        <tr>
+                            <th>Nome Pt Código</th>
                             <td>{{$propdd->namePt}}</td>
                         </tr>
                         <tr>

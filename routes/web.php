@@ -165,6 +165,7 @@ Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
 
     Route::post('/properties/addNewPropertyFromDictionary', [PropertiesController::class, 'addFromDictionary'])->name('properties.addFromDataDictionary');
     Route::post('/properties/addFromDictionary', [PropertiesController::class, 'PropertiesAddedDictionaryPage'])->name('properties.addFromDictionary');
+    Route::post('/properties/uploadExcel', [PropertiesController::class, 'uploadExcel'])->name('properties.uploadExcel');
     // edit properties
 
     Route::post('/properties/edit/{propertyId}', [PropertiesController::class, 'updateProperty'])->name('properties.update');

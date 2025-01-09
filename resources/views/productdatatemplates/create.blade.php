@@ -28,6 +28,48 @@
                         </select>
                     </div>
 
+
+                    <div class="form-group">
+                        <label for="category">{{ __('Category') }}</label>
+                        <select class="form-control" id="category" name="category" required>
+                            <option value="Construção" selected>Construção</option>
+                            <option value="Material de Construção">Material de Construção</option>
+                            <option value="Obras Geotécnicas">Obras Geotécnicas</option>
+                            <option value="Escavação e Estabilização">Escavação e Estabilização</option>
+                            <option value="Fundação e Estacas">Fundação e Estacas</option>
+                            <option value="Estruturas de Retenção de Terra">Estruturas de Retenção de Terra</option>
+                            <option value="Betão">Betão</option>
+                            <option value="Aço">Aço</option>
+                            <option value="Estruturas de Madeira">Estruturas de Madeira</option>
+                            <option value="Alvenaria e Tijolo">Alvenaria e Tijolo</option>
+                            <option value="Materiais Compostos e Especializados">Materiais Compostos e Especializados</option>
+                            <option value="Paredes">Paredes</option>
+                            <option value="Telhados">Telhados</option>
+                            <option value="Revestimento">Revestimento</option>
+                            <option value="Isolamento">Isolamento</option>
+                            <option value="Janelas">Janelas</option>
+                            <option value="Portas">Portas</option>
+                            <option value="Divisórias">Divisórias</option>
+                            <option value="Tetos">Tetos</option>
+                            <option value="Pisos">Pisos</option>
+                            <option value="Tinta">Tinta</option>
+                            <option value="Revestimentos de Parede">Revestimentos de Parede</option>
+                            <option value="Sanitário">Sanitário</option>
+                            <option value="Cozinha">Cozinha</option>
+                            <option value="Ferrovias">Ferrovias</option>
+                            <option value="Vias Rodoviárias">Vias Rodoviárias</option>
+                            <option value="Sistemas de HVAC">Sistemas de HVAC</option>
+                            <option value="Sistemas Elétricos">Sistemas Elétricos</option>
+                            <option value="Plumbing">Plumbing</option>
+                            <option value="Proteção Contra Incêndio">Proteção Contra Incêndio</option>
+                            <option value="Serviços Civis e de Utilidade">Serviços Civis e de Utilidade</option>
+                            <option value="Infraestrutura de TI">Infraestrutura de TI</option>
+                            <option value="Obras e Paisagismo">Obras e Paisagismo</option>
+                            <option value="Sistemas de Segurança e Proteção">Sistemas de Segurança e Proteção</option>
+                        </select>
+                    </div>
+
+
                     <div class="form-group">
                         <label for="revisionNumber">{{ __('editionNumber') }}</label>
                         <input type="text" class="form-control" id="editionNumber" name="editionNumber" required>

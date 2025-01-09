@@ -45,7 +45,7 @@
                         @foreach($sorted_combined_groups as $group)
                         <tbody>
                             <tr>
-                                <td class="text-left content-start bg-slate-300 p-3" colspan="4">
+                                <td class="text-left content-start bg-slate-300 p-3" colspan="5">
                                     <input class="text-left expand" type="checkbox" name="{{ $group[0]->gopNamePt }}" id="{{ $group[0]->gopNamePt }}" data-toggle="toggle">
                                     <label class="my-auto text-left cursor-pointer" for="{{ $group[0]->gopNamePt }}">Grupo de propriedades -
                                         <a href="{{ url('datadictionaryviewGOP/' . $group[0]->Id . '-' . $group[0]->GUID) }}">
@@ -106,7 +106,8 @@
                                 <td class="p-1.5">{{ $property->units ? $property->units : 'Sem unidade' }}</td>
                                 <td class="p-1.5">
                                     <div class="flex flex-col">
-                                        <p>{{ $property->descriptionPt }}</p>
+
+                                        <p><span style="color: darkgrey;"> {{ $property->namePtSc }}:</span><br>{{ $property->descriptionPt }}</p>
                                         @if($property->visualRepresentation == "TRUE")
                                         <div class="col-sm">
                                             <img src="{{ asset ('img/'.$property->nameEn.'.png')}}" alt='{{$property->nameEn}}' class="property-image">

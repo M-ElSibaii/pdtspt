@@ -9,7 +9,7 @@
                 <h2>Group of property: {{ $group->gopNameEn }}</h2>
                 <br>
                 <!-- Button to add new properties manually -->
-                <form method="POST" action="{{ route('properties.addFromDictionary') }}">
+                <form method="POST" action="{{ route('properties.addFromDictionary') }}" target="_blank">
                     @csrf
                     <input type="hidden" name="pdtId" value="{{ $selectedPdt->Id }}">
                     <input type="hidden" name="gopId" value="{{ $group->Id }}">
@@ -19,7 +19,7 @@
                 <br>
 
                 <!-- Button to add new properties manually -->
-                <form method="POST" action="{{ route('properties.addNew') }}">
+                <form method="POST" action="{{ route('properties.addNew') }}" target="_blank">
                     @csrf
                     <input type="hidden" name="pdtId" value="{{ $selectedPdt->Id }}">
                     <input type="hidden" name="gopId" value="{{ $group->Id }}">

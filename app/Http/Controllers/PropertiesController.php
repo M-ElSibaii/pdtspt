@@ -9,6 +9,7 @@ use App\Models\referenceDocuments;
 use App\Models\propertiesdatadictionaries;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PropertiesController extends Controller
 {
@@ -353,6 +354,78 @@ class PropertiesController extends Controller
             ->get();
         $referenceDocuments = ReferenceDocuments::all();
         return view('properties.addNew', compact('selectedPdt', 'selectedGroup', 'selectedProperties', 'referenceDocuments'))->with('success', 'Property added successfully.');
+    }
+
+
+    public function uploadExcel(Request $request)
+    {
+        Log::info("you are here1");
+
+        // Validate uploaded file
+        $request->validate([
+            'excelFile' => 'required|mimes:xlsx,xls,csv|max:2048',
+        ]);
+        Log::info("you are here2");
+
+        // Get the uploaded file path
+        $path = $request->file('excelFile')->getRealPath();
+        Log::info("you are here3");
+
+        // Load the Excel file into a collection
+        $sheets = Excel::toCollection([], $path);
+        Log::info("you are here4");
+
+        // Get the selected group name from the request
+        $selectedGroupName = $request->input('selectedGroupName');
+        Log::info("Selected group name: {$selectedGroupName}");
+
+        // Initialize empty arrays for matched and unmatched properties
+        $matchedPropertyIds = [];
+        $unmatchedProperties = [];
+        Log::info("you are here5");
+
+        // Iterate through the sheets
+        $sheets->each(function ($sheetData, $sheetName) use ($selectedGroupName, &$matchedPropertyIds, &$unmatchedProperties) {
+            Log::info("Sheet name: {$sheetName}");
+
+            // Check if the sheet name matches the selected group name (case-insensitive)
+            if (strtolower(trim($sheetName)) === strtolower(trim($selectedGroupName))) {
+                Log::info("Sheet found and processing: {$sheetName}");
+
+                // Extract property names from the sheet (assuming the first column contains property names)
+                $propertyNames = collect($sheetData)->flatten()->map(fn($name) => trim($name))->toArray();
+                Log::info("Extracted property names: " . implode(', ', $propertyNames));
+
+                // Fetch matching properties from the database
+                $matchedProperties = \App\Models\PropertiesDataDictionaries::whereIn('nameEn', $propertyNames)
+                    ->orWhereIn('namePt', $propertyNames)
+                    ->get();
+
+                // Add matched property IDs to the array
+                $matchedPropertyIds = $matchedProperties->pluck('Id')->toArray();
+                Log::info("Matched property IDs: " . implode(', ', $matchedPropertyIds));
+
+                // Find unmatched properties by comparing with the ones in the database
+                foreach ($propertyNames as $propertyName) {
+                    $propertyExists = $matchedProperties->firstWhere('nameEn', $propertyName) || $matchedProperties->firstWhere('namePt', $propertyName);
+
+                    if (!$propertyExists) {
+                        $unmatchedProperties[] = $propertyName;
+                        Log::info("Unmatched property: {$propertyName}");
+                    }
+                }
+
+                // Break the loop once the matching sheet is found
+                Log::info("Finished processing sheet: {$sheetName}");
+                return false;  // Stops further iteration after the matching sheet is found
+            }
+        });
+
+        // Return the matched and unmatched properties as a response
+        return response()->json([
+            'matchedPropertyIds' => $matchedPropertyIds,
+            'unmatchedProperties' => $unmatchedProperties,
+        ]);
     }
 
 
