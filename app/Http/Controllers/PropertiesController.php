@@ -53,7 +53,7 @@ class PropertiesController extends Controller
         $pdtId = $request->input('pdtId');
 
         // Fetch the selected PDT and pass it to the view
-        $selectedPdt = productdatatemplates::find($pdtId);
+        $selectedPdt = productdatatemplates::where("Id", $pdtId)->first();
         $groupofproperties = GroupOfProperties::where('pdtId', $pdtId)->get();
         $properties = Properties::where('pdtId', $pdtId)->get();
         $selectedProperties = Properties::where('pdtId', $pdtId)
@@ -368,12 +368,18 @@ class PropertiesController extends Controller
         Log::info("you are here2");
 
         // Get the uploaded file path
-        $path = $request->file('excelFile')->getRealPath();
+        $path = $request->file('excelFile');
         Log::info("you are here3");
 
-        // Load the Excel file into a collection
-        $sheets = Excel::toCollection([], $path);
-        Log::info("you are here4");
+        // Load the Excel file with sheet names
+        $excelData = Excel::toArray([], $path);
+
+        // Fetch sheet names using IOFactory
+        $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($path->getRealPath());
+        $spreadsheet = $reader->load($path->getRealPath());
+        $sheetNames = $spreadsheet->getSheetNames();
+
+        Log::info("Sheet names: " . implode(', ', $sheetNames));
 
         // Get the selected group name from the request
         $selectedGroupName = $request->input('selectedGroupName');
@@ -384,8 +390,8 @@ class PropertiesController extends Controller
         $unmatchedProperties = [];
         Log::info("you are here5");
 
-        // Iterate through the sheets
-        $sheets->each(function ($sheetData, $sheetName) use ($selectedGroupName, &$matchedPropertyIds, &$unmatchedProperties) {
+        // Iterate through the sheets with names
+        foreach ($sheetNames as $index => $sheetName) {
             Log::info("Sheet name: {$sheetName}");
 
             // Check if the sheet name matches the selected group name (case-insensitive)
@@ -393,6 +399,7 @@ class PropertiesController extends Controller
                 Log::info("Sheet found and processing: {$sheetName}");
 
                 // Extract property names from the sheet (assuming the first column contains property names)
+                $sheetData = $excelData[$index] ?? [];
                 $propertyNames = collect($sheetData)->flatten()->map(fn($name) => trim($name))->toArray();
                 Log::info("Extracted property names: " . implode(', ', $propertyNames));
 
@@ -417,9 +424,9 @@ class PropertiesController extends Controller
 
                 // Break the loop once the matching sheet is found
                 Log::info("Finished processing sheet: {$sheetName}");
-                return false;  // Stops further iteration after the matching sheet is found
+                break; // Stops further iteration after the matching sheet is found
             }
-        });
+        }
 
         // Return the matched and unmatched properties as a response
         return response()->json([

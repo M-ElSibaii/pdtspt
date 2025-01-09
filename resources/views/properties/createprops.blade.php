@@ -2,6 +2,7 @@
     <div style="background-color: white;">
         <div class="container sm:max-w-full py-9">
             <div class="container">
+                <h1>{{ $selectedPdt->pdtNameEn }} Data Template</h1>
                 <h1>{{ __('Create Properties') }}</h1>
 
                 @if(isset($selectedPdt) && $groupofproperties->count() > 0)
