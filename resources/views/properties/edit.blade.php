@@ -19,6 +19,12 @@
             </div>
 
             <div class="form-group">
+                <label for="propertyId">{{ __('property name in Dictionary') }}</label>
+                <input type="text" name="nameEn" id="nameEn" class="form-control" value="{{ $propertyNameInDD->nameEn }}" readonly>
+            </div>
+
+
+            <div class="form-group">
                 <label for="GUID">{{ __('GUID') }}</label>
                 <input type="text" name="GUID" id="GUID" class="form-control" value="{{ old('GUID', $property->GUID) }}" readonly>
             </div>
@@ -33,20 +39,50 @@
                 <input type="text" name="pdtID" id="pdtID" class="form-control" value="{{ old('pdtID', $property->pdtID) }}" readonly>
             </div>
 
+
             <div class="form-group">
                 <label for="referenceDocumentGUID">{{ __('Reference Document') }}</label>
-                <select class="form-control" id="referenceDocumentGUID" name="referenceDocumentGUID">
-                    <!-- Default 'n/a' option without displaying it -->
-                    <option value="n/a" style="display: none;" {{ $property->referenceDocumentGUID == 'n/a' ? 'selected' : '' }}>n/a</option>
 
-                    <!-- Populate dropdown with reference documents -->
+                <!-- Search input to filter radio buttons -->
+                <input type="text" id="searchReferenceDocument" class="form-control mb-2" placeholder="Search Reference Document" onkeyup="filterReferenceDocuments()">
+
+                <!-- Scrollable container for radio buttons -->
+                <div class="scrollable-container" style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 5px;">
+                    <!-- 'None' option to deselect -->
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="referenceDocumentGUID" id="referenceDocumentNone" value="n/a" {{ $property->referenceDocumentGUID == 'n/a' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="referenceDocumentNone">
+                            None
+                        </label>
+                    </div>
+
                     @foreach ($referenceDocuments as $document)
-                    <option value="{{ $document->GUID }}" {{ $property->referenceDocumentGUID == $document->GUID ? 'selected' : '' }}>
-                        {{ $document->rdName }}
-                    </option>
+                    @if ($document->GUID != 'n/a') <!-- Only include documents where GUID is not 'n/a' -->
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="referenceDocumentGUID" id="referenceDocument{{ $document->GUID }}" value="{{ $document->GUID }}" {{ $property->referenceDocumentGUID == $document->GUID ? 'checked' : '' }}>
+                        <label class="form-check-label" for="referenceDocument{{ $document->GUID }}">
+                            {{ $document->rdName }}: {{ $document->title }}
+                        </label>
+                    </div>
+                    @endif
                     @endforeach
-                </select>
+                </div>
             </div>
+
+            <script>
+                // JavaScript function to filter the radio buttons based on the input value
+                function filterReferenceDocuments() {
+                    const searchInput = document.getElementById('searchReferenceDocument').value.toLowerCase();
+                    const radioButtons = document.querySelectorAll('.form-check');
+
+                    radioButtons.forEach(radioButton => {
+                        const label = radioButton.querySelector('label').textContent.toLowerCase();
+                        radioButton.style.display = label.includes(searchInput) ? '' : 'none'; // Show or hide based on the search input
+                    });
+                }
+            </script>
+
+
 
             <div class="form-group">
                 <label for="descriptionEn">{{ __('Description (English)') }}</label>

@@ -74,7 +74,8 @@ class PropertiesController extends Controller
     {
         $property = Properties::findOrFail($propertyId);
         $referenceDocuments = referenceDocuments::all();
-        return view('properties.edit', compact('property', 'referenceDocuments'));
+        $propertyNameInDD = propertiesdatadictionaries::where("Id", $property->propertyId)->first();
+        return view('properties.edit', compact('property', 'referenceDocuments', 'propertyNameInDD'));
     }
 
 
@@ -137,7 +138,24 @@ class PropertiesController extends Controller
         $gopId = $request->input('gopId');
         $selectedPdt = ProductDataTemplates::findOrFail($pdtId);
         $selectedGroup = GroupOfProperties::findOrFail($gopId);
-        $dataDictionary = propertiesdatadictionaries::All();
+        $dataDictionary = PropertiesDataDictionaries::select('*')
+            ->whereIn('Id', function ($query) {
+                $query->selectRaw('MAX(Id)')  // Select the latest id for each nameEn
+                    ->from('propertiesDataDictionaries as p1')
+                    ->whereRaw('NOT EXISTS (
+                    SELECT 1
+                    FROM propertiesDataDictionaries as p2
+                    WHERE p2.GUID = p1.GUID
+                    AND (p2.versionNumber > p1.versionNumber
+                        OR (p2.versionNumber = p1.versionNumber AND p2.revisionNumber > p1.revisionNumber))
+                )')
+                    ->groupBy('p1.nameEn');
+            })
+            ->get();
+
+
+
+
         // Fetch properties from the Properties table
         $addedProperties = Properties::where('pdtId', $pdtId)->where('gopId', $gopId)->get();
 
@@ -159,18 +177,22 @@ class PropertiesController extends Controller
         $gopId = $request->input('gopId');
         $selectedPdt = ProductDataTemplates::findOrFail($pdtId);
         $selectedGroup = GroupOfProperties::findOrFail($gopId);
-        $dataDictionary = PropertiesDataDictionaries::select('GUID', 'nameEn', 'namePt', 'units', 'versionNumber', 'revisionNumber')
-            ->whereIn('versionNumber', function ($query) {
-                $query->selectRaw('MAX(versionNumber)')
-                    ->from('propertiesDataDictionaries')
-                    ->groupBy('GUID');
-            })
-            ->whereIn('revisionNumber', function ($query) {
-                $query->selectRaw('MAX(revisionNumber)')
-                    ->from('propertiesDataDictionaries')
-                    ->groupBy('GUID');
+        $dataDictionary = PropertiesDataDictionaries::select('*')
+            ->whereIn('Id', function ($query) {
+                $query->selectRaw('MAX(Id)')  // Select the latest id for each nameEn
+                    ->from('propertiesDataDictionaries as p1')
+                    ->whereRaw('NOT EXISTS (
+                    SELECT 1
+                    FROM propertiesDataDictionaries as p2
+                    WHERE p2.GUID = p1.GUID
+                    AND (p2.versionNumber > p1.versionNumber
+                        OR (p2.versionNumber = p1.versionNumber AND p2.revisionNumber > p1.revisionNumber))
+                )')
+                    ->groupBy('p1.nameEn');
             })
             ->get();
+
+
 
         // Get selected property IDs and reference documents from the form
         $selectedProperties = $request->input('selectedProperties');
@@ -215,18 +237,23 @@ class PropertiesController extends Controller
         $gopId = $request->input('gopId');
         $selectedPdt = ProductDataTemplates::findOrFail($pdtId);
         $selectedGroup = GroupOfProperties::findOrFail($gopId);
-        $dataDictionary = PropertiesDataDictionaries::select('GUID', 'nameEn', 'namePt', 'units', 'versionNumber', 'revisionNumber')
-            ->whereIn('versionNumber', function ($query) {
-                $query->selectRaw('MAX(versionNumber)')
-                    ->from('propertiesDataDictionaries')
-                    ->groupBy('GUID');
-            })
-            ->whereIn('revisionNumber', function ($query) {
-                $query->selectRaw('MAX(revisionNumber)')
-                    ->from('propertiesDataDictionaries')
-                    ->groupBy('GUID');
+        $dataDictionary = PropertiesDataDictionaries::select('*')
+            ->whereIn('Id', function ($query) {
+                $query->selectRaw('MAX(Id)')  // Select the latest id for each nameEn
+                    ->from('propertiesDataDictionaries as p1')
+                    ->whereRaw('NOT EXISTS (
+                    SELECT 1
+                    FROM propertiesDataDictionaries as p2
+                    WHERE p2.GUID = p1.GUID
+                    AND (p2.versionNumber > p1.versionNumber
+                        OR (p2.versionNumber = p1.versionNumber AND p2.revisionNumber > p1.revisionNumber))
+                )')
+                    ->groupBy('p1.nameEn');
             })
             ->get();
+
+
+
         // Fetch properties from the Properties table
         $addedProperties = Properties::where('pdtId', $pdtId)->where('gopId', $gopId)->get();
 
@@ -399,7 +426,17 @@ class PropertiesController extends Controller
             Log::info("Sheet name: {$sheetName}");
 
             // Check if the sheet name matches the selected group name (case-insensitive)
-            if (strtolower(trim($sheetName)) === strtolower(trim($selectedGroupName))) {
+
+            // Normalize both sheet name and selected group name
+            $normalizedSheetName = strtolower(preg_replace('/[^a-zA-Z]/', '', $sheetName));
+            $normalizedSelectedGroupName = strtolower(preg_replace('/[^a-zA-Z]/', '', $selectedGroupName));
+
+            // Log the normalized versions for debugging
+            Log::info("Normalized sheet name: '{$normalizedSheetName}'");
+            Log::info("Normalized selected group name: '{$normalizedSelectedGroupName}'");
+
+            // Compare the two normalized strings (case insensitive)
+            if ($normalizedSheetName === $normalizedSelectedGroupName) {
                 Log::info("Sheet found and processing: {$sheetName}");
 
                 // Extract property names from the sheet (assuming the first column contains property names)

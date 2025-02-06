@@ -50,10 +50,26 @@
                             onkeyup="filterProperties()" />
                     </div>
 
+                    @php
+                    // Create an array to track duplicates
+                    $nameEnOccurrences = [];
+
+                    // Count occurrences of each nameEn
+                    foreach ($dataDictionary as $property) {
+                    $nameEnOccurrences[$property->nameEn] = ($nameEnOccurrences[$property->nameEn] ?? 0) + 1;
+                    }
+
+                    // Identify duplicated nameEn values
+                    $duplicatedNames = array_filter($nameEnOccurrences, function ($count) {
+                    return $count > 1;
+                    });
+                    @endphp
+
                     <!-- Scrollable Properties List -->
                     <div id="propertyList" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
                         @foreach ($dataDictionary as $property)
-                        <div class="form-check mb-2">
+                        <div
+                            class="form-check mb-2 {{ array_key_exists($property->nameEn, $duplicatedNames) ? 'highlight-duplicate' : '' }}">
                             <input
                                 type="checkbox"
                                 class="form-check-input property-checkbox"
@@ -66,7 +82,10 @@
                             </label>
                         </div>
                         @endforeach
+
+
                     </div>
+
                     <br>
                     <x-secondary-button type="submit">{{ __('Add Selected Properties') }}</x-secondary-button>
                 </form>
@@ -171,7 +190,6 @@
                     const unmatchedList = document.getElementById('unmatchedProperties');
                     unmatchedList.innerHTML = ''; // Clear any previous unmatched properties
 
-                    console.log("Displaying unmatched properties");
                     unmatchedProperties.forEach(name => {
                         console.log("Unmatched property:", name); // Log each unmatched property
                         const listItem = document.createElement('li');

@@ -331,6 +331,11 @@
             padding: 0 1em 0 2em;
         }
 
+        .highlight-duplicate {
+            background-color: #ffe4e4;
+            /* Light red for duplicates */
+        }
+
         #tblpdts {
             font-family: 'Open Sans', Arial, Helvetica, sans-serif;
             border-collapse: collapse;

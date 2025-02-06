@@ -54,6 +54,44 @@ return new class extends Migration
         });
     }
 
+    /*
+Construction
+Construction Material
+Geotechnical Works
+Excavation and Stabilization
+Foundation and Piles
+Earth Retaining Structures
+Concrete
+Steel
+Wooden Structures
+Masonry and Brickwork
+Composite and Specialized Materials
+Walls
+Roofs
+Cladding
+Insulation
+Windows
+Doors
+Partitions
+Ceilings
+Floors
+Paint
+Wall Coverings
+Sanitary
+Kitchen
+Railways
+Roadways
+HVAC Systems
+Electrical Systems
+Plumbing
+Fire Protection
+Civil and Utility Services
+IT Infrastructure
+Landscaping and Earthworks
+Security and Protection Systems
+*/
+
+
     /**
      * Reverse the migrations.
      *

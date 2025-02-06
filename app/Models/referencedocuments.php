@@ -7,7 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class referencedocuments extends Model
 {
-
+    protected $fillable = [
+        'GUID',
+        'rdName',
+        'description',
+        'status',
+        'title',
+    ];
     use HasFactory;
     public function groupofproperties()
     {

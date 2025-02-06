@@ -34,7 +34,7 @@
                                 <!-- Populate table rows with reference documents, excluding 'n/a' -->
                                 @foreach ($rds as $document)
                                 @if (strtolower($document->rdName) !== 'n/a')
-                                <tr>
+                                <tr class="reference-document-item" data-name="{{ strtolower($document->rdName) }}">
                                     <td style="padding: 8px; border-bottom: 1px solid #ddd;">{{ $document->rdName }}</td>
                                     <td style="padding: 8px; border-bottom: 1px solid #ddd;">{{ $document->title }}</td>
                                     <td style="padding: 8px; border-bottom: 1px solid #ddd;">
@@ -52,7 +52,6 @@
                     </div>
                 </div>
                 <br>
-
 
                 <h1>{{ __('Add Reference Document') }}</h1>
 
@@ -98,17 +97,23 @@
                 </form>
 
             </div>
-            <script>
-                // JavaScript function to filter the list
-                function filterReferenceDocuments() {
-                    const searchInput = document.getElementById('searchReferenceDocument').value.toLowerCase();
-                    const listItems = document.querySelectorAll('#referenceDocumentList .reference-document-item');
+        </div>
+    </div>
 
-                    listItems.forEach(item => {
-                        const name = item.dataset.name.toLowerCase();
-                        item.style.display = name.includes(searchInput) ? '' : 'none';
-                    });
+    <script>
+        // JavaScript function to filter the list of reference documents
+        function filterReferenceDocuments() {
+            const searchInput = document.getElementById('searchReferenceDocument').value.toLowerCase();
+            const rows = document.querySelectorAll('.reference-document-item');
+
+            rows.forEach(row => {
+                const name = row.dataset.name; // Get the name from the data-name attribute
+                if (name.includes(searchInput)) {
+                    row.style.display = ''; // Show row
+                } else {
+                    row.style.display = 'none'; // Hide row
                 }
-            </script>
-
+            });
+        }
+    </script>
 </x-app-layout>
