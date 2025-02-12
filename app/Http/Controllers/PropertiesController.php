@@ -282,6 +282,8 @@ class PropertiesController extends Controller
             'gopId' => 'required|exists:groupofproperties,Id',
             'nameEn' => 'required|string',
             'namePt' => 'required|string',
+            'nameEnSc' => 'required|string',
+            'namePtSc' => 'required|string',
             'GUID' => 'required|string',
             'definitionEn' => 'required|string',
             'definitionPt' => 'required|string',
@@ -321,6 +323,8 @@ class PropertiesController extends Controller
         $dataDictionaryProperty->GUID = $request->input('GUID');
         $dataDictionaryProperty->nameEn = $request->input('nameEn');
         $dataDictionaryProperty->namePt = $request->input('namePt');
+        $dataDictionaryProperty->nameEnSc = $request->input('nameEnSc');
+        $dataDictionaryProperty->namePtSc = $request->input('namePtSc');
         $dataDictionaryProperty->definitionEn = $request->input('definitionEn');
         $dataDictionaryProperty->definitionPt = $request->input('definitionPt');
         $dataDictionaryProperty->status = $request->input('status');

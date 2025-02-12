@@ -19,11 +19,19 @@
                     <input type="hidden" name="nextIdDataDictionary" value="{{ $nextIdDataDictionary }}">
 
                     <div class="form-group">
-                        <label for="nameEn">{{ __('Name (English)') }}</label>
+                        <label for="nameEnSc">{{ __('Name (English) Senctence case') }}</label>
+                        <input type="text" class="form-control" id="nameEnSc" name="nameEnSc" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="nameEn">{{ __('Name (English) PascalCase') }}</label>
                         <input type="text" class="form-control" id="nameEn" name="nameEn" required>
                     </div>
                     <div class="form-group">
-                        <label for="namePt">{{ __(' Name (Portuguese)') }}</label>
+                        <label for="namePtSc">{{ __(' Name (Portuguese) Senctence case, no accents') }}</label>
+                        <input type="text" class="form-control" id="namePtSc" name="namePtSc" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="namePt">{{ __(' Name (Portuguese) PascalCase') }}</label>
                         <input type="text" class="form-control" id="namePt" name="namePt" required>
                     </div>
                     <div class="form-group">

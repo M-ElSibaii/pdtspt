@@ -3,7 +3,7 @@
         <div class="container sm:max-w-full py-9 flex ls:flex-row md:flex-row sm:flex-col gap-6">
             <div class="basis-1/2 text-current">
                 <h2>Contactos</h2>
-                <p>Para entrar em contacto com a equipa de investigação utilize o formulário a baixo ou contact-nos no nosso email:</p>
+                <p>Para entrar em contacto com a equipa de investigação contact-nos no nosso email:</p>
                 <a href="mailto: pdts.portugal@gmail.com">pdts.portugal@gmail.com</a>
                 <img class="max-h-[500px] w-auto" src="{{asset('/img/contact.jpg')}}" alt="contact">
             </div>
@@ -28,56 +28,7 @@
                 </div>
                 @endif
 
-                <h3>Formulário de contacto</h3>
-                <div class="">
-                    <form method="POST" action="{{ route('contact.store') }}" id="contactUSForm">
-                        @csrf
 
-                        <!-- Name -->
-                        <div class="mt-2">
-                            <x-input-label for="name" :value="__('Nome:')" />
-                            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus />
-                            <x-input-error :messages="$errors->get('name')" class="mt-2" />
-                        </div>
-
-                        <!-- Email Address -->
-                        <div class="mt-2">
-                            <x-input-label for="email" :value="__('Email')" />
-                            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-                            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-                        </div>
-                        <!-- Subject -->
-                        <div class="mt-2">
-                            <x-input-label for="subject" :value="__('Assunto:')" />
-                            <x-text-input id="subject" class="block mt-1 w-full" type="text" name="subject" :value="old('subject')" required autofocus />
-                            <x-input-error :messages="$errors->get('subject')" class="mt-2" />
-                        </div>
-
-                        <!-- Message -->
-                        <div class="mt-2">
-                            <x-input-label for="message" :value="__('Mensagem:')" />
-                            <x-textarea-input id="message" rows=10 class="block mt-1 w-full" type="text" name="message" old_message="{{old('message')}}" required autofocus />
-                            <x-input-error :messages="$errors->get('message')" class="mt-2" />
-                        </div>
-
-                        <!-- Captcha -->
-                        <div class="form-group">
-                            <label for="captcha">Por favor escreva as cartas que vê abaixo</label>
-                            {!! captcha_img() !!}
-                            <input type="text" id="captcha" name="captcha">
-                            @if ($errors->has('captcha'))
-                            <span class="text-danger">{{ $errors->first('captcha') }}</span>
-                            @endif
-                        </div>
-
-                        <div class="flex items-center justify-end mt-2">
-                            <x-primary-button class="ml-3">
-                                Enviar mensagem
-                            </x-primary-button>
-                        </div>
-
-                    </form>
-                </div>
             </div>
         </div>
     </div>
