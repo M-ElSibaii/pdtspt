@@ -173,7 +173,7 @@
                     {{ $property->units }}
                 </td>
                 <td>
-                    {{$property->descriptionPt}}
+                    {{$property->namePtSc}}: {{$property->descriptionPt}}
                 </td>
                 <td>
                     @if ($referenceDocument->where('GUID', $property->referenceDocumentGUID)->first())
@@ -237,21 +237,21 @@
                 });
                 const link = document.createElement("a");
                 link.href = URL.createObjectURL(blob);
-                link.download = "{{ $pdt->pdtNameEn }}_data_template.json";
+                link.download = "{{ $pdt->pdtNameEn }} data template V {{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.json";
                 link.click();
             });
             //export csv
             $("#csv").on("click", function() {
                 $("#tblpdtsh").tableHTMLExport({
                     type: "csv",
-                    filename: "{{ $pdt->pdtNameEn }} data template.csv"
+                    filename: "{{ $pdt->pdtNameEn }} data template V {{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.csv"
                 });
             });
             //export text
             $("#txt").on("click", function() {
                 $("#tblpdtsh").tableHTMLExport({
                     type: "txt",
-                    filename: "{{ $pdt->pdtNameEn }} data template.txt"
+                    filename: "{{ $pdt->pdtNameEn }} data template V {{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.txt"
                 });
             });
         </script>
