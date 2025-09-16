@@ -97,7 +97,7 @@ class PropertiesController extends Controller
             $property->descriptionEn = $request->input('descriptionEn');
             $property->descriptionPt = $request->input('descriptionPt');
             $property->referenceDocumentGUID = $request->input('referenceDocumentGUID'); // Update the reference document
-
+            $property->visualRepresentation = $request->input('visualRepresentation');
             // Add other fields as needed
             $property->save();
 
@@ -388,7 +388,11 @@ class PropertiesController extends Controller
             ->select('Properties.*', 'propertiesDataDictionaries.nameEn', 'propertiesDataDictionaries.units')
             ->get();
         $referenceDocuments = ReferenceDocuments::all();
-        return view('properties.addNew', compact('selectedPdt', 'selectedGroup', 'selectedProperties', 'referenceDocuments'))->with('success', 'Property added successfully.');
+
+        $lastIdDataDictionary =  PropertiesDataDictionaries::latest('Id')->value('Id');
+        $nextIdDataDictionary = $lastIdDataDictionary + 1;
+
+        return view('properties.addNew', compact('selectedPdt', 'selectedGroup', 'selectedProperties', 'nextIdDataDictionary', 'referenceDocuments'))->with('success', 'Property added successfully.');
     }
 
 

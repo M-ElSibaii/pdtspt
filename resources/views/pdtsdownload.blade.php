@@ -151,11 +151,11 @@
 
         <table hidden id="tblpdtsh">
             <tr>
-                <th style="width: 15%;">Grupo de propriedades</th>
-                <th>Propriedade </th>
-                <th style="width: 7%;">Unidade</th>
-                <th style="width: 40%;">Descrição</th>
-                <th style="width: 16%;">Documento de referência</th>
+                <th style="width: 15%;">Group of Properties</th>
+                <th>Proprties</th>
+                <th style="width: 7%;">Unit</th>
+                <th style="width: 40%;">Description</th>
+                <th style="width: 16%;">Reference Document</th>
             </tr>
             @foreach($sorted_combined_groups as $group)
             @foreach($group as $propertyGroup)
@@ -164,16 +164,16 @@
 
             <tr>
                 <td>
-                    {{ $propertyGroup->gopNamePt }}
+                    {{ $propertyGroup->gopNameEn }}
                 </td>
                 <td>
-                    {{ $property->namePt }}
+                    {{ $property->nameEn }}
                 </td>
                 <td>
                     {{ $property->units }}
                 </td>
                 <td>
-                    {{$property->namePtSc}}: {{$property->descriptionPt}}
+                    {{$property->nameEnSc}}: {{$property->descriptionEn}}
                 </td>
                 <td>
                     @if ($referenceDocument->where('GUID', $property->referenceDocumentGUID)->first())

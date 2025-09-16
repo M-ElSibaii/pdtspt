@@ -153,14 +153,14 @@
                                     card_image="{{asset('/img/bSDD_logo.png')}}" 
                                     card_title=""
                                     card_description=""
-                                    card_link="https://single-market-economy.ec.europa.eu/sectors/construction/construction-products-regulation-cpr_en"
+                                    card_link="https://www.buildingsmart.org/users/services/buildingsmart-data-dictionary/"
                                     card_link_title="Ver mais"
                                     />
                                 <x-card-image 
                                     card_image="{{asset('/img/COBie_logo.png')}}" 
                                     card_title=""
                                     card_description=""
-                                    card_link="https://single-market-economy.ec.europa.eu/sectors/construction/construction-products-regulation-cpr_en"
+                                    card_link="https://www.nibs.org/nbims/v3/cobie"
                                     card_link_title="Ver mais"
                                     />
                                 

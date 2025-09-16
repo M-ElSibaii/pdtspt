@@ -90,18 +90,33 @@
                         <input type="text" class="form-control" id="GUID" name="GUID" required>
                     </div>
 
-                    <div class="form-group">
-                        <label for="referenceDocumentGUID">{{ __('Reference Document GUID') }}</label>
-                        <select class="form-control" id="referenceDocumentGUID" name="referenceDocumentGUID">
-                            <!-- Default 'n/a' option -->
-                            <option value="n/a">n/a</option>
+              <!-- Reference Document Dropdown -->
+<div class="form-group">
+    <label for="referenceDocumentGUID">{{ __('Reference Document GUID') }}</label>
+    <select class="form-control select2" id="referenceDocumentGUID" name="referenceDocumentGUID">
+        <!-- Default 'n/a' option -->
+        <option value="n/a">n/a</option>
 
-                            <!-- Populate dropdown with reference documents -->
-                            @foreach ($referenceDocuments as $document)
-                            <option value="{{ $document->GUID }}">{{ $document->rdName }}</option>
-                            @endforeach
-                        </select>
-                    </div>
+        <!-- Populate dropdown with reference documents -->
+        @foreach ($referenceDocuments as $document)
+            <option value="{{ $document->GUID }}">{{ $document->rdName }}</option>
+        @endforeach
+    </select>
+</div>
+
+<!-- Include Select2 (CSS + JS) -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- Initialize -->
+<script>
+    $(document).ready(function() {
+        $('#referenceDocumentGUID').select2({
+            placeholder: "Select or type to search...",
+            allowClear: true
+        });
+    });
+</script>
+
 
                     <div class="form-group">
                         <label for="descriptionEn">{{ __('Description (English)') }}</label>

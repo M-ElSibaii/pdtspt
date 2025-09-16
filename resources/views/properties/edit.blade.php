@@ -23,6 +23,11 @@
                 <input type="text" name="nameEn" id="nameEn" class="form-control" value="{{ $propertyNameInDD->nameEn }}" readonly>
             </div>
 
+                  <div class="form-group">
+                <label for="propertyId">{{ __('property name in Dictionary PT') }}</label>
+                <input type="text" name="namePt" id="namePt" class="form-control" value="{{ $propertyNameInDD->namePt }}" readonly>
+            </div>
+
 
             <div class="form-group">
                 <label for="GUID">{{ __('GUID') }}</label>
@@ -95,10 +100,14 @@
             </div>
 
 
-            <div class="form-group">
-                <label for="visualRepresentation">{{ __('Visual Representation') }}</label>
-                <input type="text" name="visualRepresentation" id="visualRepresentation" class="form-control" value="{{ old('visualRepresentation', $property->visualRepresentation) }}" readonly>
-            </div>
+        <div class="form-group">
+    <label for="visualRepresentation">{{ __('Visual Representation') }}</label>
+    <select name="visualRepresentation" id="visualRepresentation" class="form-control">
+        <option value="True" {{ old('visualRepresentation', $property->visualRepresentation) == 'True' ? 'selected' : '' }}>True</option>
+        <option value="False" {{ old('visualRepresentation', $property->visualRepresentation ?? 'False') == 'False' ? 'selected' : '' }}>False</option>
+    </select>
+</div>
+
 
             <x-button-primary-pdts type="submit" title="Update Property" />
         </form>

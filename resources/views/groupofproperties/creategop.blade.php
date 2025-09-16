@@ -184,6 +184,14 @@
                     <x-primary-button type="submit">
                         {{ __('Add Group of Properties') }}
                     </x-primary-button>
+
+                    <!-- Button to go to createprops page with PDT Id -->
+<div class="form-group mt-4">
+    <a href="{{ url('/properties/createprops?pdtId=' . $selectedPdt->Id) }}" class="btn btn-secondary">
+        {{ __('Go to Properties Creation') }}
+    </a>
+</div>
+
                 </form>
             </div>
         </div>

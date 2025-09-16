@@ -27,7 +27,7 @@
                         <input type="text" class="form-control" id="nameEn" name="nameEn" required>
                     </div>
                     <div class="form-group">
-                        <label for="namePtSc">{{ __(' Name (Portuguese) Senctence case, no accents') }}</label>
+                        <label for="namePtSc">{{ __(' Name (Portuguese) Senctence case') }}</label>
                         <input type="text" class="form-control" id="namePtSc" name="namePtSc" required>
                     </div>
                     <div class="form-group">
@@ -165,7 +165,7 @@
 
                     <div class="form-group">
                         <label for="units">{{ __('Units') }}</label>
-                        <input type="text" class="form-control" id="units" name="units" required>
+                        <input type="text" class="form-control" id="units" name="units">
                     </div>
 
                     <div class="form-group">
