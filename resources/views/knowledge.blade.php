@@ -39,6 +39,17 @@
             <div class="grid grid-cols-1 gap-6">
                 <!-- Publication Containers -->
 
+                   <div class="border border-gray-200 rounded-lg p-4 flex items-center">
+                    <img src="img/ITCONpdtplatformjournalarticle.png" alt="Publication Thumbnail" class="mr-4 rounded-lg" style="width: 200px; height: 200px;">
+                    <div>
+                        <a href="https://www.itcon.org/paper/2025/28" target="_blank" class="text-xl font-semibold block">
+                            An Open And Standards-Compliant Platform For Product Data Templates In Digital Construction </a>
+                        <p><strong>Autores:</strong> Mohamad El Sibaii, José Granja, Miguel Azenha</p>
+                        <p class="text-gray-500 text-sm">Date: 01/05/2025</p>
+                    </div>
+                </div>
+
+
                 <div class="border border-gray-200 rounded-lg p-4 flex items-center">
                     <img src="img/Transformação digital na indústria da construção Capacitando a gestão de dados através de uma plataforma de modelos de dados de produtos.png" alt="Publication Thumbnail" class="mr-4 rounded-lg" style="width: 200px; height: 200px;">
                     <div>
@@ -104,7 +115,7 @@
                     <img src="img/RUMO À MODELAÇÃO EFICIENTE DE PARÂMETROS GEOTÉCNICOS EM BIM.png" alt="Publication Thumbnail" class="mr-4 rounded-lg" style="width: 200px; height: 200px;">
                     <div>
                         <a href="https://repositorium.sdum.uminho.pt/bitstream/1822/70621/1/%5b76%5d.pdf" target="_blank" class="text-xl font-semibold block">
-                            RUMO À MODELAÇÃO EFICIENTE DE PARÂMETROS GEOTÉCNICOS EM BIM</a>
+                            Rumo À Modelação Eficiente De Parâmetros Geotécnicos Em BIM</a>
                         <p><strong>Autores:</strong> Mohamad El Sibaii, Cátia Marques, Luis Bidarra, Miguel Azenha</p>
                         <p class="text-gray-500 text-sm">Date: 26/11/2020</p>
                     </div>
