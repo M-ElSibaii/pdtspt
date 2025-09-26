@@ -151,11 +151,11 @@
 
         <table hidden id="tblpdtsh">
             <tr>
-                <th style="width: 15%;">Group of Properties</th>
-                <th>Proprties</th>
-                <th style="width: 7%;">Unit</th>
-                <th style="width: 40%;">Description</th>
-                <th style="width: 16%;">Reference Document</th>
+          <th style="width: 15%;">Grupo de propriedades</th>
+                <th>Propriedade </th>
+                <th style="width: 7%;">Unidade</th>
+                <th style="width: 40%;">Descrição</th>
+                <th style="width: 16%;">Documento de referência</th>
             </tr>
             @foreach($sorted_combined_groups as $group)
             @foreach($group as $propertyGroup)
@@ -164,16 +164,16 @@
 
             <tr>
                 <td>
-                    {{ $propertyGroup->gopNameEn }}
+                    {{ $propertyGroup->gopNamePt }}
                 </td>
                 <td>
-                    {{ $property->nameEn }}
+                    {{ $property->namePt }}
                 </td>
                 <td>
                     {{ $property->units }}
                 </td>
                 <td>
-                    {{$property->nameEnSc}}: {{$property->descriptionEn}}
+                    {{$property->namePtSc}}: {{$property->descriptionPt}}
                 </td>
                 <td>
                     @if ($referenceDocument->where('GUID', $property->referenceDocumentGUID)->first())
@@ -237,21 +237,21 @@
                 });
                 const link = document.createElement("a");
                 link.href = URL.createObjectURL(blob);
-                link.download = "{{ $pdt->pdtNameEn }} data template V {{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.json";
+                link.download = "{{ $pdt->pdtNamePt }} data template V {{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.json";
                 link.click();
             });
             //export csv
             $("#csv").on("click", function() {
                 $("#tblpdtsh").tableHTMLExport({
                     type: "csv",
-                    filename: "{{ $pdt->pdtNameEn }} data template V {{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.csv"
+                    filename: "{{ $pdt->pdtNamePt }} data template V {{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.csv"
                 });
             });
             //export text
             $("#txt").on("click", function() {
                 $("#tblpdtsh").tableHTMLExport({
                     type: "txt",
-                    filename: "{{ $pdt->pdtNameEn }} data template V {{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.txt"
+                    filename: "{{ $pdt->pdtNamePt }} data template V {{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.txt"
                 });
             });
         </script>
