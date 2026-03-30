@@ -61,6 +61,13 @@ Route::get('/dashboard', [ProductdatatemplatesController::class, 'getLatestPDTs'
 Route::get('/pdtsdownload/{pdtID}', [GroupofpropertiesController::class, 'getGroupOfProperties'])
     ->name('pdtsdownload');
 
+// Single PDT export endpoints (EN ISO 23387 format)
+Route::post('/pdt-export/json/{pdtId}', [ProductdatatemplatesController::class, 'downloadPdtJson'])
+    ->name('pdt.export.json');
+
+Route::post('/pdt-export/xml/{pdtId}', [ProductdatatemplatesController::class, 'downloadPdtXml'])
+    ->name('pdt.export.xml');
+
 Route::middleware('auth', 'verified')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

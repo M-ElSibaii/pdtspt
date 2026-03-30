@@ -685,4 +685,44 @@ class ProductdatatemplatesController extends Controller
 
         return $pascalCaseString;
     }
+
+    /**
+     * Download single PDT as JSON (EN ISO 23387 format)
+     */
+    public function downloadPdtJson($pdtId)
+    {
+        $exporter = new \App\Services\Iso23387Exporter();
+        $json = $exporter->exportToJson($pdtId);
+
+        $pdt = productdatatemplates::find($pdtId);
+        $fileName = $pdt->pdtNamePt . '_V' . $pdt->editionNumber . '.' . $pdt->versionNumber . '.' . $pdt->revisionNumber . '_' . date('Y-m-d') . '.json';
+
+        return response()->streamDownload(
+            function () use ($json) {
+                echo $json;
+            },
+            $fileName,
+            ['Content-Type' => 'application/json']
+        );
+    }
+
+    /**
+     * Download single PDT as XML (EN ISO 23387 format with XSD validation)
+     */
+    public function downloadPdtXml($pdtId)
+    {
+        $exporter = new \App\Services\Iso23387Exporter();
+        $xml = $exporter->exportToXml($pdtId);
+
+        $pdt = productdatatemplates::find($pdtId);
+        $fileName = $pdt->pdtNamePt . '_V' . $pdt->editionNumber . '.' . $pdt->versionNumber . '.' . $pdt->revisionNumber . '_' . date('Y-m-d') . '.xml';
+
+        return response()->streamDownload(
+            function () use ($xml) {
+                echo $xml;
+            },
+            $fileName,
+            ['Content-Type' => 'application/xml']
+        );
+    }
 }

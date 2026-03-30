@@ -1,0 +1,352 @@
+This XML file does not appear to have any style information associated with it. The document tree is shown below.
+<dt:Library xmlns:dt="https://standards.iso.org/iso/23387/ed-2/en/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://standards.iso.org/iso/23387/ed-2/en/ https://standards.iso.org/iso/23387/ed-2/en/23387_AnnexE_XSD_V15.xsd" dt:GUID="854ce262-d7b8-42e1-9aad-b4704c6fb7a4">
+<dt:Name language="en">exterior door</dt:Name>
+<dt:DataTemplate dt:GUID="ff2755a7-09c2-4e97-8d0a-1c66d123f504" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">exterior door template</dt:Name>
+<dt:Definition language="en-EN">data template for exterior doors according to EN 14351-1</dt:Definition>
+<dt:ReferenceDocumentRef dt:GUID="f7d4dc8e-545f-4b2a-8a4d-d21ac8a42945"/>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:HasObjectTypeRef dt:GUID="0c603707-4b61-44dd-9ace-15ba3df1877e"/>
+<dt:HasPropertyRef dt:GUID="994b0654-3193-412b-9061-22a7bcc8d0da"/>
+<dt:HasPropertyRef dt:GUID="44f30bd6-c23c-4c40-a1d9-fcdabbcef498"/>
+<dt:HasPropertyRef dt:referenceURI="https://identifier.buildingsmart.org/uri/LCA/LCA/3.0/prop/GWP_total" dt:GUID="32441e1a-de40-440b-9ae6-e5d9ef5a2a70"/>
+<dt:HasPropertyRef dt:GUID="da8679d9-9763-4fe5-b1b0-7fead74ac641"/>
+<dt:HasGroupOfPropertiesRef dt:GUID="8a0cb4e4-1bcc-4c3f-a39c-3bf427184fa6"/>
+<dt:HasGroupOfPropertiesRef dt:GUID="0e8e499f-ba96-4738-9df5-38194e80c25f"/>
+<dt:HasGroupOfPropertiesRef dt:GUID="dc55b635-b740-464d-874b-97be8c75c206"/>
+</dt:DataTemplate>
+<dt:ObjectType dt:GUID="0c603707-4b61-44dd-9ace-15ba3df1877e" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">exterior door</dt:Name>
+<dt:Definition language="en-EN">pedestrian door or doorset intended for installation with exposure to exterior climate</dt:Definition>
+<dt:ReferenceDocumentRef dt:GUID="f7d4dc8e-545f-4b2a-8a4d-d21ac8a42945"/>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+</dt:ObjectType>
+<dt:GroupOfProperties dt:GUID="8a0cb4e4-1bcc-4c3f-a39c-3bf427184fa6" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">properties from EN 14351-1</dt:Name>
+<dt:Definition language="en-EN">group of properties defined in EN 14351-1</dt:Definition>
+<dt:ReferenceDocumentRef dt:GUID="f7d4dc8e-545f-4b2a-8a4d-d21ac8a42945"/>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:HasPropertyRef dt:GUID="994b0654-3193-412b-9061-22a7bcc8d0da"/>
+<dt:HasPropertyRef dt:GUID="44f30bd6-c23c-4c40-a1d9-fcdabbcef498"/>
+</dt:GroupOfProperties>
+<dt:GroupOfProperties dt:GUID="0e8e499f-ba96-4738-9df5-38194e80c25f" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">properties from ISO 22057</dt:Name>
+<dt:Definition language="en-EN">group of properties defined in ISO 22057</dt:Definition>
+<dt:ReferenceDocumentRef dt:GUID="86e4b1dd-7357-4720-8491-b809b691ab14"/>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:HasPropertyRef dt:referenceURI="https://identifier.buildingsmart.org/uri/LCA/LCA/3.0/prop/GWP_total" dt:GUID="32441e1a-de40-440b-9ae6-e5d9ef5a2a70"/>
+<dt:HasPropertyRef dt:GUID="da8679d9-9763-4fe5-b1b0-7fead74ac641"/>
+</dt:GroupOfProperties>
+<dt:GroupOfProperties dt:GUID="dc55b635-b740-464d-874b-97be8c75c206" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">purchasing</dt:Name>
+<dt:Definition language="en-EN">properties relevant to purchasing of doors</dt:Definition>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:HasPropertyRef dt:GUID="994b0654-3193-412b-9061-22a7bcc8d0da"/>
+<dt:HasPropertyRef dt:GUID="44f30bd6-c23c-4c40-a1d9-fcdabbcef498"/>
+<dt:HasPropertyRef dt:GUID="c88e112f-4136-439b-bb41-0a35057885e4"/>
+</dt:GroupOfProperties>
+<dt:ReferenceDocument dt:GUID="f7d4dc8e-545f-4b2a-8a4d-d21ac8a42945" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">EN 14351-1:2006+A2:2016 Windows and doors - Product standard, performance characteristics - Part 1: Windows and external pedestrian doorsets</dt:Name>
+<dt:Definition language="en-EN">This European Standard identifies material independent performance characteristics, except resistance to fire and smoke control characteristics, that are applicable to windows (including roof windows, roof windows with external fire resistance and door height windows), external pedestrian doorsets (and their assemblies, including unframed glass doorsets, escape route doorsets) and screens. Fire resisting and/or smoke control characteristics for pedestrian doorsets and openable windows are covered by EN 16034. This European Standard applies to: a) fixed windows or fixed lights, manually or power operated windows and door height windows, and screens for installation in vertical wall apertures and roof windows for installation in roofs, complete with: 1) related hardware, if any; 2) weather stripping, if any; 3) glazed apertures when intended to have glazed apertures; 4) with or without incorporated shutters and/or shutter boxes and/or blinds; and manually or power operated windows, roof windows, door height windows and screens that are: 5) fully or partially glazed including any non-transparent infill; 6) fixed or partly fixed or openable with one or more casements/sashes (e.g. hinged, projecting, pivoted, sliding); b) manually operated external pedestrian doorsets with flush or panelled leaves, complete with: 1) integral fanlights, if any; 2) adjacent parts that are contained within a single frame for inclusion in a single aperture, if any. The windows covered by this standard are not assessed regarding their ability to release (to open). The products covered by this European Standard are not assessed for structural applications. This European Standard does not apply to: - rooflights according to EN 1873 and EN 14963; - curtain walling according to EN 13830; - industrial, commercial and garage doors and gates according to EN 13241; - internal pedestrian doorsets according to prEN 14351 2; - revolving doorsets; - power operated pedestrian doorsets according to EN 16361; - windows intended to be part of internal partition.</dt:Definition>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:DateOfPublication>2016-09-21T00:00:00Z</dt:DateOfPublication>
+<dt:Language>en-EN</dt:Language>
+<dt:URI>https://standards.cencenelec.eu/dyn/www/f?p=CEN:110:0::::FSP_PROJECT,FSP_ORG_ID:62940,6017&cs=1D420D1EE788537B1BD61ED72F18FC262</dt:URI>
+</dt:ReferenceDocument>
+<dt:ReferenceDocument dt:GUID="86e4b1dd-7357-4720-8491-b809b691ab14" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">ISO 22057:2022 Sustainability in buildings and civil engineering works — Data templates for the use of environmental product declarations (EPDs) for construction products in building information modelling (BIM)</dt:Name>
+<dt:Definition language="en-EN">This document provides the principles and requirements to enable environmental and technical data provided in EPDs for construction products and services, construction elements and integrated technical systems to be used in BIM to assist in the assessment of the environmental performance of a construction works over its life cycle. This document gives requirements on structuring EPD information using a data template according to ISO 23386 and ISO 23387, to make EPD data machine-interpretable and to enable their integration into information-driven design, construction, use and end-of-life stages. This document is applicable to structuring generic LCA data for use within a BIM environment, as these data are required in the absence of suitable EPD data to enable assessment of the environmental performance at the construction works level. The assessment of environmental performance at the construction works level is not covered by this document.</dt:Definition>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:DateOfPublication>2022-04-01T00:00:00Z</dt:DateOfPublication>
+<dt:Language>en-EN</dt:Language>
+<dt:URI>https://www.iso.org/obp/ui#iso:std:iso:22057:ed-1:v1:en</dt:URI>
+</dt:ReferenceDocument>
+<dt:ReferenceDocument dt:GUID="4b94e20a-a0f0-471e-a073-dc4cd675f0f9" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">ISO 717-1:2020 Acoustics - Rating of sound insulation in buildings and of building elements - Part 1: Airborne sound insulation</dt:Name>
+<dt:Definition language="en-EN">This document a) defines single-number quantities for airborne sound insulation in buildings and of building elements such as walls, floors, doors, and windows, b) takes into consideration the different sound level spectra of various noise sources such as noise sources inside a building and traffic outside a building, and c) gives rules for determining these quantities from the results of measurements carried out in one-third-octave or octave bands for example in accordance with ISO 10140-2 and ISO 16283-1. The single-number quantities in accordance with this document are intended for rating airborne sound insulation and for simplifying the formulation of acoustical requirements in building codes. An additional single-number evaluation in steps of 0,1 dB is indicated for the expression of uncertainty (except for spectrum adaptation terms). The required numerical values of the single-number quantities are specified according to varying needs. The single-number quantities are based on results of measurements in one-third-octave bands or octave bands. For laboratory measurements made in accordance with ISO 10140-2, single-number quantities are calculated using one-third-octave bands only. The rating of results of measurements carried out over an enlarged frequency range is dealt with in Annex B.</dt:Definition>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:DateOfPublication>2020-12-01T00:00:00Z</dt:DateOfPublication>
+<dt:Language>en-EN</dt:Language>
+<dt:URI>https://www.iso.org/obp/ui#iso:std:iso:717:-1:ed-4:v1:en</dt:URI>
+</dt:ReferenceDocument>
+<dt:ReferenceDocument dt:GUID="0474018b-f6ae-47b4-b93f-ca703e285836" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">EN 13501-1:2018 Fire classification of construction products and building elements - Part 1: Classification using data from reaction to fire tests</dt:Name>
+<dt:Definition language="en-EN">This document provides the reaction to fire classification procedure for all construction products, including products incorporated within building elements with the exception of power, control and communication cables which are covered by EN 13501-6. Products are considered in relation to their end use application. This document applies to three categories, which are treated separately in this document: - construction products, excluding floorings and linear pipe thermal insulation products; - floorings; - linear pipe thermal insulation products. NOTE For CE marking of construction products under the Construction Product Regulation ((EC) 305/2011) the NPD option can be used when no reaction of fire performance is to be declared.</dt:Definition>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:DateOfPublication>2018-12-19T00:00:00Z</dt:DateOfPublication>
+<dt:Language>en-EN</dt:Language>
+<dt:URI>https://standards.cencenelec.eu/dyn/www/f?p=CEN:110:0::::FSP_PROJECT,FSP_ORG_ID:63280,6109&cs=11654D216B402343CAE55D92E0B229A1E</dt:URI>
+</dt:ReferenceDocument>
+<dt:ReferenceDocument dt:GUID="785900f2-3eba-4a50-92b4-25c4ea775010" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">UNECE Rec. 20 Codes for units of measure used in international trade</dt:Name>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:DateOfPublication>2010-09-13T00:00:00Z</dt:DateOfPublication>
+<dt:Language>en-EN</dt:Language>
+</dt:ReferenceDocument>
+<dt:ReferenceDocument dt:GUID="d1e1a3e3-d927-44fc-8429-ea4fb991a19b" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">EN 15804:2012+A1:2013 Sustainability of construction works - Environmental product declarations - Core rules for the product category of construction products</dt:Name>
+<dt:Definition language="en-EN">This European standard provides core product category rules (PCR) for Type III environmental declarations for any construction product and construction service. NOTE The assessment of social and economic performances at product level is not covered by this standard. The core PCR: - defines the parameters to be declared and the way in which they are collated and reported, - describes which stages of a product’s life cycle are considered in the EPD and which processes are to be included in the life cycle stages, - defines rules for the development of scenarios, - includes the rules for calculating the Life Cycle Inventory and the Life Cycle Impact Assessment underlying the EPD, including the specification of the data quality to be applied, - includes the rules for reporting predetermined, environmental and health information, that is not covered by LCA for a product, construction process and construction service where necessary, - defines the conditions under which construction products can be compared based on the information provided by EPD. For the EPD of construction services the same rules and requirements apply as for the EPD of construction products.</dt:Definition>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:DateOfPublication>2013-11-20T00:00:00Z</dt:DateOfPublication>
+<dt:Language>en-EN</dt:Language>
+<dt:URI>https://standards.cencenelec.eu/dyn/www/f?p=CEN:110:0::::FSP_PROJECT,FSP_ORG_ID:40703,481830&cs=15C7577E4A7FF1C0036CA927F8F4EB732</dt:URI>
+</dt:ReferenceDocument>
+<dt:ReferenceDocument dt:GUID="101b772d-dcb9-4c9b-902d-e017ce09e6ca" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">ISO 80000-4:2019 Quantities and units - Part 4: Mechanics</dt:Name>
+<dt:Definition language="en-EN">This document gives names, symbols, definitions and units for quantities of mechanics. Where appropriate, conversion factors are also given.</dt:Definition>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:DateOfPublication>2019-08-01T00:00:00Z</dt:DateOfPublication>
+<dt:Language>en-EN</dt:Language>
+<dt:URI>https://www.iso.org/obp/ui#iso:std:iso:80000:-4:ed-2:v1:en</dt:URI>
+</dt:ReferenceDocument>
+<dt:ReferenceDocument dt:GUID="3a0a6344-186f-4766-bf9c-16e6c5f5c43a" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">ISO 80000-1:2022 Quantities and units - Part 1: General</dt:Name>
+<dt:Definition language="en-EN">This document gives general information and definitions concerning quantities, systems of quantities, units, quantity and unit symbols, and coherent unit systems, especially the International System of Quantities (ISQ). The principles laid down in this document are intended for general use within the various fields of science and technology, and as an introduction to other parts of this International Standard. The ISO/IEC 80000 series does not, as yet, cover ordinal quantities and nominal properties.</dt:Definition>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:DateOfPublication>2022-12-01T00:00:00Z</dt:DateOfPublication>
+<dt:Language>en-EN</dt:Language>
+<dt:URI>https://www.iso.org/obp/ui#iso:std:iso:80000:-1:ed-2:v1:en</dt:URI>
+</dt:ReferenceDocument>
+<dt:ReferenceDocument dt:GUID="f7cdd07e-016c-4163-82ff-cf30a7632e1d" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">ISO/FDIS 23387:2024 Building information modelling (BIM) – Data templates for objects used in the life cycle of assets</dt:Name>
+<dt:Definition language="en-EN">This document provides the concept of data templates developed to enable machine-interpretability based on a standardized data structure, carrying the alphanumerical information for any object used in the life cycle of assets. This document provides a description of how data templates are implemented following ISO 12006-3. This document provides a methodology to create and maintain data templates in data dictionaries. This document provides guidance for linking between data templates and classification systems within data dictionaries based on ISO 12006-3. This document provides an XML Schema Definition (XSD) representing an implementation of the EN ISO 23387 and EN ISO 12006-3 data models. It is not within the scope of this document to provide the content of any data templates.</dt:Definition>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:Language>en-EN</dt:Language>
+</dt:ReferenceDocument>
+<dt:ReferenceDocument dt:GUID="5976fa1c-5cf9-4620-8232-6d67c0ec5203" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">ISO 23386:2020 Building information modelling and other digital processes used in construction - Methodology to describe, author and maintain properties in interconnected data dictionaries</dt:Name>
+<dt:Definition language="en-EN">This document establishes the rules for defining properties used in construction and a methodology for authoring and maintaining them, for a confident and seamless digital share among stakeholders following a BIM process. Regarding the definition of properties and groups of properties, this document provides: — definitions of properties and groups of properties as a list of attributes; — definitions of all the provided attributes. Regarding the authoring and maintaining process, this document provides: — definitions and roles of applicants; — definitions and roles of experts and the commission of experts; — definitions of request's attributes; — definitions of expert's attributes; — requirements to establish the management rules to interconnect data dictionaries through the mapping process for properties and groups of properties. To apply the methodology of this document, it is presupposed that the following are in place: — an established governance model for a data dictionary; — a framework for a network of data dictionaries. It is not in the scope of this document to provide the content of the interconnected data dictionaries.</dt:Definition>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:DateOfPublication>2020-03-01T00:00:00Z</dt:DateOfPublication>
+<dt:Language>en-EN</dt:Language>
+<dt:URI>https://www.iso.org/obp/ui#iso:std:iso:23386:ed-1:v1:en</dt:URI>
+</dt:ReferenceDocument>
+<dt:Property dt:GUID="994b0654-3193-412b-9061-22a7bcc8d0da" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">direct airborne sound insulation</dt:Name>
+<dt:Definition language="en-EN">ability of a building element to insulate against airborne sound transmission from one side of the element to the other</dt:Definition>
+<dt:ReferenceDocumentRef dt:GUID="4b94e20a-a0f0-471e-a073-dc4cd675f0f9"/>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:DataType name="REAL">
+<dt:MinInclusive value="0"/>
+</dt:DataType>
+<dt:DimensionRef dt:GUID="00000000-0000-0000-0000-000000000000"/>
+</dt:Property>
+<dt:Property dt:GUID="44f30bd6-c23c-4c40-a1d9-fcdabbcef498" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">reaction to fire</dt:Name>
+<dt:Definition language="en-EN">response of a product in contributing by its own decomposition to a fire to which it is exposed, under specified conditions</dt:Definition>
+<dt:ReferenceDocumentRef dt:GUID="0474018b-f6ae-47b4-b93f-ca703e285836"/>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:DataType name="STRING">
+<dt:PossibleValues>
+<dt:ValueList language="en-EN">
+<dt:Value order="1">A1</dt:Value>
+<dt:Value order="2">A2</dt:Value>
+<dt:Value order="3">B</dt:Value>
+<dt:Value order="4">C,D</dt:Value>
+<dt:Value order="5">E</dt:Value>
+<dt:Value order="6">F</dt:Value>
+<dt:Value order="7">NPD</dt:Value>
+</dt:ValueList>
+</dt:PossibleValues>
+</dt:DataType>
+<dt:DimensionRef dt:GUID="00000000-0000-0000-0000-000000000000"/>
+</dt:Property>
+<dt:Property dt:GUID="da8679d9-9763-4fe5-b1b0-7fead74ac641" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">information module</dt:Name>
+<dt:Definition language="en-EN">compilation of data to be used as a basis for a Type III environmental declaration covering a unit process or a combination of unit processes that are part of the life cycle of a product</dt:Definition>
+<dt:ReferenceDocumentRef dt:GUID="86e4b1dd-7357-4720-8491-b809b691ab14"/>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:DataType name="STRING">
+<dt:PossibleValues>
+<dt:ValueList language="en-EN">
+<dt:Value order="1">A1</dt:Value>
+<dt:Value order="2">A2</dt:Value>
+<dt:Value order="3">A3</dt:Value>
+<dt:Value order="4">A1–A3</dt:Value>
+<dt:Value order="5">A4</dt:Value>
+<dt:Value order="6">A5</dt:Value>
+<dt:Value order="7">B1</dt:Value>
+<dt:Value order="8">B2</dt:Value>
+<dt:Value order="9">B3</dt:Value>
+<dt:Value order="10">B4</dt:Value>
+<dt:Value order="11">B5</dt:Value>
+<dt:Value order="12">B6</dt:Value>
+<dt:Value order="13">B7</dt:Value>
+<dt:Value order="14">C1</dt:Value>
+<dt:Value order="15">C2</dt:Value>
+<dt:Value order="16">C3</dt:Value>
+<dt:Value order="17">C4</dt:Value>
+<dt:Value order="18">D</dt:Value>
+</dt:ValueList>
+</dt:PossibleValues>
+</dt:DataType>
+<dt:DimensionRef dt:GUID="00000000-0000-0000-0000-000000000000"/>
+</dt:Property>
+<dt:Unit dt:GUID="acc4e47c-325b-4e97-a2f5-1e18417ea281" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">decibel</dt:Name>
+<dt:Definition language="en-EN">unit for level of a field quantity, level of a power quantity, sound pressure level, sound power level, sound reduction index</dt:Definition>
+<dt:ReferenceDocumentRef dt:GUID="785900f2-3eba-4a50-92b4-25c4ea775010"/>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:DimensionRef dt:GUID="00000000-0000-0000-0000-000000000000"/>
+<dt:Scale>LOGARITHMIC</dt:Scale>
+<dt:Base>TEN</dt:Base>
+<dt:Coefficient>1/10</dt:Coefficient>
+<dt:Offset>0/1</dt:Offset>
+</dt:Unit>
+<dt:Unit dt:GUID="68b8b73d-97cf-484e-9a54-9603c332034d" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">kilogram CO2 equivalents</dt:Name>
+<dt:Definition language="en-EN">unit for amount of carbon dioxide (CO2) emission that would have an equivalent effect on a specified key measure of climate change, over a specified time horizon, as an emitted amount of another greenhouse gas (GHG) or a mixture of other GHGs</dt:Definition>
+<dt:ReferenceDocumentRef dt:GUID="785900f2-3eba-4a50-92b4-25c4ea775010"/>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:DimensionRef dt:GUID="00000100-0000-0000-0000-000000000000"/>
+<dt:Scale>LINEAR</dt:Scale>
+<dt:Base>ONE</dt:Base>
+<dt:Coefficient>1/1</dt:Coefficient>
+<dt:Offset>0/1</dt:Offset>
+</dt:Unit>
+<dt:QuantityKind dt:GUID="af51d2df-ce96-40fb-b64c-a5146d4388f5" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">level quantity</dt:Name>
+<dt:Definition language="en-EN">logarithm of the ratio of two quantities of the same kind</dt:Definition>
+<dt:ReferenceDocumentRef dt:GUID="3a0a6344-186f-4766-bf9c-16e6c5f5c43a"/>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:DimensionRef dt:GUID="00000000-0000-0000-0000-000000000000"/>
+</dt:QuantityKind>
+<dt:QuantityKind dt:GUID="20016277-a1c7-48ee-985a-cade0e2683ef" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">without</dt:Name>
+<dt:Definition language="en-EN">term used for properties without magnitude</dt:Definition>
+<dt:ReferenceDocumentRef dt:GUID="5976fa1c-5cf9-4620-8232-6d67c0ec5203"/>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:DimensionRef dt:GUID="00000000-0000-0000-0000-000000000000"/>
+</dt:QuantityKind>
+<dt:QuantityKind dt:GUID="61c004a8-317d-4d54-a5af-4dec45b0ef4b" dateOfCreation="2025-03-20T00:00:00Z">
+<dt:Name language="en-EN">mass</dt:Name>
+<dt:Definition language="en-EN">property of a body which expresses itself in terms of inertia with regard to changes in its state of motion as well as its gravitational attraction to other bodies</dt:Definition>
+<dt:ReferenceDocumentRef dt:GUID="101b772d-dcb9-4c9b-902d-e017ce09e6ca"/>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:DimensionRef dt:GUID="00000100-0000-0000-0000-000000000000"/>
+</dt:QuantityKind>
+<dt:Dimension dt:GUID="00000000-0000-0000-0000-000000000000" dateOfCreation="2000-01-01T00:00:00Z">
+<dt:Name language="en-EN">dimensionless</dt:Name>
+<dt:Definition language="en-EN">physical dimension with all exponents equal to zero</dt:Definition>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:DimensionExponentForAmountOfSubstance>0</dt:DimensionExponentForAmountOfSubstance>
+<dt:DimensionExponentForElectricCurrent>0</dt:DimensionExponentForElectricCurrent>
+<dt:DimensionExponentForLength>0</dt:DimensionExponentForLength>
+<dt:DimensionExponentForLuminousIntensity>0</dt:DimensionExponentForLuminousIntensity>
+<dt:DimensionExponentForMass>0</dt:DimensionExponentForMass>
+<dt:DimensionExponentForThermodynamicTemperature>0</dt:DimensionExponentForThermodynamicTemperature>
+<dt:DimensionExponentForTime>0</dt:DimensionExponentForTime>
+</dt:Dimension>
+<dt:Dimension dt:GUID="00000100-0000-0000-0000-000000000000" dateOfCreation="2000-01-01T00:00:00Z">
+<dt:Name language="en-EN">mass</dt:Name>
+<dt:Definition language="en-EN">physical dimension with mass exponent equal 1</dt:Definition>
+<dt:LanguageOfCreator>en-EN</dt:LanguageOfCreator>
+<dt:CountryOfOrigin>NO</dt:CountryOfOrigin>
+<dt:MajorVersion>1</dt:MajorVersion>
+<dt:MinorVersion>0</dt:MinorVersion>
+<dt:Status>XTD_ACTIVE</dt:Status>
+<dt:DimensionExponentForAmountOfSubstance>0</dt:DimensionExponentForAmountOfSubstance>
+<dt:DimensionExponentForElectricCurrent>0</dt:DimensionExponentForElectricCurrent>
+<dt:DimensionExponentForLength>0</dt:DimensionExponentForLength>
+<dt:DimensionExponentForLuminousIntensity>0</dt:DimensionExponentForLuminousIntensity>
+<dt:DimensionExponentForMass>1</dt:DimensionExponentForMass>
+<dt:DimensionExponentForThermodynamicTemperature>0</dt:DimensionExponentForThermodynamicTemperature>
+<dt:DimensionExponentForTime>0</dt:DimensionExponentForTime>
+</dt:Dimension>
+</dt:Library>

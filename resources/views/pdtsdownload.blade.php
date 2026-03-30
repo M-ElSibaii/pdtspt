@@ -24,6 +24,9 @@
                         <x-secondary-button id="json" class="btn">
                             <i class="fa fa-download"></i>&nbsp;JSON
                         </x-secondary-button>
+                        <x-secondary-button id="xml" class="btn">
+                            <i class="fa fa-download"></i>&nbsp;XML
+                        </x-secondary-button>
                         <x-secondary-button id="csv" class="btn">
                             <i class="fa fa-download"></i>&nbsp;CSV/XLS
                         </x-secondary-button>
@@ -204,42 +207,58 @@
                 });
             });
 
-            //export json
+            //export json - server-side EN ISO 23387 format
             $("#json").on("click", function() {
-                const tableData = {};
-
-                // Iterate over each row in the table to build JSON structure
-                $("#tblpdtsh tr").each(function() {
-                    const row = $(this).find("td");
-                    if (row.length > 0) {
-                        const group = row.eq(0).text().trim();
-                        const propertyData = {
-                            "Propriedade": row.eq(1).text().trim(),
-                            "Unidade": row.eq(2).text().trim(),
-                            "Descrição": row.eq(3).text().trim(),
-                            "Documento de referência": row.eq(4).text().trim()
-                        };
-
-                        // Initialize group if it doesn't exist, then add property data to it
-                        if (!tableData[group]) {
-                            tableData[group] = [];
-                        }
-                        tableData[group].push(propertyData);
+                const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+                const url = "{{ route('pdt.export.json', $pdt->Id) }}";
+                
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': token,
                     }
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Download failed');
+                    return response.blob();
+                })
+                .then(blob => {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = "{{ $pdt->pdtNamePt }}_V{{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.json";
+                    link.click();
+                })
+                .catch(error => {
+                    alert('Erro ao descarregar JSON: ' + error.message);
                 });
-
-                // Create a JSON string and format it for readability
-                const jsonString = JSON.stringify(tableData, null, 4);
-
-                // Create a Blob for the JSON data
-                const blob = new Blob([jsonString], {
-                    type: "application/json"
-                });
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
-                link.download = "{{ $pdt->pdtNamePt }} data template V {{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.json";
-                link.click();
             });
+
+            //export xml - server-side EN ISO 23387 format with XSD validation
+            $("#xml").on("click", function() {
+                const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+                const url = "{{ route('pdt.export.xml', $pdt->Id) }}";
+                
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': token,
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Download failed');
+                    return response.blob();
+                })
+                .then(blob => {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = "{{ $pdt->pdtNamePt }}_V{{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.xml";
+                    link.click();
+                })
+                .catch(error => {
+                    alert('Erro ao descarregar XML: ' + error.message);
+                });
+            });
+
             //export csv
             $("#csv").on("click", function() {
                 $("#tblpdtsh").tableHTMLExport({
