@@ -6,450 +6,1102 @@ use App\Models\productdatatemplates;
 use App\Models\groupofproperties;
 use App\Models\propertiesdatadictionaries;
 use App\Models\referencedocuments;
+use App\Models\constructionobjects;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 use DOMDocument;
-use DOMException;
+use DOMElement;
 
+/**
+ * STRICT EN ISO 23387 Serializer 
+ * - ObjectType referenced via HasObjectTypeRef (not as element)
+ * - Includes Master PDT properties automatically
+ * - Always loads LATEST version of PDT
+ */
 class Iso23387Exporter
 {
-    /**
-     * Build complete EN ISO 23387 structure for a single PDT
-     */
-    public function getPdtStructure($pdtId): array
-    {
-        $pdt = productdatatemplates::find($pdtId);
+    private const NAMESPACE_URI = 'https://standards.iso.org/iso/23387/ed-2/en/';
+    private const NAMESPACE_PREFIX = 'dt';
+    private const MASTER_PDT_GUID = '230d9954097541b793f2a1fddb8bd0ad';
 
+    /**
+     * Export PDT to JSON (structurally identical to XML)
+     */
+    public function exportToJson($pdtId): string
+    {
+        $structure = $this->buildLibraryStructure($pdtId);
+        return json_encode($structure, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * Export PDT to XML (EN ISO 23387 compliant, strictly schema-aligned)
+     */
+    public function exportToXml($pdtId): string
+    {
+        $structure = $this->buildLibraryStructure($pdtId);
+        return $this->structureToXml($structure);
+    }
+
+    /**
+     * Get the LATEST version of a PDT by GUID or ID
+     */
+    public function getLatestPdt($pdtIdOrGuid)
+    {
+        // Check if it's a GUID or ID
+        if (strlen($pdtIdOrGuid) > 5) {
+            // Likely a GUID
+            return DB::table('productdatatemplates')
+                ->where('GUID', $pdtIdOrGuid)
+                ->orderByRaw('versionNumber DESC, revisionNumber DESC, editionNumber DESC')
+                ->first();
+        } else {
+            // Likely an ID
+            return productdatatemplates::find($pdtIdOrGuid);
+        }
+    }
+
+    /**
+     * Build complete Library structure in proper element order per XSD
+     * INCLUDES: Master Data Template properties if not already the Master
+     * ObjectType is defined separately at Library level
+     */
+    private function buildLibraryStructure($pdtId): array
+    {
+        // Get latest version of the PDT
+        $pdt = $this->getLatestPdt($pdtId);
         if (!$pdt) {
             throw new \Exception("PDT not found: {$pdtId}");
         }
 
-        // Get groupofproperties using direct DB query
-        $groupofproperties = DB::table('groupofproperties')
-            ->where('pdtId', $pdtId)
-            ->get();
+        $groupsOfProperties = $this->loadGroupsOfProperties($pdt->Id);
+        $properties = $this->loadPropertiesByPdt($pdt->Id);
 
-        // Build Library root structure
+        // Include Master Data Template properties if this is not the Master itself
+        if ($pdt->GUID !== self::MASTER_PDT_GUID) {
+            $masterGroupsOfProperties = $this->loadMasterGroupsOfProperties();
+            $masterProperties = $this->loadMasterProperties();
+            // Merge but keep separate GOPs based on GUID
+            $groupsOfProperties = $groupsOfProperties->merge($masterGroupsOfProperties);
+            $properties = $properties->merge($masterProperties);
+        }
+
+        $referenceDocuments = $this->loadReferenceDocuments($pdt, $groupsOfProperties, $properties);
+
+        // Load ObjectType element separately if it exists
+        $objectType = null;
+        if ($pdt->constructionObjectGUID) {
+            $objectType = $this->loadObjectType($pdt->constructionObjectGUID);
+        }
+
         $library = [
-            'Library' => [
-                'GUID' => $pdt->GUID,
-                'Name' => $pdt->pdtNamePt,
-                'DataTemplates' => [],
-                'GroupOfProperties' => [],
-                'Properties' => [],
-                'ReferenceDocuments' => []
-            ]
+            'dt:GUID' => $pdt->GUID,
+            'dateOfCreation' => $this->formatDate($pdt->dateOfVersion ?? $pdt->dateOfRevision),
+            'Name' => $this->buildMultilingualNames($pdt->pdtNameEn, $pdt->pdtNamePt),
+            'Definition' => $this->buildMultilingualDefinitions($pdt->descriptionEn, $pdt->descriptionPt),
+            'URI' => 'https://pdts.pt/pdtview/' . $pdt->Id . '-' . $pdt->GUID
         ];
 
-        // Build DataTemplate element
-        $library['Library']['DataTemplates'][] = $this->buildDataTemplate($pdt, $groupofproperties);
+        $library['DataTemplates'] = [$this->buildDataTemplate($pdt, $groupsOfProperties, $properties)];
 
-        // Build GroupOfProperties elements
-        foreach ($groupofproperties as $gop) {
-            $library['Library']['GroupOfProperties'][] = $this->buildGroupOfProperties($gop);
+        // ADD: ObjectType as separate Library element (not nested within DataTemplate)
+        if ($objectType) {
+            $library['ObjectType'] = $this->buildObjectTypeElement($objectType);
         }
 
-        // Build Property elements - get all properties linked to this PDT via properties table
-        $allProperties = DB::table('properties')
-            ->where('pdtID', $pdtId)
-            ->select('GUID')
-            ->distinct()
-            ->pluck('GUID');
+        $library['GroupOfProperties'] = $this->buildGroupsOfPropertiesElements($groupsOfProperties);
+        $library['Properties'] = $this->buildPropertiesElements($properties);
+        $library['ReferenceDocuments'] = $this->buildReferenceDocumentsElements($referenceDocuments);
 
-        // Load propertiesdatadictionaries for these GUIDs
-        if ($allProperties->count() > 0) {
-            $properties = propertiesdatadictionaries::whereIn('GUID', $allProperties->toArray())->get();
-            foreach ($properties as $prop) {
-                $library['Library']['Properties'][] = $this->buildProperty($prop);
-            }
-        }
-
-        // Build ReferenceDocument elements - collect all referenced document GUIDs
-        $refDocGUIDs = collect([$pdt->referenceDocumentGUID])
-            ->merge($groupofproperties->pluck('referenceDocumentGUID'))
-            ->filter(function ($guid) {
-                return $guid && $guid !== 'n/a';
-            })
-            ->unique();
-
-        // Also get reference docs from properties via properties table
-        $propRefDocs = DB::table('properties')
-            ->where('pdtID', $pdtId)
-            ->whereNotIn('referenceDocumentGUID', ['n/a', null, ''])
-            ->select('referenceDocumentGUID')
-            ->distinct()
-            ->pluck('referenceDocumentGUID');
-
-        $refDocGUIDs = $refDocGUIDs->merge($propRefDocs)->filter()->unique();
-
-        if ($refDocGUIDs->count() > 0) {
-            $refDocs = referencedocuments::whereIn('GUID', $refDocGUIDs->toArray())->get();
-            foreach ($refDocs as $refDoc) {
-                $library['Library']['ReferenceDocuments'][] = $this->buildReferenceDocument($refDoc);
-            }
-        }
-
-        return $library;
+        return [
+            'Library' => $library
+        ];
     }
 
     /**
-     * Build DataTemplate element from productdatatemplates
+     * Build DataTemplate element with STRICT element ordering from XSD
+     * INCLUDES properties and groups from Master Data Template
+     * Parameters now include merged $properties and $groupsOfProperties collections
      */
-    private function buildDataTemplate($pdt, $groupofproperties): array
+    private function buildDataTemplate($pdt, $groupsOfProperties, $properties): array
     {
-        $template = [
-            'GUID' => $pdt->GUID,
-            'dateOfCreation' => $pdt->dateOfVersion,
-            'Name' => [
-                'language' => 'pt',
-                'value' => $pdt->pdtNamePt
-            ],
-            'Definition' => [
-                'language' => 'pt',
-                'value' => $pdt->descriptionPt
-            ],
-            'Status' => $pdt->status,
-            'HasGroupOfPropertiesRef' => [],
-            'HasPropertyRef' => []
-        ];
+        $template = [];
 
-        // Add group references
-        foreach ($groupofproperties as $gop) {
-            $template['HasGroupOfPropertiesRef'][] = ['GUID' => $gop->GUID];
+        // REQUIRED: Name (1..*)
+        $template['Name'] = $this->buildMultilingualNames($pdt->pdtNameEn, $pdt->pdtNamePt);
+
+        // REQUIRED: Definition (1..1)
+        $template['Definition'] = $this->buildMultilingualDefinitions($pdt->descriptionEn, $pdt->descriptionPt);
+
+        // OPTIONAL: ReferenceDocumentRef (0..*)
+        if ($pdt->referenceDocumentGUID && $pdt->referenceDocumentGUID !== 'n/a') {
+            $template['ReferenceDocumentRef'] = ['dt:GUID' => $pdt->referenceDocumentGUID];
         }
 
-        // Add property references - get unique property GUIDs from properties table for this PDT
-        $propGUIDs = DB::table('properties')
-            ->where('pdtID', $pdt->Id)
-            ->select('GUID')
-            ->distinct()
-            ->pluck('GUID');
-
-        foreach ($propGUIDs as $guid) {
-            $template['HasPropertyRef'][] = ['GUID' => $guid];
+        // OPTIONAL: LanguageOfCreator (0..1)
+        if ($pdt->creatorsLanguage ?? false) {
+            $template['LanguageOfCreator'] = $pdt->creatorsLanguage;
         }
+
+        // OPTIONAL: CountryOfOrigin (0..1)
+        if ($pdt->countryOfOrigin ?? false) {
+            $template['CountryOfOrigin'] = $pdt->countryOfOrigin;
+        }
+
+        // OPTIONAL: MajorVersion (0..1)
+        if ($pdt->editionNumber) {
+            $template['MajorVersion'] = (int)$pdt->editionNumber;
+        }
+
+        // OPTIONAL: MinorVersion (0..1)
+        if ($pdt->versionNumber) {
+            $template['MinorVersion'] = (int)$pdt->versionNumber;
+        }
+
+        // OPTIONAL: Status (0..*)
+        if ($pdt->status) {
+            $template['Status'] = $pdt->status;
+        }
+
+        // OPTIONAL: DeprecationExplanation (0..*)
+        if ($pdt->depreciationExplanation ?? false) {
+            $template['DeprecationExplanation'] = $pdt->depreciationExplanation;
+        }
+
+        // OPTIONAL: HasPropertyRef (0..*)
+        // INCLUDES properties from current PDT + Master PDT (via merged collection)
+        $propGuids = $this->buildPropertyRefsFromCollection($properties);
+        if (!empty($propGuids)) {
+            $template['HasPropertyRef'] = $propGuids;
+        }
+
+        // ADD: HasObjectTypeRef reference in DataTemplate (if ObjectType exists)
+        if ($pdt->constructionObjectGUID) {
+            $template['HasObjectTypeRef'] = ['dt:GUID' => $pdt->constructionObjectGUID];
+        }
+
+        // OPTIONAL: HasGroupOfPropertiesRef (0..*)
+        // INCLUDES groups from Master PDT as well (via merged collection)
+        $gopGuids = $this->buildGroupOfPropertiesRefsFromCollection($groupsOfProperties);
+        if (!empty($gopGuids)) {
+            $template['HasGroupOfPropertiesRef'] = $gopGuids;
+        }
+
+        // Attributes
+        $template['dt:GUID'] = $pdt->GUID;
+        $template['dateOfCreation'] = $this->formatDate($pdt->dateOfVersion ?? $pdt->dateOfRevision);
+        $template['URI'] = 'https://pdts.pt/pdtview/' . $pdt->Id . '-' . $pdt->GUID;
 
         return $template;
     }
 
     /**
-     * Build GroupOfProperties element from groupofproperties
+     * Build GroupOfProperties elements
      */
-    private function buildGroupOfProperties($gop): array
+    private function buildGroupsOfPropertiesElements($groupsOfProperties): array
     {
-        $group = [
-            'GUID' => $gop->GUID,
-            'dateOfCreation' => $gop->dateOfVersion,
-            'Name' => [
-                'language' => 'pt',
-                'value' => $gop->gopNamePt
-            ],
-            'Definition' => [
-                'language' => 'pt',
-                'value' => $gop->definitionPt
-            ],
-            'Status' => $gop->status,
-            'LanguageOfCreator' => $gop->creatorsLanguage,
-            'CountryOfOrigin' => $gop->countryOfOrigin,
-            'HasPropertyRef' => []
+        return $groupsOfProperties->map(function ($gop) {
+            return $this->buildGroupOfPropertiesElement($gop);
+        })->toArray();
+    }
+
+    /**
+     * Build single GroupOfProperties element with STRICT element ordering
+     */
+    private function buildGroupOfPropertiesElement($gop): array
+    {
+        $element = [];
+
+        // REQUIRED: Name (1..*)
+        $element['Name'] = $this->buildMultilingualNames($gop->gopNameEn, $gop->gopNamePt);
+
+        // REQUIRED: Definition (1..1)
+        $element['Definition'] = $this->buildMultilingualDefinitions($gop->definitionEn, $gop->definitionPt);
+
+        // OPTIONAL: ReferenceDocumentRef (0..*)
+        if ($gop->referenceDocumentGUID && $gop->referenceDocumentGUID !== 'n/a') {
+            $element['ReferenceDocumentRef'] = ['dt:GUID' => $gop->referenceDocumentGUID];
+        }
+
+        // OPTIONAL: LanguageOfCreator (0..1)
+        if ($gop->creatorsLanguage) {
+            $element['LanguageOfCreator'] = $gop->creatorsLanguage;
+        }
+
+        // OPTIONAL: CountryOfOrigin (0..1)
+        if ($gop->countryOfOrigin) {
+            $element['CountryOfOrigin'] = $gop->countryOfOrigin;
+        }
+
+        // OPTIONAL: MajorVersion (0..1)
+        if ($gop->versionNumber) {
+            $element['MajorVersion'] = (int)$gop->versionNumber;
+        }
+
+        // OPTIONAL: MinorVersion (0..1)
+        if ($gop->revisionNumber) {
+            $element['MinorVersion'] = (int)$gop->revisionNumber;
+        }
+
+        // OPTIONAL: Status (0..*)
+        if ($gop->status) {
+            $element['Status'] = $gop->status;
+        }
+
+        // REQUIRED for GroupOfProperties: HasPropertyRef (1..*)
+        $propGuids = $this->getPropertyGuidsForGop($gop->Id);
+        if (!empty($propGuids)) {
+            $element['HasPropertyRef'] = $propGuids;
+        }
+
+        // Attributes
+        $element['dt:GUID'] = $gop->GUID;
+        $element['dateOfCreation'] = $this->formatDate($gop->dateOfVersion);
+        $element['URI'] = 'https://pdts.pt/datadictionaryviewGOP/' . $gop->Id . '-' . $gop->GUID;
+
+        return $element;
+    }
+
+    /**
+     * Build Property elements
+     */
+    private function buildPropertiesElements($properties): array
+    {
+        return $properties->map(function ($prop) {
+            return $this->buildPropertyElement($prop);
+        })->toArray();
+    }
+
+    /**
+     * Build single Property element with STRICT element ordering
+     * REMOVED: QuantityKindRef
+     * ADDED: Units field only if it exists
+     */
+    private function buildPropertyElement($prop): array
+    {
+        $element = [];
+
+        // REQUIRED: Name (1..*)
+        $element['Name'] = $this->buildMultilingualNames($prop->nameEn, $prop->namePt);
+
+        // REQUIRED: Definition (1..1)
+        $element['Definition'] = $this->buildMultilingualDefinitions($prop->definitionEn, $prop->definitionPt);
+
+        // OPTIONAL: LanguageOfCreator (0..1)
+        if ($prop->creatorsLanguage) {
+            $element['LanguageOfCreator'] = $prop->creatorsLanguage;
+        }
+
+        // OPTIONAL: CountryOfOrigin (0..1)
+        if ($prop->countryOfOrigin) {
+            $element['CountryOfOrigin'] = $prop->countryOfOrigin;
+        }
+
+        // OPTIONAL: MajorVersion (0..1)
+        if ($prop->versionNumber) {
+            $element['MajorVersion'] = (int)$prop->versionNumber;
+        }
+
+        // OPTIONAL: MinorVersion (0..1)
+        if ($prop->revisionNumber) {
+            $element['MinorVersion'] = (int)$prop->revisionNumber;
+        }
+
+        // OPTIONAL: Status (0..*)
+        if ($prop->status) {
+            $element['Status'] = $prop->status;
+        }
+
+        // REQUIRED: DataType (1..1) - XSD mandates this element
+        $dataTypeName = $prop->dataType && $prop->dataType !== '' ? $prop->dataType : 'STRING';
+        $element['DataType'] = [
+            'name' => $dataTypeName
         ];
 
-        // Load properties for this group - use direct query
-        $propGUIDs = DB::table('properties')
-            ->where('gopId', $gop->Id)
+        // OPTIONAL: DimensionRef (0..1)
+        if ($prop->dimension && $prop->dimension !== '') {
+            $element['DimensionRef'] = ['dt:GUID' => $prop->dimension];
+        }
+
+        // OPTIONAL: Units (replaces QuantityKindRef) - only if it exists
+        if ($prop->units && $prop->units !== '') {
+            $element['Units'] = $prop->units;
+        }
+
+        // Attributes
+        $element['dt:GUID'] = $prop->GUID;
+        $element['dateOfCreation'] = $this->formatDate($prop->dateOfVersion);
+        $element['referenceURI'] = 'https://pdts.pt/datadictionaryview/' . $prop->Id . '-' . $prop->GUID;
+
+        return $element;
+    }
+
+    /**
+     * Build ReferenceDocument elements
+     */
+    private function buildReferenceDocumentsElements($referenceDocuments): array
+    {
+        return $referenceDocuments->map(function ($refDoc) {
+            return $this->buildReferenceDocumentElement($refDoc);
+        })->toArray();
+    }
+
+    /**
+     * Build single ReferenceDocument element with STRICT element ordering
+     * REQUIRED: Name, Definition, Language
+     */
+    private function buildReferenceDocumentElement($refDoc): array
+    {
+        $element = [];
+
+        // REQUIRED: Name (1..*)
+        $element['Name'] = [['language' => 'en', 'value' => $refDoc->rdName]];
+
+        // REQUIRED: Definition (1..1)
+        $definition = $refDoc->description ?: ($refDoc->title ?: 'Referenced document');
+        $element['Definition'] = [['language' => 'en', 'value' => $definition]];
+
+        // OPTIONAL: Status (0..*)
+        if ($refDoc->status) {
+            $element['Status'] = $refDoc->status;
+        }
+
+        // REQUIRED: Language (1..*) - XSD mandates at least one language
+        $element['Language'] = 'en';
+
+        // Attributes
+        $element['dt:GUID'] = $refDoc->GUID;
+        $element['dateOfCreation'] = $this->formatDate($refDoc->created_at);
+
+        return $element;
+    }
+
+    /**
+     * Load groups of properties for a PDT
+     */
+    private function loadGroupsOfProperties($pdtId)
+    {
+        return groupofproperties::where('pdtId', $pdtId)->get();
+    }
+
+    /**
+     * Load Master Data Template groups of properties (LATEST VERSIONS ONLY)
+     * Filter by GUID to get only latest version of each GOP
+     */
+    private function loadMasterGroupsOfProperties()
+    {
+        $masterPdt = DB::table('productdatatemplates')
+            ->where('GUID', self::MASTER_PDT_GUID)
+            ->orderByRaw('versionNumber DESC, revisionNumber DESC, editionNumber DESC')
+            ->first();
+
+        if (!$masterPdt) {
+            return collect();
+        }
+
+        // Get distinct GOPs by GUID for Master PDT
+        $gopGuids = DB::table('groupofproperties')
+            ->where('pdtId', $masterPdt->Id)
             ->select('GUID')
             ->distinct()
             ->pluck('GUID');
 
-        foreach ($propGUIDs as $guid) {
-            $group['HasPropertyRef'][] = ['GUID' => $guid];
+        // For each GUID, get only the latest version
+        $latestGops = [];
+        foreach ($gopGuids as $guid) {
+            $latestGop = groupofproperties::where('GUID', $guid)
+                ->where('pdtId', $masterPdt->Id)
+                ->orderByRaw('versionNumber DESC, revisionNumber DESC')
+                ->first();
+            if ($latestGop) {
+                $latestGops[] = $latestGop;
+            }
         }
 
-        return $group;
+        return collect($latestGops);
     }
 
     /**
-     * Build Property element from propertiesdatadictionaries
+     * Load all properties linked to a PDT via junction table
      */
-    private function buildProperty($prop): array
+    private function loadPropertiesByPdt($pdtId)
     {
-        return [
-            'GUID' => $prop->GUID,
-            'dateOfCreation' => $prop->dateOfVersion,
-            'Name' => [
-                'language' => 'pt',
-                'value' => $prop->namePt
-            ],
-            'Definition' => [
-                'language' => 'pt',
-                'value' => $prop->definitionPt
-            ],
-            'Status' => $prop->status,
-            'LanguageOfCreator' => $prop->creatorsLanguage,
-            'CountryOfOrigin' => $prop->countryOfOrigin,
-            'Units' => $prop->units,
-            'PhysicalQuantity' => $prop->physicalQuantity
-        ];
+        $propertyGuids = DB::table('properties')
+            ->where('pdtID', $pdtId)
+            ->select('GUID')
+            ->distinct()
+            ->pluck('GUID');
+
+        return propertiesdatadictionaries::whereIn('GUID', $propertyGuids->toArray())->get();
     }
 
     /**
-     * Build ReferenceDocument element from referencedocuments
+     * Load Master Data Template properties (FROM LATEST VERSIONS ONLY)
+     * Only include properties from latest version of each Master GOP
      */
-    private function buildReferenceDocument($refDoc): array
+    private function loadMasterProperties()
     {
-        return [
-            'GUID' => $refDoc->GUID,
-            'dateOfCreation' => $refDoc->dateOfCreation,
-            'Name' => [
-                'language' => 'en',
-                'value' => $refDoc->rdName
-            ],
-            'Status' => $refDoc->status ?? 'XTD_ACTIVE',
-            'URI' => $refDoc->uri ?? null
-        ];
+        $masterPdt = DB::table('productdatatemplates')
+            ->where('GUID', self::MASTER_PDT_GUID)
+            ->orderByRaw('versionNumber DESC, revisionNumber DESC, editionNumber DESC')
+            ->first();
+
+        if (!$masterPdt) {
+            return collect();
+        }
+
+        // Get distinct GOPs by GUID for Master PDT
+        $gopGuids = DB::table('groupofproperties')
+            ->where('pdtId', $masterPdt->Id)
+            ->select('GUID')
+            ->distinct()
+            ->pluck('GUID');
+
+        // For each GUID, get only the latest version and collect their IDs
+        $latestGopIds = [];
+        foreach ($gopGuids as $guid) {
+            $latestGop = groupofproperties::where('GUID', $guid)
+                ->where('pdtId', $masterPdt->Id)
+                ->orderByRaw('versionNumber DESC, revisionNumber DESC')
+                ->first();
+            if ($latestGop) {
+                $latestGopIds[] = $latestGop->Id;
+            }
+        }
+
+        if (empty($latestGopIds)) {
+            return collect();
+        }
+
+        // Get properties only from these latest GOPs
+        $propertyGuids = DB::table('properties')
+            ->whereIn('gopId', $latestGopIds)
+            ->select('GUID')
+            ->distinct()
+            ->pluck('GUID');
+
+        return propertiesdatadictionaries::whereIn('GUID', $propertyGuids->toArray())->get();
     }
 
     /**
-     * Export PDT to JSON format (EN ISO 23387 structure)
+     * Load all referenced documents from PDT, GroupsOfProperties, and properties junction
      */
-    public function exportToJson($pdtId): string
+    private function loadReferenceDocuments($pdt, $groupsOfProperties, $properties)
     {
-        $structure = $this->getPdtStructure($pdtId);
-        return json_encode($structure, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $guids = collect();
+
+        if ($pdt->referenceDocumentGUID && $pdt->referenceDocumentGUID !== 'n/a') {
+            $guids->push($pdt->referenceDocumentGUID);
+        }
+
+        $groupsOfProperties->each(function ($gop) use ($guids) {
+            if ($gop->referenceDocumentGUID && $gop->referenceDocumentGUID !== 'n/a') {
+                $guids->push($gop->referenceDocumentGUID);
+            }
+        });
+
+        // Get reference docs from properties junction table
+        $propRefDocs = DB::table('properties')
+            ->whereNotNull('referenceDocumentGUID')
+            ->where('referenceDocumentGUID', '!=', 'n/a')
+            ->select('referenceDocumentGUID')
+            ->distinct()
+            ->pluck('referenceDocumentGUID');
+
+        $guids = $guids->merge($propRefDocs)->filter()->unique();
+
+        return referencedocuments::whereIn('GUID', $guids->toArray())->get();
     }
 
     /**
-     * Export PDT to XML format (EN ISO 23387 structure, XSD validated)
+     * Get property GUIDs for a PDT with referenceURI
      */
-    public function exportToXml($pdtId): string
+    private function getPropertyGuidsForPdt($pdtId): array
     {
-        $structure = $this->getPdtStructure($pdtId);
-        $xmlString = $this->buildXmlDocument($structure);
+        $properties = DB::table('properties as p')
+            ->join('propertiesdatadictionaries as pdd', 'p.GUID', '=', 'pdd.GUID')
+            ->where('p.pdtID', $pdtId)
+            ->select('p.GUID', 'pdd.Id')
+            ->distinct()
+            ->get();
 
-        // Note: XSD validation is optional and can be enabled when needed
-        // Currently skipping validation to avoid libxml schema reading errors
-        // You can validate locally with: php -r 'echo (new DOMDocument())->schemaValidate("path/to/xsd");'
-
-        return $xmlString;
+        return $properties->map(function ($prop) {
+            return [
+                'dt:GUID' => $prop->GUID,
+                'referenceURI' => 'https://pdts.pt/datadictionaryview/' . $prop->Id . '-' . $prop->GUID
+            ];
+        })->toArray();
     }
 
     /**
-     * Build XML document from structure array
+     * Get property GUIDs for a GroupOfProperties with referenceURI
      */
-    private function buildXmlDocument($structure): string
+    private function getPropertyGuidsForGop($gopId): array
+    {
+        $properties = DB::table('properties as p')
+            ->join('propertiesdatadictionaries as pdd', 'p.GUID', '=', 'pdd.GUID')
+            ->where('p.gopId', $gopId)
+            ->select('p.GUID', 'pdd.Id')
+            ->distinct()
+            ->get();
+
+        return $properties->map(function ($prop) {
+            return [
+                'dt:GUID' => $prop->GUID,
+                'referenceURI' => 'https://pdts.pt/datadictionaryview/' . $prop->Id . '-' . $prop->GUID
+            ];
+        })->toArray();
+    }
+
+    /**
+     * Get GroupOfProperties GUIDs for a PDT with referenceURI
+     */
+    private function getGroupOfPropertiesGuids($pdtId): array
+    {
+        $gops = DB::table('groupofproperties')
+            ->where('pdtId', $pdtId)
+            ->select('GUID', 'Id')
+            ->distinct()
+            ->get();
+
+        return $gops->map(function ($gop) {
+            return [
+                'dt:GUID' => $gop->GUID,
+                'referenceURI' => 'https://pdts.pt/datadictionaryviewGOP/' . $gop->Id . '-' . $gop->GUID
+            ];
+        })->toArray();
+    }
+
+    /**
+     * Build property references from merged properties collection
+     * Extracts GUIDs and IDs from already-loaded properties (including Master properties)
+     */
+    private function buildPropertyRefsFromCollection($properties): array
+    {
+        if (!$properties || $properties->isEmpty()) {
+            return [];
+        }
+
+        return $properties->map(function ($prop) {
+            return [
+                'dt:GUID' => $prop->GUID,
+                'referenceURI' => 'https://pdts.pt/datadictionaryview/' . $prop->Id . '-' . $prop->GUID
+            ];
+        })->unique('GUID')->values()->toArray();
+    }
+
+    /**
+     * Build GroupOfProperties references from merged collection
+     * Extracts GUIDs and IDs from already-loaded GOPs (including Master GOPs)
+     */
+    private function buildGroupOfPropertiesRefsFromCollection($groupsOfProperties): array
+    {
+        if (!$groupsOfProperties || $groupsOfProperties->isEmpty()) {
+            return [];
+        }
+
+        return $groupsOfProperties->map(function ($gop) {
+            return [
+                'dt:GUID' => $gop->GUID,
+                'referenceURI' => 'https://pdts.pt/datadictionaryviewGOP/' . $gop->Id . '-' . $gop->GUID
+            ];
+        })->unique('GUID')->values()->toArray();
+    }
+
+    /**
+     * Build multilingual Name array
+     */
+    private function buildMultilingualNames($en, $pt): array
+    {
+        $names = [];
+        if ($pt) {
+            $names[] = ['language' => 'pt', 'value' => $pt];
+        }
+        if ($en) {
+            $names[] = ['language' => 'en', 'value' => $en];
+        }
+        return $names ?: [['language' => 'en', 'value' => 'Unnamed']];
+    }
+
+    /**
+     * Build multilingual Definition array
+     */
+    private function buildMultilingualDefinitions($en, $pt): array
+    {
+        $defs = [];
+        if ($pt) {
+            $defs[] = ['language' => 'pt', 'value' => $pt];
+        }
+        if ($en) {
+            $defs[] = ['language' => 'en', 'value' => $en];
+        }
+        return $defs ?: [['language' => 'en', 'value' => 'No definition']];
+    }
+
+    /**
+     * Format date to ISO 8601 (YYYY-MM-DDTHH:MM:SSZ)
+     */
+    private function formatDate($date): string
+    {
+        if (!$date) {
+            return Carbon::now()->toIso8601String();
+        }
+        return Carbon::parse($date)->toIso8601String();
+    }
+
+    /**
+     * Load ObjectType (construction object) by GUID
+     */
+    private function loadObjectType($objectTypeGuid)
+    {
+        return constructionobjects::where('GUID', $objectTypeGuid)
+            ->orderByRaw('versionNumber DESC, revisionNumber DESC')
+            ->first();
+    }
+
+    /**
+     * Build ObjectType element
+     */
+    private function buildObjectTypeElement($objectType): array
+    {
+        $element = [];
+
+        // REQUIRED: Name (1..*)
+        $element['Name'] = $this->buildMultilingualNames($objectType->nameEn ?? $objectType->name, $objectType->namePt ?? null);
+
+        // OPTIONAL: Definition (1..1)
+        if ($objectType->descriptionEn || $objectType->descriptionPt) {
+            $element['Definition'] = $this->buildMultilingualDefinitions($objectType->descriptionEn, $objectType->descriptionPt);
+        }
+
+        // Attributes
+        $element['dt:GUID'] = $objectType->GUID;
+        $element['dateOfCreation'] = $this->formatDate($objectType->dateOfVersion ?? $objectType->dateOfRevision);
+
+        return $element;
+    }
+
+    /**
+     * Convert structure array to XML string with proper namespace and element order
+     */
+    private function structureToXml($structure): string
     {
         $dom = new DOMDocument('1.0', 'UTF-8');
         $dom->formatOutput = true;
 
-        // Create Library element with namespaces
-        $library = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:Library');
-        $library->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
-        $library->setAttribute('xsi:schemaLocation', 'https://standards.iso.org/iso/23387/ed-2/en/ https://standards.iso.org/iso/23387/ed-2/en/23387_AnnexE_XSD_V15.xsd');
-
         $libData = $structure['Library'];
-        if (isset($libData['GUID'])) {
-            $library->setAttribute('dt:GUID', $libData['GUID']);
+        $libraryElem = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':Library');
+        $libraryElem->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:' . self::NAMESPACE_PREFIX, self::NAMESPACE_URI);
+
+        // Add GUID attribute
+        if (isset($libData['dt:GUID'])) {
+            $libraryElem->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $libData['dt:GUID']);
         }
 
-        // Add Library Name
+        // Add dateOfCreation attribute
+        if (isset($libData['dateOfCreation'])) {
+            $libraryElem->setAttribute('dateOfCreation', $libData['dateOfCreation']);
+        }
+
+        // Add URI attribute
+        if (isset($libData['URI'])) {
+            $libraryElem->setAttribute('URI', $libData['URI']);
+        }
+
+        // Add Name elements
         if (isset($libData['Name'])) {
-            $nameElem = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:Name', htmlspecialchars($libData['Name']));
-            $nameElem->setAttribute('language', 'pt');
-            $library->appendChild($nameElem);
+            foreach ($libData['Name'] as $name) {
+                $this->appendTextElement($dom, $libraryElem, 'Name', $name['value'], $name['language']);
+            }
+        }
+
+        // Add Definition elements
+        if (isset($libData['Definition'])) {
+            foreach ($libData['Definition'] as $def) {
+                $this->appendTextElement($dom, $libraryElem, 'Definition', $def['value'], $def['language']);
+            }
         }
 
         // Add DataTemplates
-        foreach ($libData['DataTemplates'] as $dt) {
-            $dtElem = $this->buildXmlDataTemplate($dom, $dt);
-            $library->appendChild($dtElem);
+        if (isset($libData['DataTemplates'])) {
+            foreach ($libData['DataTemplates'] as $dt) {
+                $libraryElem->appendChild($this->buildXmlDataTemplate($dom, $dt));
+            }
+        }
+
+        // Add ObjectType element (separate at Library level)
+        if (isset($libData['ObjectType'])) {
+            $libraryElem->appendChild($this->buildXmlObjectType($dom, $libData['ObjectType']));
         }
 
         // Add GroupOfProperties
-        foreach ($libData['GroupOfProperties'] as $gop) {
-            $gopElem = $this->buildXmlGroupOfProperties($dom, $gop);
-            $library->appendChild($gopElem);
+        if (isset($libData['GroupOfProperties'])) {
+            foreach ($libData['GroupOfProperties'] as $gop) {
+                $libraryElem->appendChild($this->buildXmlGroupOfProperties($dom, $gop));
+            }
         }
 
         // Add Properties
-        foreach ($libData['Properties'] as $prop) {
-            $propElem = $this->buildXmlProperty($dom, $prop);
-            $library->appendChild($propElem);
+        if (isset($libData['Properties'])) {
+            foreach ($libData['Properties'] as $prop) {
+                $libraryElem->appendChild($this->buildXmlProperty($dom, $prop));
+            }
         }
 
         // Add ReferenceDocuments
-        foreach ($libData['ReferenceDocuments'] as $refDoc) {
-            $rdElem = $this->buildXmlReferenceDocument($dom, $refDoc);
-            $library->appendChild($rdElem);
+        if (isset($libData['ReferenceDocuments'])) {
+            foreach ($libData['ReferenceDocuments'] as $refDoc) {
+                $libraryElem->appendChild($this->buildXmlReferenceDocument($dom, $refDoc));
+            }
         }
 
-        $dom->appendChild($library);
+        $dom->appendChild($libraryElem);
         return $dom->saveXML();
     }
 
     /**
-     * Build XML DataTemplate element
+     * Build XML DataTemplate element with STRICT element ordering
      */
-    private function buildXmlDataTemplate($dom, $dtData)
+    private function buildXmlDataTemplate($dom, $dtData): DOMElement
     {
-        $dt = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:DataTemplate');
+        $dt = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':DataTemplate');
 
-        if (isset($dtData['GUID'])) {
-            $dt->setAttribute('dt:GUID', $dtData['GUID']);
+        if (isset($dtData['dt:GUID'])) {
+            $dt->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $dtData['dt:GUID']);
         }
         if (isset($dtData['dateOfCreation'])) {
             $dt->setAttribute('dateOfCreation', $dtData['dateOfCreation']);
         }
+        if (isset($dtData['URI'])) {
+            $dt->setAttribute('URI', $dtData['URI']);
+        }
 
+        // Name elements
         if (isset($dtData['Name'])) {
-            $name = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:Name', htmlspecialchars($dtData['Name']['value']));
-            $name->setAttribute('language', $dtData['Name']['language']);
-            $dt->appendChild($name);
+            foreach ($dtData['Name'] as $name) {
+                $this->appendTextElement($dom, $dt, 'Name', $name['value'], $name['language']);
+            }
         }
 
+        // Definition elements
         if (isset($dtData['Definition'])) {
-            $def = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:Definition', htmlspecialchars($dtData['Definition']['value']));
-            $def->setAttribute('language', $dtData['Definition']['language']);
-            $dt->appendChild($def);
+            foreach ($dtData['Definition'] as $def) {
+                $this->appendTextElement($dom, $dt, 'Definition', $def['value'], $def['language']);
+            }
         }
 
+        // ReferenceDocumentRef
+        if (isset($dtData['ReferenceDocumentRef'])) {
+            $ref = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':ReferenceDocumentRef');
+            $ref->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $dtData['ReferenceDocumentRef']['dt:GUID']);
+            $dt->appendChild($ref);
+        }
+
+        // LanguageOfCreator
+        if (isset($dtData['LanguageOfCreator'])) {
+            $this->appendTextElement($dom, $dt, 'LanguageOfCreator', $dtData['LanguageOfCreator']);
+        }
+
+        // CountryOfOrigin
+        if (isset($dtData['CountryOfOrigin'])) {
+            $this->appendTextElement($dom, $dt, 'CountryOfOrigin', $dtData['CountryOfOrigin']);
+        }
+
+        // MajorVersion
+        if (isset($dtData['MajorVersion'])) {
+            $this->appendTextElement($dom, $dt, 'MajorVersion', (string)$dtData['MajorVersion']);
+        }
+
+        // MinorVersion
+        if (isset($dtData['MinorVersion'])) {
+            $this->appendTextElement($dom, $dt, 'MinorVersion', (string)$dtData['MinorVersion']);
+        }
+
+        // Status
         if (isset($dtData['Status'])) {
-            $status = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:Status', htmlspecialchars($dtData['Status']));
-            $dt->appendChild($status);
+            $this->appendTextElement($dom, $dt, 'Status', $dtData['Status']);
         }
 
-        foreach ($dtData['HasGroupOfPropertiesRef'] as $ref) {
-            $refElem = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:HasGroupOfPropertiesRef');
-            $refElem->setAttribute('dt:GUID', $ref['GUID']);
-            $dt->appendChild($refElem);
+        // DeprecationExplanation
+        if (isset($dtData['DeprecationExplanation'])) {
+            $this->appendTextElement($dom, $dt, 'DeprecationExplanation', $dtData['DeprecationExplanation']);
         }
 
-        foreach ($dtData['HasPropertyRef'] as $ref) {
-            $refElem = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:HasPropertyRef');
-            $refElem->setAttribute('dt:GUID', $ref['GUID']);
-            $dt->appendChild($refElem);
+        // HasPropertyRef
+        if (isset($dtData['HasPropertyRef'])) {
+            foreach ($dtData['HasPropertyRef'] as $ref) {
+                $refElem = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':HasPropertyRef');
+                $refElem->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $ref['dt:GUID']);
+                if (isset($ref['referenceURI'])) {
+                    $refElem->setAttribute('referenceURI', $ref['referenceURI']);
+                }
+                $dt->appendChild($refElem);
+            }
+        }
+
+        // HasGroupOfPropertiesRef
+        if (isset($dtData['HasGroupOfPropertiesRef'])) {
+            foreach ($dtData['HasGroupOfPropertiesRef'] as $ref) {
+                $refElem = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':HasGroupOfPropertiesRef');
+                $refElem->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $ref['dt:GUID']);
+                if (isset($ref['referenceURI'])) {
+                    $refElem->setAttribute('referenceURI', $ref['referenceURI']);
+                }
+                $dt->appendChild($refElem);
+            }
+        }
+
+        // HasObjectTypeRef reference in DataTemplate
+        if (isset($dtData['HasObjectTypeRef'])) {
+            $ref = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':HasObjectTypeRef');
+            $ref->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $dtData['HasObjectTypeRef']['dt:GUID']);
+            $dt->appendChild($ref);
         }
 
         return $dt;
     }
 
     /**
-     * Build XML GroupOfProperties element
+     * Build XML ObjectType element (defined separately at Library level)
      */
-    private function buildXmlGroupOfProperties($dom, $gopData)
+    private function buildXmlObjectType($dom, $objTypeData): DOMElement
     {
-        $gop = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:GroupOfProperties');
+        $objType = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':ObjectType');
 
-        if (isset($gopData['GUID'])) {
-            $gop->setAttribute('dt:GUID', $gopData['GUID']);
+        if (isset($objTypeData['dt:GUID'])) {
+            $objType->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $objTypeData['dt:GUID']);
+        }
+        if (isset($objTypeData['dateOfCreation'])) {
+            $objType->setAttribute('dateOfCreation', $objTypeData['dateOfCreation']);
+        }
+
+        // Name elements
+        if (isset($objTypeData['Name'])) {
+            foreach ($objTypeData['Name'] as $name) {
+                $this->appendTextElement($dom, $objType, 'Name', $name['value'], $name['language']);
+            }
+        }
+
+        // Definition elements
+        if (isset($objTypeData['Definition'])) {
+            foreach ($objTypeData['Definition'] as $def) {
+                $this->appendTextElement($dom, $objType, 'Definition', $def['value'], $def['language']);
+            }
+        }
+
+        return $objType;
+    }
+
+    /**
+     * Build XML GroupOfProperties element with STRICT element ordering
+     */
+    private function buildXmlGroupOfProperties($dom, $gopData): DOMElement
+    {
+        $gop = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GroupOfProperties');
+
+        if (isset($gopData['dt:GUID'])) {
+            $gop->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $gopData['dt:GUID']);
         }
         if (isset($gopData['dateOfCreation'])) {
             $gop->setAttribute('dateOfCreation', $gopData['dateOfCreation']);
         }
+        if (isset($gopData['URI'])) {
+            $gop->setAttribute('URI', $gopData['URI']);
+        }
 
+        // Name elements
         if (isset($gopData['Name'])) {
-            $name = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:Name', htmlspecialchars($gopData['Name']['value']));
-            $name->setAttribute('language', $gopData['Name']['language']);
-            $gop->appendChild($name);
+            foreach ($gopData['Name'] as $name) {
+                $this->appendTextElement($dom, $gop, 'Name', $name['value'], $name['language']);
+            }
         }
 
+        // Definition elements
         if (isset($gopData['Definition'])) {
-            $def = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:Definition', htmlspecialchars($gopData['Definition']['value']));
-            $def->setAttribute('language', $gopData['Definition']['language']);
-            $gop->appendChild($def);
+            foreach ($gopData['Definition'] as $def) {
+                $this->appendTextElement($dom, $gop, 'Definition', $def['value'], $def['language']);
+            }
         }
 
-        if (isset($gopData['Status'])) {
-            $status = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:Status', htmlspecialchars($gopData['Status']));
-            $gop->appendChild($status);
+        // ReferenceDocumentRef
+        if (isset($gopData['ReferenceDocumentRef'])) {
+            $ref = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':ReferenceDocumentRef');
+            $ref->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $gopData['ReferenceDocumentRef']['dt:GUID']);
+            $gop->appendChild($ref);
         }
 
+        // LanguageOfCreator
         if (isset($gopData['LanguageOfCreator'])) {
-            $lang = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:LanguageOfCreator', htmlspecialchars($gopData['LanguageOfCreator']));
-            $gop->appendChild($lang);
+            $this->appendTextElement($dom, $gop, 'LanguageOfCreator', $gopData['LanguageOfCreator']);
         }
 
+        // CountryOfOrigin
         if (isset($gopData['CountryOfOrigin'])) {
-            $country = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:CountryOfOrigin', htmlspecialchars($gopData['CountryOfOrigin']));
-            $gop->appendChild($country);
+            $this->appendTextElement($dom, $gop, 'CountryOfOrigin', $gopData['CountryOfOrigin']);
         }
 
-        foreach ($gopData['HasPropertyRef'] as $ref) {
-            $refElem = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:HasPropertyRef');
-            $refElem->setAttribute('dt:GUID', $ref['GUID']);
-            $gop->appendChild($refElem);
+        // MajorVersion
+        if (isset($gopData['MajorVersion'])) {
+            $this->appendTextElement($dom, $gop, 'MajorVersion', (string)$gopData['MajorVersion']);
+        }
+
+        // MinorVersion
+        if (isset($gopData['MinorVersion'])) {
+            $this->appendTextElement($dom, $gop, 'MinorVersion', (string)$gopData['MinorVersion']);
+        }
+
+        // Status
+        if (isset($gopData['Status'])) {
+            $this->appendTextElement($dom, $gop, 'Status', $gopData['Status']);
+        }
+
+        // HasPropertyRef (REQUIRED for GroupOfProperties, 1..*)
+        if (isset($gopData['HasPropertyRef'])) {
+            foreach ($gopData['HasPropertyRef'] as $ref) {
+                $refElem = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':HasPropertyRef');
+                $refElem->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $ref['dt:GUID']);
+                if (isset($ref['referenceURI'])) {
+                    $refElem->setAttribute('referenceURI', $ref['referenceURI']);
+                }
+                $gop->appendChild($refElem);
+            }
         }
 
         return $gop;
     }
 
     /**
-     * Build XML Property element
+     * Build XML Property element with STRICT element ordering
+     * REMOVED: QuantityKindRef
+     * ADDED: Units (only when present)
+     * ADDED: referenceURI attribute
      */
-    private function buildXmlProperty($dom, $propData)
+    private function buildXmlProperty($dom, $propData): DOMElement
     {
-        $prop = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:Property');
+        $prop = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':Property');
 
-        if (isset($propData['GUID'])) {
-            $prop->setAttribute('dt:GUID', $propData['GUID']);
+        if (isset($propData['dt:GUID'])) {
+            $prop->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $propData['dt:GUID']);
         }
         if (isset($propData['dateOfCreation'])) {
             $prop->setAttribute('dateOfCreation', $propData['dateOfCreation']);
         }
+        if (isset($propData['referenceURI'])) {
+            $prop->setAttribute('referenceURI', $propData['referenceURI']);
+        }
 
+        // Name elements
         if (isset($propData['Name'])) {
-            $name = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:Name', htmlspecialchars($propData['Name']['value']));
-            $name->setAttribute('language', $propData['Name']['language']);
-            $prop->appendChild($name);
+            foreach ($propData['Name'] as $name) {
+                $this->appendTextElement($dom, $prop, 'Name', $name['value'], $name['language']);
+            }
         }
 
+        // Definition elements
         if (isset($propData['Definition'])) {
-            $def = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:Definition', htmlspecialchars($propData['Definition']['value']));
-            $def->setAttribute('language', $propData['Definition']['language']);
-            $prop->appendChild($def);
+            foreach ($propData['Definition'] as $def) {
+                $this->appendTextElement($dom, $prop, 'Definition', $def['value'], $def['language']);
+            }
         }
 
+        // LanguageOfCreator
+        if (isset($propData['LanguageOfCreator'])) {
+            $this->appendTextElement($dom, $prop, 'LanguageOfCreator', $propData['LanguageOfCreator']);
+        }
+
+        // CountryOfOrigin
+        if (isset($propData['CountryOfOrigin'])) {
+            $this->appendTextElement($dom, $prop, 'CountryOfOrigin', $propData['CountryOfOrigin']);
+        }
+
+        // MajorVersion
+        if (isset($propData['MajorVersion'])) {
+            $this->appendTextElement($dom, $prop, 'MajorVersion', (string)$propData['MajorVersion']);
+        }
+
+        // MinorVersion
+        if (isset($propData['MinorVersion'])) {
+            $this->appendTextElement($dom, $prop, 'MinorVersion', (string)$propData['MinorVersion']);
+        }
+
+        // Status
         if (isset($propData['Status'])) {
-            $status = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:Status', htmlspecialchars($propData['Status']));
-            $prop->appendChild($status);
+            $this->appendTextElement($dom, $prop, 'Status', $propData['Status']);
         }
 
-        if (isset($propData['Units']) && $propData['Units']) {
-            $units = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:Units', htmlspecialchars($propData['Units']));
-            $prop->appendChild($units);
+        // REQUIRED: DataType (1..1) - with name attribute
+        if (isset($propData['DataType'])) {
+            $dataTypeElem = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':DataType');
+            if (isset($propData['DataType']['name'])) {
+                $dataTypeElem->setAttribute('name', $propData['DataType']['name']);
+            }
+            $prop->appendChild($dataTypeElem);
+        }
+
+        // DimensionRef
+        if (isset($propData['DimensionRef'])) {
+            $ref = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':DimensionRef');
+            $ref->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $propData['DimensionRef']['dt:GUID']);
+            $prop->appendChild($ref);
+        }
+
+        // NEW: Units (replaces QuantityKindRef) - only if exists
+        if (isset($propData['Units'])) {
+            $this->appendTextElement($dom, $prop, 'Units', $propData['Units']);
         }
 
         return $prop;
     }
 
     /**
-     * Build XML ReferenceDocument element
+     * Build XML ReferenceDocument element with STRICT element ordering
      */
-    private function buildXmlReferenceDocument($dom, $rdData)
+    private function buildXmlReferenceDocument($dom, $rdData): DOMElement
     {
-        $rd = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:ReferenceDocument');
+        $rd = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':ReferenceDocument');
 
-        if (isset($rdData['GUID'])) {
-            $rd->setAttribute('dt:GUID', $rdData['GUID']);
+        if (isset($rdData['dt:GUID'])) {
+            $rd->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $rdData['dt:GUID']);
         }
         if (isset($rdData['dateOfCreation'])) {
             $rd->setAttribute('dateOfCreation', $rdData['dateOfCreation']);
         }
 
+        // Name elements
         if (isset($rdData['Name'])) {
-            $name = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:Name', htmlspecialchars($rdData['Name']['value']));
-            $name->setAttribute('language', $rdData['Name']['language']);
-            $rd->appendChild($name);
+            foreach ($rdData['Name'] as $name) {
+                $this->appendTextElement($dom, $rd, 'Name', $name['value'], $name['language']);
+            }
         }
 
+        // REQUIRED: Definition (1..1)
+        if (isset($rdData['Definition'])) {
+            foreach ($rdData['Definition'] as $def) {
+                $this->appendTextElement($dom, $rd, 'Definition', $def['value'], $def['language']);
+            }
+        }
+
+        // Status
         if (isset($rdData['Status'])) {
-            $status = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:Status', htmlspecialchars($rdData['Status']));
-            $rd->appendChild($status);
+            $this->appendTextElement($dom, $rd, 'Status', $rdData['Status']);
         }
 
-        if (isset($rdData['URI']) && $rdData['URI']) {
-            $uri = $dom->createElementNS('https://standards.iso.org/iso/23387/ed-2/en/', 'dt:URI', htmlspecialchars($rdData['URI']));
-            $rd->appendChild($uri);
+        // REQUIRED: Language (1..*)
+        if (isset($rdData['Language'])) {
+            $this->appendTextElement($dom, $rd, 'Language', $rdData['Language']);
         }
 
         return $rd;
+    }
+
+    /**
+     * Append a text element with optional language attribute
+     */
+    private function appendTextElement($dom, $parentElem, $tagName, $value, $language = null): void
+    {
+        $elem = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':' . $tagName, htmlspecialchars($value, ENT_XML1, 'UTF-8'));
+        if ($language) {
+            $elem->setAttribute('language', $language);
+        }
+        $parentElem->appendChild($elem);
     }
 }

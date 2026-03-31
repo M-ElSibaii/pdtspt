@@ -23,6 +23,14 @@
                             <td class="lg:w-3/4 md:w-3/4 sm:w-1/2">{{$gopdd->GUID}}</td>
                         </tr>
                         <tr>
+                            <th>URI</th>
+                            <td>
+                                <a href="https://pdts.pt/datadictionaryviewGOP/{{$gopdd->Id}}-{{$gopdd->GUID}}" target="_blank">
+                                    https://pdts.pt/datadictionaryviewGOP/{{$gopdd->Id}}-{{$gopdd->GUID}}
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
                             <th>Nome En</th>
                             <td>{{$gopdd->gopNameEn}}</td>
                         </tr>

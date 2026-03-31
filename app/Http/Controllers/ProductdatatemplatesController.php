@@ -17,6 +17,43 @@ use Carbon\Carbon;
 
 class ProductdatatemplatesController extends Controller
 {
+
+    /**
+     * View a single PDT with all attributes
+     */
+    public function viewPdt($id, $guid)
+    {
+        $pdt = productdatatemplates::where('Id', $id)->where('GUID', $guid)->firstOrFail();
+
+        // Load related data
+        $groupsOfProperties = groupofproperties::where('pdtId', $id)->get();
+        $pdtVersions = productdatatemplates::where('GUID', $guid)->get();
+
+        // Load ObjectType if exists
+        $objectType = null;
+        if ($pdt->constructionObjectGUID) {
+            $objectType = constructionobjects::where('GUID', $pdt->constructionObjectGUID)->first();
+        }
+
+        // Load Master properties info (count)
+        $masterPropertiesCount = 0;
+        if ($pdt->GUID !== '230d9954097541b793f2a1fddb8bd0ad') {
+            $masterPdt = productdatatemplates::where('GUID', '230d9954097541b793f2a1fddb8bd0ad')
+                ->orderByRaw('versionNumber DESC, revisionNumber DESC, editionNumber DESC')
+                ->first();
+            if ($masterPdt) {
+                $masterPropertiesCount = DB::table('properties')
+                    ->where('pdtID', $masterPdt->Id)
+                    ->select('GUID')
+                    ->distinct()
+                    ->count();
+            }
+        }
+
+        return view('pdtview', compact('pdt', 'groupsOfProperties', 'pdtVersions', 'objectType', 'masterPropertiesCount'));
+    }
+
+
     /** Get the latest version of a PDT */
     public function getLatestPDTs()
     {
@@ -66,15 +103,405 @@ class ProductdatatemplatesController extends Controller
     }
 
 
+    /**
+     * GET /api/{pdtID}
+     * EN ISO 23387 compliant JSON export with COMPLETE data
+     * 
+     * Includes ALL attributes from:
+     * - productdatatemplates
+     * - constructionobjects
+     * - groupofproperties
+     * - propertiesdatadictionaries (COMPLETE)
+     * - referencedocuments
+     * 
+     * Structure: 23387 hierarchy
+     * Data: COMPLETE from all EN ISO 23386 data dictionary tables
+     */
+    public function productDataTemplate($pdtID)
+    {
+        try {
+            // Get latest version of PDT
+            $pdt = DB::table('productdatatemplates')
+                ->where(function ($query) use ($pdtID) {
+                    $query->where('Id', $pdtID)
+                        ->orWhere('GUID', $pdtID);
+                })
+                ->orderByRaw('versionNumber DESC, revisionNumber DESC, editionNumber DESC')
+                ->first();
 
+            if (!$pdt) {
+                return response()->json(['error' => 'PDT not found'], 404);
+            }
 
+            // ========== PDT DATA ==========
+            $pdtData = (array)$pdt;
+
+            // ========== CONSTRUCTION OBJECT DATA ==========
+            $constructionObjectData = null;
+            $hasObjectTypeRef = null;
+            if ($pdt->constructionObjectGUID) {
+                $constructionObject = constructionobjects::where('GUID', $pdt->constructionObjectGUID)->first();
+                if ($constructionObject) {
+                    $constructionObjectData = $constructionObject->toArray();
+                    $hasObjectTypeRef = [
+                        'dt:GUID' => $pdt->constructionObjectGUID,
+                        'name' => $constructionObject->constructionObjectNamePt ?? $constructionObject->constructionObjectNameEn,
+                        'nameEn' => $constructionObject->constructionObjectNameEn,
+                        'namePt' => $constructionObject->constructionObjectNamePt,
+                        'description' => $constructionObject->descriptionEn,
+                        'descriptionPt' => $constructionObject->descriptionPt,
+                        'descriptionEn' => $constructionObject->descriptionEn,
+                    ];
+                }
+            }
+
+            // ========== GROUPS OF PROPERTIES WITH COMPLETE DATA ==========
+            $groupsOfPropertiesData = [];
+            $groupOfPropertiesIds = DB::table('groupofproperties')
+                ->where('pdtId', $pdt->Id)
+                ->orderBy('Id')
+                ->pluck('Id');
+
+            foreach ($groupOfPropertiesIds as $gopId) {
+                $gop = groupofproperties::find($gopId);
+                if ($gop) {
+                    $gopArray = $gop->toArray();
+
+                    // Load ALL properties for this GOP with COMPLETE propertiesdatadictionaries data
+                    $gopProperties = [];
+                    $propertyIds = DB::table('properties')
+                        ->where('gopId', $gopId)
+                        ->select('GUID', 'propertyId', 'Id')
+                        ->get();
+
+                    foreach ($propertyIds as $prop) {
+                        // Get property from propertiesdatadictionaries (COMPLETE data)
+                        $propComplete = propertiesdatadictionaries::where('GUID', $prop->GUID)->first();
+                        if ($propComplete) {
+                            $gopProperties[] = [
+                                'properties_link_id' => $prop->Id,
+                                'propertyId' => $prop->propertyId,
+                                'GUID' => $prop->GUID,
+                                // COMPLETE propertiesdatadictionaries attributes
+                                'completeDictionary' => $propComplete->toArray(),
+                                // Structured for 23387
+                                'ISO23387' => $this->buildProperty23387($propComplete),
+                            ];
+                        }
+                    }
+
+                    $groupsOfPropertiesData[] = [
+                        'gopRawData' => $gopArray,
+                        'gopId' => $gopId,
+                        'GUID' => $gop->GUID,
+                        'properties' => $gopProperties,
+                        'ISO23387' => $this->buildGroupOfProperties23387($gop),
+                    ];
+                }
+            }
+
+            // ========== PROPERTIES LINKED DIRECTLY TO PDT ==========
+            $pdtPropertiesData = [];
+            $directPropertyGuids = DB::table('properties')
+                ->where('pdtID', $pdt->Id)
+                ->select('GUID', 'propertyId', 'Id')
+                ->distinct()
+                ->get();
+
+            foreach ($directPropertyGuids as $prop) {
+                $propComplete = propertiesdatadictionaries::where('GUID', $prop->GUID)->first();
+                if ($propComplete) {
+                    $pdtPropertiesData[] = [
+                        'properties_link_id' => $prop->Id,
+                        'propertyId' => $prop->propertyId,
+                        'GUID' => $prop->GUID,
+                        'completeDictionary' => $propComplete->toArray(),
+                        'ISO23387' => $this->buildProperty23387($propComplete),
+                    ];
+                }
+            }
+
+            // ========== MASTER DATA TEMPLATE PROPERTIES (if not master itself) ==========
+            $masterProperties = [];
+            $masterGOP = [];
+            if ($pdt->GUID !== '230d9954097541b793f2a1fddb8bd0ad') {
+                $masterPdt = DB::table('productdatatemplates')
+                    ->where('GUID', '230d9954097541b793f2a1fddb8bd0ad')
+                    ->orderByRaw('versionNumber DESC, revisionNumber DESC, editionNumber DESC')
+                    ->first();
+
+                if ($masterPdt) {
+                    // Master GOPs
+                    $masterGopIds = DB::table('groupofproperties')
+                        ->where('pdtId', $masterPdt->Id)
+                        ->orderBy('Id')
+                        ->pluck('Id');
+
+                    foreach ($masterGopIds as $gopId) {
+                        $gop = groupofproperties::find($gopId);
+                        if ($gop) {
+                            $masterGOP[] = [
+                                'source' => 'Master',
+                                'gopRawData' => $gop->toArray(),
+                                'GUID' => $gop->GUID,
+                                'ISO23387' => $this->buildGroupOfProperties23387($gop),
+                            ];
+                        }
+                    }
+
+                    // Master Properties
+                    $masterPropGuids = DB::table('properties')
+                        ->where('pdtID', $masterPdt->Id)
+                        ->select('GUID', 'propertyId', 'Id')
+                        ->distinct()
+                        ->get();
+
+                    foreach ($masterPropGuids as $prop) {
+                        $propComplete = propertiesdatadictionaries::where('GUID', $prop->GUID)->first();
+                        if ($propComplete) {
+                            $masterProperties[] = [
+                                'source' => 'Master',
+                                'GUID' => $prop->GUID,
+                                'completeDictionary' => $propComplete->toArray(),
+                                'ISO23387' => $this->buildProperty23387($propComplete),
+                            ];
+                        }
+                    }
+                }
+            }
+
+            // ========== REFERENCE DOCUMENTS WITH COMPLETE DATA ==========
+            $referenceDocumentsData = [];
+
+            // Collect all ref doc GUIDs from PDT, GOPs, and properties
+            $refDocGuids = collect();
+            if ($pdt->referenceDocumentGUID && $pdt->referenceDocumentGUID !== 'n/a') {
+                $refDocGuids->push($pdt->referenceDocumentGUID);
+            }
+
+            foreach ($groupsOfPropertiesData as $gopData) {
+                $gop = groupofproperties::find($gopData['gopId']);
+                if ($gop && $gop->referenceDocumentGUID && $gop->referenceDocumentGUID !== 'n/a') {
+                    $refDocGuids->push($gop->referenceDocumentGUID);
+                }
+            }
+
+            $propRefDocs = DB::table('properties')
+                ->where('pdtID', $pdt->Id)
+                ->whereNotNull('referenceDocumentGUID')
+                ->where('referenceDocumentGUID', '!=', 'n/a')
+                ->select('referenceDocumentGUID')
+                ->distinct()
+                ->pluck('referenceDocumentGUID');
+
+            $refDocGuids = $refDocGuids->merge($propRefDocs)->filter()->unique();
+
+            foreach ($refDocGuids as $guid) {
+                $refDoc = referencedocuments::where('GUID', $guid)->first();
+                if ($refDoc) {
+                    $referenceDocumentsData[] = [
+                        'GUID' => $guid,
+                        'rawData' => $refDoc->toArray(),
+                        'ISO23387' => [
+                            'dt:GUID' => $guid,
+                            'Name' => [
+                                ['language' => 'en', 'value' => $refDoc->rdName ?? $refDoc->title ?? '']
+                            ],
+                            'Definition' => [
+                                ['language' => 'en', 'value' => $refDoc->description ?? $refDoc->title ?? 'Referenced document']
+                            ],
+                            'Status' => $refDoc->status ?? 'Active',
+                            'Language' => 'en',
+                        ]
+                    ];
+                }
+            }
+
+            // ========== BUILD COMPLETE JSON STRUCTURE ==========
+            $response = [
+                'meta' => [
+                    'exportFormat' => 'EN ISO 23387 + COMPLETE EN ISO 23386 DATA',
+                    'version' => '1.0',
+                    'timestamp' => Carbon::now()->toIso8601String(),
+                    'pdtVersion' => "{$pdt->versionNumber}.{$pdt->revisionNumber}",
+                ],
+                'Library' => [
+                    'ISO23387' => [
+                        'dt:GUID' => $pdt->GUID,
+                        'dateOfCreation' => $this->formatDate($pdt->dateOfVersion ?? $pdt->dateOfRevision),
+                        'Name' => $this->buildMultilingualNames($pdt->pdtNameEn, $pdt->pdtNamePt),
+                        'Definition' => $this->buildMultilingualDefinitions($pdt->descriptionEn, $pdt->descriptionPt),
+                        'URI' => "https://pdts.pt/pdtview/{$pdt->Id}-{$pdt->GUID}",
+                        'HasObjectTypeRef' => $hasObjectTypeRef,
+                    ],
+                    'rawData' => $pdtData,
+                    'ObjectType' => $constructionObjectData,
+                    'DataTemplate' => [
+                        'ISO23387' => [
+                            'dt:GUID' => $pdt->GUID,
+                            'dateOfCreation' => $this->formatDate($pdt->dateOfVersion ?? $pdt->dateOfRevision),
+                            'Name' => $this->buildMultilingualNames($pdt->pdtNameEn, $pdt->pdtNamePt),
+                            'Definition' => $this->buildMultilingualDefinitions($pdt->descriptionEn, $pdt->descriptionPt),
+                            'MajorVersion' => (int)$pdt->versionNumber,
+                            'MinorVersion' => (int)$pdt->revisionNumber,
+                            'Status' => $pdt->status ?? 'Active',
+                        ],
+                        'rawData' => $pdtData,
+                    ],
+                    'GroupsOfProperties' => [
+                        'current' => $groupsOfPropertiesData,
+                        'master' => $masterGOP,
+                        'count' => [
+                            'current' => count($groupsOfPropertiesData),
+                            'master' => count($masterGOP),
+                        ]
+                    ],
+                    'Properties' => [
+                        'directToTemplate' => $pdtPropertiesData,
+                        'fromMaster' => $masterProperties,
+                        'count' => [
+                            'directToTemplate' => count($pdtPropertiesData),
+                            'fromMaster' => count($masterProperties),
+                            'total' => count($pdtPropertiesData) + count($masterProperties),
+                        ]
+                    ],
+                    'ReferenceDocuments' => $referenceDocumentsData,
+                ],
+            ];
+
+            return response()->json($response, 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Failed to export PDT',
+                'message' => $e->getMessage(),
+                'trace' => config('app.debug') ? $e->getTraceAsString() : null
+            ], 500);
+        }
+    }
+
+    /**
+     * Helper: Build Property in ISO 23387 format with complete data
+     */
+    private function buildProperty23387($propComplete)
+    {
+        return [
+            'dt:GUID' => $propComplete->GUID,
+            'dateOfCreation' => $this->formatDate($propComplete->dateOfVersion ?? $propComplete->dateOfCreation),
+            'Name' => $this->buildMultilingualNames($propComplete->nameEn, $propComplete->namePt),
+            'Definition' => $this->buildMultilingualDefinitions($propComplete->definitionEn, $propComplete->definitionPt),
+            'LanguageOfCreator' => $propComplete->creatorsLanguage ?? 'pt-PT',
+            'CountryOfOrigin' => $propComplete->countryOfOrigin ?? 'PT',
+            'MajorVersion' => (int)($propComplete->versionNumber ?? 1),
+            'MinorVersion' => (int)($propComplete->revisionNumber ?? 0),
+            'Status' => $propComplete->status ?? 'Active',
+            'DataType' => [
+                'name' => $propComplete->dataType ?? 'STRING'
+            ],
+            'Units' => $propComplete->units ?? null,
+            'Dimension' => $propComplete->dimension ?? null,
+            'PhysicalQuantity' => $propComplete->physicalQuantity ?? null,
+            'DimensionRef' => $propComplete->dimension ? ['dt:GUID' => $propComplete->dimension] : null,
+        ];
+    }
+
+    /**
+     * Helper: Build GroupOfProperties in ISO 23387 format
+     */
+    private function buildGroupOfProperties23387($gop)
+    {
+        return [
+            'dt:GUID' => $gop->GUID,
+            'dateOfCreation' => $this->formatDate($gop->dateOfVersion ?? $gop->dateOfCreation),
+            'Name' => $this->buildMultilingualNames($gop->gopNameEn, $gop->gopNamePt),
+            'Definition' => $this->buildMultilingualDefinitions($gop->definitionEn, $gop->definitionPt),
+            'LanguageOfCreator' => $gop->creatorsLanguage ?? 'pt-PT',
+            'CountryOfOrigin' => $gop->countryOfOrigin ?? 'PT',
+            'MajorVersion' => (int)($gop->versionNumber ?? 1),
+            'MinorVersion' => (int)($gop->revisionNumber ?? 0),
+            'Status' => $gop->status ?? 'Active',
+            'URI' => "https://pdts.pt/datadictionaryviewGOP/{$gop->Id}-{$gop->GUID}",
+        ];
+    }
+
+    /**
+     * Helper: Build multilingual Names
+     */
+    private function buildMultilingualNames($en, $pt)
+    {
+        $names = [];
+        if ($pt) {
+            $names[] = ['language' => 'pt', 'value' => $pt];
+        }
+        if ($en) {
+            $names[] = ['language' => 'en', 'value' => $en];
+        }
+        return $names ?: [['language' => 'en', 'value' => 'Unnamed']];
+    }
+
+    /**
+     * Helper: Build multilingual Definitions
+     */
+    private function buildMultilingualDefinitions($en, $pt)
+    {
+        $defs = [];
+        if ($pt) {
+            $defs[] = ['language' => 'pt', 'value' => $pt];
+        }
+        if ($en) {
+            $defs[] = ['language' => 'en', 'value' => $en];
+        }
+        return $defs ?: [['language' => 'en', 'value' => 'No definition']];
+    }
+
+    /**
+     * Helper: Format date to ISO 8601
+     */
+    private function formatDate($date)
+    {
+        if (!$date) {
+            return Carbon::now()->toIso8601String();
+        }
+        return Carbon::parse($date)->toIso8601String();
+    }
+
+    /**
+     * GET /api/{pdtID}/json - EN ISO 23387 JSON export
+     */
+    public function productDataTemplateJson($pdtID)
+    {
+        try {
+            $exporter = new \App\Services\Iso23387Exporter();
+            $jsonString = $exporter->exportToJson($pdtID);
+            $structure = json_decode($jsonString, true);
+
+            return response()->json($structure, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
+    }
+
+    /**
+     * GET /api/{pdtID}/xml - EN ISO 23387 XML export
+     */
+    public function productDataTemplateXml($pdtID)
+    {
+        try {
+            $exporter = new \App\Services\Iso23387Exporter();
+            $xmlString = $exporter->exportToXml($pdtID);
+
+            return response($xmlString, 200)
+                ->header('Content-Type', 'application/xml');
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 404);
+        }
+    }
 
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function productDataTemplate($pdtID)
+    public function productDataTemplateold($pdtID)
     {
         $pdt = ProductDataTemplates::where('Id', $pdtID)->first();
 
@@ -102,31 +529,6 @@ class ProductdatatemplatesController extends Controller
         $pdt->referenceDocuments = $referenceDocuments;
 
         return response()->json(['productDataTemplate' => $pdt]);
-    }
-
-
-    public function productDataTemplateold($pdtID)
-    {
-        $pdt = ProductDataTemplates::where('Id', $pdtID)->get();
-        $gop = GroupOfProperties::where('pdtId', $pdtID)->get();
-        $referenceDocument = ReferenceDocuments::all();
-
-        $properties = Properties::where('pdtID', $pdtID)->get();
-
-        $propertiesInDataDictionary = Properties::leftJoin('propertiesdatadictionaries', function ($join) {
-            $join->on('properties.propertyId', '=', 'propertiesdatadictionaries.Id');
-        })->select('propertiesdatadictionaries.*')
-            ->get();
-
-        $data = [
-            'productDataTemplate' => $pdt,
-            'groupsOfProperties' => $gop,
-            'properties' => $properties,
-            'referenceDocuments' => $referenceDocument,
-            'propertiesAttributesInDataDictionary' => $propertiesInDataDictionary,
-        ];
-
-        return response()->json($data);
     }
 
     public function constructionObjects()

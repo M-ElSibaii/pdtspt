@@ -61,6 +61,10 @@ Route::get('/dashboard', [ProductdatatemplatesController::class, 'getLatestPDTs'
 Route::get('/pdtsdownload/{pdtID}', [GroupofpropertiesController::class, 'getGroupOfProperties'])
     ->name('pdtsdownload');
 
+// PDT View Page
+Route::get('/pdtview/{id}-{guid}', [ProductdatatemplatesController::class, 'viewPdt'])
+    ->name('pdtview');
+
 // Single PDT export endpoints (EN ISO 23387 format)
 Route::post('/pdt-export/json/{pdtId}', [ProductdatatemplatesController::class, 'downloadPdtJson'])
     ->name('pdt.export.json');

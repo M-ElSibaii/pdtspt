@@ -1,0 +1,105 @@
+<!-- Test if the export routes work -->
+<!doctype html>
+<html>
+    <head>
+        <title>Test PDT Export Routes</title>
+        <style>
+            body {
+                font-family: Arial;
+                margin: 20px;
+            }
+            button {
+                padding: 10px 20px;
+                margin: 10px;
+                font-size: 16px;
+                cursor: pointer;
+            }
+            .result {
+                margin: 20px 0;
+                padding: 10px;
+                background: #f0f0f0;
+                border-radius: 5px;
+            }
+            .success {
+                background: #90ee90;
+            }
+            .error {
+                background: #ffb6c6;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>PDT Export Routes Test</h1>
+        <p>PDT ID: <input type="number" id="pdtId" value="1" min="1" /></p>
+
+        <button onclick="testJsonExport()">Test JSON Export</button>
+        <button onclick="testXmlExport()">Test XML Export</button>
+
+        <div id="jsonResult" class="result" style="display: none"></div>
+        <div id="xmlResult" class="result" style="display: none"></div>
+
+        <script>
+            function testJsonExport() {
+                const pdtId = document.getElementById("pdtId").value;
+                fetch(`/pdt-export/json/${pdtId}`, { method: "POST" })
+                    .then((r) => {
+                        document.getElementById("jsonResult").style.display =
+                            "block";
+                        if (r.ok) {
+                            document
+                                .getElementById("jsonResult")
+                                .classList.add("success");
+                            document.getElementById("jsonResult").innerHTML =
+                                `✓ JSON Export OK (${r.headers.get("content-length")} bytes)`;
+                        } else {
+                            document
+                                .getElementById("jsonResult")
+                                .classList.add("error");
+                            document.getElementById("jsonResult").innerHTML =
+                                `✗ JSON Export Failed (${r.status})`;
+                        }
+                    })
+                    .catch((e) => {
+                        document.getElementById("jsonResult").style.display =
+                            "block";
+                        document
+                            .getElementById("jsonResult")
+                            .classList.add("error");
+                        document.getElementById("jsonResult").innerHTML =
+                            `✗ Error: ${e.message}`;
+                    });
+            }
+
+            function testXmlExport() {
+                const pdtId = document.getElementById("pdtId").value;
+                fetch(`/pdt-export/xml/${pdtId}`, { method: "POST" })
+                    .then((r) => {
+                        document.getElementById("xmlResult").style.display =
+                            "block";
+                        if (r.ok) {
+                            document
+                                .getElementById("xmlResult")
+                                .classList.add("success");
+                            document.getElementById("xmlResult").innerHTML =
+                                `✓ XML Export OK (${r.headers.get("content-length")} bytes)`;
+                        } else {
+                            document
+                                .getElementById("xmlResult")
+                                .classList.add("error");
+                            document.getElementById("xmlResult").innerHTML =
+                                `✗ XML Export Failed (${r.status})`;
+                        }
+                    })
+                    .catch((e) => {
+                        document.getElementById("xmlResult").style.display =
+                            "block";
+                        document
+                            .getElementById("xmlResult")
+                            .classList.add("error");
+                        document.getElementById("xmlResult").innerHTML =
+                            `✗ Error: ${e.message}`;
+                    });
+            }
+        </script>
+    </body>
+</html>

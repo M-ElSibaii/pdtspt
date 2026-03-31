@@ -23,6 +23,14 @@
                             <td class="lg:w-3/4 md:w-3/4 sm:w-1/2">{{$propdd->GUID}}</td>
                         </tr>
                         <tr>
+                            <th>URI</th>
+                            <td>
+                                <a href="https://pdts.pt/datadictionaryview/{{$propdd->Id}}-{{$propdd->GUID}}" target="_blank">
+                                    https://pdts.pt/datadictionaryview/{{$propdd->Id}}-{{$propdd->GUID}}
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
                             <th>Nome En</th>
                             <td>{{$propdd->nameEnSc}}</td>
                         </tr>

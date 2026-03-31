@@ -59,7 +59,8 @@
                                 <img class="w-auto max-w-[100px] max-h-14" src="{{ asset('/img/' . $pdt->pdtNameEn . '.png') }}" alt="" />
                             </td>
                             <td class="whitespace-normal px-6 py-4 font-medium" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: normal;">
-                                {{ $pdt->pdtNamePt }}
+                            <a href="/pdtview/{{ $pdt->Id }}-{{ $pdt->GUID }}" class="text-blue-500 hover:text-blue-700">                                    {{ $pdt->pdtNamePt }}
+                                </a>
                             </td>
                             <td class="whitespace-nowrap px-6 py-4 font-medium">
                                 <div class="flex items-center">

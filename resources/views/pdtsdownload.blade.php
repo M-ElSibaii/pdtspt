@@ -30,9 +30,6 @@
                         <x-secondary-button id="csv" class="btn">
                             <i class="fa fa-download"></i>&nbsp;CSV/XLS
                         </x-secondary-button>
-                        <x-secondary-button id="txt" class="btn">
-                            <i class="fa fa-download"></i>&nbsp;TXT
-                        </x-secondary-button>
                     </div>
                 </div>
                 <div class="overflow-auto" style="overflow-y: auto; max-height: calc(100vh - 300px); border: #cbd5e1 1px Solid;">
@@ -266,13 +263,7 @@
                     filename: "{{ $pdt->pdtNamePt }} data template V {{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.csv"
                 });
             });
-            //export text
-            $("#txt").on("click", function() {
-                $("#tblpdtsh").tableHTMLExport({
-                    type: "txt",
-                    filename: "{{ $pdt->pdtNamePt }} data template V {{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.txt"
-                });
-            });
+     
         </script>
 
 

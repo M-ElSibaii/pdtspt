@@ -1,0 +1,9 @@
+### JSON export
+GET http://127.0.0.1:8000/api/4
+Accept: application/json
+
+###
+
+### XML export
+POST http://127.0.0.1:8000/pdt-export/xml/4
+Accept: application/xml

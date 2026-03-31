@@ -49,3 +49,7 @@ Route::get('/groupsOfProperties', [ProductdatatemplatesController::class, 'group
 Route::get('/groupsOfProperties/{Id}', [ProductdatatemplatesController::class, 'groupOfProperties']);
 
 Route::get('/{pdtID}', [ProductdatatemplatesController::class, 'productDataTemplate']);
+
+Route::get('/{pdtID}/json', [ProductdatatemplatesController::class, 'productDataTemplateJson']);
+
+Route::get('/{pdtID}/xml', [ProductdatatemplatesController::class, 'productDataTemplateXml']);

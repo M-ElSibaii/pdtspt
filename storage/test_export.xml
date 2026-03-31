@@ -1,0 +1,1962 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dt:Library xmlns:dt="https://standards.iso.org/iso/23387/ed-2/en/" dt:GUID="230d9954097541b793f2a1fddb8bd0ad" dateOfCreation="2022-05-06T00:00:00+00:00">
+  <dt:Name language="pt">Mestre</dt:Name>
+  <dt:Name language="en">Master</dt:Name>
+  <dt:Definition language="pt">Modelo de Dados Mestre tem propriedades que são comuns a todos os Modelos de Dados</dt:Definition>
+  <dt:Definition language="en">Master Data Template has properties that are common for all Data Templates</dt:Definition>
+  <dt:DataTemplate dt:GUID="230d9954097541b793f2a1fddb8bd0ad" dateOfCreation="2022-05-06T00:00:00+00:00">
+    <dt:Name language="pt">Mestre</dt:Name>
+    <dt:Name language="en">Master</dt:Name>
+    <dt:Definition language="pt">Modelo de Dados Mestre tem propriedades que são comuns a todos os Modelos de Dados</dt:Definition>
+    <dt:Definition language="en">Master Data Template has properties that are common for all Data Templates</dt:Definition>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DeprecationExplanation>New version created</dt:DeprecationExplanation>
+    <dt:HasPropertyRef dt:GUID="3f0daaecf9684dcc8b7f90dfd46a278b"/>
+    <dt:HasPropertyRef dt:GUID="e3602b8b4b4747ce94a9a885ca100344"/>
+    <dt:HasPropertyRef dt:GUID="441cccb1b9ef44db9b5bfc16f5b66115"/>
+    <dt:HasPropertyRef dt:GUID="dcf813f681d941b09947a73411853dee"/>
+    <dt:HasPropertyRef dt:GUID="74d8c396bc0c463389b7fd2144072268"/>
+    <dt:HasPropertyRef dt:GUID="91ef06456c2c420a8c060fcc813452d9"/>
+    <dt:HasPropertyRef dt:GUID="9910eb7cd2914eac96def42ef14a3948"/>
+    <dt:HasPropertyRef dt:GUID="cd55f3b748614064b4884a9098097000"/>
+    <dt:HasPropertyRef dt:GUID="0edbd799c0674b60861b739e281f91f4"/>
+    <dt:HasPropertyRef dt:GUID="01486c4404334e32b01e1531ee681926"/>
+    <dt:HasPropertyRef dt:GUID="102cf0b8b11b4887a02bd1c6b986389b"/>
+    <dt:HasPropertyRef dt:GUID="c63eaa3f42fd42dd8d2c3946420e740d"/>
+    <dt:HasPropertyRef dt:GUID="9a1ddce509264427adcfa92f23e72921"/>
+    <dt:HasPropertyRef dt:GUID="a0e30649600043e9a48d9a5f6b1661f8"/>
+    <dt:HasPropertyRef dt:GUID="992198967d1e4d0a9f87a401dcfff225"/>
+    <dt:HasPropertyRef dt:GUID="4025df51ba064254a041119f454fd7cc"/>
+    <dt:HasPropertyRef dt:GUID="65376bcb7b324cb58ca6b82ee19e0e66"/>
+    <dt:HasPropertyRef dt:GUID="c78df3144c304bf0804e5ea0fce821d9"/>
+    <dt:HasPropertyRef dt:GUID="cf0bba2b8da64320adde114bb20b34dc"/>
+    <dt:HasPropertyRef dt:GUID="41ae4130b5d847498c5c6cb2af81ae22"/>
+    <dt:HasPropertyRef dt:GUID="7c8eba7adb0f46ec9e606329eff2c3e4"/>
+    <dt:HasPropertyRef dt:GUID="c1371efd75e24c408ed2d82f68dbf1e3"/>
+    <dt:HasPropertyRef dt:GUID="d9926ec81f834645b242c6df10d1417d"/>
+    <dt:HasPropertyRef dt:GUID="8cc60abeb30a43b8a42a26df67c3eccb"/>
+    <dt:HasPropertyRef dt:GUID="8fc2055e1787437d8466e5b5708001c5"/>
+    <dt:HasPropertyRef dt:GUID="a6f43f611eaf4ecca9ee58671fc747c5"/>
+    <dt:HasPropertyRef dt:GUID="8bb2064de2ec4b9e8047c629d051190d"/>
+    <dt:HasPropertyRef dt:GUID="fa38ba90a3cc4658af595d634e25aba5"/>
+    <dt:HasPropertyRef dt:GUID="cf975c1391a84a22a70bbac05b30bc51"/>
+    <dt:HasPropertyRef dt:GUID="ae348b27ac9248c88451a6126598d886"/>
+    <dt:HasPropertyRef dt:GUID="c56bca0c39bf439e857ed5e407f72a01"/>
+    <dt:HasPropertyRef dt:GUID="1fd6c7bbb64f4adb8e52cdc34248ae9c"/>
+    <dt:HasPropertyRef dt:GUID="78e27a71faf94363a51e4801631fcf4b"/>
+    <dt:HasPropertyRef dt:GUID="de786ea559eb4137bbeac91ad82965b6"/>
+    <dt:HasPropertyRef dt:GUID="ce077379f5664fbe8795416de036754e"/>
+    <dt:HasPropertyRef dt:GUID="cb7a3b6b80784cd0843a14db9e7d3b70"/>
+    <dt:HasPropertyRef dt:GUID="8752084b64184ec8b76912f3db41060c"/>
+    <dt:HasPropertyRef dt:GUID="0c9866d845964df9b87e19331f4bc4cb"/>
+    <dt:HasPropertyRef dt:GUID="86ac6d55492a40ffae2fad3cf49b30cc"/>
+    <dt:HasPropertyRef dt:GUID="aaaffd4107fe4c14a9b9db2bd6f8249f"/>
+    <dt:HasPropertyRef dt:GUID="d12ecb0bb9cd4203bccea390ba910ed6"/>
+    <dt:HasPropertyRef dt:GUID="33e05609f83e435b8f663e91dd7f694e"/>
+    <dt:HasPropertyRef dt:GUID="e9c5ccce8a3c43e2988abdab8254f380"/>
+    <dt:HasPropertyRef dt:GUID="fe68ee90c5694e5db358e857158c8da5"/>
+    <dt:HasPropertyRef dt:GUID="a2a391b4cf1348c5839d7c05644b0813"/>
+    <dt:HasPropertyRef dt:GUID="b79995cef4e24c81beef21e56b08759c"/>
+    <dt:HasPropertyRef dt:GUID="8917d897d76f4e14bdca76a160e5e85c"/>
+    <dt:HasPropertyRef dt:GUID="fee39e56e0404e2d8849314e39063d21"/>
+    <dt:HasPropertyRef dt:GUID="a654e8860cba464f8c654400d8c92ba8"/>
+    <dt:HasPropertyRef dt:GUID="203f809ebe854ed49ed94564bc8cb428"/>
+    <dt:HasPropertyRef dt:GUID="c52c0d26bd86406990cc037c30c1a21b"/>
+    <dt:HasPropertyRef dt:GUID="5f06d01eac4e401fbeba0459db39a6e0"/>
+    <dt:HasPropertyRef dt:GUID="37b3950a476f4d9c89384bc524f41dd7"/>
+    <dt:HasPropertyRef dt:GUID="a90a3aa948984a6e859a6daad9d70e1a"/>
+    <dt:HasPropertyRef dt:GUID="97f6c74363f445abb9875af754995359"/>
+    <dt:HasPropertyRef dt:GUID="fee932c3ad1a4e9283a88670d50b12cc"/>
+    <dt:HasPropertyRef dt:GUID="5c389b0ddb6b46d0b47e61977fa60ee9"/>
+    <dt:HasPropertyRef dt:GUID="eedfc0b5190045669049fa9fa3406ffa"/>
+    <dt:HasPropertyRef dt:GUID="8df4ef60cbf94169a9d5405c7ca8631e"/>
+    <dt:HasPropertyRef dt:GUID="c34f6d1a74cd49a08e26eaeb307e458c"/>
+    <dt:HasPropertyRef dt:GUID="6ae6e2cce1fa4707b1ba5290cfa68c98"/>
+    <dt:HasPropertyRef dt:GUID="d8ca72cd39de4fc6b83bea6dcb07c48a"/>
+    <dt:HasPropertyRef dt:GUID="ab6c6a6b82f545ab918ee609931ab131"/>
+    <dt:HasPropertyRef dt:GUID="69b559a73ab84a93a4cc6bda7f253f95"/>
+    <dt:HasPropertyRef dt:GUID="80f85e6efbd544a38ac7780b76581c44"/>
+    <dt:HasPropertyRef dt:GUID="715f15deb16a43c994268416cda75c06"/>
+    <dt:HasPropertyRef dt:GUID="c5b9ba15afaf40e3877f6f64df537fde"/>
+    <dt:HasPropertyRef dt:GUID="e8e832eb16b746b1a75f1816e693d6a5"/>
+    <dt:HasPropertyRef dt:GUID="5767681921ba4f8883e47c3009e5c301"/>
+    <dt:HasPropertyRef dt:GUID="c66e900f05674eb8b49c96332f9e8de6"/>
+    <dt:HasPropertyRef dt:GUID="51db70ebcfd8477b983f6ce78c47e1d0"/>
+    <dt:HasPropertyRef dt:GUID="d08a3ad2f38244ef9e205078c3a5ac3a"/>
+    <dt:HasPropertyRef dt:GUID="b2eb2c55d81f456aad26170832e9441a"/>
+    <dt:HasPropertyRef dt:GUID="cc46dd921f7c4f9ab2cf88266e9d4e8e"/>
+    <dt:HasPropertyRef dt:GUID="42b59e0489ea4119a501c185b41b04b8"/>
+    <dt:HasPropertyRef dt:GUID="107f963642194c1da7158ea1f0f3dbd9"/>
+    <dt:HasPropertyRef dt:GUID="67c0fca4eee14d5599f744ae08265537"/>
+    <dt:HasPropertyRef dt:GUID="feb7c008bbfa4222b088b8fcd5202b21"/>
+    <dt:HasPropertyRef dt:GUID="5417fc0ff2a248f2a5f1330ae276a704"/>
+    <dt:HasPropertyRef dt:GUID="fdc4fdcc770c44b1b7cd5a641b7e8247"/>
+    <dt:HasPropertyRef dt:GUID="79e7b9ef865f4ceea52d4dfb7d8fa42f"/>
+    <dt:HasPropertyRef dt:GUID="93ad9ed951174e3780832eb5df0b3f5d"/>
+    <dt:HasPropertyRef dt:GUID="2e5529f8988f4c79b83366e3a6d6a996"/>
+    <dt:HasPropertyRef dt:GUID="d597e7ae8a124341a3401dc36fbf6f33"/>
+    <dt:HasPropertyRef dt:GUID="eff7132382d94cbb89087b04c0463f44"/>
+    <dt:HasPropertyRef dt:GUID="303c35dc322c4f5384821206244e8706"/>
+    <dt:HasPropertyRef dt:GUID="dd9f360281224620ad66cf1e5559a39a"/>
+    <dt:HasPropertyRef dt:GUID="ad25685569ee4ca3ba0e99b0dea3a9f2"/>
+    <dt:HasPropertyRef dt:GUID="910a91186a7d43008fa90feb61bca54a"/>
+    <dt:HasPropertyRef dt:GUID="a1e63749b1d346fdbfddd269196f4e5f"/>
+    <dt:HasPropertyRef dt:GUID="c4a90fb5237b489cbe12e3293f2a8aae"/>
+    <dt:HasPropertyRef dt:GUID="c6d6602cfe5040e296d381105fad91ed"/>
+    <dt:HasPropertyRef dt:GUID="87d7fa5753cd4764abd9fb106f155339"/>
+    <dt:HasPropertyRef dt:GUID="afc77dba81524af49ad7d8715d314507"/>
+    <dt:HasPropertyRef dt:GUID="82ebe7453f9b489b9bb40d2d6050b4f8"/>
+    <dt:HasPropertyRef dt:GUID="4a455616db7641e48ecf61a683b22785"/>
+    <dt:HasPropertyRef dt:GUID="0c761976007f4e7b896028b56acbff46"/>
+    <dt:HasPropertyRef dt:GUID="5b083d80f7c2483d93183e91b8b81275"/>
+    <dt:HasPropertyRef dt:GUID="3b1cb0ddeee444e6a3116552ae922a48"/>
+    <dt:HasGroupOfPropertiesRef dt:GUID="881d15b5a0b54f24b837ad83ffde8a29"/>
+    <dt:HasGroupOfPropertiesRef dt:GUID="c1436d3b51ca4818882e3adcd99236fd"/>
+    <dt:HasGroupOfPropertiesRef dt:GUID="eb5abf5a97e546489826328eac212559"/>
+    <dt:HasGroupOfPropertiesRef dt:GUID="9deb9cab9dbe489f98f166339035fed6"/>
+    <dt:HasGroupOfPropertiesRef dt:GUID="4024d31b1f1d489db377711f847f8156"/>
+    <dt:HasGroupOfPropertiesRef dt:GUID="ba9e98ad524e4ca594b219d20db1ed27"/>
+  </dt:DataTemplate>
+  <dt:GroupOfProperties dt:GUID="881d15b5a0b54f24b837ad83ffde8a29" dateOfCreation="2022-05-06T00:00:00+00:00">
+    <dt:Name language="pt">Dados de classificação</dt:Name>
+    <dt:Name language="en">Classification data</dt:Name>
+    <dt:Definition language="pt">Esta categoria inclui dados de classificação do produto</dt:Definition>
+    <dt:Definition language="en">This category includes product classification data</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:HasPropertyRef dt:GUID="3f0daaecf9684dcc8b7f90dfd46a278b"/>
+    <dt:HasPropertyRef dt:GUID="e3602b8b4b4747ce94a9a885ca100344"/>
+    <dt:HasPropertyRef dt:GUID="441cccb1b9ef44db9b5bfc16f5b66115"/>
+  </dt:GroupOfProperties>
+  <dt:GroupOfProperties dt:GUID="c1436d3b51ca4818882e3adcd99236fd" dateOfCreation="2022-05-06T00:00:00+00:00">
+    <dt:Name language="pt">Dados gerais</dt:Name>
+    <dt:Name language="en">General data</dt:Name>
+    <dt:Definition language="pt">Esta categoria inclui dados de identificação e discrição do produto</dt:Definition>
+    <dt:Definition language="en">This category includes product identification and discription</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:HasPropertyRef dt:GUID="dcf813f681d941b09947a73411853dee"/>
+    <dt:HasPropertyRef dt:GUID="74d8c396bc0c463389b7fd2144072268"/>
+    <dt:HasPropertyRef dt:GUID="91ef06456c2c420a8c060fcc813452d9"/>
+    <dt:HasPropertyRef dt:GUID="9910eb7cd2914eac96def42ef14a3948"/>
+    <dt:HasPropertyRef dt:GUID="cd55f3b748614064b4884a9098097000"/>
+    <dt:HasPropertyRef dt:GUID="0edbd799c0674b60861b739e281f91f4"/>
+  </dt:GroupOfProperties>
+  <dt:GroupOfProperties dt:GUID="eb5abf5a97e546489826328eac212559" dateOfCreation="2022-05-06T00:00:00+00:00">
+    <dt:Name language="pt">Dados geométricos</dt:Name>
+    <dt:Name language="en">Geometrical data</dt:Name>
+    <dt:Definition language="pt">Esta categoria inclui dados que descrevem as propriedades físicas do produto</dt:Definition>
+    <dt:Definition language="en">This category includes data that describes the physical properties of the product</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:HasPropertyRef dt:GUID="01486c4404334e32b01e1531ee681926"/>
+    <dt:HasPropertyRef dt:GUID="102cf0b8b11b4887a02bd1c6b986389b"/>
+    <dt:HasPropertyRef dt:GUID="c63eaa3f42fd42dd8d2c3946420e740d"/>
+    <dt:HasPropertyRef dt:GUID="9a1ddce509264427adcfa92f23e72921"/>
+  </dt:GroupOfProperties>
+  <dt:GroupOfProperties dt:GUID="9deb9cab9dbe489f98f166339035fed6" dateOfCreation="2022-05-06T00:00:00+00:00">
+    <dt:Name language="pt">Dados de gestão de instalações</dt:Name>
+    <dt:Name language="en">Facility management data</dt:Name>
+    <dt:Definition language="pt">Esta categoria inclui dados que apoiam a fase de gestão das instalações no ciclo de vida deste produto</dt:Definition>
+    <dt:Definition language="en">This category includes data that supports the facility management phase in this product's lifecycle</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:HasPropertyRef dt:GUID="a0e30649600043e9a48d9a5f6b1661f8"/>
+    <dt:HasPropertyRef dt:GUID="992198967d1e4d0a9f87a401dcfff225"/>
+    <dt:HasPropertyRef dt:GUID="4025df51ba064254a041119f454fd7cc"/>
+    <dt:HasPropertyRef dt:GUID="65376bcb7b324cb58ca6b82ee19e0e66"/>
+    <dt:HasPropertyRef dt:GUID="c78df3144c304bf0804e5ea0fce821d9"/>
+    <dt:HasPropertyRef dt:GUID="cf0bba2b8da64320adde114bb20b34dc"/>
+    <dt:HasPropertyRef dt:GUID="41ae4130b5d847498c5c6cb2af81ae22"/>
+    <dt:HasPropertyRef dt:GUID="7c8eba7adb0f46ec9e606329eff2c3e4"/>
+    <dt:HasPropertyRef dt:GUID="c1371efd75e24c408ed2d82f68dbf1e3"/>
+    <dt:HasPropertyRef dt:GUID="d9926ec81f834645b242c6df10d1417d"/>
+    <dt:HasPropertyRef dt:GUID="8cc60abeb30a43b8a42a26df67c3eccb"/>
+  </dt:GroupOfProperties>
+  <dt:GroupOfProperties dt:GUID="4024d31b1f1d489db377711f847f8156" dateOfCreation="2022-05-06T00:00:00+00:00">
+    <dt:Name language="pt">Dados do fabricante</dt:Name>
+    <dt:Name language="en">Manufacturer data</dt:Name>
+    <dt:Definition language="pt">Esta categoria inclui informação sobre o fabricante e dados específicos que o fabricante fornece sobre o produto</dt:Definition>
+    <dt:Definition language="en">This category includes information about the manufacturer and specific data that the manufacturer provides about the product</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:HasPropertyRef dt:GUID="8fc2055e1787437d8466e5b5708001c5"/>
+    <dt:HasPropertyRef dt:GUID="a6f43f611eaf4ecca9ee58671fc747c5"/>
+    <dt:HasPropertyRef dt:GUID="8bb2064de2ec4b9e8047c629d051190d"/>
+    <dt:HasPropertyRef dt:GUID="fa38ba90a3cc4658af595d634e25aba5"/>
+    <dt:HasPropertyRef dt:GUID="cf975c1391a84a22a70bbac05b30bc51"/>
+    <dt:HasPropertyRef dt:GUID="ae348b27ac9248c88451a6126598d886"/>
+    <dt:HasPropertyRef dt:GUID="c56bca0c39bf439e857ed5e407f72a01"/>
+    <dt:HasPropertyRef dt:GUID="1fd6c7bbb64f4adb8e52cdc34248ae9c"/>
+    <dt:HasPropertyRef dt:GUID="78e27a71faf94363a51e4801631fcf4b"/>
+    <dt:HasPropertyRef dt:GUID="de786ea559eb4137bbeac91ad82965b6"/>
+    <dt:HasPropertyRef dt:GUID="ce077379f5664fbe8795416de036754e"/>
+    <dt:HasPropertyRef dt:GUID="cb7a3b6b80784cd0843a14db9e7d3b70"/>
+    <dt:HasPropertyRef dt:GUID="8752084b64184ec8b76912f3db41060c"/>
+    <dt:HasPropertyRef dt:GUID="0c9866d845964df9b87e19331f4bc4cb"/>
+    <dt:HasPropertyRef dt:GUID="86ac6d55492a40ffae2fad3cf49b30cc"/>
+    <dt:HasPropertyRef dt:GUID="aaaffd4107fe4c14a9b9db2bd6f8249f"/>
+    <dt:HasPropertyRef dt:GUID="d12ecb0bb9cd4203bccea390ba910ed6"/>
+    <dt:HasPropertyRef dt:GUID="33e05609f83e435b8f663e91dd7f694e"/>
+    <dt:HasPropertyRef dt:GUID="e9c5ccce8a3c43e2988abdab8254f380"/>
+    <dt:HasPropertyRef dt:GUID="fe68ee90c5694e5db358e857158c8da5"/>
+    <dt:HasPropertyRef dt:GUID="a2a391b4cf1348c5839d7c05644b0813"/>
+    <dt:HasPropertyRef dt:GUID="b79995cef4e24c81beef21e56b08759c"/>
+    <dt:HasPropertyRef dt:GUID="8917d897d76f4e14bdca76a160e5e85c"/>
+    <dt:HasPropertyRef dt:GUID="fee39e56e0404e2d8849314e39063d21"/>
+    <dt:HasPropertyRef dt:GUID="a654e8860cba464f8c654400d8c92ba8"/>
+    <dt:HasPropertyRef dt:GUID="203f809ebe854ed49ed94564bc8cb428"/>
+    <dt:HasPropertyRef dt:GUID="c52c0d26bd86406990cc037c30c1a21b"/>
+    <dt:HasPropertyRef dt:GUID="5f06d01eac4e401fbeba0459db39a6e0"/>
+    <dt:HasPropertyRef dt:GUID="37b3950a476f4d9c89384bc524f41dd7"/>
+    <dt:HasPropertyRef dt:GUID="a90a3aa948984a6e859a6daad9d70e1a"/>
+    <dt:HasPropertyRef dt:GUID="97f6c74363f445abb9875af754995359"/>
+  </dt:GroupOfProperties>
+  <dt:GroupOfProperties dt:GUID="ba9e98ad524e4ca594b219d20db1ed27" dateOfCreation="2022-05-06T00:00:00+00:00">
+    <dt:Name language="pt">Dados de sustentabilidade</dt:Name>
+    <dt:Name language="en">Sustainability data</dt:Name>
+    <dt:Definition language="pt">Esta categoria inclui dados que descrevem o desempenho ambiental do produto</dt:Definition>
+    <dt:Definition language="en">This category includes data that describe the environmental performance of the product</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:HasPropertyRef dt:GUID="fee932c3ad1a4e9283a88670d50b12cc"/>
+    <dt:HasPropertyRef dt:GUID="5c389b0ddb6b46d0b47e61977fa60ee9"/>
+    <dt:HasPropertyRef dt:GUID="eedfc0b5190045669049fa9fa3406ffa"/>
+    <dt:HasPropertyRef dt:GUID="8df4ef60cbf94169a9d5405c7ca8631e"/>
+    <dt:HasPropertyRef dt:GUID="c34f6d1a74cd49a08e26eaeb307e458c"/>
+    <dt:HasPropertyRef dt:GUID="6ae6e2cce1fa4707b1ba5290cfa68c98"/>
+    <dt:HasPropertyRef dt:GUID="d8ca72cd39de4fc6b83bea6dcb07c48a"/>
+    <dt:HasPropertyRef dt:GUID="ab6c6a6b82f545ab918ee609931ab131"/>
+    <dt:HasPropertyRef dt:GUID="69b559a73ab84a93a4cc6bda7f253f95"/>
+    <dt:HasPropertyRef dt:GUID="80f85e6efbd544a38ac7780b76581c44"/>
+    <dt:HasPropertyRef dt:GUID="715f15deb16a43c994268416cda75c06"/>
+    <dt:HasPropertyRef dt:GUID="c5b9ba15afaf40e3877f6f64df537fde"/>
+    <dt:HasPropertyRef dt:GUID="e8e832eb16b746b1a75f1816e693d6a5"/>
+    <dt:HasPropertyRef dt:GUID="5767681921ba4f8883e47c3009e5c301"/>
+    <dt:HasPropertyRef dt:GUID="c66e900f05674eb8b49c96332f9e8de6"/>
+    <dt:HasPropertyRef dt:GUID="51db70ebcfd8477b983f6ce78c47e1d0"/>
+    <dt:HasPropertyRef dt:GUID="d08a3ad2f38244ef9e205078c3a5ac3a"/>
+    <dt:HasPropertyRef dt:GUID="b2eb2c55d81f456aad26170832e9441a"/>
+    <dt:HasPropertyRef dt:GUID="cc46dd921f7c4f9ab2cf88266e9d4e8e"/>
+    <dt:HasPropertyRef dt:GUID="42b59e0489ea4119a501c185b41b04b8"/>
+    <dt:HasPropertyRef dt:GUID="107f963642194c1da7158ea1f0f3dbd9"/>
+    <dt:HasPropertyRef dt:GUID="67c0fca4eee14d5599f744ae08265537"/>
+    <dt:HasPropertyRef dt:GUID="feb7c008bbfa4222b088b8fcd5202b21"/>
+    <dt:HasPropertyRef dt:GUID="5417fc0ff2a248f2a5f1330ae276a704"/>
+    <dt:HasPropertyRef dt:GUID="fdc4fdcc770c44b1b7cd5a641b7e8247"/>
+    <dt:HasPropertyRef dt:GUID="79e7b9ef865f4ceea52d4dfb7d8fa42f"/>
+    <dt:HasPropertyRef dt:GUID="93ad9ed951174e3780832eb5df0b3f5d"/>
+    <dt:HasPropertyRef dt:GUID="2e5529f8988f4c79b83366e3a6d6a996"/>
+    <dt:HasPropertyRef dt:GUID="d597e7ae8a124341a3401dc36fbf6f33"/>
+    <dt:HasPropertyRef dt:GUID="eff7132382d94cbb89087b04c0463f44"/>
+    <dt:HasPropertyRef dt:GUID="303c35dc322c4f5384821206244e8706"/>
+    <dt:HasPropertyRef dt:GUID="dd9f360281224620ad66cf1e5559a39a"/>
+    <dt:HasPropertyRef dt:GUID="ad25685569ee4ca3ba0e99b0dea3a9f2"/>
+    <dt:HasPropertyRef dt:GUID="910a91186a7d43008fa90feb61bca54a"/>
+    <dt:HasPropertyRef dt:GUID="a1e63749b1d346fdbfddd269196f4e5f"/>
+    <dt:HasPropertyRef dt:GUID="c4a90fb5237b489cbe12e3293f2a8aae"/>
+    <dt:HasPropertyRef dt:GUID="c6d6602cfe5040e296d381105fad91ed"/>
+    <dt:HasPropertyRef dt:GUID="87d7fa5753cd4764abd9fb106f155339"/>
+    <dt:HasPropertyRef dt:GUID="afc77dba81524af49ad7d8715d314507"/>
+    <dt:HasPropertyRef dt:GUID="82ebe7453f9b489b9bb40d2d6050b4f8"/>
+    <dt:HasPropertyRef dt:GUID="4a455616db7641e48ecf61a683b22785"/>
+    <dt:HasPropertyRef dt:GUID="0c761976007f4e7b896028b56acbff46"/>
+    <dt:HasPropertyRef dt:GUID="5b083d80f7c2483d93183e91b8b81275"/>
+    <dt:HasPropertyRef dt:GUID="3b1cb0ddeee444e6a3116552ae922a48"/>
+  </dt:GroupOfProperties>
+  <dt:Property dt:GUID="01486c4404334e32b01e1531ee681926" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">AlturaNominal</dt:Name>
+    <dt:Name language="en">NominalHeight</dt:Name>
+    <dt:Definition language="pt">Tipicamente a dimensão característica vertical ou secundária do produto, ex. 300</dt:Definition>
+    <dt:Definition language="en">Typically the vertical or secondary characteristic dimension, ex. 300</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:DimensionRef dt:GUID="L"/>
+    <dt:QuantityKindRef dt:GUID="milli metre | en.EN"/>
+  </dt:Property>
+  <dt:Property dt:GUID="0c761976007f4e7b896028b56acbff46" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">FaseDoCicloDeVida</dt:Name>
+    <dt:Name language="en">LifeCyclePhase</dt:Name>
+    <dt:Definition language="pt">Todo o ciclo de vida ou apenas uma determinada fase a partir da qual os dados ambientais são válidos, ex. A1- A3 (Fase de produção)</dt:Definition>
+    <dt:Definition language="en">The whole life cycle or only a given phase from which environmental data are valid, ex. A1- A3 (Production stage)</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="0c9866d845964df9b87e19331f4bc4cb" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">EstimativaCustosManutencaoFuturos</dt:Name>
+    <dt:Name language="en">FutureCostAssumptions</dt:Name>
+    <dt:Definition language="pt">Estimativas de custos para a manutenção do elemento durante o seu ciclo de vida, ex. 50 EUR</dt:Definition>
+    <dt:Definition language="en">Costs estimates for maintaining the element during its lifecycle, ex. 50EUR</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="0edbd799c0674b60861b739e281f91f4" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">DOPurl</dt:Name>
+    <dt:Name language="en">DOPurl</dt:Name>
+    <dt:Definition language="pt">URL para o documento DoP (PDF, ou versão digital)</dt:Definition>
+    <dt:Definition language="en">A URL to the DoP document (PDF, or digital version)</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="0edbd799c0674b60861b739e281f91f4" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">UrlDOP</dt:Name>
+    <dt:Name language="en">UrlDOP</dt:Name>
+    <dt:Definition language="pt">URL para o documento DoP (PDF, ou versão digital)</dt:Definition>
+    <dt:Definition language="en">A URL to the DoP document (PDF, or digital version)</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>2</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="102cf0b8b11b4887a02bd1c6b986389b" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">ComprimentoNominal</dt:Name>
+    <dt:Name language="en">NominalLength</dt:Name>
+    <dt:Definition language="pt">Tipicamente a maior dimensão horizontal, ou dimensão característica horizontal primária, do produto, ex. 5000</dt:Definition>
+    <dt:Definition language="en">Typically the larger or primary horizontal dimension., ex. 5000</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:DimensionRef dt:GUID="L"/>
+    <dt:QuantityKindRef dt:GUID="milli metre | en.EN"/>
+  </dt:Property>
+  <dt:Property dt:GUID="107f963642194c1da7158ea1f0f3dbd9" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">PotencialDeEutrofizacaoFraccaoDeNutrientesQueAtingemOCompartimentoFinalMarinho</dt:Name>
+    <dt:Name language="en">EutrophicationPotentialFractionOfNutrientsReachingMarineEndCompartment</dt:Name>
+    <dt:Definition language="pt">uma medida da eutrofização causada pelas emissões que atingem a água marinha</dt:Definition>
+    <dt:Definition language="en">a measure of the eutrophication caused by emissions reaching marine water</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Kilogram"/>
+  </dt:Property>
+  <dt:Property dt:GUID="1fd6c7bbb64f4adb8e52cdc34248ae9c" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">DataAquisicao</dt:Name>
+    <dt:Name language="en">AcquisitionDate</dt:Name>
+    <dt:Definition language="pt">A data em que o artigo fabricado foi comprado, ex. 31/12/1999 23:59:59</dt:Definition>
+    <dt:Definition language="en">The date that the manufactured item was purchased, ex. 31/12/1999 23:59:59</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="203f809ebe854ed49ed94564bc8cb428" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">FimValidade</dt:Name>
+    <dt:Name language="en">EndOfValidity</dt:Name>
+    <dt:Definition language="pt">A data de fim de validade do artigo, ex. 31/12/1999</dt:Definition>
+    <dt:Definition language="en">The end date of validity of the article, ex. 31/12/1999</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="2e5529f8988f4c79b83366e3a6d6a996" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">RecursosPrimariosRenovaveisComConteudoEnergeticoUtilizadosComoMaterial</dt:Name>
+    <dt:Name language="en">RenewablePrimaryResourcesWithEnergyContentUsedAsMaterial</dt:Name>
+    <dt:Definition language="pt">Materiais de base biológica utilizados (primeira utilização) como materiais (por exemplo, madeira, cânhamo, etc.).</dt:Definition>
+    <dt:Definition language="en">Bio-based materials used (first use) as materials (e.g. wood, hemp, etc.).</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Mega Joule"/>
+  </dt:Property>
+  <dt:Property dt:GUID="303c35dc322c4f5384821206244e8706" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">ConsumoDeAguaDoce</dt:Name>
+    <dt:Name language="en">ConsumptionOfFreshwater</dt:Name>
+    <dt:Definition language="pt">água doce líquida a entrar no sistema de produto em estudo que não é devolvida à mesma bacia de drenagem de onde provém</dt:Definition>
+    <dt:Definition language="en">net freshwater entering the product system being studied that is not returned to the same drainage basin from which it originated</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="cubic metre"/>
+  </dt:Property>
+  <dt:Property dt:GUID="33e05609f83e435b8f663e91dd7f694e" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">Categoria</dt:Name>
+    <dt:Name language="en">Category</dt:Name>
+    <dt:Definition language="pt">Categoria à qual o produto corresponde, ex. Portas de correr</dt:Definition>
+    <dt:Definition language="en">Category to which the product corresponds, ex. Sliding doors</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="33e05609f83e435b8f663e91dd7f694e" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">Categoria</dt:Name>
+    <dt:Name language="en">Category</dt:Name>
+    <dt:Definition language="pt">Categoria do produto quando existem produtos semelhantes pertencentes ao mesmo tipo de produto. Por exemplo, os azulejos de cerâmica têm várias categorias que podem ser utilizadas em diferentes contextos. Ex: ladrilho de chão, rodapé, ladrilho de parede, ... </dt:Definition>
+    <dt:Definition language="en">Category of the product when similar products exist belonging to the same product type. For example ceramic tiles have several categories that can be used in different context. Ex: Floor tile, Skirting, Wall tile, … </dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>2</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="37b3950a476f4d9c89384bc524f41dd7" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">TipoDocumento</dt:Name>
+    <dt:Name language="en">DocumentType</dt:Name>
+    <dt:Definition language="pt">Tipo de anexo/bens digitais, ex. PDF or PNG</dt:Definition>
+    <dt:Definition language="en">Type of attachment/digital asset, ex. PDF or PNG</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="3b1cb0ddeee444e6a3116552ae922a48" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">EPDUnidade</dt:Name>
+    <dt:Name language="en">EPDUnit</dt:Name>
+    <dt:Definition language="pt">A unidade com a qual os valores dos indicadores ambientais estão relacionados, ex. 1 peça de porta de aço</dt:Definition>
+    <dt:Definition language="en">The unit of the quantity the environmental indicators values are related with, ex. 1 piece of steel door</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="3b1cb0ddeee444e6a3116552ae922a48" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">UnidadeEPD</dt:Name>
+    <dt:Name language="en">EPDUnit</dt:Name>
+    <dt:Definition language="pt">A unidade com a qual os valores dos indicadores ambientais estão relacionados, ex. 1 peça de porta de aço</dt:Definition>
+    <dt:Definition language="en">The unit of the quantity the environmental indicators values are related with, ex. 1 piece of steel door</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>2</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="3f0daaecf9684dcc8b7f90dfd46a278b" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">&lt;SistemaClassificacao&gt;&lt;Tabela&gt;Codigo</dt:Name>
+    <dt:Name language="en">&lt;ClassificationSystem&gt;&lt;Table&gt;Code</dt:Name>
+    <dt:Definition language="pt">Código de classificação do produto, ex. Uniclass2015Pr20_85_08</dt:Definition>
+    <dt:Definition language="en">Classification code of the product, ex. Uniclass2015Pr20_85_08</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="3f0daaecf9684dcc8b7f90dfd46a278b" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">Classificacao&lt;Sistema&gt;&lt;Tabela&gt;Codigo</dt:Name>
+    <dt:Name language="en">Classification&lt;System&gt;&lt;Table&gt;Code</dt:Name>
+    <dt:Definition language="pt">Código de classificação do produto, ex. ClassificacaoSECClasSPr20_85_08</dt:Definition>
+    <dt:Definition language="en">Classification code of the product, ex. ClassificationSECClasSPr20_85_08</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>2</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="3f0daaecf9684dcc8b7f90dfd46a278b" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">Classificacao&lt;Sistema&gt;&lt;Tabela&gt;Codigo</dt:Name>
+    <dt:Name language="en">Classification&lt;System&gt;&lt;Table&gt;Code</dt:Name>
+    <dt:Definition language="pt">Código de classificação do produto, ex. ClassificacaoSecclassProdutosNumero = Pr_20_85_08</dt:Definition>
+    <dt:Definition language="en">Classification code of the product, ex. ClassificationSecclassProductsNumber = Pr_20_85_08</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>3</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="4025df51ba064254a041119f454fd7cc" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">DuracaoGarantiaDasPecas</dt:Name>
+    <dt:Name language="en">WarrantyDurationParts</dt:Name>
+    <dt:Definition language="pt">Duração da garantia das peças, ex. 5 anos</dt:Definition>
+    <dt:Definition language="en">Duration of parts warranty., ex. 5 years</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="41ae4130b5d847498c5c6cb2af81ae22" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">IdentificadorGarantia</dt:Name>
+    <dt:Name language="en">WarrantyIdentifier</dt:Name>
+    <dt:Definition language="pt">O identificador atribuído a uma garantia</dt:Definition>
+    <dt:Definition language="en">The identifier assigned to a warranty</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="42b59e0489ea4119a501c185b41b04b8" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">PotencialDeEutrofizacaoFraccaoDeNutrientesQueAtinfemOCompartimentoFinalDeAguaDoce</dt:Name>
+    <dt:Name language="en">EutrophicationPotentialFractionOfNutrientsReachingFreshwaterEndCompartment</dt:Name>
+    <dt:Definition language="pt">uma medida da eutrofização causada pelas emissões que atingem a água doce</dt:Definition>
+    <dt:Definition language="en">a measure of the eutrophication caused by emissions reaching freshwater</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Kilogram"/>
+  </dt:Property>
+  <dt:Property dt:GUID="42b59e0489ea4119a501c185b41b04b8" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">PotencialDeEutrofizacaoFraccaoDeNutrientesQueAtingemOCompartimentoFinalDeAguaDoce</dt:Name>
+    <dt:Name language="en">EutrophicationPotentialFractionOfNutrientsReachingFreshwaterEndCompartment</dt:Name>
+    <dt:Definition language="pt">uma medida da eutrofização causada pelas emissões que atingem a água doce</dt:Definition>
+    <dt:Definition language="en">a measure of the eutrophication caused by emissions reaching freshwater</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>2</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Kilogram"/>
+  </dt:Property>
+  <dt:Property dt:GUID="441cccb1b9ef44db9b5bfc16f5b66115" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">&lt;SistemaClassificacao&gt;&lt;Tabela&gt;Versao</dt:Name>
+    <dt:Name language="en">&lt;ClassificationSystem&gt;&lt;Table&gt;Version</dt:Name>
+    <dt:Definition language="pt">Versão do sistema de classificação utilizado, ex. Uniclass2015Prv1.4</dt:Definition>
+    <dt:Definition language="en">Classification system version used, ex. Uniclass2015Prv1.4</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="441cccb1b9ef44db9b5bfc16f5b66115" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">Classificacao&lt;Sistema&gt;&lt;Tabela&gt;Versao</dt:Name>
+    <dt:Name language="en">Classification&lt;System&gt;&lt;Table&gt;Version</dt:Name>
+    <dt:Definition language="pt">Versão do sistema de classificação utilizado, ex. ClassificacaoSECClasSPrV1.4</dt:Definition>
+    <dt:Definition language="en">Classification system version used, ex. ClassificationSECClasSPrV1.4</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>2</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="441cccb1b9ef44db9b5bfc16f5b66115" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">Classificacao&lt;Sistema&gt;&lt;Tabela&gt;Versao</dt:Name>
+    <dt:Name language="en">Classification&lt;System&gt;&lt;Table&gt;Version</dt:Name>
+    <dt:Definition language="pt">Versão do sistema de classificação utilizado, ex. ClassificacaoSecclassProdutosVersao = v1.4</dt:Definition>
+    <dt:Definition language="en">Classification system version used, ex. ClassificationSecclassProductsVersion  = v1.4</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>3</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="4a455616db7641e48ecf61a683b22785" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">MateriaisParaReciclagem</dt:Name>
+    <dt:Name language="en">MaterialsForRecycling</dt:Name>
+    <dt:Definition language="pt">Material secundário para utilização no próximo sistema de produtos</dt:Definition>
+    <dt:Definition language="en">Secondary material for use in the next product system</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Kilogram"/>
+  </dt:Property>
+  <dt:Property dt:GUID="51db70ebcfd8477b983f6ce78c47e1d0" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">AumentoDaConcentracaoDeOzonoTroposferico</dt:Name>
+    <dt:Name language="en">TroposphericOzoneConcentrationIncrease</dt:Name>
+    <dt:Definition language="pt">medida da quantidade de ozono na troposfera (à superfície da terra) onde causa smog de verão</dt:Definition>
+    <dt:Definition language="en">measure of the amoutn of ozone in the troposphere (at the earths surface) where it causes summer smog</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Kilogram"/>
+  </dt:Property>
+  <dt:Property dt:GUID="5417fc0ff2a248f2a5f1330ae276a704" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">RecursosPrimariosNaoRenovaveisComConteudoEnergeticoUtilizadoComoMaterial</dt:Name>
+    <dt:Name language="en">NonRenewablePrimaryResourcesWithEnergyContentUsedAsMaterial</dt:Name>
+    <dt:Definition language="pt">Recursos primários tais como petróleo, gás e carvão, utilizados (primeira utilização) para produtos (por exemplo, produtos à base de plástico).</dt:Definition>
+    <dt:Definition language="en">Primary resources such as oil, gas and coal, used (first use) for products (e.g. plastic-based products).</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Mega Joule"/>
+  </dt:Property>
+  <dt:Property dt:GUID="5767681921ba4f8883e47c3009e5c301" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">PotencialDeAquecimentoGlobalUsoDoSoloEMudancaDeUsoDoSolo</dt:Name>
+    <dt:Name language="en">GlobalWarmingPotentialLandUseAndLandUseChange</dt:Name>
+    <dt:Definition language="pt">factor que descreve o potencial impacto radiante forçador das emissões e das emissões de carbono (CO2, CO e CH4) provenientes de alterações do carbono armazenado causadas pelo uso do solo durante um determinado período de tempo e por alterações do uso do solo.</dt:Definition>
+    <dt:Definition language="en">factor describing the potential radiative forcing impact of carbon uptakes and emissions (CO2, CO and CH4) originating from carbon stock changes caused by land use change and land use over a given period of time</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Kilogram"/>
+  </dt:Property>
+  <dt:Property dt:GUID="5b083d80f7c2483d93183e91b8b81275" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">FasesDoCicloDeVidaOmitidas</dt:Name>
+    <dt:Name language="en">LifeCycleStagesOmitted</dt:Name>
+    <dt:Definition language="pt">Fases do ciclo de vida omitidas nos cálculos da Declaração Ambiental do Produto, ex. B1 - B7 (fase de utilização), C1 - C4 (fase de fim de vida)</dt:Definition>
+    <dt:Definition language="en">Life cycle stages omitted from the Environmental Product Declaration calculations, ex. B1 - B7 (use stage), C1 - C4 (end of life stage).</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="5c389b0ddb6b46d0b47e61977fa60ee9" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">DataListaREACH</dt:Name>
+    <dt:Name language="en">REACHListDate</dt:Name>
+    <dt:Definition language="pt">Data, em que o produto foi verificado pelo fabricante para REACH, ex. 31/12/1900</dt:Definition>
+    <dt:Definition language="en">Date, on which the product was checked by the manufacturer for REACH.</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="5f06d01eac4e401fbeba0459db39a6e0" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">DocumentoURL</dt:Name>
+    <dt:Name language="en">Documenturl</dt:Name>
+    <dt:Definition language="pt">URL do anexo/bens digitais.</dt:Definition>
+    <dt:Definition language="en">URL to the attachment/digital asset</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="5f06d01eac4e401fbeba0459db39a6e0" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">&lt;Annexo&gt;Url</dt:Name>
+    <dt:Name language="en">&lt;Attachment&gt;Url</dt:Name>
+    <dt:Definition language="pt">URL para o anexo/ativo digital referenciado ex. ProdutoFotourl = www.manufcaturer.com/product/photo</dt:Definition>
+    <dt:Definition language="en">URL to the referenced attachment/digital asset ex. ProductPhotourl = www.manufcaturer.com/product/photo</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>2</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="65376bcb7b324cb58ca6b82ee19e0e66" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">ResponsavelGarantiaDeServico</dt:Name>
+    <dt:Name language="en">WarrantyGuarantorLabor</dt:Name>
+    <dt:Definition language="pt">Endereço de e-mail da organização responsável pela garantia de serviço</dt:Definition>
+    <dt:Definition language="en">Email address for the organisation responsible for the labour warranty.</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="67c0fca4eee14d5599f744ae08265537" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">PotencialPrivacaoDeAguaConsumoDeAguaPonderado</dt:Name>
+    <dt:Name language="en">WaterDeprivationPotentialDeprivationWeightedWaterConsumption</dt:Name>
+    <dt:Definition language="pt">unidade para a categoria de impacto de utilização de água</dt:Definition>
+    <dt:Definition language="en">unit for the impact category water use</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="cubic metre"/>
+  </dt:Property>
+  <dt:Property dt:GUID="69b559a73ab84a93a4cc6bda7f253f95" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">ResiduosInertes</dt:Name>
+    <dt:Name language="en">InertWaste</dt:Name>
+    <dt:Definition language="pt">Quantidade de resíduos inertes gerados</dt:Definition>
+    <dt:Definition language="en">Quantity of inert waste generated</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Kilogram"/>
+  </dt:Property>
+  <dt:Property dt:GUID="6ae6e2cce1fa4707b1ba5290cfa68c98" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">ItemEReciclado</dt:Name>
+    <dt:Name language="en">ItemIsRecycled</dt:Name>
+    <dt:Definition language="pt">Indicação se este item é reciclado (= VERDADEIRO) ou não (= FALSO)</dt:Definition>
+    <dt:Definition language="en">Indication of whether this item is recycled (=TRUE) or not (= FALSE)</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="6ae6e2cce1fa4707b1ba5290cfa68c98" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">ItemEReciclado</dt:Name>
+    <dt:Name language="en">IsItemRecycled</dt:Name>
+    <dt:Definition language="pt">Indicação se este item é totalmente reciclado (= VERDADEIRO) ou não (= FALSO)</dt:Definition>
+    <dt:Definition language="en">Indication of whether this item is totally recycled (=TRUE) or not (= FALSE)</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>2</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="715f15deb16a43c994268416cda75c06" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">PotencialDeEsgotamentoAbioticoDosRecursosNaoFosseisMineraisEMetais</dt:Name>
+    <dt:Name language="en">AbioticDepletionPotentialForNonFossilResourcesMineralsAndMetals</dt:Name>
+    <dt:Definition language="pt">define a disponibilidade decrescente de recursos não - renováveis em resultado da sua extracção e escassez subjacentes, relacionados com elementos escassos e os seus minérios</dt:Definition>
+    <dt:Definition language="en">defines the decreasing availability of non - renewable resources as a result of their extraction and underlaying scarcity, relating to scarce elements and their ores</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Kilogram"/>
+  </dt:Property>
+  <dt:Property dt:GUID="74d8c396bc0c463389b7fd2144072268" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">Descricao</dt:Name>
+    <dt:Name language="en">Description</dt:Name>
+    <dt:Definition language="pt">Uma descrição geral do objeto.</dt:Definition>
+    <dt:Definition language="en">A general description of the object</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="78e27a71faf94363a51e4801631fcf4b" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">PesoLiquido</dt:Name>
+    <dt:Name language="en">NetWeight</dt:Name>
+    <dt:Definition language="pt">Peso líquido da unidade, excluindo embalagem de expedição, ex. 60</dt:Definition>
+    <dt:Definition language="en">Element net weight excluding shipping packaging, ex. 60 kg</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="79e7b9ef865f4ceea52d4dfb7d8fa42f" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">EnergiaRecuperada</dt:Name>
+    <dt:Name language="en">RecoveredEnergy</dt:Name>
+    <dt:Definition language="pt">Materiais não renováveis com conteúdo energético que tenham atravessado a fronteira do sistema entre sistemas de produtos e sejam utilizados como combustível (fonte de energia) noutro sistema de produtos (por exemplo, solventes processados, pneus triturados</dt:Definition>
+    <dt:Definition language="en">energy recovered from disposal of waste in previous systems, such as energy recovery from combustion of landfill gas or energy recovered from other systems using energy sources</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Mega Joule"/>
+  </dt:Property>
+  <dt:Property dt:GUID="79e7b9ef865f4ceea52d4dfb7d8fa42f" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">EnergiaRecuperada</dt:Name>
+    <dt:Name language="en">RecoveredEnergy</dt:Name>
+    <dt:Definition language="pt">Energia recuperada a partir da eliminação de resíduos em sistemas anteriores, tais como a recuperação de energia a partir da combustão de gás de aterro ou energia recuperada a partir de outros sistemas que utilizam fontes de energia</dt:Definition>
+    <dt:Definition language="en">energy recovered from disposal of waste in previous systems, such as energy recovery from combustion of landfill gas or energy recovered from other systems using energy sources</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>2</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Mega Joule"/>
+  </dt:Property>
+  <dt:Property dt:GUID="7c8eba7adb0f46ec9e606329eff2c3e4" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">DataFimGarantia</dt:Name>
+    <dt:Name language="en">WarrantyEndDate</dt:Name>
+    <dt:Definition language="pt">A data em que a garantia expira, ex. 31/12/1999 23:59:59</dt:Definition>
+    <dt:Definition language="en">The date on which the warranty expires, ex. 31/12/1999 23:59:59</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="80f85e6efbd544a38ac7780b76581c44" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">PotencialDeEsgotamentoAbioticoDosRecursosFosseis</dt:Name>
+    <dt:Name language="en">AbioticDepletionPotentialForFossilResources</dt:Name>
+    <dt:Definition language="pt">define a disponibilidade decrescente de recursos não - renováveis em resultado da sua extracção e escassez de materiais subjacentes, relacionados com combustíveis fósseis</dt:Definition>
+    <dt:Definition language="en">defines the decreasing availability of non - renewable resources as a result of their extraction and underlaying scarcity, relating to fossil fuels</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Mega Joule"/>
+  </dt:Property>
+  <dt:Property dt:GUID="82ebe7453f9b489b9bb40d2d6050b4f8" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">MateriaisParaRecuperacaoDeEnergia</dt:Name>
+    <dt:Name language="en">MaterialsForEnergyRecovery</dt:Name>
+    <dt:Definition language="pt">Combustíveis secundários para utilização no próximo sistema de produtos</dt:Definition>
+    <dt:Definition language="en">Secondary fuels for use in the next product system</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Kilogram"/>
+  </dt:Property>
+  <dt:Property dt:GUID="86ac6d55492a40ffae2fad3cf49b30cc" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">CustoEnvio</dt:Name>
+    <dt:Name language="en">ShippingCost</dt:Name>
+    <dt:Definition language="pt">Custo de envio para o local de instalação</dt:Definition>
+    <dt:Definition language="en">Cost of shipping to installation location</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="8752084b64184ec8b76912f3db41060c" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">CustoSubstituicao</dt:Name>
+    <dt:Name language="en">ReplacementCost</dt:Name>
+    <dt:Definition language="pt">Um custo indicativo para a substituição da unidade, ex. 200 EUR</dt:Definition>
+    <dt:Definition language="en">An indicative cost for unit replacement, ex. 200 EUR</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="87d7fa5753cd4764abd9fb106f155339" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">EnergiaElectricaExportada</dt:Name>
+    <dt:Name language="en">ExportedElectricalEnergy</dt:Name>
+    <dt:Definition language="pt">Quantidade de energia eléctrica disponível no mercado após incineração</dt:Definition>
+    <dt:Definition language="en">Amount of electrical energy available in the market after incineration</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Mega Joule"/>
+  </dt:Property>
+  <dt:Property dt:GUID="8917d897d76f4e14bdca76a160e5e85c" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">PaisDestino</dt:Name>
+    <dt:Name language="en">DataDeliveryCountry</dt:Name>
+    <dt:Definition language="pt">País para o qual está planeada a entrega de dados. Território (isto é, país, estado, região) codificado segundo a norma ISO 3166-1 Alpha2, ex. FR</dt:Definition>
+    <dt:Definition language="en">Country for which data delivery is planned. Territory (i.e. country, state, region) coded according to ISO 3166-1 Alpha2, ex. FR</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="8bb2064de2ec4b9e8047c629d051190d" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">ReferenciaModelo</dt:Name>
+    <dt:Name language="en">ModelReference</dt:Name>
+    <dt:Definition language="pt">O número do modelo ou designador do modelo do produto (ou linha de produtos), conforme atribuído pelo fabricante do artigo fabricado, ex. Porta metálica ASMD</dt:Definition>
+    <dt:Definition language="en">The model number or designator of the product model (or product line) as assigned by the manufacturer of the manufactured item, ex. ASMD Metal Door</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="8cc60abeb30a43b8a42a26df67c3eccb" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">DataInstalacao</dt:Name>
+    <dt:Name language="en">InstallationDate</dt:Name>
+    <dt:Definition language="pt">A data em que o artigo fabricado foi instalado, ex. 31/12/1999 23:59:59</dt:Definition>
+    <dt:Definition language="en">The date that the manufactured item was installed (per instance), ex. 31/12/1999 23:59:59</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="8df4ef60cbf94169a9d5405c7ca8631e" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">ItemENovo</dt:Name>
+    <dt:Name language="en">ItemIsNew</dt:Name>
+    <dt:Definition language="pt">Indicação de se este item é novo (= VERDADEIRO) ou não (= FALSO)</dt:Definition>
+    <dt:Definition language="en">Indication of whether this item is new (=TRUE) or not (= FALSE)</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="8df4ef60cbf94169a9d5405c7ca8631e" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">ItemENovo</dt:Name>
+    <dt:Name language="en">IsItemNew</dt:Name>
+    <dt:Definition language="pt">Indicação de se este item é novo (= VERDADEIRO) ou não (= FALSO)</dt:Definition>
+    <dt:Definition language="en">Indication of whether this item is new (=TRUE) or not (= FALSE)</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>2</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="8fc2055e1787437d8466e5b5708001c5" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">Fabricante</dt:Name>
+    <dt:Name language="en">Manufacturer</dt:Name>
+    <dt:Definition language="pt">A organização que fabricou e/ou montou o bem</dt:Definition>
+    <dt:Definition language="en">The organization that manufactured and/or assembled the item</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="910a91186a7d43008fa90feb61bca54a" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">ResiduosNaoPerigososEliminados</dt:Name>
+    <dt:Name language="en">NonHazardousWasteDisposed</dt:Name>
+    <dt:Definition language="pt">Os resíduos não perigosos são não tóxicos e semelhantes aos resíduos domésticos. É constituído por resíduos inertes e resíduos domésticos ordinários</dt:Definition>
+    <dt:Definition language="en">Non-hazardous waste is non-toxic and similar to household waste. It consists of inert waste and ordinary household waste</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Kilogram"/>
+  </dt:Property>
+  <dt:Property dt:GUID="91ef06456c2c420a8c060fcc813452d9" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">ReferenciaEPD</dt:Name>
+    <dt:Name language="en">EPDReference</dt:Name>
+    <dt:Definition language="pt">Referência do documento de Declaração de Projecto Ambiental</dt:Definition>
+    <dt:Definition language="en">Reference of the Environmental Project Declaration document</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="91ef06456c2c420a8c060fcc813452d9" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">NumeroDeRegistoDAP</dt:Name>
+    <dt:Name language="en">EPDRegistrationNumber</dt:Name>
+    <dt:Definition language="pt">Número de registo do documento de declaração do projeto ambiental</dt:Definition>
+    <dt:Definition language="en">Registration number of the Environmental Project Declaration document</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>2</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="93ad9ed951174e3780832eb5df0b3f5d" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">RecursosPrimariosRenovaveisUtilizadosComoTransportadoresDeEnergiaCombustivel</dt:Name>
+    <dt:Name language="en">RenewablePrimaryResourcesUsedAsAnEnergyCarrierFuel</dt:Name>
+    <dt:Definition language="pt">Os materiais de base biológica utilizados (primeira utilização) como fonte de energia e a energia hídrica, solar e eólica utilizada na tecnoesfera estão incluídos.</dt:Definition>
+    <dt:Definition language="en">Bio-based materials used (first use) as an energy source and hydropower, solar and wind power used in the technosphere are included.</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Mega Joule"/>
+  </dt:Property>
+  <dt:Property dt:GUID="97f6c74363f445abb9875af754995359" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">PaisOrigem</dt:Name>
+    <dt:Name language="en">CountryOfOrigin</dt:Name>
+    <dt:Definition language="pt">O país de origem é o país onde o artigo foi fabricado, ou a última etapa essencial do processamento foi concluída. Descrição do país de acordo com &gt;&gt;ISO-3166-1 Alpha2&lt;&lt; (Códigos de Subdivisão do País). Os códigos dos países devem ser escritos em 2 letras maiúsculas, ex. PT</dt:Definition>
+    <dt:Definition language="en">Country of origin is the country where the article was manufactured, or the last essential processing step was completed. Description of the country according to &gt;&gt;ISO-3166-1 Alpha2&lt;&lt; (Country Subdivision Codes). Country codes must be written in 2 capital letters, ex. PT</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="9910eb7cd2914eac96def42ef14a3948" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">EPDurl</dt:Name>
+    <dt:Name language="en">EPDurl</dt:Name>
+    <dt:Definition language="pt">URL para o documento da EPD (PDF, ou versão digital)</dt:Definition>
+    <dt:Definition language="en">A URL to the EPD document (PDF, or digital version)</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="9910eb7cd2914eac96def42ef14a3948" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">UrlEPD</dt:Name>
+    <dt:Name language="en">UrlEPD</dt:Name>
+    <dt:Definition language="pt">URL para o documento da EPD (PDF, ou versão digital)</dt:Definition>
+    <dt:Definition language="en">A URL to the EPD document (PDF, or digital version)</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>2</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="9910eb7cd2914eac96def42ef14a3948" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">ReferenciaDAP</dt:Name>
+    <dt:Name language="en">ReferenceToOriginalEPD</dt:Name>
+    <dt:Definition language="pt">uma hiperligação para a DAP original de acordo com a norma PCR</dt:Definition>
+    <dt:Definition language="en">a hyperlink to the original EPD according to standard PCR</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>2</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="992198967d1e4d0a9f87a401dcfff225" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">DuracaoGarantiaDeServico</dt:Name>
+    <dt:Name language="en">WarrantyDurationLabor</dt:Name>
+    <dt:Definition language="pt">A duração da garantia laboral, ex. 5 anos</dt:Definition>
+    <dt:Definition language="en">Duration of labour warranty., ex. 5 years</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="9a1ddce509264427adcfa92f23e72921" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">Forma</dt:Name>
+    <dt:Name language="en">Shape</dt:Name>
+    <dt:Definition language="pt">Forma característica do produto, ex. Rectângulo</dt:Definition>
+    <dt:Definition language="en">Characteristic shape of product, ex. Rectangle</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="a0e30649600043e9a48d9a5f6b1661f8" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">ConteudoGarantia</dt:Name>
+    <dt:Name language="en">WarrantyContent</dt:Name>
+    <dt:Definition language="pt">Uma descrição geral do conteúdo da garantia.</dt:Definition>
+    <dt:Definition language="en">A general description of the content of the warranty.</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="a1e63749b1d346fdbfddd269196f4e5f" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">MassaTotalDeResiduosRadioactivosEliminados</dt:Name>
+    <dt:Name language="en">TotalRadioactiveWasteDisposedMass</dt:Name>
+    <dt:Definition language="pt">A soma, em massa, dos resíduos radioactivos de alto, médio e baixo nível, acondicionados, até ao depósito final</dt:Definition>
+    <dt:Definition language="en">The sum, in weight, high-, intermediate- and low-level radioactive waste, conditioned, to final repository</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Kilogram"/>
+  </dt:Property>
+  <dt:Property dt:GUID="a2a391b4cf1348c5839d7c05644b0813" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">Material</dt:Name>
+    <dt:Name language="en">Material</dt:Name>
+    <dt:Definition language="pt">Material primário ou característico do produto., ex. Madeira de pinho</dt:Definition>
+    <dt:Definition language="en">Characteristic or primary material of product., ex. Pine wood</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="a654e8860cba464f8c654400d8c92ba8" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">InicioValidade</dt:Name>
+    <dt:Name language="en">StartOfValidity</dt:Name>
+    <dt:Definition language="pt">A data de início de validade do artigo, ex. 31/12/1999</dt:Definition>
+    <dt:Definition language="en">The start date of validity of the article, ex. 31/12/1999</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="a6f43f611eaf4ecca9ee58671fc747c5" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">FabricanteURL</dt:Name>
+    <dt:Name language="en">ManufacturerURL</dt:Name>
+    <dt:Definition language="pt">O website da organização que fabricou e/ou montou o bem</dt:Definition>
+    <dt:Definition language="en">The website of the organization that manufactured and/or assembled the item</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="a90a3aa948984a6e859a6daad9d70e1a" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">urlFabricanteArtigo</dt:Name>
+    <dt:Name language="en">DeepLinkurl</dt:Name>
+    <dt:Definition language="pt">URL para  página web relevante do fornecedor ou da empresa fabricante, onde podem ser encontradas mais informações sobre o artigo, ex. www.company.com/product</dt:Definition>
+    <dt:Definition language="en">A deep link (URL) redirects to a relevant webpage of the supplier or manufacturer company, where further information on the article may be found, ex. www.company.com/product</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="a90a3aa948984a6e859a6daad9d70e1a" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">UrlFabricanteArtigo</dt:Name>
+    <dt:Name language="en">DeepLinkUrl</dt:Name>
+    <dt:Definition language="pt">URL para  página web relevante do fornecedor ou da empresa fabricante, onde podem ser encontradas mais informações sobre o artigo, ex. www.company.com/product</dt:Definition>
+    <dt:Definition language="en">A deep link (URL) redirects to a relevant webpage of the supplier or manufacturer company, where further information on the article may be found, ex. www.company.com/product</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>2</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="aaaffd4107fe4c14a9b9db2bd6f8249f" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">Constituintes</dt:Name>
+    <dt:Name language="en">Constituents</dt:Name>
+    <dt:Definition language="pt">Características constituintes opcionais, peças ou acabamentos, ex. porta com fechadura automática</dt:Definition>
+    <dt:Definition language="en">Optional constituent features, parts or finishes, ex. Door with self closing lock</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="ab6c6a6b82f545ab918ee609931ab131" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">ReferenciaUnidadeFuncional</dt:Name>
+    <dt:Name language="en">FunctionalUnitReference</dt:Name>
+    <dt:Definition language="pt">Referência a uma base de dados ou a uma classificação, ex. EPD Internacional</dt:Definition>
+    <dt:Definition language="en">Reference to a database or a classification, ex. EPD international</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="ad25685569ee4ca3ba0e99b0dea3a9f2" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">ResiduosPerigososEliminados</dt:Name>
+    <dt:Name language="en">HazardousWasteDisposed</dt:Name>
+    <dt:Definition language="pt">resíduos perigosos para o repositório final</dt:Definition>
+    <dt:Definition language="en">hazardous waste to final repository</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Kilogram"/>
+  </dt:Property>
+  <dt:Property dt:GUID="ae348b27ac9248c88451a6126598d886" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">NumeroGlobalDeItemComercial</dt:Name>
+    <dt:Name language="en">GlobalTradeItemNumber</dt:Name>
+    <dt:Definition language="pt">O Número Global de Item Comercial (GTIN) é um identificador para artigos de comércio desenvolvido por GS1 (www.gs1.org), ex. 123456789012</dt:Definition>
+    <dt:Definition language="en">The Global Trade Item Number (GTIN) is an identifier for trade items developed by GS1 (www.gs1.org), ex. 123456789012</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="afc77dba81524af49ad7d8715d314507" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">EnergiaTermicaExportada</dt:Name>
+    <dt:Name language="en">ExportedThermalEnergy</dt:Name>
+    <dt:Definition language="pt">Quantidade de energia térmica disponível no mercado após incineração</dt:Definition>
+    <dt:Definition language="en">Amount of thermal energy available in the market after incineration</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Mega Joule"/>
+  </dt:Property>
+  <dt:Property dt:GUID="b2eb2c55d81f456aad26170832e9441a" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">PotencialDeAcidificacaoAcumuladaExcesso</dt:Name>
+    <dt:Name language="en">AcidificationPotentialAccumulatedExceedance</dt:Name>
+    <dt:Definition language="pt">uma medida da acidificação causada à terra e à água pelas emissões para o ar de substâncias acidificantes</dt:Definition>
+    <dt:Definition language="en">a measure of the acidification caused to land and water from emissions to air of acidifying substances</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Moles"/>
+  </dt:Property>
+  <dt:Property dt:GUID="b79995cef4e24c81beef21e56b08759c" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">GLNFabricante</dt:Name>
+    <dt:Name language="en">ManufacturerGLN</dt:Name>
+    <dt:Definition language="pt">GLN- Número de Localização Global do Fabricante. Pode ser o GLN local ou da sede, dependendo do ponto de origem, ex. 1234567890123</dt:Definition>
+    <dt:Definition language="en">GLN- Global Location Number of the Manufacturer. This could be your local or headquarter GLN depending on point of origin, ex. 1234567890123</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="c1371efd75e24c408ed2d82f68dbf1e3" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">GarantiaEAlargada</dt:Name>
+    <dt:Name language="en">IsExtendedWarranty</dt:Name>
+    <dt:Definition language="pt">Indicação de se se trata de uma garantia alargada cuja duração é superior à normalmente atribuída a um artefacto (=VERDADEIRO) ou não (= FALSO), ex. FALSO</dt:Definition>
+    <dt:Definition language="en">Indication of whether this is an extended warranty whose duration is greater than that normally assigned to an artefact (=TRUE) or not (= FALSE), ex. FALSE</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="c34f6d1a74cd49a08e26eaeb307e458c" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">ItemEParcialmenteReciclado</dt:Name>
+    <dt:Name language="en">ItemIsPartiallyRecycled</dt:Name>
+    <dt:Definition language="pt">Indicação se este item é parcialmente reciclado (= VERDADEIRO) ou não (= FALSO)</dt:Definition>
+    <dt:Definition language="en">Indication of whether this item is partially recycled (=TRUE) or not (= FALSE)</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="c34f6d1a74cd49a08e26eaeb307e458c" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">ItemEParcialmenteReciclado</dt:Name>
+    <dt:Name language="en">IsItemPartiallyRecycled</dt:Name>
+    <dt:Definition language="pt">Indicação se este item é parcialmente reciclado (= VERDADEIRO) ou não (= FALSO)</dt:Definition>
+    <dt:Definition language="en">Indication of whether this item is partially recycled (=TRUE) or not (= FALSE)</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>2</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="c4a90fb5237b489cbe12e3293f2a8aae" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">VolumeTotalDeResiduosRadioactivosEliminados</dt:Name>
+    <dt:Name language="en">TotalRadioactiveWasteDisposedVolume</dt:Name>
+    <dt:Definition language="pt">A soma, em volume, dos resíduos radioactivos de alto, médio e baixo nível, acondicionados, até ao depósito final</dt:Definition>
+    <dt:Definition language="en">The sum, in volume, of high-, intermediate- and low-level radioactive waste, conditioned, to final repository</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="cubic metre"/>
+  </dt:Property>
+  <dt:Property dt:GUID="c52c0d26bd86406990cc037c30c1a21b" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">NomeDocumento</dt:Name>
+    <dt:Name language="en">Document</dt:Name>
+    <dt:Definition language="pt">Nome do anexo/bens digitais, ex. Catálogo de Produto ou Foto1</dt:Definition>
+    <dt:Definition language="en">Name of the attachment/digital asset, ex. Product Catalogue or Photo1</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="c56bca0c39bf439e857ed5e407f72a01" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">AnoProducao</dt:Name>
+    <dt:Name language="en">ProductionYear</dt:Name>
+    <dt:Definition language="pt">O ano de produção do artigo manufacturado, ex. 1900</dt:Definition>
+    <dt:Definition language="en">The year of production of the manufactured item, ex. 1900</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="c56bca0c39bf439e857ed5e407f72a01" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">DataProducao</dt:Name>
+    <dt:Name language="en">ProductionDate</dt:Name>
+    <dt:Definition language="pt">A data de produção do artigo manufacturado, ex. 31/12/1999 23:59:59</dt:Definition>
+    <dt:Definition language="en">The date of production of the manufactured item, ex. 31/12/1999 23:59:59</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>2</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="c5b9ba15afaf40e3877f6f64df537fde" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">PotencialDeAquecimentoGlobalBiogenico</dt:Name>
+    <dt:Name language="en">GlobalWarmingPotentialBiogenic</dt:Name>
+    <dt:Definition language="pt">abrange as emissões de carbono para o ar (CO2, CO e CH4) provenientes da oxidação e/ou redução da biomassa à superfície através da sua transformação ou degradação (por exemplo, combustão, digestão, compostagem, deposição em aterro) e a absorção de CO2 da atmosfera através da fotossíntese durante o crescimento da biomassa - ou seja, correspondente ao teor de carbono dos produtos, biocombustíveis ou resíduos de plantas acima do solo, tais como lixo e madeira morta</dt:Definition>
+    <dt:Definition language="en">covers carbon emissions to air (CO2, CO and CH4) originating from the oxidation and/or reduction of aboveground biomass by means of its transformation or degradation (e.g. combustion, digestion, composting, landfilling) and CO2 uptake from the atmosphere through photosynthesis during biomass growth – i.e. corresponding to the carbon content of products, biofuels or above ground plant residues such as litter and dead wood</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Kilogram"/>
+  </dt:Property>
+  <dt:Property dt:GUID="c63eaa3f42fd42dd8d2c3946420e740d" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">LarguraNominal</dt:Name>
+    <dt:Name language="en">NominalWidth</dt:Name>
+    <dt:Definition language="pt">Largura nominal do produto, tipicamente a menor dimensão horizontal, ou dimensão característica horizontal secundária, ex. 200</dt:Definition>
+    <dt:Definition language="en">Nominal width of product, typically the characteristic or secondary horizontal or characteristic dimension, ex. 200</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:DimensionRef dt:GUID="L"/>
+    <dt:QuantityKindRef dt:GUID="milli metre | en.EN"/>
+  </dt:Property>
+  <dt:Property dt:GUID="c66e900f05674eb8b49c96332f9e8de6" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">PotencialDeAquecimentoGlobalTotal</dt:Name>
+    <dt:Name language="en">GlobalWarmingPotentialTotal</dt:Name>
+    <dt:Definition language="pt">representa o potencial de aquecimento global total decorrente das emissões fósseis, biogénicas e de uso e alteração do uso do solo</dt:Definition>
+    <dt:Definition language="en">it accounts for the total global warming potential arising from fossil, biogenic and land use and land use change emissions</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Kilogram"/>
+  </dt:Property>
+  <dt:Property dt:GUID="c6d6602cfe5040e296d381105fad91ed" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">ComponentesParaReutilizacao</dt:Name>
+    <dt:Name language="en">ComponentsForReUse</dt:Name>
+    <dt:Definition language="pt">Quantidade de componentes que são reutilizados no fim de vida</dt:Definition>
+    <dt:Definition language="en">Amount of components which are reused at end-of-life</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Kilogram"/>
+  </dt:Property>
+  <dt:Property dt:GUID="c78df3144c304bf0804e5ea0fce821d9" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">ResponsavelGarantiaDePecas</dt:Name>
+    <dt:Name language="en">WarrantyGuarantorParts</dt:Name>
+    <dt:Definition language="pt">Endereço de correio electrónico da organização responsável pela garantia das peças</dt:Definition>
+    <dt:Definition language="en">Email address for the organisation responsible for the parts warranty.</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="cb7a3b6b80784cd0843a14db9e7d3b70" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">CustoRealRegistado</dt:Name>
+    <dt:Name language="en">RecordedActualCost</dt:Name>
+    <dt:Definition language="pt">o custo real do bem , ex. 195 EUR</dt:Definition>
+    <dt:Definition language="en">the actual cost of the asset , ex. 195EUR</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="cc46dd921f7c4f9ab2cf88266e9d4e8e" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">PotencialDeEutrofizacaoAcumuladaExcesso</dt:Name>
+    <dt:Name language="en">EutrophicationPotentialAccumulatedExceedance</dt:Name>
+    <dt:Definition language="pt">uma medida da eutrofização causada pelas emissões</dt:Definition>
+    <dt:Definition language="en">a measure of the eutrophication caused by emissions</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Moles"/>
+  </dt:Property>
+  <dt:Property dt:GUID="cd55f3b748614064b4884a9098097000" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">ReferenciaDOP</dt:Name>
+    <dt:Name language="en">DOPReference</dt:Name>
+    <dt:Definition language="pt">Referência da Declaração de Desempenho (DoP)</dt:Definition>
+    <dt:Definition language="en">Reference of the Declaration of Performance</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="ce077379f5664fbe8795416de036754e" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">CustoEstimado</dt:Name>
+    <dt:Name language="en">ConceptualCost</dt:Name>
+    <dt:Definition language="pt">A estimativa do custo estimado é feita durante a fase de pré-construção de um projecto, ex. 200 EUR</dt:Definition>
+    <dt:Definition language="en">Conceptual cost estimating is done during the pre-construction stage of a project, ex. 200 EUR</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="cf0bba2b8da64320adde114bb20b34dc" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">DataInicioGarantia</dt:Name>
+    <dt:Name language="en">WarrantyStartDate</dt:Name>
+    <dt:Definition language="pt">A data de início da garantia, ex. 31/12/1999 23:59:59</dt:Definition>
+    <dt:Definition language="en">The date on which the warranty commences, ex. 31/12/1999 23:59:59</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="cf975c1391a84a22a70bbac05b30bc51" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">NumeroDeSerie</dt:Name>
+    <dt:Name language="en">SerialNumber</dt:Name>
+    <dt:Definition language="pt">O número de série atribuído a uma ocorrência de um produto</dt:Definition>
+    <dt:Definition language="en">The serial number assigned to an occurrence of a product</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="d08a3ad2f38244ef9e205078c3a5ac3a" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">PotencialDeEmpobrecimentoDaCamadaDeOzonoEstratosferica</dt:Name>
+    <dt:Name language="en">DepletionPotentialOfTheStratosphericOzoneLayer</dt:Name>
+    <dt:Definition language="pt">a quantidade relativa de degradação para a camada de ozono que um produto pode causar</dt:Definition>
+    <dt:Definition language="en">the relative amount of degradation to the ozone layer a product can cause</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Kilogram"/>
+  </dt:Property>
+  <dt:Property dt:GUID="d12ecb0bb9cd4203bccea390ba910ed6" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">Cor</dt:Name>
+    <dt:Name language="en">Color</dt:Name>
+    <dt:Definition language="pt">Selecção de cor para este objecto ex. Branco, Castanho, e Preto</dt:Definition>
+    <dt:Definition language="en">Color selection for this object, ex. White, Brown, and Black</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="d597e7ae8a124341a3401dc36fbf6f33" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">CombustiveisSecundariosRenovaveis</dt:Name>
+    <dt:Name language="en">RenewableSecondaryFuels</dt:Name>
+    <dt:Definition language="pt">materiais renováveis com conteúdo energético que tenham atravessado a fronteira do sistema entre sistemas de produtos e sejam utilizados como combustível (fonte de energia) noutro sistema de produtos (por exemplo, aglomerados de resíduos de biomassa, resíduos de madeira triturados)</dt:Definition>
+    <dt:Definition language="en">renewable materials with energy content that have crossed the system boundary between product systems and are used as fuel input (energy source) in another product system (e.g. biomass residue pellets, chipped waste wood)</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Mega Joule"/>
+  </dt:Property>
+  <dt:Property dt:GUID="d8ca72cd39de4fc6b83bea6dcb07c48a" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">VidaUtilEsperada</dt:Name>
+    <dt:Name language="en">ExpectedServiceLife</dt:Name>
+    <dt:Definition language="pt">Vida útil esperada em anos, ex. 60 anos</dt:Definition>
+    <dt:Definition language="en">Expected service life in years, ex. 60 years</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="d9926ec81f834645b242c6df10d1417d" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">ExclusoesGarantia</dt:Name>
+    <dt:Name language="en">Exclusions</dt:Name>
+    <dt:Definition language="pt">Artigos, condições ou acções que possam ser excluídos da garantia ou que possam causar a anulação da garantia</dt:Definition>
+    <dt:Definition language="en">Items, conditions or actions that may be excluded from the warranty or that may cause the warranty to become void</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="dcf813f681d941b09947a73411853dee" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">Nome</dt:Name>
+    <dt:Name language="en">Name</dt:Name>
+    <dt:Definition language="pt">O nome do produto deve consistir nos seguintes campos: &lt;Fonte&gt;_&lt;Tipo&gt;_&lt;Subtipo&gt;_&lt;Diferenciador_n&gt;, ex. LEDSMART_Luminária_Interior_1420x37x84mm. Para mais informações, consulte a norma em desenvolvimento Modelação de Informação da Construção (BIM) Regras para Modelação de Objetos BIM e o link: https://secclass.pt/wp-content/uploads/2021/10/R_M_ObjectosBIM.pdf</dt:Definition>
+    <dt:Definition language="en">The product name shall consist of the following fields: &lt;Source&gt;_&lt;Type&gt;_&lt;Subtype&gt;_&lt;Differentiator_n&gt;, ex. LEDSMART_Luminaire_Interior_1420x37x84mm. For more information, consult the standard draft Building Information Modelling (BIM) - Rules for the Modelling of BIM Objects and the link:  https://secclass.pt/wp-content/uploads/2021/10/R_M_ObjectosBIM.pdf</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="dd9f360281224620ad66cf1e5559a39a" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">UtilizacaoLiquidaDeAguaDoce</dt:Name>
+    <dt:Name language="en">NetUseOfFreshwater</dt:Name>
+    <dt:Definition language="pt">água doce a entrar no sistema do produto em estudo que não é devolvida à mesma bacia de drenagem de onde provém. Medido utilizando os princípios de análise do inventário da pegada hídrica de acordo com a norma ISO 14046.</dt:Definition>
+    <dt:Definition language="en">freshwater entering the product system being studied that is not returned to the same drainage basin from which it originated. Measured using the principles of water footprint inventory analysis according to ISO 14046.</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="cubic metre"/>
+  </dt:Property>
+  <dt:Property dt:GUID="de786ea559eb4137bbeac91ad82965b6" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">PesoBruto</dt:Name>
+    <dt:Name language="en">GrossWeight</dt:Name>
+    <dt:Definition language="pt">Peso da unidade incluindo embalagem de expedição, ex. 55</dt:Definition>
+    <dt:Definition language="en">Element weight including shipping packaging, ex. 55 kg</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="e3602b8b4b4747ce94a9a885ca100344" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">&lt;SistemaClassificacao&gt;&lt;Tabela&gt;Titulo</dt:Name>
+    <dt:Name language="en">&lt;ClassificationSystem&gt;&lt;Table&gt;Title</dt:Name>
+    <dt:Definition language="pt">Título de classificação do produto, ex. Uniclass2015PrVigasDeMadeira</dt:Definition>
+    <dt:Definition language="en">Classification title of the product, ex. Uniclass2015PrTimberBeams</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="e3602b8b4b4747ce94a9a885ca100344" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">Classificacao&lt;Sistema&gt;&lt;Tabela&gt;Titulo</dt:Name>
+    <dt:Name language="en">Classification&lt;System&gt;&lt;Table&gt;Title</dt:Name>
+    <dt:Definition language="pt">Título de classificação do produto, ex.  ClassificacaoSECClasSPrVigasDeMadeira</dt:Definition>
+    <dt:Definition language="en">Classification title of the product, ex. ClassificationSECClasSPrTimberBeams</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>2</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>InActive</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="e3602b8b4b4747ce94a9a885ca100344" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">Classificacao&lt;Sistema&gt;&lt;Tabela&gt;Titulo</dt:Name>
+    <dt:Name language="en">Classification&lt;System&gt;&lt;Table&gt;Title</dt:Name>
+    <dt:Definition language="pt">Título de classificação do produto, ex. ClassificacaoSecclassProdutosDescricao = Vigas de madeira</dt:Definition>
+    <dt:Definition language="en">Classification title of the product, ex. ClassificationSecclassProductsDescription  = Timber beams</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>3</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="e8e832eb16b746b1a75f1816e693d6a5" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">CombustiveisFosseisComPotencialDeAquecimentoGlobal</dt:Name>
+    <dt:Name language="en">GlobalWarmingPotentialFossilFuels</dt:Name>
+    <dt:Definition language="pt">abrange as emissões de gases com efeito de estufa (GEE) para quaisquer meios provenientes da oxidação e/ou redução de combustíveis fósseis através da sua transformação ou degradação (por exemplo, combustão, digestão, deposição em aterro, etc.)</dt:Definition>
+    <dt:Definition language="en">it covers greenhouse gas (GHG) emissions to any media originating from the oxidation and/or reduction of fossil fuels by means of their transformation or degradation (e.g. combustion, digestion, landfilling, etc.)</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Kilogram"/>
+  </dt:Property>
+  <dt:Property dt:GUID="e9c5ccce8a3c43e2988abdab8254f380" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">Acabamento</dt:Name>
+    <dt:Name language="en">Finish</dt:Name>
+    <dt:Definition language="pt">Acabamento característico ou primário do produto</dt:Definition>
+    <dt:Definition language="en">Characteristic or primary finish of product</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="eedfc0b5190045669049fa9fa3406ffa" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">DesempenhoSustentabilidade</dt:Name>
+    <dt:Name language="en">SustainabilityPerformance</dt:Name>
+    <dt:Definition language="pt">Descrição do(s) problema(s) de sustentabilidade que o objecto satisfaz.</dt:Definition>
+    <dt:Definition language="en">Description of the sustainability issue(s) which the object satisfies</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="eff7132382d94cbb89087b04c0463f44" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">MateriaisSecundarios</dt:Name>
+    <dt:Name language="en">SecondaryMaterials</dt:Name>
+    <dt:Definition language="pt">material recuperado de utilização anterior ou de resíduos que substituem materiais primários</dt:Definition>
+    <dt:Definition language="en">material recovered from previous use or from waste which substitutes primary materials</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Kilogram"/>
+  </dt:Property>
+  <dt:Property dt:GUID="fa38ba90a3cc4658af595d634e25aba5" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">CodigoDeBarras</dt:Name>
+    <dt:Name language="en">BarCode</dt:Name>
+    <dt:Definition language="pt">A identidade do código de barras dado a uma ocorrência do produto</dt:Definition>
+    <dt:Definition language="en">The identity of the bar code given to an occurrence of the product</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="fdc4fdcc770c44b1b7cd5a641b7e8247" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">CombustiveisSecundariosNaoRenovaveis</dt:Name>
+    <dt:Name language="en">NonRenewableSecondaryFuels</dt:Name>
+    <dt:Definition language="pt">Materiais não renováveis com conteúdo energético que tenham atravessado a fronteira do sistema entre sistemas de produtos e sejam utilizados como combustível (fonte de energia) noutro sistema de produtos (por exemplo, solventes processados, pneus triturados</dt:Definition>
+    <dt:Definition language="en">Non-renewable materials with energy content that have crossed the system boundary between product systems and are used as fuel input (energy source) in another product system (e.g. processed solvents, shredded tyres</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Mega Joule"/>
+  </dt:Property>
+  <dt:Property dt:GUID="fe68ee90c5694e5db358e857158c8da5" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">CaracteristicasAdicionais</dt:Name>
+    <dt:Name language="en">Features</dt:Name>
+    <dt:Definition language="pt">Outras características ou características importantes relevantes para a especificação do produto</dt:Definition>
+    <dt:Definition language="en">Other important characteristics or features relevant to product specification.</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="feb7c008bbfa4222b088b8fcd5202b21" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">RecursosPrimariosNaoRenovaveisUtilizadosComoTransportadorDeEnergiaCombustivel</dt:Name>
+    <dt:Name language="en">NonRenewablePrimaryResourcesUsedAsAnEnergyCarrierFuel</dt:Name>
+    <dt:Definition language="pt">Materiais tais como turfa, petróleo, gás, carvão, urânio utilizados (primeira utilização) como fonte de energia.</dt:Definition>
+    <dt:Definition language="en">Materials such as peat, oil, gas, coal, uranium used (first use) as an energy source.</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="Mega Joule"/>
+  </dt:Property>
+  <dt:Property dt:GUID="fee39e56e0404e2d8849314e39063d21" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">Idioma</dt:Name>
+    <dt:Name language="en">DataDeliveryLanguage</dt:Name>
+    <dt:Definition language="pt">Linguagem básica da entrega de dados. Este elemento especifica as línguas utilizadas (acc. ISO 639-1), especialmente a língua utilizada, por regra, em toda a informação dependente da língua, ex. fr</dt:Definition>
+    <dt:Definition language="en">Basic language of the data delivery. This element specifies the used languages (acc. ISO 639-1), especially the default language of all language-dependent information, ex. fr</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:Property dt:GUID="fee932c3ad1a4e9283a88670d50b12cc" dateOfCreation="-0001-11-30T00:00:00+00:00">
+    <dt:Name language="pt">EtiquetaREACH</dt:Name>
+    <dt:Name language="en">REACHLabel</dt:Name>
+    <dt:Definition language="pt">Indicação sobre se um artigo ou ingrediente de um artigo está sujeito ao Regulamento REACH: os artigos e ingredientes de artigos que estão listados como substâncias que suscitam elevada preocupação ao abrigo do REACH têm de ser rotulados no fornecimento de dados. Valores permitidos: sim / não / sem dados. Se o REACH não for aplicável, por exemplo, os serviços utilizam (não). Se a informação REACH não estiver disponível, utilizar (não há dados).</dt:Definition>
+    <dt:Definition language="en">Indication as to whether an article or ingredient of an article is subject to the REACH Regulation: articles and ingredients of articles that are listed as substances of very high concern under REACH have to be labelled in the data delivery. Allowed values: yes / no / no data. If REACH is not applicable e.g. services use (no). If REACH info is not available, use (no data).</dt:Definition>
+    <dt:LanguageOfCreator>pt-PT</dt:LanguageOfCreator>
+    <dt:CountryOfOrigin>PT</dt:CountryOfOrigin>
+    <dt:VisualRepresentation>FALSE</dt:VisualRepresentation>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:MinorVersion>1</dt:MinorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="String"/>
+    <dt:QuantityKindRef dt:GUID="without"/>
+  </dt:Property>
+  <dt:ReferenceDocument dt:GUID="4e67b5d72e1f484f866e9ba3ac2a5f75" dateOfCreation="2023-03-09T00:00:00+00:00">
+    <dt:Name language="en">ISO 14025:2006</dt:Name>
+    <dt:Definition language="en">ISO 14025:2006 establishes the principles and specifies the procedures for developing Type III environmental declaration programmes and Type III environmental declarations. It specifically establishes the use of the ISO 14040 series of standards in the development of Type III environmental declaration programmes and Type III environmental declarations.</dt:Definition>
+    <dt:Status>Published</dt:Status>
+    <dt:Language>en</dt:Language>
+  </dt:ReferenceDocument>
+</dt:Library>
