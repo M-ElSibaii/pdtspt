@@ -48,8 +48,10 @@ Route::get('/groupsOfProperties', [ProductdatatemplatesController::class, 'group
 
 Route::get('/groupsOfProperties/{Id}', [ProductdatatemplatesController::class, 'groupOfProperties']);
 
-Route::get('/{pdtID}', [ProductdatatemplatesController::class, 'productDataTemplate']);
-
+// Specific routes BEFORE generic catch-all
 Route::get('/{pdtID}/json', [ProductdatatemplatesController::class, 'productDataTemplateJson']);
 
 Route::get('/{pdtID}/xml', [ProductdatatemplatesController::class, 'productDataTemplateXml']);
+
+// Generic catch-all route LAST
+Route::get('/{pdtID}', [ProductdatatemplatesController::class, 'productDataTemplate']);

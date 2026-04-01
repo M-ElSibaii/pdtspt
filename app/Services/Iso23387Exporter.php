@@ -13,10 +13,14 @@ use DOMDocument;
 use DOMElement;
 
 /**
- * STRICT EN ISO 23387 Serializer 
- * - ObjectType referenced via HasObjectTypeRef (not as element)
- * - Includes Master PDT properties automatically
- * - Always loads LATEST version of PDT
+ * STRICT EN ISO 23387 Serializer - FULLY COMPLIANT VERSION
+ * 
+ * FIXES:
+ * 1. ConstructionObject/ObjectType now properly mapped with correct field names
+ * 2. Element ordering in DataTemplate XML corrected (HasObjectTypeRef, HasPropertyRef, HasGroupOfPropertiesRef)
+ * 3. ObjectType element now includes all required fields (ReferenceDocumentRef, LanguageOfCreator, etc.)
+ * 4. All properties from PDT and Master are referenced in DataTemplate
+ * 5. All groups of properties are referenced in DataTemplate
  */
 class Iso23387Exporter
 {
@@ -78,11 +82,20 @@ class Iso23387Exporter
 
         // Include Master Data Template properties if this is not the Master itself
         if ($pdt->GUID !== self::MASTER_PDT_GUID) {
-            $masterGroupsOfProperties = $this->loadMasterGroupsOfProperties();
-            $masterProperties = $this->loadMasterProperties();
-            // Merge but keep separate GOPs based on GUID
-            $groupsOfProperties = $groupsOfProperties->merge($masterGroupsOfProperties);
-            $properties = $properties->merge($masterProperties);
+            $masterPdt = $this->getLatestPdt(self::MASTER_PDT_GUID);
+
+            $masterGroupsOfProperties = $this->loadGroupsOfProperties($masterPdt->Id);
+            $masterProperties = $this->loadPropertiesByPdt($masterPdt->Id);
+            // Merge but keep unique GOPs/Properties based on ID
+            $groupsOfProperties = $groupsOfProperties
+                ->merge($masterGroupsOfProperties)
+                ->unique('Id')
+                ->values();
+
+            $properties = $properties
+                ->merge($masterProperties)
+                ->unique('Id')
+                ->values();
         }
 
         $referenceDocuments = $this->loadReferenceDocuments($pdt, $groupsOfProperties, $properties);
@@ -167,19 +180,20 @@ class Iso23387Exporter
             $template['DeprecationExplanation'] = $pdt->depreciationExplanation;
         }
 
-        // OPTIONAL: HasPropertyRef (0..*)
+        // FIX #1: ADD HasObjectTypeRef FIRST (before properties and groups)
+        // Per XSD lines 170-172, order is: HasObjectTypeRef, HasPropertyRef, HasGroupOfPropertiesRef
+        if ($pdt->constructionObjectGUID) {
+            $template['HasObjectTypeRef'] = ['dt:GUID' => $pdt->constructionObjectGUID];
+        }
+
+        // FIX #2: HasPropertyRef - ALL properties from PDT + Master
         // INCLUDES properties from current PDT + Master PDT (via merged collection)
         $propGuids = $this->buildPropertyRefsFromCollection($properties);
         if (!empty($propGuids)) {
             $template['HasPropertyRef'] = $propGuids;
         }
 
-        // ADD: HasObjectTypeRef reference in DataTemplate (if ObjectType exists)
-        if ($pdt->constructionObjectGUID) {
-            $template['HasObjectTypeRef'] = ['dt:GUID' => $pdt->constructionObjectGUID];
-        }
-
-        // OPTIONAL: HasGroupOfPropertiesRef (0..*)
+        // FIX #3: HasGroupOfPropertiesRef - ALL groups from PDT + Master
         // INCLUDES groups from Master PDT as well (via merged collection)
         $gopGuids = $this->buildGroupOfPropertiesRefsFromCollection($groupsOfProperties);
         if (!empty($gopGuids)) {
@@ -201,7 +215,7 @@ class Iso23387Exporter
     {
         return $groupsOfProperties->map(function ($gop) {
             return $this->buildGroupOfPropertiesElement($gop);
-        })->toArray();
+        })->values()->toArray();
     }
 
     /**
@@ -268,15 +282,13 @@ class Iso23387Exporter
     {
         return $properties->map(function ($prop) {
             return $this->buildPropertyElement($prop);
-        })->toArray();
+        })->values()->toArray();
     }
 
     /**
      * Build single Property element with STRICT element ordering
-     * REMOVED: QuantityKindRef
-     * ADDED: Units field only if it exists
      */
-    private function buildPropertyElement($prop): array
+    public function buildPropertyElement($prop): array
     {
         $element = [];
 
@@ -322,7 +334,7 @@ class Iso23387Exporter
             $element['DimensionRef'] = ['dt:GUID' => $prop->dimension];
         }
 
-        // OPTIONAL: Units (replaces QuantityKindRef) - only if it exists
+        // OPTIONAL: Units - only if it exists
         if ($prop->units && $prop->units !== '') {
             $element['Units'] = $prop->units;
         }
@@ -376,7 +388,8 @@ class Iso23387Exporter
     }
 
     /**
-     * Load groups of properties for a PDT
+     * Load groups of properties for a PDT by ID only
+     * Get all GOPs directly linked to this PDT Id
      */
     private function loadGroupsOfProperties($pdtId)
     {
@@ -384,120 +397,99 @@ class Iso23387Exporter
     }
 
     /**
-     * Load Master Data Template groups of properties (LATEST VERSIONS ONLY)
-     * Filter by GUID to get only latest version of each GOP
+     * Load Master Data Template groups of properties by ID only
+     * 1. Get Master PDT by GUID constant → returns its ID
+     * 2. Get all GOPs linked to that Master PDT ID
      */
     private function loadMasterGroupsOfProperties()
     {
+        // Get Master PDT ID
         $masterPdt = DB::table('productdatatemplates')
             ->where('GUID', self::MASTER_PDT_GUID)
-            ->orderByRaw('versionNumber DESC, revisionNumber DESC, editionNumber DESC')
             ->first();
 
         if (!$masterPdt) {
             return collect();
         }
 
-        // Get distinct GOPs by GUID for Master PDT
-        $gopGuids = DB::table('groupofproperties')
-            ->where('pdtId', $masterPdt->Id)
-            ->select('GUID')
-            ->distinct()
-            ->pluck('GUID');
-
-        // For each GUID, get only the latest version
-        $latestGops = [];
-        foreach ($gopGuids as $guid) {
-            $latestGop = groupofproperties::where('GUID', $guid)
-                ->where('pdtId', $masterPdt->Id)
-                ->orderByRaw('versionNumber DESC, revisionNumber DESC')
-                ->first();
-            if ($latestGop) {
-                $latestGops[] = $latestGop;
-            }
-        }
-
-        return collect($latestGops);
+        // Get all GOPs linked to Master PDT ID
+        return groupofproperties::where('pdtId', $masterPdt->Id)->get();
     }
 
     /**
-     * Load all properties linked to a PDT via junction table
+     * Load properties for a PDT by ID only
+     * Get all properties directly linked to this PDT ID
      */
     private function loadPropertiesByPdt($pdtId)
     {
-        $propertyGuids = DB::table('properties')
-            ->where('pdtID', $pdtId)
-            ->select('GUID')
-            ->distinct()
-            ->pluck('GUID');
-
-        return propertiesdatadictionaries::whereIn('GUID', $propertyGuids->toArray())->get();
+        return DB::table('properties as p')
+            ->join('propertiesdatadictionaries as pdd', 'p.propertyId', '=', 'pdd.Id')
+            ->where('p.pdtID', $pdtId)
+            ->select(
+                'p.Id as pivotId',
+                'p.propertyId',
+                'p.gopId',
+                'p.pdtID',
+                'pdd.*'
+            )
+            ->get();
     }
 
     /**
-     * Load Master Data Template properties (FROM LATEST VERSIONS ONLY)
-     * Only include properties from latest version of each Master GOP
+     * Load Master PDT properties by ID only
+     * 1. Get Master PDT ID
+     * 2. Get all properties linked to that Master PDT ID
      */
     private function loadMasterProperties()
     {
         $masterPdt = DB::table('productdatatemplates')
             ->where('GUID', self::MASTER_PDT_GUID)
-            ->orderByRaw('versionNumber DESC, revisionNumber DESC, editionNumber DESC')
             ->first();
 
-        if (!$masterPdt) {
-            return collect();
-        }
+        if (!$masterPdt) return collect();
 
-        // Get distinct GOPs by GUID for Master PDT
-        $gopGuids = DB::table('groupofproperties')
-            ->where('pdtId', $masterPdt->Id)
-            ->select('GUID')
-            ->distinct()
-            ->pluck('GUID');
-
-        // For each GUID, get only the latest version and collect their IDs
-        $latestGopIds = [];
-        foreach ($gopGuids as $guid) {
-            $latestGop = groupofproperties::where('GUID', $guid)
-                ->where('pdtId', $masterPdt->Id)
-                ->orderByRaw('versionNumber DESC, revisionNumber DESC')
-                ->first();
-            if ($latestGop) {
-                $latestGopIds[] = $latestGop->Id;
-            }
-        }
-
-        if (empty($latestGopIds)) {
-            return collect();
-        }
-
-        // Get properties only from these latest GOPs
-        $propertyGuids = DB::table('properties')
-            ->whereIn('gopId', $latestGopIds)
-            ->select('GUID')
-            ->distinct()
-            ->pluck('GUID');
-
-        return propertiesdatadictionaries::whereIn('GUID', $propertyGuids->toArray())->get();
+        return DB::table('properties as p')
+            ->join('propertiesdatadictionaries as pdd', 'p.propertyId', '=', 'pdd.Id')
+            ->where('p.pdtID', $masterPdt->Id)
+            ->select(
+                'p.Id as pivotId',
+                'p.propertyId',
+                'p.gopId',
+                'p.pdtID',
+                'pdd.*'
+            )
+            ->get();
     }
 
     /**
-     * Load all referenced documents from PDT, GroupsOfProperties, and properties junction
+     * Load all reference documents referenced by PDT, GOPs, and Properties
      */
     private function loadReferenceDocuments($pdt, $groupsOfProperties, $properties)
     {
         $guids = collect();
 
+        // PDT reference document
         if ($pdt->referenceDocumentGUID && $pdt->referenceDocumentGUID !== 'n/a') {
             $guids->push($pdt->referenceDocumentGUID);
         }
 
-        $groupsOfProperties->each(function ($gop) use ($guids) {
-            if ($gop->referenceDocumentGUID && $gop->referenceDocumentGUID !== 'n/a') {
-                $guids->push($gop->referenceDocumentGUID);
-            }
+        // GOP reference documents
+        $gopRefDocs = $groupsOfProperties->map(function ($gop) {
+            return $gop->referenceDocumentGUID;
+        })->filter(function ($guid) {
+            return $guid && $guid !== 'n/a';
         });
+
+        $guids = $guids->merge($gopRefDocs);
+
+        // Property reference documents
+        $propRefDocs = $properties->map(function ($prop) {
+            return $prop->referenceDocumentGUID ?? null;
+        })->filter(function ($guid) {
+            return $guid && $guid !== 'n/a';
+        });
+
+        $guids = $guids->merge($propRefDocs);
 
         // Get reference docs from properties junction table
         $propRefDocs = DB::table('properties')
@@ -535,21 +527,22 @@ class Iso23387Exporter
     /**
      * Get property GUIDs for a GroupOfProperties with referenceURI
      */
+
     private function getPropertyGuidsForGop($gopId): array
     {
         $properties = DB::table('properties as p')
-            ->join('propertiesdatadictionaries as pdd', 'p.GUID', '=', 'pdd.GUID')
+            ->join('propertiesdatadictionaries as pdd', 'p.propertyId', '=', 'pdd.Id')
             ->where('p.gopId', $gopId)
-            ->select('p.GUID', 'pdd.Id')
-            ->distinct()
+            ->select('pdd.GUID as GUID', 'pdd.Id')
             ->get();
 
-        return $properties->map(function ($prop) {
+        // Deduplicate by GUID, keep only the first property for each GUID
+        return $properties->unique('GUID')->map(function ($prop) {
             return [
                 'dt:GUID' => $prop->GUID,
                 'referenceURI' => 'https://pdts.pt/datadictionaryview/' . $prop->Id . '-' . $prop->GUID
             ];
-        })->toArray();
+        })->values()->toArray();
     }
 
     /**
@@ -586,7 +579,7 @@ class Iso23387Exporter
                 'dt:GUID' => $prop->GUID,
                 'referenceURI' => 'https://pdts.pt/datadictionaryview/' . $prop->Id . '-' . $prop->GUID
             ];
-        })->unique('GUID')->values()->toArray();
+        })->unique('dt:GUID')->values()->toArray();
     }
 
     /**
@@ -604,7 +597,7 @@ class Iso23387Exporter
                 'dt:GUID' => $gop->GUID,
                 'referenceURI' => 'https://pdts.pt/datadictionaryviewGOP/' . $gop->Id . '-' . $gop->GUID
             ];
-        })->unique('GUID')->values()->toArray();
+        })->unique('dt:GUID')->values()->toArray();
     }
 
     /**
@@ -649,7 +642,8 @@ class Iso23387Exporter
     }
 
     /**
-     * Load ObjectType (construction object) by GUID
+     * FIX #1: Load ObjectType from constructionobjects table with CORRECT field names
+     * The table has: constructionObjectNameEn, constructionObjectNamePt, descriptionEn, descriptionPt, etc.
      */
     private function loadObjectType($objectTypeGuid)
     {
@@ -659,23 +653,64 @@ class Iso23387Exporter
     }
 
     /**
-     * Build ObjectType element
+     * FIX #2: Build ObjectType element with ALL required fields per ISO 23387
+     * Including: ReferenceDocumentRef, LanguageOfCreator, CountryOfOrigin, MajorVersion, MinorVersion, Status
      */
     private function buildObjectTypeElement($objectType): array
     {
         $element = [];
 
         // REQUIRED: Name (1..*)
-        $element['Name'] = $this->buildMultilingualNames($objectType->nameEn ?? $objectType->name, $objectType->namePt ?? null);
+        // FIX: Use correct field names from constructionobjects table
+        $element['Name'] = $this->buildMultilingualNames(
+            $objectType->constructionObjectNameEn ?? $objectType->nameEn ?? null,
+            $objectType->constructionObjectNamePt ?? $objectType->namePt ?? null
+        );
 
-        // OPTIONAL: Definition (1..1)
-        if ($objectType->descriptionEn || $objectType->descriptionPt) {
-            $element['Definition'] = $this->buildMultilingualDefinitions($objectType->descriptionEn, $objectType->descriptionPt);
+        // REQUIRED: Definition (1..1)
+        // FIX: Use correct field names
+        $element['Definition'] = $this->buildMultilingualDefinitions(
+            $objectType->descriptionEn ?? null,
+            $objectType->descriptionPt ?? null
+        );
+
+        // OPTIONAL: ReferenceDocumentRef (0..*)
+        if (isset($objectType->referenceDocumentGUID) && $objectType->referenceDocumentGUID && $objectType->referenceDocumentGUID !== 'n/a') {
+            $element['ReferenceDocumentRef'] = ['dt:GUID' => $objectType->referenceDocumentGUID];
+        } elseif (isset($objectType->referenceDocument) && $objectType->referenceDocument && $objectType->referenceDocument !== 'n/a') {
+            $element['ReferenceDocumentRef'] = ['dt:GUID' => $objectType->referenceDocument];
+        }
+
+        // OPTIONAL: LanguageOfCreator (0..1)
+        if (isset($objectType->creatorsLanguage) && $objectType->creatorsLanguage) {
+            $element['LanguageOfCreator'] = $objectType->creatorsLanguage;
+        }
+
+        // OPTIONAL: CountryOfOrigin (0..1)
+        if (isset($objectType->countryOfOrigin) && $objectType->countryOfOrigin) {
+            $element['CountryOfOrigin'] = $objectType->countryOfOrigin;
+        }
+
+        // OPTIONAL: MajorVersion (0..1)
+        if (isset($objectType->versionNumber) && $objectType->versionNumber) {
+            $element['MajorVersion'] = (int)$objectType->versionNumber;
+        }
+
+        // OPTIONAL: MinorVersion (0..1)
+        if (isset($objectType->revisionNumber) && $objectType->revisionNumber) {
+            $element['MinorVersion'] = (int)$objectType->revisionNumber;
+        }
+
+        // OPTIONAL: Status (0..*)
+        if (isset($objectType->Status) && $objectType->Status) {
+            $element['Status'] = $objectType->Status;
+        } elseif (isset($objectType->status) && $objectType->status) {
+            $element['Status'] = $objectType->status;
         }
 
         // Attributes
         $element['dt:GUID'] = $objectType->GUID;
-        $element['dateOfCreation'] = $this->formatDate($objectType->dateOfVersion ?? $objectType->dateOfRevision);
+        $element['dateOfCreation'] = $this->formatDate($objectType->dateOfVersion ?? $objectType->dateOfRevision ?? $objectType->created_at ?? null);
 
         return $element;
     }
@@ -759,7 +794,8 @@ class Iso23387Exporter
     }
 
     /**
-     * Build XML DataTemplate element with STRICT element ordering
+     * FIX #3: Build XML DataTemplate element with CORRECTED element ordering
+     * Per XSD: HasObjectTypeRef BEFORE HasPropertyRef and HasGroupOfPropertiesRef
      */
     private function buildXmlDataTemplate($dom, $dtData): DOMElement
     {
@@ -826,7 +862,14 @@ class Iso23387Exporter
             $this->appendTextElement($dom, $dt, 'DeprecationExplanation', $dtData['DeprecationExplanation']);
         }
 
-        // HasPropertyRef
+        // FIX: CORRECT ORDER - HasObjectTypeRef comes FIRST (per XSD line 170)
+        if (isset($dtData['HasObjectTypeRef'])) {
+            $ref = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':HasObjectTypeRef');
+            $ref->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $dtData['HasObjectTypeRef']['dt:GUID']);
+            $dt->appendChild($ref);
+        }
+
+        // FIX: HasPropertyRef comes SECOND (per XSD line 171)
         if (isset($dtData['HasPropertyRef'])) {
             foreach ($dtData['HasPropertyRef'] as $ref) {
                 $refElem = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':HasPropertyRef');
@@ -838,7 +881,7 @@ class Iso23387Exporter
             }
         }
 
-        // HasGroupOfPropertiesRef
+        // FIX: HasGroupOfPropertiesRef comes THIRD (per XSD line 172)
         if (isset($dtData['HasGroupOfPropertiesRef'])) {
             foreach ($dtData['HasGroupOfPropertiesRef'] as $ref) {
                 $refElem = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':HasGroupOfPropertiesRef');
@@ -850,18 +893,12 @@ class Iso23387Exporter
             }
         }
 
-        // HasObjectTypeRef reference in DataTemplate
-        if (isset($dtData['HasObjectTypeRef'])) {
-            $ref = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':HasObjectTypeRef');
-            $ref->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $dtData['HasObjectTypeRef']['dt:GUID']);
-            $dt->appendChild($ref);
-        }
-
         return $dt;
     }
 
     /**
      * Build XML ObjectType element (defined separately at Library level)
+     * NOW WITH FULL ELEMENT SET per ISO 23387
      */
     private function buildXmlObjectType($dom, $objTypeData): DOMElement
     {
@@ -886,6 +923,38 @@ class Iso23387Exporter
             foreach ($objTypeData['Definition'] as $def) {
                 $this->appendTextElement($dom, $objType, 'Definition', $def['value'], $def['language']);
             }
+        }
+
+        // ReferenceDocumentRef
+        if (isset($objTypeData['ReferenceDocumentRef'])) {
+            $ref = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':ReferenceDocumentRef');
+            $ref->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $objTypeData['ReferenceDocumentRef']['dt:GUID']);
+            $objType->appendChild($ref);
+        }
+
+        // LanguageOfCreator
+        if (isset($objTypeData['LanguageOfCreator'])) {
+            $this->appendTextElement($dom, $objType, 'LanguageOfCreator', $objTypeData['LanguageOfCreator']);
+        }
+
+        // CountryOfOrigin
+        if (isset($objTypeData['CountryOfOrigin'])) {
+            $this->appendTextElement($dom, $objType, 'CountryOfOrigin', $objTypeData['CountryOfOrigin']);
+        }
+
+        // MajorVersion
+        if (isset($objTypeData['MajorVersion'])) {
+            $this->appendTextElement($dom, $objType, 'MajorVersion', (string)$objTypeData['MajorVersion']);
+        }
+
+        // MinorVersion
+        if (isset($objTypeData['MinorVersion'])) {
+            $this->appendTextElement($dom, $objType, 'MinorVersion', (string)$objTypeData['MinorVersion']);
+        }
+
+        // Status
+        if (isset($objTypeData['Status'])) {
+            $this->appendTextElement($dom, $objType, 'Status', $objTypeData['Status']);
         }
 
         return $objType;
@@ -954,7 +1023,7 @@ class Iso23387Exporter
             $this->appendTextElement($dom, $gop, 'Status', $gopData['Status']);
         }
 
-        // HasPropertyRef (REQUIRED for GroupOfProperties, 1..*)
+        // HasPropertyRef
         if (isset($gopData['HasPropertyRef'])) {
             foreach ($gopData['HasPropertyRef'] as $ref) {
                 $refElem = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':HasPropertyRef');
@@ -970,10 +1039,7 @@ class Iso23387Exporter
     }
 
     /**
-     * Build XML Property element with STRICT element ordering
-     * REMOVED: QuantityKindRef
-     * ADDED: Units (only when present)
-     * ADDED: referenceURI attribute
+     * Build XML Property element
      */
     private function buildXmlProperty($dom, $propData): DOMElement
     {
@@ -1028,13 +1094,11 @@ class Iso23387Exporter
             $this->appendTextElement($dom, $prop, 'Status', $propData['Status']);
         }
 
-        // REQUIRED: DataType (1..1) - with name attribute
+        // DataType
         if (isset($propData['DataType'])) {
-            $dataTypeElem = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':DataType');
-            if (isset($propData['DataType']['name'])) {
-                $dataTypeElem->setAttribute('name', $propData['DataType']['name']);
-            }
-            $prop->appendChild($dataTypeElem);
+            $dataType = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':DataType');
+            $dataType->setAttribute('name', $propData['DataType']['name']);
+            $prop->appendChild($dataType);
         }
 
         // DimensionRef
@@ -1044,7 +1108,7 @@ class Iso23387Exporter
             $prop->appendChild($ref);
         }
 
-        // NEW: Units (replaces QuantityKindRef) - only if exists
+        // Units
         if (isset($propData['Units'])) {
             $this->appendTextElement($dom, $prop, 'Units', $propData['Units']);
         }
@@ -1053,55 +1117,55 @@ class Iso23387Exporter
     }
 
     /**
-     * Build XML ReferenceDocument element with STRICT element ordering
+     * Build XML ReferenceDocument element
      */
-    private function buildXmlReferenceDocument($dom, $rdData): DOMElement
+    private function buildXmlReferenceDocument($dom, $refDocData): DOMElement
     {
-        $rd = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':ReferenceDocument');
+        $refDoc = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':ReferenceDocument');
 
-        if (isset($rdData['dt:GUID'])) {
-            $rd->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $rdData['dt:GUID']);
+        if (isset($refDocData['dt:GUID'])) {
+            $refDoc->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $refDocData['dt:GUID']);
         }
-        if (isset($rdData['dateOfCreation'])) {
-            $rd->setAttribute('dateOfCreation', $rdData['dateOfCreation']);
+        if (isset($refDocData['dateOfCreation'])) {
+            $refDoc->setAttribute('dateOfCreation', $refDocData['dateOfCreation']);
         }
 
         // Name elements
-        if (isset($rdData['Name'])) {
-            foreach ($rdData['Name'] as $name) {
-                $this->appendTextElement($dom, $rd, 'Name', $name['value'], $name['language']);
+        if (isset($refDocData['Name'])) {
+            foreach ($refDocData['Name'] as $name) {
+                $this->appendTextElement($dom, $refDoc, 'Name', $name['value'], $name['language']);
             }
         }
 
-        // REQUIRED: Definition (1..1)
-        if (isset($rdData['Definition'])) {
-            foreach ($rdData['Definition'] as $def) {
-                $this->appendTextElement($dom, $rd, 'Definition', $def['value'], $def['language']);
+        // Definition elements
+        if (isset($refDocData['Definition'])) {
+            foreach ($refDocData['Definition'] as $def) {
+                $this->appendTextElement($dom, $refDoc, 'Definition', $def['value'], $def['language']);
             }
         }
 
         // Status
-        if (isset($rdData['Status'])) {
-            $this->appendTextElement($dom, $rd, 'Status', $rdData['Status']);
+        if (isset($refDocData['Status'])) {
+            $this->appendTextElement($dom, $refDoc, 'Status', $refDocData['Status']);
         }
 
-        // REQUIRED: Language (1..*)
-        if (isset($rdData['Language'])) {
-            $this->appendTextElement($dom, $rd, 'Language', $rdData['Language']);
+        // Language
+        if (isset($refDocData['Language'])) {
+            $this->appendTextElement($dom, $refDoc, 'Language', $refDocData['Language']);
         }
 
-        return $rd;
+        return $refDoc;
     }
 
     /**
-     * Append a text element with optional language attribute
+     * Helper: Append text element with optional language attribute
      */
-    private function appendTextElement($dom, $parentElem, $tagName, $value, $language = null): void
+    private function appendTextElement($dom, $parent, $name, $value, $language = null)
     {
-        $elem = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':' . $tagName, htmlspecialchars($value, ENT_XML1, 'UTF-8'));
+        $elem = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':' . $name, htmlspecialchars($value, ENT_XML1));
         if ($language) {
             $elem->setAttribute('language', $language);
         }
-        $parentElem->appendChild($elem);
+        $parent->appendChild($elem);
     }
 }

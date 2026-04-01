@@ -1,5 +1,5 @@
 ### JSON export
-GET http://127.0.0.1:8000/api/4
+GET http://127.0.0.1:8000/api/3
 Accept: application/json
 
 ###

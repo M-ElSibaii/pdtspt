@@ -17,6 +17,69 @@ use Carbon\Carbon;
 
 class ProductdatatemplatesController extends Controller
 {
+    /**
+     * Build ISO 23387-compliant property structure using the Iso23387Exporter service
+     */
+    private function buildProperty23387($propComplete)
+    {
+        $exporter = new \App\Services\Iso23387Exporter();
+        // Use buildPropertyElement for strict ISO 23387 property structure
+        return $exporter->buildPropertyElement($propComplete);
+    }
+
+    /**
+     * Build ISO 23387-compliant group of properties structure
+     */
+    private function buildGroupOfProperties23387($gop)
+    {
+        return [
+            'Name' => $this->buildMultilingualNames($gop->gopNameEn, $gop->gopNamePt),
+            'Definition' => $this->buildMultilingualDefinitions($gop->definitionEn, $gop->definitionPt),
+            'dt:GUID' => $gop->GUID,
+            'referenceURI' => 'https://pdts.pt/groupofpropertiesview/' . $gop->Id . '-' . $gop->GUID
+        ];
+    }
+
+    /**
+     * Build multilingual name array for ISO 23387
+     */
+    private function buildMultilingualNames($en, $pt): array
+    {
+        $names = [];
+        if ($en) {
+            $names[] = ['language' => 'en', 'value' => $en];
+        }
+        if ($pt) {
+            $names[] = ['language' => 'pt', 'value' => $pt];
+        }
+        return !empty($names) ? $names : [['language' => 'en', 'value' => 'N/A']];
+    }
+
+    /**
+     * Build multilingual definition array for ISO 23387
+     */
+    private function buildMultilingualDefinitions($en, $pt): array
+    {
+        $defs = [];
+        if ($en) {
+            $defs[] = ['language' => 'en', 'value' => $en];
+        }
+        if ($pt) {
+            $defs[] = ['language' => 'pt', 'value' => $pt];
+        }
+        return !empty($defs) ? $defs : [['language' => 'en', 'value' => 'N/A']];
+    }
+
+    /**
+     * Format date to ISO 8601 string
+     */
+    private function formatDate($date): string
+    {
+        if (!$date) {
+            return Carbon::now()->toIso8601String();
+        }
+        return Carbon::parse($date)->toIso8601String();
+    }
 
     /**
      * View a single PDT with all attributes
@@ -379,90 +442,7 @@ class ProductdatatemplatesController extends Controller
         }
     }
 
-    /**
-     * Helper: Build Property in ISO 23387 format with complete data
-     */
-    private function buildProperty23387($propComplete)
-    {
-        return [
-            'dt:GUID' => $propComplete->GUID,
-            'dateOfCreation' => $this->formatDate($propComplete->dateOfVersion ?? $propComplete->dateOfCreation),
-            'Name' => $this->buildMultilingualNames($propComplete->nameEn, $propComplete->namePt),
-            'Definition' => $this->buildMultilingualDefinitions($propComplete->definitionEn, $propComplete->definitionPt),
-            'LanguageOfCreator' => $propComplete->creatorsLanguage ?? 'pt-PT',
-            'CountryOfOrigin' => $propComplete->countryOfOrigin ?? 'PT',
-            'MajorVersion' => (int)($propComplete->versionNumber ?? 1),
-            'MinorVersion' => (int)($propComplete->revisionNumber ?? 0),
-            'Status' => $propComplete->status ?? 'Active',
-            'DataType' => [
-                'name' => $propComplete->dataType ?? 'STRING'
-            ],
-            'Units' => $propComplete->units ?? null,
-            'Dimension' => $propComplete->dimension ?? null,
-            'PhysicalQuantity' => $propComplete->physicalQuantity ?? null,
-            'DimensionRef' => $propComplete->dimension ? ['dt:GUID' => $propComplete->dimension] : null,
-        ];
-    }
 
-    /**
-     * Helper: Build GroupOfProperties in ISO 23387 format
-     */
-    private function buildGroupOfProperties23387($gop)
-    {
-        return [
-            'dt:GUID' => $gop->GUID,
-            'dateOfCreation' => $this->formatDate($gop->dateOfVersion ?? $gop->dateOfCreation),
-            'Name' => $this->buildMultilingualNames($gop->gopNameEn, $gop->gopNamePt),
-            'Definition' => $this->buildMultilingualDefinitions($gop->definitionEn, $gop->definitionPt),
-            'LanguageOfCreator' => $gop->creatorsLanguage ?? 'pt-PT',
-            'CountryOfOrigin' => $gop->countryOfOrigin ?? 'PT',
-            'MajorVersion' => (int)($gop->versionNumber ?? 1),
-            'MinorVersion' => (int)($gop->revisionNumber ?? 0),
-            'Status' => $gop->status ?? 'Active',
-            'URI' => "https://pdts.pt/datadictionaryviewGOP/{$gop->Id}-{$gop->GUID}",
-        ];
-    }
-
-    /**
-     * Helper: Build multilingual Names
-     */
-    private function buildMultilingualNames($en, $pt)
-    {
-        $names = [];
-        if ($pt) {
-            $names[] = ['language' => 'pt', 'value' => $pt];
-        }
-        if ($en) {
-            $names[] = ['language' => 'en', 'value' => $en];
-        }
-        return $names ?: [['language' => 'en', 'value' => 'Unnamed']];
-    }
-
-    /**
-     * Helper: Build multilingual Definitions
-     */
-    private function buildMultilingualDefinitions($en, $pt)
-    {
-        $defs = [];
-        if ($pt) {
-            $defs[] = ['language' => 'pt', 'value' => $pt];
-        }
-        if ($en) {
-            $defs[] = ['language' => 'en', 'value' => $en];
-        }
-        return $defs ?: [['language' => 'en', 'value' => 'No definition']];
-    }
-
-    /**
-     * Helper: Format date to ISO 8601
-     */
-    private function formatDate($date)
-    {
-        if (!$date) {
-            return Carbon::now()->toIso8601String();
-        }
-        return Carbon::parse($date)->toIso8601String();
-    }
 
     /**
      * GET /api/{pdtID}/json - EN ISO 23387 JSON export
@@ -494,41 +474,6 @@ class ProductdatatemplatesController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 404);
         }
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function productDataTemplateold($pdtID)
-    {
-        $pdt = ProductDataTemplates::where('Id', $pdtID)->first();
-
-        $gops = GroupOfProperties::where('pdtId', $pdtID)->get();
-
-        $allReferenceDocuments = [];
-
-        foreach ($gops as $gop) {
-            $properties = Properties::where('gopID', $gop->Id)->get();
-            foreach ($properties as $property) {
-                $propertyAttributes = PropertiesDataDictionaries::where('Id', $property->propertyId)->first();
-                $property->propertiesAttributesInDataDictionary = $propertyAttributes;
-
-                // Collect reference documents GUID
-                $allReferenceDocuments[] = $property->referenceDocumentGUID;
-            }
-
-            $gop->properties = $properties;
-        }
-
-        // Fetch reference documents based on collected GUIDs
-        $referenceDocuments = ReferenceDocuments::whereIn('GUID', $allReferenceDocuments)->get();
-
-        $pdt->groupOfProperties = $gops;
-        $pdt->referenceDocuments = $referenceDocuments;
-
-        return response()->json(['productDataTemplate' => $pdt]);
     }
 
     public function constructionObjects()
