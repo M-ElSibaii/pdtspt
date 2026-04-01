@@ -17,6 +17,20 @@ use Carbon\Carbon;
 
 class ProductdatatemplatesController extends Controller
 {
+    public function productDataTemplate($pdtID)
+    {
+        try {
+            $exporter = new \App\Services\Iso23387Exporter();
+
+            $data = $exporter->exportWithRawData($pdtID);
+
+            return response()->json($data, 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 404);
+        }
+    }
     /**
      * Build ISO 23387-compliant property structure using the Iso23387Exporter service
      */
@@ -180,7 +194,7 @@ class ProductdatatemplatesController extends Controller
      * Structure: 23387 hierarchy
      * Data: COMPLETE from all EN ISO 23386 data dictionary tables
      */
-    public function productDataTemplate($pdtID)
+    public function productDataTemplateout($pdtID)
     {
         try {
             // Get latest version of PDT

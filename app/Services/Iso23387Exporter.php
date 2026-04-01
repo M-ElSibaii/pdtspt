@@ -37,6 +37,87 @@ class Iso23387Exporter
         return json_encode($structure, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
+    public function exportWithRawData($pdtId): array
+    {
+        $structure = $this->buildLibraryStructure($pdtId);
+
+        // Attach raw data
+        $structure = $this->attachRawData($structure, $pdtId);
+
+        return $structure;
+    }
+
+    private function attachRawData($structure, $pdtId)
+    {
+        $pdt = $this->getLatestPdt($pdtId);
+
+        // Attach PDT raw
+        $structure['Library']['_raw'] = (array)$pdt;
+
+        // ObjectType raw
+        if (isset($structure['Library']['ObjectType'])) {
+            $obj = $this->loadObjectType($pdt->constructionObjectGUID);
+            $structure['Library']['ObjectType']['_raw'] = (array)$obj;
+        }
+        $gopGuids = collect($structure['Library']['GroupOfProperties'])->pluck('dt:GUID');
+
+        $gops = groupofproperties::whereIn('GUID', $gopGuids)
+            ->get()
+            ->keyBy('GUID');
+        // GOP raw
+        foreach ($structure['Library']['GroupOfProperties'] as &$gop) {
+            $model = $gops[$gop['dt:GUID']] ?? null;
+
+            if ($model) {
+                $gop['_raw'] = $model->toArray();
+            }
+        }
+        if (!isset($structure['Library']['Properties'])) return $structure;
+        // Properties raw
+        $propGuids = collect($structure['Library']['Properties'])->pluck('dt:GUID')->filter();
+
+        $dictionaryProps = propertiesdatadictionaries::whereIn('GUID', $propGuids)
+            ->get()
+            ->keyBy('GUID');
+
+        $pivotProps = DB::table('properties')
+            ->whereIn('propertyId', $dictionaryProps->pluck('Id'))
+            ->where('pdtID', $pdt->Id)
+            ->get()
+            ->keyBy('propertyId');
+
+        foreach ($structure['Library']['Properties'] as &$prop) {
+
+            $dict = $dictionaryProps[$prop['dt:GUID']] ?? null;
+
+            if ($dict) {
+                $pivot = $pivotProps[$dict->Id] ?? null;
+
+                $prop['_raw'] = [
+                    'dictionary' => $dict->toArray(),
+                    'pivot' => $pivot ? (array)$pivot : null,
+                    'source' => $pivot ? 'PDT' : 'MASTER'
+                ];
+            }
+        }
+
+        // ReferenceDocuments raw
+        $refGuids = collect($structure['Library']['ReferenceDocuments'])->pluck('dt:GUID');
+
+        $refs = referencedocuments::whereIn('GUID', $refGuids)
+            ->get()
+            ->keyBy('GUID');
+        foreach ($structure['Library']['ReferenceDocuments'] as &$ref) {
+            $model = $refs[$ref['dt:GUID']] ?? null;
+
+            if ($model) {
+                $ref['_raw'] = $model->toArray();
+            }
+        }
+
+        return $structure;
+    }
+
     /**
      * Export PDT to XML (EN ISO 23387 compliant, strictly schema-aligned)
      */
