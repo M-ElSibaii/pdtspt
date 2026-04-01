@@ -237,7 +237,7 @@
             $("div[id='comments-addbutton-" + id + "']").replaceWith('<div id="comments-addbutton-' + id + '">\
                         <a data-te-ripple-init data-te-ripple-color="light" \
                             type="submit" \
-                            class="inline-flex items-center px-4 py-2 bg-slate-700 dark:bg-slate-200 rounded-md font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-slate-900 dark:hover:bg-white focus:bg-slate-900 dark:focus:bg-white active:bg-slate-900 dark:active:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150" \
+                            class="inline-flex items-center px-4 py-2 bg-slate-700 rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-slate-900 focus:bg-slate-900 active:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150" \
                             onclick="openModal(' + id + ')" \
                             type="button">\
                             Adicionar comentário\
@@ -251,8 +251,8 @@
                 <lable>Adicionar comentário</lable>\
                 <textarea class="form-control" name="message" id="message"></textarea>\
                 <div class="flex flex-row gap-4 my-2">\
-                    <a type="button" style="float:right" data-te-ripple-init data-te-ripple-color="light" class="inline-flex items-center px-4 py-2 bg-slate-700 dark:bg-slate-200 rounded-md font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-slate-900 dark:hover:bg-white focus:bg-slate-900 dark:focus:bg-white active:bg-slate-900 dark:active:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150" onclick="insertComment(' + id + ')" id="insertComment">Adicionar comentário</a>\
-                    <a type="button" style="float:right" data-te-ripple-init data-te-ripple-color="light" class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-500 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-25 transition ease-in-out duration-150" onclick="closeModal(' + id + ')">Cancelar</a>\
+                    <a type="button" style="float:right" data-te-ripple-init data-te-ripple-color="light" class="inline-flex items-center px-4 py-2 bg-slate-700 rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-slate-900 focus:bg-slate-900 active:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150" onclick="insertComment(' + id + ')" id="insertComment">Adicionar comentário</a>\
+                    <a type="button" style="float:right" data-te-ripple-init data-te-ripple-color="light" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150" onclick="closeModal(' + id + ')">Cancelar</a>\
                 </div>\
             </div>');
         }
@@ -273,7 +273,7 @@
                     <div id="comments-addbutton-' + id + '">\
                         <a data-te-ripple-init data-te-ripple-color="light" \
                             type="submit" \
-                            class="inline-flex items-center px-4 py-2 bg-slate-700 dark:bg-slate-200 rounded-md font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-slate-900 dark:hover:bg-white focus:bg-slate-900 dark:focus:bg-white active:bg-slate-900 dark:active:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150" \
+                            class="inline-flex items-center px-4 py-2 bg-slate-700 rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-slate-900 focus:bg-slate-900 active:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150" \
                             onclick="openModal(' + id + ')" \
                             type="button">\
                             Adicionar comentário\

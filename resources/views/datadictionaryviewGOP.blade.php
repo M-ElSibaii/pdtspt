@@ -51,6 +51,19 @@
                             <td>{{$gopdd->status}}</td>
                         </tr>
                         <tr>
+                            <th>Documento de referência</th>
+                             <td class="p-1.5">
+                                @if ($referencedocument->rdName === 'n/a')
+                                <span>n/a</span>
+                                @else
+                                <a href="{{ route('referencedocumentview', ['rdGUID' => $gopdd->referenceDocumentGUID]) }}">
+                                    <p title="{{ $referencedocument->title }}">{{ $referencedocument->rdName }}</p>
+                                </a>
+                                @endif
+                            </td>
+                            
+                        </tr>
+                        <tr>
                             <th>Data de criação</th>
                             <td>{{$gopdd->dateOfCreation}}</td>
                         </tr>

@@ -373,6 +373,9 @@ class ProductdatatemplatesController extends Controller
                             'Definition' => [
                                 ['language' => 'en', 'value' => $refDoc->description ?? $refDoc->title ?? 'Referenced document']
                             ],
+                            'URI' => [
+                                ['language' => 'en', 'value' => 'https://pdts.pt/referencedocumentview/' . $refDoc->GUID]
+                            ],
                             'Status' => $refDoc->status ?? 'Active',
                             'Language' => 'en',
                         ]

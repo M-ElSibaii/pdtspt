@@ -98,7 +98,7 @@ class Iso23387Exporter
                 ->values();
         }
 
-        $referenceDocuments = $this->loadReferenceDocuments($pdt, $groupsOfProperties, $properties);
+        $referenceDocuments = $this->loadReferenceDocuments($pdtId);
 
         // Load ObjectType element separately if it exists
         $objectType = null;
@@ -298,6 +298,11 @@ class Iso23387Exporter
         // REQUIRED: Definition (1..1)
         $element['Definition'] = $this->buildMultilingualDefinitions($prop->definitionEn, $prop->definitionPt);
 
+        // ReferenceDocumentRef (0..*)
+        if (isset($prop->referenceDocumentGUID) && $prop->referenceDocumentGUID && $prop->referenceDocumentGUID !== 'n/a') {
+            $element['ReferenceDocumentRef'] = ['dt:GUID' => $prop->referenceDocumentGUID];
+        }
+
         // OPTIONAL: LanguageOfCreator (0..1)
         if ($prop->creatorsLanguage) {
             $element['LanguageOfCreator'] = $prop->creatorsLanguage;
@@ -331,7 +336,7 @@ class Iso23387Exporter
 
         // OPTIONAL: DimensionRef (0..1)
         if ($prop->dimension && $prop->dimension !== '') {
-            $element['DimensionRef'] = ['dt:GUID' => $prop->dimension];
+            $element['Dimension'] = $prop->dimension;
         }
 
         // OPTIONAL: Units - only if it exists
@@ -376,6 +381,8 @@ class Iso23387Exporter
         if ($refDoc->status) {
             $element['Status'] = $refDoc->status;
         }
+        // OPTIONAL: URI
+        $element['URI'] = 'https://pdts.pt/referencedocumentview/' . $refDoc->GUID;
 
         // REQUIRED: Language (1..*) - XSD mandates at least one language
         $element['Language'] = 'en';
@@ -430,6 +437,7 @@ class Iso23387Exporter
                 'p.propertyId',
                 'p.gopId',
                 'p.pdtID',
+                'p.referenceDocumentGUID',
                 'pdd.*'
             )
             ->get();
@@ -456,54 +464,78 @@ class Iso23387Exporter
                 'p.propertyId',
                 'p.gopId',
                 'p.pdtID',
+                'p.referenceDocumentGUID',
                 'pdd.*'
             )
             ->get();
     }
 
-    /**
-     * Load all reference documents referenced by PDT, GOPs, and Properties
-     */
-    private function loadReferenceDocuments($pdt, $groupsOfProperties, $properties)
+
+    private function loadReferenceDocuments($pdtId)
     {
         $guids = collect();
 
-        // PDT reference document
-        if ($pdt->referenceDocumentGUID && $pdt->referenceDocumentGUID !== 'n/a') {
+        // 1. PDT reference document
+        $pdt = DB::table('productdatatemplates')
+            ->where('Id', $pdtId)
+            ->first();
+
+        if ($pdt && !empty($pdt->referenceDocumentGUID) && $pdt->referenceDocumentGUID !== 'n/a') {
             $guids->push($pdt->referenceDocumentGUID);
         }
 
-        // GOP reference documents
-        $gopRefDocs = $groupsOfProperties->map(function ($gop) {
-            return $gop->referenceDocumentGUID;
-        })->filter(function ($guid) {
-            return $guid && $guid !== 'n/a';
-        });
-
-        $guids = $guids->merge($gopRefDocs);
-
-        // Property reference documents
-        $propRefDocs = $properties->map(function ($prop) {
-            return $prop->referenceDocumentGUID ?? null;
-        })->filter(function ($guid) {
-            return $guid && $guid !== 'n/a';
-        });
-
-        $guids = $guids->merge($propRefDocs);
-
-        // Get reference docs from properties junction table
-        $propRefDocs = DB::table('properties')
+        // 2. GOP reference documents
+        $gopGuids = DB::table('groupofproperties')
+            ->where('pdtId', $pdtId)
             ->whereNotNull('referenceDocumentGUID')
             ->where('referenceDocumentGUID', '!=', 'n/a')
-            ->select('referenceDocumentGUID')
-            ->distinct()
             ->pluck('referenceDocumentGUID');
 
-        $guids = $guids->merge($propRefDocs)->filter()->unique();
+        $guids = $guids->merge($gopGuids);
 
-        return referencedocuments::whereIn('GUID', $guids->toArray())->get();
+        // 3. Property reference documents
+        $propGuids = DB::table('properties')
+            ->where('pdtID', $pdtId)
+            ->whereNotNull('referenceDocumentGUID')
+            ->where('referenceDocumentGUID', '!=', 'n/a')
+            ->pluck('referenceDocumentGUID');
+
+        $guids = $guids->merge($propGuids);
+
+        // 4. MASTER PDT
+        $masterPdt = DB::table('productdatatemplates')
+            ->where('GUID', self::MASTER_PDT_GUID)
+            ->orderByDesc('editionNumber')
+            ->orderByDesc('versionNumber')
+            ->orderByDesc('revisionNumber')
+            ->first();
+
+        if ($masterPdt) {
+
+            // GOPs
+            $masterGopGuids = DB::table('groupofproperties')
+                ->where('pdtId', $masterPdt->Id)
+                ->whereNotNull('referenceDocumentGUID')
+                ->where('referenceDocumentGUID', '!=', 'n/a')
+                ->pluck('referenceDocumentGUID');
+
+            $guids = $guids->merge($masterGopGuids);
+
+            // Properties
+            $masterPropGuids = DB::table('properties')
+                ->where('pdtID', $masterPdt->Id)
+                ->whereNotNull('referenceDocumentGUID')
+                ->where('referenceDocumentGUID', '!=', 'n/a')
+                ->pluck('referenceDocumentGUID');
+
+            $guids = $guids->merge($masterPropGuids);
+        }
+
+        // FINAL: unique
+        $guids = $guids->filter()->unique()->values();
+
+        return referencedocuments::whereIn('GUID', $guids)->get();
     }
-
     /**
      * Get property GUIDs for a PDT with referenceURI
      */
@@ -1101,10 +1133,16 @@ class Iso23387Exporter
             $prop->appendChild($dataType);
         }
 
-        // DimensionRef
-        if (isset($propData['DimensionRef'])) {
-            $ref = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':DimensionRef');
-            $ref->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $propData['DimensionRef']['dt:GUID']);
+        // dimension
+
+        if (isset($propData['Dimension'])) {
+            $this->appendTextElement($dom, $prop, 'Dimension', $propData['Dimension']);
+        }
+
+        // ReferenceDocumentRef
+        if (isset($propData['ReferenceDocumentRef'])) {
+            $ref = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':ReferenceDocumentRef');
+            $ref->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $propData['ReferenceDocumentRef']['dt:GUID']);
             $prop->appendChild($ref);
         }
 
@@ -1147,6 +1185,11 @@ class Iso23387Exporter
         // Status
         if (isset($refDocData['Status'])) {
             $this->appendTextElement($dom, $refDoc, 'Status', $refDocData['Status']);
+        }
+
+        // URI
+        if (isset($refDocData['URI'])) {
+            $this->appendTextElement($dom, $refDoc, 'URI', $refDocData['URI']);
         }
 
         // Language

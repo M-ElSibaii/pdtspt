@@ -446,7 +446,7 @@
 
     <!-- Page Heading -->
     @if (isset($header))
-    <header class="bg-white dark:bg-gray-800 shadow">
+    <header class="bg-white shadow">
         <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             {{ $header }}
         </div>
@@ -463,10 +463,10 @@
         {{ $slot }}
     </main>
 </body>
-<footer class="bg-neutral-200 text-center dark:bg-neutral-700 lg:text-left flex flex-rows">
-    <div class="p-4 grow text-center text-neutral-700 dark:text-neutral-200">
+<footer class="bg-neutral-200 text-center lg:text-left flex flex-rows">
+    <div class="p-4 grow text-center text-neutral-700">
         © 2021 Universidade do Minho. Todos os direitos reservados &middot;
-        <a class="text-neutral-800 dark:text-neutral-400" href="{{route('privacypolicy')}}">Política de privacidade</a>
+        <a class="text-neutral-800" href="{{route('privacypolicy')}}">Política de privacidade</a>
     </div>
     <p class="p-4 flex-none"><a href="#">Back to top</a></p>
 </footer>

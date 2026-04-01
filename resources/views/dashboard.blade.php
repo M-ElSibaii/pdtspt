@@ -23,7 +23,7 @@
                         <col style="width: 100px"> <!-- Fixed width for action buttons -->
                         <col style="width: 100px"> <!-- Fixed width for survey button -->
                     </colgroup>
-                    <thead class="sticky top-0 z-50 border-b bg-white font-medium dark:border-neutral-500">
+                    <thead class="sticky top-0 z-50 border-b bg-white font-medium">
                         <tr>
                             <th scope="col" class="px-6 py-4">Imagem</th>
                             <th scope="col" class="px-6 py-4">Nome</th>
@@ -53,7 +53,7 @@
                         <!-- Filtering using Alpine.js -->
                         @foreach($latestPDT as $pdt)
                         <tr
-                            class="border-b dark:border-neutral-500"
+                            class="border-b"
                             x-show="(search === '' || '{{ strtolower($pdt->pdtNamePt) }}'.includes(search.toLowerCase())) && (selectedCategories.length === 0 || selectedCategories.includes('{{ $pdt->category }}'))">
                             <td class="whitespace-nowrap px-6 py-4 font-medium">
                                 <img class="w-auto max-w-[100px] max-h-14" src="{{ asset('/img/' . $pdt->pdtNameEn . '.png') }}" alt="" />

@@ -22,6 +22,10 @@
                         <th>Descrição</th>
                         <td>{{$rd->description}}</td>
                     </tr>
+                     <tr>
+                        <th>URI</th>
+                        <td>https://pdts.pt/referencedocumentview/{{$rd->GUID}}</td>
+                    </tr>
                     <tr>
                         <th>Estado</th>
                         <td>{{$rd->status}}</td>

@@ -216,9 +216,10 @@ class GroupofpropertiesController extends Controller
             ->get();
         $pdts = productdatatemplates::get();
         $gopversions = groupofproperties::where('GUID', $gopGUID)->get();
+        // Retrieve the latest referenceDocumentGUID
+        $referencedocument = referencedocuments::where('GUID', $gopdd->referenceDocumentGUID)->first();
 
-
-        return view('datadictionaryviewGOP', compact('gopdd', 'gopinpdts', 'pdts', 'gopversions'));
+        return view('datadictionaryviewGOP', compact('gopdd', 'gopinpdts', 'pdts', 'gopversions', 'referencedocument'));
     }
 
 
