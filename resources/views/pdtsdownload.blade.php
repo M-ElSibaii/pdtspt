@@ -62,47 +62,51 @@
                             @if($property->gopID == $propertyGroup->Id)
                             <!-- Apply the 'master-template-row' class if the property is from master template -->
                             <tr class="{{ $property->from_master ? 'master-template-row' : '' }}">
-                                <td class="p-1.5 property-td">
-                                    <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . $property->GUID) }}">
-                                        {{ $property->namePt }}
-                                    </a>
-                                    @if($property->status == 'InActive')
-                                    <span class="status-tag status-tag-inactive">Inativa</span>
-                                    @endif
+                               <td class="p-1.5 property-td">
+    @if(!is_null($property->relationToOtherDataDictionaries))
+        @php
+            $relations = explode('),(', trim($property->relationToOtherDataDictionaries, '()'));
+            $propertyUrl = null;
+            $domainUrl = null;
 
+            foreach ($relations as $relation) {
+                $parts = explode(', ', $relation);
+                if (isset($parts[1]) && trim($parts[1]) === 'bsdd.buildingsmart.org') {
+                    $propertyUrl = trim($parts[0]);
+                    $domainUrl = trim($parts[1]);
+                    break;
+                }
+            }
+        @endphp
 
-                                    {{-- Check if the relationToOtherDataDictionaries attribute exists and is not null --}}
-                                    @if(!is_null($property->relationToOtherDataDictionaries))
-                                    @php
-                                    // Remove parentheses and split by ',' to get individual elements
-                                    $relations = explode('),(', trim($property->relationToOtherDataDictionaries, '()'));
+        @if($domainUrl === 'bsdd.buildingsmart.org')
+            {{-- bsDD link exists: show EN name first, then logo, then PT name --}}
+            <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . $property->GUID) }}">
+                {{ $property->nameEn }}
+            </a>
+            <a href="{{ $propertyUrl }}" target="_blank">
+                <img src="{{ asset('img/IFCBSDD.png') }}" alt="IFC Logo" style="width:40px; height:auto; margin-left:10px;">
+            </a>
+            <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . $property->GUID) }}">
+                {{ $property->namePt }}
+            </a>
+        @else
+            {{-- No bsDD link: original behaviour --}}
+            <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . $property->GUID) }}">
+                {{ $property->namePt }}
+            </a>
+        @endif
+    @else
+        {{-- No relation at all: original behaviour --}}
+        <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . $property->GUID) }}">
+            {{ $property->namePt }}
+        </a>
+    @endif
 
-                                    // Initialize variables for storing URLs
-                                    $propertyUrl = null;
-                                    $domainUrl = null;
-
-                                    // Iterate through each relation to check for bsdd.buildingsmart.org
-                                    foreach ($relations as $relation) {
-                                    // Split each relation into property URL and domain URL
-                                    $parts = explode(', ', $relation);
-
-                                    // If the second part (domain URL) matches bsdd.buildingsmart.org, store the property URL
-                                    if (isset($parts[1]) && trim($parts[1]) === 'bsdd.buildingsmart.org') {
-                                    $propertyUrl = trim($parts[0]); // Store the property URL
-                                    $domainUrl = trim($parts[1]); // Store the domain URL
-                                    break; // Stop the loop once we find the correct domain
-                                    }
-                                    }
-                                    @endphp
-
-                                    {{-- Only show the logo if the domain matches --}}
-                                    @if($domainUrl === 'bsdd.buildingsmart.org')
-                                    <a href="{{ $propertyUrl }}" target="_blank">
-                                        <img src="{{ asset('img/IFCBSDD.png') }}" alt="IFC Logo" style="width:40px; height:auto; margin-left:10px;">
-                                    </a>
-                                    @endif
-                                    @endif
-                                </td>
+    @if($property->status == 'InActive')
+        <span class="status-tag status-tag-inactive">Inativa</span>
+    @endif
+</td>
                                 <td class="p-1.5">{{ $property->units ? $property->units : 'Sem unidade' }}</td>
                                 <td class="p-1.5">
                                     <div class="flex flex-col">
@@ -149,46 +153,61 @@
             </div>
         </div>
 
-        <table hidden id="tblpdtsh">
-            <tr>
-          <th style="width: 15%;">Grupo de propriedades</th>
-                <th>Propriedade </th>
-                <th style="width: 7%;">Unidade</th>
-                <th style="width: 40%;">Descrição</th>
-                <th style="width: 16%;">Documento de referência</th>
-            </tr>
-            @foreach($sorted_combined_groups as $group)
-            @foreach($group as $propertyGroup)
-            @foreach($joined_properties as $property)
-            @if($property->gopID == $propertyGroup->Id)
+       <table hidden id="tblpdtsh">
+    <tr>
+        <th style="width: 15%;">Grupo de propriedades</th>
+        <th>Propriedade</th>
+        <th style="width: 7%;">Unidade</th>
+        <th style="width: 40%;">Descrição</th>
+        <th style="width: 16%;">Documento de referência</th>
+    </tr>
+    @foreach($sorted_combined_groups as $group)
+    @foreach($group as $propertyGroup)
+    @foreach($joined_properties as $property)
+    @if($property->gopID == $propertyGroup->Id)
 
-            <tr>
-                <td>
-                    {{ $propertyGroup->gopNamePt }}
-                </td>
-                <td>
+        @php
+            $propertyUrl = null;
+            $domainUrl = null;
+
+            if (!is_null($property->relationToOtherDataDictionaries)) {
+                $relations = explode('),(', trim($property->relationToOtherDataDictionaries, '()'));
+                foreach ($relations as $relation) {
+                    $parts = explode(', ', $relation);
+                    if (isset($parts[1]) && trim($parts[1]) === 'bsdd.buildingsmart.org') {
+                        $propertyUrl = trim($parts[0]);
+                        $domainUrl = trim($parts[1]);
+                        break;
+                    }
+                }
+            }
+        @endphp
+
+        <tr>
+            <td>{{ $propertyGroup->gopNamePt }}</td>
+            <td>
+                @if($domainUrl === 'bsdd.buildingsmart.org')
+                    {{ $property->nameEn }} - {{ $property->namePt }}
+                @else
                     {{ $property->namePt }}
-                </td>
-                <td>
-                    {{ $property->units }}
-                </td>
-                <td>
-                    {{$property->namePtSc}}: {{$property->descriptionPt}}
-                </td>
-                <td>
-                    @if ($referenceDocument->where('GUID', $property->referenceDocumentGUID)->first())
+                @endif
+            </td>
+            <td>{{ $property->units }}</td>
+            <td>{{ $property->namePtSc }}: {{ $property->descriptionPt }}</td>
+            <td>
+                @if($referenceDocument->where('GUID', $property->referenceDocumentGUID)->first())
                     {{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->rdName }}
-                    @else
+                @else
                     n/a
-                    @endif
-                </td>
+                @endif
+            </td>
+        </tr>
 
-            </tr>
-            @endif
-            @endforeach
-            @endforeach
-            @endforeach
-        </table>
+    @endif
+    @endforeach
+    @endforeach
+    @endforeach
+</table>
 
 
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
