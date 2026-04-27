@@ -28,6 +28,145 @@ class Iso23387Exporter
     private const NAMESPACE_PREFIX = 'dt';
     private const MASTER_PDT_GUID = '230d9954097541b793f2a1fddb8bd0ad';
 
+
+    private function  sanitizePascalCase($string): string
+    {
+        if (!$string) return '';
+
+        $accents = [
+            'à' => 'a',
+            'á' => 'a',
+            'â' => 'a',
+            'ã' => 'a',
+            'ä' => 'a',
+            'å' => 'a',
+            'è' => 'e',
+            'é' => 'e',
+            'ê' => 'e',
+            'ë' => 'e',
+            'ì' => 'i',
+            'í' => 'i',
+            'î' => 'i',
+            'ï' => 'i',
+            'ò' => 'o',
+            'ó' => 'o',
+            'ô' => 'o',
+            'õ' => 'o',
+            'ö' => 'o',
+            'ù' => 'u',
+            'ú' => 'u',
+            'û' => 'u',
+            'ü' => 'u',
+            'ý' => 'y',
+            'ÿ' => 'y',
+            'ç' => 'c',
+            'ñ' => 'n',
+            'À' => 'A',
+            'Á' => 'A',
+            'Â' => 'A',
+            'Ã' => 'A',
+            'Ä' => 'A',
+            'Å' => 'A',
+            'È' => 'E',
+            'É' => 'E',
+            'Ê' => 'E',
+            'Ë' => 'E',
+            'Ì' => 'I',
+            'Í' => 'I',
+            'Î' => 'I',
+            'Ï' => 'I',
+            'Ò' => 'O',
+            'Ó' => 'O',
+            'Ô' => 'O',
+            'Õ' => 'O',
+            'Ö' => 'O',
+            'Ù' => 'U',
+            'Ú' => 'U',
+            'Û' => 'U',
+            'Ü' => 'U',
+            'Ý' => 'Y',
+            'Ç' => 'C',
+            'Ñ' => 'N',
+        ];
+        $string = strtr($string, $accents);
+
+        // Remove disallowed characters and whitespace, preserve casing
+        $string = preg_replace('/["#%\/\\\\:`{}\[\]|;<>?~\s]/', '', $string);
+
+        return $string;
+    }
+    private function convertToPascalCase($string): string
+    {
+        if (!$string) return '';
+
+        // Replace Portuguese/accented characters with ASCII equivalents
+        $accents = [
+            'à' => 'a',
+            'á' => 'a',
+            'â' => 'a',
+            'ã' => 'a',
+            'ä' => 'a',
+            'å' => 'a',
+            'è' => 'e',
+            'é' => 'e',
+            'ê' => 'e',
+            'ë' => 'e',
+            'ì' => 'i',
+            'í' => 'i',
+            'î' => 'i',
+            'ï' => 'i',
+            'ò' => 'o',
+            'ó' => 'o',
+            'ô' => 'o',
+            'õ' => 'o',
+            'ö' => 'o',
+            'ù' => 'u',
+            'ú' => 'u',
+            'û' => 'u',
+            'ü' => 'u',
+            'ý' => 'y',
+            'ÿ' => 'y',
+            'ç' => 'c',
+            'ñ' => 'n',
+            'À' => 'A',
+            'Á' => 'A',
+            'Â' => 'A',
+            'Ã' => 'A',
+            'Ä' => 'A',
+            'Å' => 'A',
+            'È' => 'E',
+            'É' => 'E',
+            'Ê' => 'E',
+            'Ë' => 'E',
+            'Ì' => 'I',
+            'Í' => 'I',
+            'Î' => 'I',
+            'Ï' => 'I',
+            'Ò' => 'O',
+            'Ó' => 'O',
+            'Ô' => 'O',
+            'Õ' => 'O',
+            'Ö' => 'O',
+            'Ù' => 'U',
+            'Ú' => 'U',
+            'Û' => 'U',
+            'Ü' => 'U',
+            'Ý' => 'Y',
+            'Ç' => 'C',
+            'Ñ' => 'N',
+        ];
+        $string = strtr($string, $accents);
+
+        // Remove any remaining non-alphanumeric characters (except spaces/dashes/underscores used as word separators)
+        $string = preg_replace('/[^a-zA-Z0-9\s\-_]/', '', $string);
+
+        // Split on word separators, lowercase each word, ucfirst, then join
+        $words = preg_split('/[\s_\-]+/', trim($string));
+        $pascalCaseString = implode('', array_map('ucfirst', array_map('strtolower', $words)));
+
+        return $pascalCaseString;
+    }
+
     /**
      * Export PDT to JSON (structurally identical to XML)
      */
@@ -137,7 +276,7 @@ class Iso23387Exporter
             // Likely a GUID
             return DB::table('productdatatemplates')
                 ->where('GUID', $pdtIdOrGuid)
-                ->orderByRaw('versionNumber DESC, revisionNumber DESC, editionNumber DESC')
+                ->orderByRaw('versionNumber DESC, revisionNumber DESC')
                 ->first();
         } else {
             // Likely an ID
@@ -192,7 +331,7 @@ class Iso23387Exporter
             'dateOfCreation' => $this->formatDate($pdt->dateOfVersion ?? $pdt->dateOfRevision),
             'Name' => $this->buildMultilingualNames($pdt->pdtNameEn, $pdt->pdtNamePt),
             'Definition' => $this->buildMultilingualDefinitions($pdt->descriptionEn, $pdt->descriptionPt),
-            'URI' => 'https://pdts.pt/pdtview/' . $pdt->Id . '-' . $pdt->GUID
+            'URI' => 'https://pdts.pt/pdtview/' . $pdt->Id . '-' . $this->convertToPascalCase($pdt->pdtNamePt)
         ];
 
         $library['DataTemplates'] = [$this->buildDataTemplate($pdt, $groupsOfProperties, $properties)];
@@ -242,13 +381,13 @@ class Iso23387Exporter
         }
 
         // OPTIONAL: MajorVersion (0..1)
-        if ($pdt->editionNumber) {
-            $template['MajorVersion'] = (int)$pdt->editionNumber;
+        if ($pdt->versionNumber) {
+            $template['MajorVersion'] = (int)$pdt->versionNumber;
         }
 
         // OPTIONAL: MinorVersion (0..1)
-        if ($pdt->versionNumber) {
-            $template['MinorVersion'] = (int)$pdt->versionNumber;
+        if ($pdt->revisionNumber) {
+            $template['MinorVersion'] = (int)$pdt->revisionNumber;
         }
 
         // OPTIONAL: Status (0..*)
@@ -284,7 +423,7 @@ class Iso23387Exporter
         // Attributes
         $template['dt:GUID'] = $pdt->GUID;
         $template['dateOfCreation'] = $this->formatDate($pdt->dateOfVersion ?? $pdt->dateOfRevision);
-        $template['URI'] = 'https://pdts.pt/pdtview/' . $pdt->Id . '-' . $pdt->GUID;
+        $template['URI'] = 'https://pdts.pt/pdtview/' . $pdt->Id . '-' . $this->convertToPascalCase($pdt->pdtNamePt);
 
         return $template;
     }
@@ -351,7 +490,7 @@ class Iso23387Exporter
         // Attributes
         $element['dt:GUID'] = $gop->GUID;
         $element['dateOfCreation'] = $this->formatDate($gop->dateOfVersion);
-        $element['URI'] = 'https://pdts.pt/datadictionaryviewGOP/' . $gop->Id . '-' . $gop->GUID;
+        $element['URI'] = 'https://pdts.pt/datadictionaryviewGOP/' . $gop->Id  . '-' . $this->convertToPascalCase($gop->gopNamePt);
 
         return $element;
     }
@@ -428,7 +567,7 @@ class Iso23387Exporter
         // Attributes
         $element['dt:GUID'] = $prop->GUID;
         $element['dateOfCreation'] = $this->formatDate($prop->dateOfVersion);
-        $element['referenceURI'] = 'https://pdts.pt/datadictionaryview/' . $prop->Id . '-' . $prop->GUID;
+        $element['referenceURI'] = 'https://pdts.pt/datadictionaryview/' . $prop->Id . '-' . $this->sanitizePascalCase($prop->namePt);
 
         return $element;
     }
@@ -586,7 +725,6 @@ class Iso23387Exporter
         // 4. MASTER PDT
         $masterPdt = DB::table('productdatatemplates')
             ->where('GUID', self::MASTER_PDT_GUID)
-            ->orderByDesc('editionNumber')
             ->orderByDesc('versionNumber')
             ->orderByDesc('revisionNumber')
             ->first();
@@ -625,14 +763,14 @@ class Iso23387Exporter
         $properties = DB::table('properties as p')
             ->join('propertiesdatadictionaries as pdd', 'p.GUID', '=', 'pdd.GUID')
             ->where('p.pdtID', $pdtId)
-            ->select('p.GUID', 'pdd.Id')
+            ->select('p.GUID', 'pdd.Id', 'pdd.namePt')
             ->distinct()
             ->get();
 
         return $properties->map(function ($prop) {
             return [
                 'dt:GUID' => $prop->GUID,
-                'referenceURI' => 'https://pdts.pt/datadictionaryview/' . $prop->Id . '-' . $prop->GUID
+                'referenceURI' => 'https://pdts.pt/datadictionaryview/' . $prop->Id . '-' . $this->sanitizePascalCase($prop->namePt)
             ];
         })->toArray();
     }
@@ -646,14 +784,14 @@ class Iso23387Exporter
         $properties = DB::table('properties as p')
             ->join('propertiesdatadictionaries as pdd', 'p.propertyId', '=', 'pdd.Id')
             ->where('p.gopId', $gopId)
-            ->select('pdd.GUID as GUID', 'pdd.Id')
+            ->select('pdd.GUID as GUID', 'pdd.Id', 'pdd.namePt')
             ->get();
 
         // Deduplicate by GUID, keep only the first property for each GUID
         return $properties->unique('GUID')->map(function ($prop) {
             return [
                 'dt:GUID' => $prop->GUID,
-                'referenceURI' => 'https://pdts.pt/datadictionaryview/' . $prop->Id . '-' . $prop->GUID
+                'referenceURI' => 'https://pdts.pt/datadictionaryview/' . $prop->Id . '-' . $this->sanitizePascalCase($prop->namePt)
             ];
         })->values()->toArray();
     }
@@ -665,14 +803,14 @@ class Iso23387Exporter
     {
         $gops = DB::table('groupofproperties')
             ->where('pdtId', $pdtId)
-            ->select('GUID', 'Id')
+            ->select('GUID', 'Id', 'gopNamePt')
             ->distinct()
             ->get();
 
         return $gops->map(function ($gop) {
             return [
                 'dt:GUID' => $gop->GUID,
-                'referenceURI' => 'https://pdts.pt/datadictionaryviewGOP/' . $gop->Id . '-' . $gop->GUID
+                'referenceURI' => 'https://pdts.pt/datadictionaryviewGOP/' . $gop->Id . '-' . $this->convertToPascalCase($gop->gopNamePt)
             ];
         })->toArray();
     }
@@ -690,7 +828,7 @@ class Iso23387Exporter
         return $properties->map(function ($prop) {
             return [
                 'dt:GUID' => $prop->GUID,
-                'referenceURI' => 'https://pdts.pt/datadictionaryview/' . $prop->Id . '-' . $prop->GUID
+                'referenceURI' => 'https://pdts.pt/datadictionaryview/' . $prop->Id . '-' . $this->sanitizePascalCase($prop->namePt)
             ];
         })->unique('dt:GUID')->values()->toArray();
     }
@@ -708,7 +846,7 @@ class Iso23387Exporter
         return $groupsOfProperties->map(function ($gop) {
             return [
                 'dt:GUID' => $gop->GUID,
-                'referenceURI' => 'https://pdts.pt/datadictionaryviewGOP/' . $gop->Id . '-' . $gop->GUID
+                'referenceURI' => 'https://pdts.pt/datadictionaryviewGOP/' . $gop->Id . '-' . $this->convertToPascalCase($gop->gopNamePt)
             ];
         })->unique('dt:GUID')->values()->toArray();
     }

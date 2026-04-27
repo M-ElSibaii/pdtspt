@@ -62,8 +62,9 @@ Route::get('/pdtsdownload/{pdtID}', [GroupofpropertiesController::class, 'getGro
     ->name('pdtsdownload');
 
 // PDT View Page
-Route::get('/pdtview/{id}-{guid}', [ProductdatatemplatesController::class, 'viewPdt'])
-    ->name('pdtview');
+Route::get('/pdtview/{idSlug}', [ProductdatatemplatesController::class, 'viewPdt'])
+    ->name('pdtview')
+    ->where('idSlug', '[0-9]+-.*');
 
 // Single PDT export endpoints (EN ISO 23387 format)
 Route::post('/pdt-export/json/{pdtId}', [ProductdatatemplatesController::class, 'downloadPdtJson'])
@@ -96,14 +97,16 @@ Route::post('/pdtssurvey/store', [GroupofpropertiesController::class, 'store'])
     ->middleware(['auth', 'verified'])->name('pdtssurveystore');
 
 Route::get(
-    '/datadictionaryview/{propID}-{propGUID}',
+    '/datadictionaryview/{idSlug}',
     [PropertiesdatadictionariesController::class, 'getPropertyDataDictionary']
-)->name('datadictionaryview');
+)->name('datadictionaryview')
+    ->where('idSlug', '[0-9]+-.*');
 
 Route::get(
-    '/datadictionaryviewGOP/{gopID}-{gopGUID}',
+    '/datadictionaryviewGOP/{idSlug}',
     [GroupofpropertiesController::class, 'getGOPDataDictionary']
-)->name('datadictionaryviewGOP');
+)->name('datadictionaryviewGOP')
+    ->where('idSlug', '[0-9]+-.*');
 
 Route::get(
     '/referencedocumentview/{rdGUID}',

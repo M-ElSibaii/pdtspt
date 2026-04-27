@@ -7,7 +7,7 @@
                     <div class="grow block py-2">
                         <div class="flex-none inline">
                             <h1 class="flex-none inline">{{ $pdt->pdtNamePt }}</h1>
-                            <p class="flex-none inline"> - V{{ $pdt-> editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}</p>
+                            <p class="flex-none inline"> - V{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}</p>
                             @if ($pdt->status == 'Active')
                             <span class="status-tag status-tag-active">Ativa</span>
                             @endif
@@ -48,7 +48,7 @@
                                 <td class="text-left content-start bg-slate-300 p-3" colspan="5">
                                     <input class="text-left expand" type="checkbox" name="{{ $group[0]->gopNamePt }}" id="{{ $group[0]->gopNamePt }}" data-toggle="toggle">
                                     <label class="my-auto text-left cursor-pointer" for="{{ $group[0]->gopNamePt }}">Grupo de propriedades -
-                                        <a href="{{ url('datadictionaryviewGOP/' . $group[0]->Id . '-' . $group[0]->GUID) }}">
+                                        <a href="{{ url('datadictionaryviewGOP/' . $group[0]->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::convertToPascalCase($group[0]->gopNamePt)) }}">
                                             {{ $group[0]->gopNamePt }}
                                         </a>
                                     </label>
@@ -81,24 +81,24 @@
 
         @if($domainUrl === 'bsdd.buildingsmart.org')
             {{-- bsDD link exists: show EN name first, then logo, then PT name --}}
-            <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . $property->GUID) }}">
+            <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($property->namePt)) }}">
                 {{ $property->nameEn }}
             </a>
             <a href="{{ $propertyUrl }}" target="_blank">
                 <img src="{{ asset('img/IFCBSDD.png') }}" alt="IFC Logo" style="width:40px; height:auto; margin-left:10px;">
             </a>
-            <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . $property->GUID) }}">
+            <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($property->namePt)) }}">
                 {{ $property->namePt }}
             </a>
         @else
             {{-- No bsDD link: original behaviour --}}
-            <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . $property->GUID) }}">
+            <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($property->namePt)) }}">
                 {{ $property->namePt }}
             </a>
         @endif
     @else
         {{-- No relation at all: original behaviour --}}
-        <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . $property->GUID) }}">
+        <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($property->namePt)) }}">
             {{ $property->namePt }}
         </a>
     @endif
@@ -241,7 +241,7 @@
                 .then(blob => {
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
-                    link.download = "{{ $pdt->pdtNamePt }}_V{{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.json";
+                    link.download = "{{ $pdt->pdtNamePt }}_V{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.json";
                     link.click();
                 })
                 .catch(error => {
@@ -267,7 +267,7 @@
                 .then(blob => {
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(blob);
-                    link.download = "{{ $pdt->pdtNamePt }}_V{{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.xml";
+                    link.download = "{{ $pdt->pdtNamePt }}_V{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.xml";
                     link.click();
                 })
                 .catch(error => {
@@ -279,7 +279,7 @@
             $("#csv").on("click", function() {
                 $("#tblpdtsh").tableHTMLExport({
                     type: "csv",
-                    filename: "{{ $pdt->pdtNamePt }} data template V {{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.csv"
+                    filename: "{{ $pdt->pdtNamePt }} data template V{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.csv"
                 });
             });
      

@@ -5,5 +5,5 @@ Accept: application/json
 ###
 
 ### XML export
-POST http://127.0.0.1:8000/pdt-export/xml/4
+GET http://127.0.0.1:8000/api/4/xml
 Accept: application/xml

@@ -28,7 +28,7 @@
     "dateOfCreation": "2026-03-31T12:00:00Z",
     "Name": [...],
     "Definition": [...],
-    "URI": "https://pdts.pt/pdtview/{id}-{guid}",
+    "URI": "https://pdts.pt/pdtview/{id}-{slug}",
     "DataTemplates": [{
         "dt:GUID": "...",
         "Name": [...],
@@ -62,7 +62,7 @@
 &lt;dt:Library xmlns:dt="https://standards.iso.org/iso/23387/ed-2/en/"
             dt:GUID="..."
             dateOfCreation="2026-03-31T12:00:00Z"
-            URI="https://pdts.pt/pdtview/{id}-{guid}"&gt;
+            URI="https://pdts.pt/pdtview/{id}-{slug}"&gt;
     &lt;dt:Name language="pt"&gt;...&lt;/dt:Name&gt;
     &lt;dt:Name language="en"&gt;...&lt;/dt:Name&gt;
     &lt;dt:Definition language="pt"&gt;...&lt;/dt:Definition&gt;

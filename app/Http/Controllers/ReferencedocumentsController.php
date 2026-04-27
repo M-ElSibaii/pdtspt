@@ -30,7 +30,6 @@ class ReferencedocumentsController extends Controller
                 'productdatatemplates.pdtNamePt',
                 'productdatatemplates.Id',
                 'productdatatemplates.versionNumber',
-                'productdatatemplates.editionNumber',
                 'productdatatemplates.revisionNumber'
             )
             ->get();

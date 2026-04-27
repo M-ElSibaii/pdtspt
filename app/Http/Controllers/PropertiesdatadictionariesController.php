@@ -13,13 +13,13 @@ use Illuminate\Http\Request;
 
 class PropertiesdatadictionariesController extends Controller
 {
-    public function getPropertyDataDictionary($propID, $propGUID)
+    public function getPropertyDataDictionary($propID)
     {
         $propdd = propertiesdatadictionaries::where('Id', $propID)->first();
         $propinpdts = properties::where('propertyId', $propID)->get();
         $pdts = productdatatemplates::get();
 
-        $propversions = propertiesdatadictionaries::where('GUID', $propGUID)->get();
+        $propversions = propertiesdatadictionaries::where('GUID', $propinpdts->first()->GUID)->get();
 
         // Retrieve the latest referenceDocumentGUID
         $referenceDocumentData = properties::where('propertyId', $propID)->latest()->first('referenceDocumentGUID');

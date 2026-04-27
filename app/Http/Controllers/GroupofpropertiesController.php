@@ -31,7 +31,7 @@ class GroupofpropertiesController extends Controller
         $pdts = productdatatemplates::where('GUID', $pdtGUID)
             ->orderBy('versionNumber', 'asc')
             ->orderBy('revisionNumber', 'asc')
-            ->orderBy('editionNumber', 'asc')
+
             ->get();
 
         $latestPdt = $pdts->last();
@@ -120,7 +120,7 @@ class GroupofpropertiesController extends Controller
         $pdts = productdatatemplates::where('GUID', $pdtGUID)
             ->orderBy('versionNumber', 'asc')
             ->orderBy('revisionNumber', 'asc')
-            ->orderBy('editionNumber', 'asc')
+
             ->get();
 
         $pdtCount = $pdts->count();
@@ -207,15 +207,15 @@ class GroupofpropertiesController extends Controller
     }
 
 
-    public function getGOPDataDictionary($gopID, $gopGUID)
+    public function getGOPDataDictionary($gopID)
     {
 
         $gopdd = groupofproperties::WHERE('Id', $gopID)
             ->first();
-        $gopinpdts = groupofproperties::where('GUID', $gopGUID)
+        $gopinpdts = groupofproperties::where('GUID', $gopdd->GUID)
             ->get();
         $pdts = productdatatemplates::get();
-        $gopversions = groupofproperties::where('GUID', $gopGUID)->get();
+        $gopversions = groupofproperties::where('GUID', $gopdd->GUID)->get();
         // Retrieve the latest referenceDocumentGUID
         $referencedocument = referencedocuments::where('GUID', $gopdd->referenceDocumentGUID)->first();
 

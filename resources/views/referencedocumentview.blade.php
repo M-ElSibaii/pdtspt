@@ -44,13 +44,13 @@
 
                     <tr>
                         <td>
-                            <a href="{{ route('pdtsdownload', ['pdtID' => $proprd->Id]) }}">{{$proprd->pdtNamePt}} V{{$proprd->editionNumber}}.{{$proprd->versionNumber}}.{{$proprd->revisionNumber}}</a>
+                            <a href="{{ route('pdtsdownload', ['pdtID' => $proprd->Id]) }}">{{$proprd->pdtNamePt}} V{{$proprd->versionNumber}}.{{$proprd->revisionNumber}}</a>
 
                             {{-- {{$proprd->pdtNamePt}} --}}
                         </td>
                         {{-- <td>{{$proprd->versionNumber}}.{{$proprd->revisionNumber}}</td> --}}
                         <td>
-                            <a href="{{ url('datadictionaryview/' . $proprd->Id . '-' . $proprd->GUID) }}">{{ $proprd->namePt }}</a>
+                            <a href="{{ url('datadictionaryview/' . $proprd->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::convertToPascalCase($proprd->namePt)) }}">{{ $proprd->namePt }}</a>
                             {{-- {{$proprd->namePt}} --}}
                         </td>
 

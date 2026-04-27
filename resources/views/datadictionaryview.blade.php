@@ -25,8 +25,8 @@
                         <tr>
                             <th>URI</th>
                             <td>
-                                <a href="https://pdts.pt/datadictionaryview/{{$propdd->Id}}-{{$propdd->GUID}}" target="_blank">
-                                    https://pdts.pt/datadictionaryview/{{$propdd->Id}}-{{$propdd->GUID}}
+                                <a href="https://pdts.pt/datadictionaryview/{{$propdd->Id}}-{{\App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($propdd->namePt)}}" target="_blank">
+                                    https://pdts.pt/datadictionaryview/{{$propdd->Id}}-{{\App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($propdd->namePt)}}
                                 </a>
                             </td>
                         </tr>
@@ -58,6 +58,15 @@
                             <th>Unidades</th>
                             <td>{{$propdd->units}}</td>
                         </tr>
+                              <tr>
+                            <th>Representação Visual</th>
+                            <td>        @if($propdd->visualRepresentation == "TRUE")
+                                        <div class="col-sm">
+                                            <img src="{{ asset ('img/'.$propdd->nameEn.'.png')}}" alt='{{$propdd->nameEn}}' class="property-image">
+                                        </div>
+                                        @endif</td>
+                        </tr>
+                 
                         <tr>
                             <th>Estado</th>
                             <td>{{$propdd->status}}</td>
@@ -106,7 +115,7 @@
                             <th>Lista de propriedades substituídas</th>
                             <td style="display: flex; border: none;">
                                 @foreach ($propversions as $version)
-                                @if ($version->versionNumber < $propdd->versionNumber || ($version->versionNumber == $propdd->versionNumber && $version->revisionNumber < $propdd->revisionNumber)) <form class="mb-3" action="{{ url('datadictionaryview/' . $version->Id . '-' . $version->GUID) }}">
+                                @if ($version->versionNumber < $propdd->versionNumber || ($version->versionNumber == $propdd->versionNumber && $version->revisionNumber < $propdd->revisionNumber)) <form class="mb-3" action="{{ url('datadictionaryview/' . $version->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($version->namePt)) }}">
                                             <button class="btn-link" type="submit" style="margin-right: 5px;">{{ $version->versionNumber}}.{{$version->revisionNumber}}, </button>
                                         </form>
                                         @endif
@@ -119,7 +128,7 @@
                             <td>
                                 @foreach ($propversions as $version)
                                 @if ($version->versionNumber > $propdd->versionNumber || ($version->versionNumber == $propdd->versionNumber && $version->revisionNumber > $propdd->revisionNumber))
-                                <form class="mb-3" action="{{ url('datadictionaryview/' . $version->Id . '-' . $version->GUID) }}">
+                                <form class="mb-3" action="{{ url('datadictionaryview/' . $version->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($version->namePt)) }}">
                                     <button class="btn-link" type="submit" style="margin-right: 5px;">{{ $version->versionNumber}}.{{$version->revisionNumber}}, </button>
                                 </form>
                                 @endif
@@ -255,7 +264,7 @@
                     @foreach ($propinpdts as $proppdts)
                     <tr>
                         <td>
-                            <a href="{{ route('pdtsdownload', ['pdtID' => $proppdts->pdtID]) }}">{{$pdts->where('Id', $proppdts->pdtID)->first()->pdtNamePt}} V{{$pdts->where('Id', $proppdts->pdtID)->first()->editionNumber}}.{{$pdts->where('Id', $proppdts->pdtID)->first()->versionNumber}}.{{$pdts->where('Id', $proppdts->pdtID)->first()->revisionNumber}}</a>
+                            <a href="{{ route('pdtsdownload', ['pdtID' => $proppdts->pdtID]) }}">{{$pdts->where('Id', $proppdts->pdtID)->first()->pdtNamePt}} V{{$pdts->where('Id', $proppdts->pdtID)->first()->versionNumber}}.{{$pdts->where('Id', $proppdts->pdtID)->first()->revisionNumber}}</a>
                         </td>
                         <td>{{$proppdts->descriptionPt}}</td>
                     </tr>

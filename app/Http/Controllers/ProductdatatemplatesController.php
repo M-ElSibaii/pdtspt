@@ -50,7 +50,7 @@ class ProductdatatemplatesController extends Controller
             'Name' => $this->buildMultilingualNames($gop->gopNameEn, $gop->gopNamePt),
             'Definition' => $this->buildMultilingualDefinitions($gop->definitionEn, $gop->definitionPt),
             'dt:GUID' => $gop->GUID,
-            'referenceURI' => 'https://pdts.pt/groupofpropertiesview/' . $gop->Id . '-' . $gop->GUID
+            'referenceURI' => 'https://pdts.pt/groupofpropertiesview/' . $gop->Id . '-' . $this->convertToPascalCase($gop->gopNamePt)
         ];
     }
 
@@ -98,13 +98,13 @@ class ProductdatatemplatesController extends Controller
     /**
      * View a single PDT with all attributes
      */
-    public function viewPdt($id, $guid)
+    public function viewPdt($id)
     {
-        $pdt = productdatatemplates::where('Id', $id)->where('GUID', $guid)->firstOrFail();
+        $pdt = productdatatemplates::where('Id', $id)->firstOrFail();
 
         // Load related data
         $groupsOfProperties = groupofproperties::where('pdtId', $id)->get();
-        $pdtVersions = productdatatemplates::where('GUID', $guid)->get();
+        $pdtVersions = productdatatemplates::where('GUID', $pdt->GUID)->get();
 
         // Load ObjectType if exists
         $objectType = null;
@@ -116,7 +116,7 @@ class ProductdatatemplatesController extends Controller
         $masterPropertiesCount = 0;
         if ($pdt->GUID !== '230d9954097541b793f2a1fddb8bd0ad') {
             $masterPdt = productdatatemplates::where('GUID', '230d9954097541b793f2a1fddb8bd0ad')
-                ->orderByRaw('versionNumber DESC, revisionNumber DESC, editionNumber DESC')
+                ->orderByRaw('versionNumber DESC, revisionNumber DESC')
                 ->first();
             if ($masterPdt) {
                 $masterPropertiesCount = DB::table('properties')
@@ -139,8 +139,7 @@ class ProductdatatemplatesController extends Controller
                 DB::raw("(SELECT 
                 GUID,
                 MAX(versionNumber) as max_versionNumber,
-                MAX(revisionNumber) as max_revisionNumber,
-                MAX(editionNumber) as max_editionNumber
+                MAX(revisionNumber) as max_revisionNumber
              
                 FROM productdatatemplates 
                 GROUP BY GUID) as mx"),
@@ -148,7 +147,6 @@ class ProductdatatemplatesController extends Controller
                     $join->on('mx.GUID', '=', 'pdt.GUID');
                     $join->on('mx.max_versionNumber', '=', 'pdt.versionNumber');
                     $join->on('mx.max_revisionNumber', '=', 'pdt.revisionNumber');
-                    $join->on('mx.max_editionNumber', '=', 'pdt.editionNumber');
                 }
             )
             ->get();
@@ -158,15 +156,13 @@ class ProductdatatemplatesController extends Controller
                 DB::raw("(SELECT 
                     GUID,
                     MAX(versionNumber) as max_versionNumber,
-                    MAX(revisionNumber) as max_revisionNumber,
-                    MAX(editionNumber) as max_editionNumber
+                    MAX(revisionNumber) as max_revisionNumber
                   FROM productdatatemplates 
                   GROUP BY GUID) as mx"),
                 function ($join) {
                     $join->on('mx.GUID', '=', 'pdt.GUID');
                     $join->on('mx.max_versionNumber', '=', 'pdt.versionNumber');
                     $join->on('mx.max_revisionNumber', '=', 'pdt.revisionNumber');
-                    $join->on('mx.max_editionNumber', '=', 'pdt.editionNumber');
                 }
             )
             ->select('pdt.category')
@@ -203,7 +199,7 @@ class ProductdatatemplatesController extends Controller
                     $query->where('Id', $pdtID)
                         ->orWhere('GUID', $pdtID);
                 })
-                ->orderByRaw('versionNumber DESC, revisionNumber DESC, editionNumber DESC')
+                ->orderByRaw('versionNumber DESC, revisionNumber DESC')
                 ->first();
 
             if (!$pdt) {
@@ -304,7 +300,7 @@ class ProductdatatemplatesController extends Controller
             if ($pdt->GUID !== '230d9954097541b793f2a1fddb8bd0ad') {
                 $masterPdt = DB::table('productdatatemplates')
                     ->where('GUID', '230d9954097541b793f2a1fddb8bd0ad')
-                    ->orderByRaw('versionNumber DESC, revisionNumber DESC, editionNumber DESC')
+                    ->orderByRaw('versionNumber DESC, revisionNumber DESC')
                     ->first();
 
                 if ($masterPdt) {
@@ -388,7 +384,7 @@ class ProductdatatemplatesController extends Controller
                                 ['language' => 'en', 'value' => $refDoc->description ?? $refDoc->title ?? 'Referenced document']
                             ],
                             'URI' => [
-                                ['language' => 'en', 'value' => 'https://pdts.pt/referencedocumentview/' . $refDoc->GUID]
+                                ['language' => 'en', 'value' => 'https://pdts.pt/referencedocumentview/' . $refDoc->GUID . '-' . str_replace(' ', '', $refDoc->rdName ?? '')]
                             ],
                             'Status' => $refDoc->status ?? 'Active',
                             'Language' => 'en',
@@ -411,7 +407,7 @@ class ProductdatatemplatesController extends Controller
                         'dateOfCreation' => $this->formatDate($pdt->dateOfVersion ?? $pdt->dateOfRevision),
                         'Name' => $this->buildMultilingualNames($pdt->pdtNameEn, $pdt->pdtNamePt),
                         'Definition' => $this->buildMultilingualDefinitions($pdt->descriptionEn, $pdt->descriptionPt),
-                        'URI' => "https://pdts.pt/pdtview/{$pdt->Id}-{$pdt->GUID}",
+                        'URI' => "https://pdts.pt/pdtview/{$pdt->Id}-" . self::convertToPascalCase($pdt->pdtNamePt),
                         'HasObjectTypeRef' => $hasObjectTypeRef,
                     ],
                     'rawData' => $pdtData,
@@ -560,12 +556,10 @@ class ProductdatatemplatesController extends Controller
             'pdtNamePt' => 'required|string',
             'descriptionEn' => 'nullable|string',
             'descriptionPt' => 'nullable|string',
-            'dateOfEdition' => 'required|date',
             'dateOfRevision' => 'required|date',
             'dateOfVersion' => 'required|date',
             'status' => 'required|string',
             'category' => 'required|string',
-            'editionNumber' => 'required|integer',
             'versionNumber' => 'required|integer',
             'revisionNumber' => 'required|integer',
             // Add other fields validation as needed
@@ -579,14 +573,12 @@ class ProductdatatemplatesController extends Controller
         $pdt->pdtNamePt = $request->input('pdtNamePt');
         $pdt->descriptionEn = $request->input('descriptionEn');
         $pdt->descriptionPt = $request->input('descriptionPt');
-        $pdt->dateOfEdition = now();
         $pdt->dateOfRevision = now();
         $pdt->dateOfVersion = now();
         $pdt->created_at = now();
         $pdt->updated_at = now();
         $pdt->status = $request->input('status');
         $pdt->category = $request->input('category');
-        $pdt->editionNumber = $request->input('editionNumber');
         $pdt->versionNumber = $request->input('versionNumber');
         $pdt->revisionNumber = $request->input('revisionNumber');
         // Set other fields as needed
@@ -730,12 +722,12 @@ class ProductdatatemplatesController extends Controller
             'DeActivationDateUtc' => $productDataTemplate->depreciationDate,
             'DeprecationExplanation' => ($productDataTemplate->depreciationDate != '0000-00-00') ? $productDataTemplate->depreciationDate : null,
             'DocumentReference' => referencedocuments::where('GUID', $productDataTemplate->referenceDocumentGUID)->value('rdName'),
-            'RevisionDateUtc' => $productDataTemplate->dateOfVersion,
-            'RevisionNumber' => (int)($productDataTemplate->versionNumber + $productDataTemplate->revisionNumber - 1),
+            'RevisionDateUtc' => $productDataTemplate->dateOfRevision,
+            'RevisionNumber' => $productDataTemplate->revisionNumber,
             'Status' => $productDataTemplate->status,
             'Uid' => $productDataTemplate->GUID,
-            'VersionDateUtc' => $productDataTemplate->dateOfEdition,
-            'VersionNumber' => (int)$productDataTemplate->editionNumber,
+            'VersionDateUtc' => $productDataTemplate->dateOfVersion,
+            'VersionNumber' => $productDataTemplate->versionNumber,
 
         ];
 
@@ -806,7 +798,6 @@ class ProductdatatemplatesController extends Controller
             'Uid' => $groupOfProperties->GUID,
             'VersionDateUtc' => $groupOfProperties->dateOfVersion,
             'VersionNumber' => (int)$groupOfProperties->versionNumber,
-            'VisualRepresentationUri' => $groupOfProperties->visualRepresentation,
             'ClassProperties' => [],
         ];
 
@@ -831,7 +822,7 @@ class ProductdatatemplatesController extends Controller
             'PropertyCode' =>  (string) $property->GUID . '-' . (string) $property->propertyId,
             'Code' =>  (string) $property->Id,
             'Description' => $property->descriptionPt,
-            'PropertySet' => $this->convertToPascalCase($group),
+            'PropertySet' => self::convertToPascalCase($group),
 
         ];
 
@@ -843,12 +834,11 @@ class ProductdatatemplatesController extends Controller
         // get referencedocument of the property from properties table
         $propertyRD = properties::where('propertyId', $property->Id)->latest()->value('referenceDocumentGUID') ?? "n/a";
 
-        //get replacing and replaced properties
-        // Assuming $property is an instance of the Property model
         $guid = $property->GUID;
         $versionNumber = $property->versionNumber;
         $revisionNumber = $property->revisionNumber;
-        // Fetch properties with the same GUID and higher version or same version with higher revision (ReplacingObjectCodes)
+
+        // ReplacingObjectCodes: same GUID, higher version/revision
         $replacingProperties = propertiesdatadictionaries::where('GUID', $guid)
             ->where(function ($query) use ($versionNumber, $revisionNumber) {
                 $query->where('versionNumber', '>', $versionNumber)
@@ -856,13 +846,11 @@ class ProductdatatemplatesController extends Controller
                         $query->where('versionNumber', $versionNumber)
                             ->where('revisionNumber', '>', $revisionNumber);
                     });
-            })
-            ->get();
-        // Extract the codes from the result set with the format "GUID-ID"
-        $replacingCodes = $replacingProperties->map(function ($replacingProperty) {
-            return $replacingProperty->GUID . '-' . $replacingProperty->Id;
-        })->toArray();
-        // Fetch properties with the same GUID and lower version or same version with lower revision (ReplacedObjectCodes)
+            })->get();
+
+        $replacingCodes = $replacingProperties->map(fn($p) => self::sanitizePascalCase($p->namePt))->toArray();
+
+        // ReplacedObjectCodes: same GUID, lower version/revision
         $replacedProperties = propertiesdatadictionaries::where('GUID', $guid)
             ->where(function ($query) use ($versionNumber, $revisionNumber) {
                 $query->where('versionNumber', '<', $versionNumber)
@@ -870,77 +858,137 @@ class ProductdatatemplatesController extends Controller
                         $query->where('versionNumber', $versionNumber)
                             ->where('revisionNumber', '<', $revisionNumber);
                     });
-            })
-            ->get();
+            })->get();
 
-        // Extract the codes from the result set with the format "GUID-ID"
-        $replacedCodes = $replacedProperties->map(function ($replacedProperty) {
-            return $replacedProperty->GUID . '-' . $replacedProperty->Id;
-        })->toArray();
+        $replacedCodes = $replacedProperties->map(fn($p) => self::sanitizePascalCase($p->namePt))->toArray();
 
+        // FIX 3: Code is PascalCase of namePt (not GUID+Id)
+        $code = self::sanitizePascalCase($property->namePt);
+
+        // FIX 4: OwnedUri for properties: https://pdts.pt/datadictionaryview/Id-namePt
+        $ownedUri = 'https://pdts.pt/datadictionaryview/' . $property->Id . '-' . self::sanitizePascalCase($property->namePt);
+
+        // FIX 2: Map dataType from DB to bSDD allowed values
+        $dataType = $this->mapDataType($property->dataType);
 
         $propertyData = [
-            'Code' => (string)$property->GUID . '-' . (string)$property->Id,
-            'Name' => $property->namePt,
-            'Definition' => $property->definitionPt,
-            'Units' =>  [$property->units],
-            'ActivationDateUtc' => ($property->dateOfVersion != '0000-00-00') ? $property->dateOfVersion : '9999-99-99',
-            'CountryOfOrigin' => $property->countryOfOrigin,
-            'CreatorLanguageIsoCode' => $property->creatorsLanguage,
-            'DeActivationDateUtc' => ($property->depreciationDate != '0000-00-00') ? $property->depreciationDate : null,
-            'DeprecationExplanation' => $property->depreciationExplanation,
-            'DocumentReference' => $propertyRD !== "n/a" ? referencedocuments::WHERE('GUID', $propertyRD)->value('rdName') : null,
-            'IsDynamic' => false,
-            'PhysicalQuantity' => $property->physicalQuantity,
-            'ReplacedObjectCodes' => $replacedCodes,
-            'ReplacingObjectCodes' => $replacingCodes,
-            'RevisionDateUtc' => $property->dateOfRevision,
-            'RevisionNumber' => (int)$property->revisionNumber,
-            'Status' => $property->status,
-            'TextFormat' => $property->textFormat,
-            'Uid' => $property->GUID,
-            'VersionDateUtc' => $property->dateOfVersion,
-            'VersionNumber' => (int)$property->versionNumber,
-            'VisualRepresentationUri' => $property->visualRepresentation,
-
+            'Code'                      => $property->Id . '-' . $code,
+            'Name'                      => $property->namePt,
+            'Definition'                => $property->definitionPt,
+            'DataType'                  => $dataType, // FIX 2: now included
+            'Units'                     => $property->units ? [$property->units] : [],
+            'ActivationDateUtc'         => ($property->dateOfVersion && $property->dateOfVersion !== '0000-00-00') ? $property->dateOfVersion : null,
+            'CountryOfOrigin'           => $property->countryOfOrigin,
+            'CreatorLanguageIsoCode'    => $property->creatorsLanguage,
+            'DeActivationDateUtc'       => ($property->depreciationDate && $property->depreciationDate !== '0000-00-00') ? $property->depreciationDate : null,
+            'DeprecationExplanation'    => $property->depreciationExplanation ?: null,
+            'DocumentReference'         => $propertyRD !== "n/a" ? referencedocuments::where('GUID', $propertyRD)->value('rdName') : null,
+            'IsDynamic'                 => (bool)($property->dynamicProperty ?? false),
+            'OwnedUri'                  => $ownedUri, // FIX 4
+            'PhysicalQuantity'          => $property->physicalQuantity,
+            'ReplacedObjectCodes'       => $replacedCodes,
+            'ReplacingObjectCodes'      => $replacingCodes,
+            'RevisionDateUtc'           => $property->dateOfRevision ?: null,
+            'RevisionNumber'            => (int)$property->revisionNumber,
+            'Status'                    => $property->status,
+            'TextFormat'                => $property->textFormat ?: null,
+            'Uid'                       => $property->GUID,
+            'VersionDateUtc'            => ($property->dateOfVersion && $property->dateOfVersion !== '0000-00-00') ? $property->dateOfVersion : null,
+            'VersionNumber'             => (int)$property->versionNumber,
+            'VisualRepresentationUri'   => $ownedUri ?: null,
         ];
-
 
         return $propertyData;
     }
 
+    /**
+     * FIX 2: Map your DB dataType values to bSDD allowed values.
+     * bSDD only accepts: Boolean, Character, Integer, Real, String, Time
+     */
+    private function mapDataType(?string $dataType): string
+    {
+        if (!$dataType) return 'String'; // safe default
+
+        $map = [
+            'boolean'   => 'Boolean',
+            'bool'      => 'Boolean',
+            'character' => 'Character',
+            'char'      => 'Character',
+            'integer'   => 'Integer',
+            'int'       => 'Integer',
+            'number'    => 'Integer',
+            'real'      => 'Real',
+            'float'     => 'Real',
+            'double'    => 'Real',
+            'decimal'   => 'Real',
+            'string'    => 'String',
+            'text'      => 'String',
+            'varchar'   => 'String',
+            'time'      => 'Time',
+            'date'      => 'Time',
+            'datetime'  => 'Time',
+        ];
+
+        return $map[strtolower(trim($dataType))] ?? 'String';
+    }
+
     public function exportDataToJsonPSETS()
     {
-        // Fetch data using raw SQL queries
-        $productDataTemplates = DB::select('SELECT * FROM productdatatemplates');
+        // FIX 1: Only the latest version of each PDT (max versionNumber, then max revisionNumber)
+        $productDataTemplates = DB::select('
+        SELECT pdt.*
+        FROM productdatatemplates pdt
+        INNER JOIN (
+            SELECT GUID, MAX(versionNumber) as maxVersion
+            FROM productdatatemplates
+            GROUP BY GUID
+        ) latest ON pdt.GUID = latest.GUID AND pdt.versionNumber = latest.maxVersion
+        INNER JOIN (
+            SELECT GUID, versionNumber, MAX(revisionNumber) as maxRevision
+            FROM productdatatemplates
+            GROUP BY GUID, versionNumber
+        ) latestRev ON pdt.GUID = latestRev.GUID
+            AND pdt.versionNumber = latestRev.versionNumber
+            AND pdt.revisionNumber = latestRev.maxRevision
+    ');
 
-        // Fetch properties from propertiesdatadictionary
-        $propertiesData = DB::select('SELECT * FROM propertiesdatadictionaries');
+        // FIX 1: Same for properties data dictionary
+        $propertiesData = DB::select('
+        SELECT p.*
+        FROM propertiesdatadictionaries p
+        INNER JOIN (
+            SELECT GUID, MAX(versionNumber) as maxVersion
+            FROM propertiesdatadictionaries
+            GROUP BY GUID
+        ) latest ON p.GUID = latest.GUID AND p.versionNumber = latest.maxVersion
+        INNER JOIN (
+            SELECT GUID, versionNumber, MAX(revisionNumber) as maxRevision
+            FROM propertiesdatadictionaries
+            GROUP BY GUID, versionNumber
+        ) latestRev ON p.GUID = latestRev.GUID
+            AND p.versionNumber = latestRev.versionNumber
+            AND p.revisionNumber = latestRev.maxRevision
+    ');
 
-        // Fetch groups of properties from groupofproperties
         $groupsOfProperties = DB::select('SELECT * FROM groupofproperties');
 
-        // Transform data into the desired JSON format
         $jsonData = $this->transformDataPSETS($productDataTemplates, $propertiesData, $groupsOfProperties);
 
-        // Save JSON data to a temporary file
         $tempFilePath = tempnam(sys_get_temp_dir(), 'PDTs.pt_Domain_bsdd_PSETS_');
-        file_put_contents($tempFilePath, json_encode($jsonData, JSON_PRETTY_PRINT));
+        file_put_contents($tempFilePath, json_encode($jsonData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
-        // Add the current date to the file name
         $currentDate = Carbon::now()->format('Y-m-d');
         $fileName = 'PDTs.pt_Domain_bsdd_PSETS_' . $currentDate . '.json';
 
-        // Stream download the file to the user
         $headers = [
-            'Content-Type' => 'application/json',
+            'Content-Type'        => 'application/json',
             'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
         ];
 
         return response()->streamDownload(
             function () use ($tempFilePath) {
                 readfile($tempFilePath);
-                unlink($tempFilePath); // Delete the temporary file after streaming
+                unlink($tempFilePath);
             },
             $fileName,
             $headers
@@ -950,27 +998,28 @@ class ProductdatatemplatesController extends Controller
     private function transformDataPSETS($productDataTemplates, $propertiesData)
     {
         $jsonData = [
-            'ModelVersion' => '2.0',
-            'OrganizationCode' => 'pdtspt',
-            'DictionaryCode' => 'pdtspt',
-            'LanguageIsoCode' => 'pt-PT',
-            'DictionaryName' => 'pdtspt',
-            'DictionaryVersion' => "0.1",
-            'MoreInfoUrl' => "https://pdts.pt",
-            'ChangeRequestEmailAddress' => "pdts.portugal@gmail.com",
-            'License' => "CC BY",
-            'LicenseUrl' => "https://creativecommons.org/share-your-work/cclicenses/",
-            'QualityAssuranceProcedure' => "EN ISO 23386:2020",
-            'Classes' => [],
-            'Properties' => [],
+            'ModelVersion'               => '2.0',
+            'OrganizationCode'           => 'pdtspt',
+            'DictionaryCode'             => 'pdtspt',
+            'LanguageIsoCode'            => 'pt-PT',
+            'LanguageOnly'               => false,
+            'UseOwnUri'                  => true,  // FIX 4: tell bSDD we supply our own URIs
+            'DictionaryUri'              => 'https://pdts.pt', // FIX 4: base URI
+            'DictionaryName'             => 'PDTs.pt',
+            'DictionaryVersion'          => '0.1',
+            'MoreInfoUrl'                => 'https://pdts.pt',
+            'ChangeRequestEmailAddress'  => 'pdts.portugal@gmail.com',
+            'License'                    => 'CC BY',
+            'LicenseUrl'                 => 'https://creativecommons.org/share-your-work/cclicenses/',
+            'QualityAssuranceProcedure'  => 'EN ISO 23386:2020',
+            'Classes'                    => [],
+            'Properties'                 => [],
         ];
 
         foreach ($productDataTemplates as $productDataTemplate) {
-            $classData = $this->transformProductDataTemplatePSETS($productDataTemplate);
-            $jsonData['Classes'][] = $classData;
+            $jsonData['Classes'][] = $this->transformProductDataTemplatePSETS($productDataTemplate);
         }
 
-        // Transform properties from propertiesdatadictionary
         foreach ($propertiesData as $property) {
             $jsonData['Properties'][] = $this->transformPropertyDataDictionary($property);
         }
@@ -980,72 +1029,203 @@ class ProductdatatemplatesController extends Controller
 
     private function transformProductDataTemplatePSETS($productDataTemplate)
     {
-        // Implement the transformation logic for a product data template
-        // Use $productDataTemplate and its properties to structure the data
+        // FIX 3: Code is PascalCase of name
+        $code = self::convertToPascalCase($productDataTemplate->pdtNamePt);
+
+        // FIX 4: OwnedUri for PDTs: https://pdts.pt/pdtview/Id-pdtNamePt
+        $ownedUri = 'https://pdts.pt/pdtview/' . $productDataTemplate->Id . '-' . self::convertToPascalCase($productDataTemplate->pdtNamePt);
 
         $classData = [
-            'ClassType' => 'Class',
-            'Code' => (string) $productDataTemplate->GUID . '-' . (string) $productDataTemplate->Id,
-            'Name' => $productDataTemplate->pdtNamePt,
-            'Definition' => $productDataTemplate->descriptionPt,
-            'ActivationDateUtc' => $productDataTemplate->dateOfVersion,
-            'DeActivationDateUtc' => $productDataTemplate->depreciationDate,
-            'DeprecationExplanation' => ($productDataTemplate->depreciationDate != '0000-00-00') ? $productDataTemplate->depreciationDate : null,
-            'DocumentReference' => $productDataTemplate->referenceDocumentGUID !== "n/a" ? referencedocuments::where('GUID', $productDataTemplate->referenceDocumentGUID)->value('rdName') : null,
-            'RevisionDateUtc' => $productDataTemplate->dateOfVersion,
-            'RevisionNumber' => (int)($productDataTemplate->versionNumber + $productDataTemplate->revisionNumber - 1),
-            'Status' => $productDataTemplate->status,
-            'Uid' => $productDataTemplate->GUID,
-            'VersionDateUtc' => $productDataTemplate->dateOfEdition,
-            'VersionNumber' => (int)$productDataTemplate->editionNumber,
-
-            'ClassProperties' => [],
+            'ClassType'              => 'Class',
+            'Code'                   => $code, // FIX 3
+            'Name'                   => $productDataTemplate->pdtNamePt,
+            'Definition'             => $productDataTemplate->descriptionPt,
+            'OwnedUri'               => $ownedUri, // FIX 4
+            'ActivationDateUtc'      => ($productDataTemplate->dateOfVersion && $productDataTemplate->dateOfVersion !== '0000-00-00') ? $productDataTemplate->dateOfVersion : null,
+            'DeActivationDateUtc'    => ($productDataTemplate->depreciationDate && $productDataTemplate->depreciationDate !== '0000-00-00') ? $productDataTemplate->depreciationDate : null,
+            'DeprecationExplanation' => ($productDataTemplate->depreciationDate && $productDataTemplate->depreciationDate !== '0000-00-00') ? $productDataTemplate->depreciationExplanation : null,
+            'DocumentReference'      => ($productDataTemplate->referenceDocumentGUID && $productDataTemplate->referenceDocumentGUID !== "n/a")
+                ? referencedocuments::where('GUID', $productDataTemplate->referenceDocumentGUID)->value('rdName')
+                : null,
+            'RevisionDateUtc'        => $productDataTemplate->dateOfRevision ?: null,
+            'RevisionNumber'         => (int)$productDataTemplate->revisionNumber,
+            'Status'                 => $productDataTemplate->status,
+            'Uid'                    => $productDataTemplate->GUID,
+            'VersionDateUtc'         => ($productDataTemplate->dateOfVersion && $productDataTemplate->dateOfVersion !== '0000-00-00') ? $productDataTemplate->dateOfVersion : null,
+            'VersionNumber'          => (int)$productDataTemplate->versionNumber,
+            'ClassProperties'        => [],
         ];
 
-        $groupOfProperties = groupofproperties::WHERE('pdtId', $productDataTemplate->Id)->get();
+        $groupOfProperties = groupofproperties::where('pdtId', $productDataTemplate->Id)->get();
 
         foreach ($groupOfProperties as $group) {
             $classProperties = DB::select('SELECT * FROM properties WHERE gopID = ?', [$group->Id]);
-
             foreach ($classProperties as $property) {
-                $propertyData = $this->transformPropertyPSET($property);
-                $classData['ClassProperties'][] = $propertyData;
+                $classData['ClassProperties'][] = $this->transformPropertyPSET($property);
             }
         }
 
         return $classData;
     }
 
-
     private function transformPropertyPSET($property)
     {
+        $group = groupofproperties::where('Id', $property->gopID)->value('gopNamePt');
 
-        $group = groupofproperties::WHERE('Id', $property->gopID)->value('gopNamePt');
-        $propertyData = [
-            'PropertyCode' =>  (string) $property->GUID . '-' . (string) $property->propertyId,
-            'Code' =>  (string) $property->Id,
-            'Description' => $property->descriptionPt,
-            'PropertySet' => $this->convertToPascalCase($group),
+        $ddProperty = propertiesdatadictionaries::where('Id', $property->propertyId)->first();
+
+        $propertyCode = self::sanitizePascalCase(
+            $ddProperty->namePt ?? $property->descriptionPt
+        );
+
+        $ddId = $ddProperty->Id ?? $property->Id;
+        $ddName = $ddProperty->namePt ?? $property->descriptionPt;
+
+        return [
+            'Code'         => (string)$ddId,
+            'PropertyCode' => $propertyCode,
+            'Description'  => $property->descriptionPt ?: null,
+            'PropertySet'  => self::convertToPascalCase($group),
+            'OwnedUri'     => 'https://pdts.pt/datadictionaryview/' . $ddId . '-' . self::sanitizePascalCase($ddName),
         ];
-
-        return $propertyData;
     }
 
-    private function convertToPascalCase($string)
+
+    public static function sanitizePascalCase($string): string
     {
-        // Remove accented characters
-        $string = iconv('UTF-8', 'ASCII//TRANSLIT', $string);
+        if (!$string) return '';
 
-        // Remove special characters
-        $string = preg_replace('/[^a-zA-Z0-9]/', '', $string);
+        $accents = [
+            'à' => 'a',
+            'á' => 'a',
+            'â' => 'a',
+            'ã' => 'a',
+            'ä' => 'a',
+            'å' => 'a',
+            'è' => 'e',
+            'é' => 'e',
+            'ê' => 'e',
+            'ë' => 'e',
+            'ì' => 'i',
+            'í' => 'i',
+            'î' => 'i',
+            'ï' => 'i',
+            'ò' => 'o',
+            'ó' => 'o',
+            'ô' => 'o',
+            'õ' => 'o',
+            'ö' => 'o',
+            'ù' => 'u',
+            'ú' => 'u',
+            'û' => 'u',
+            'ü' => 'u',
+            'ý' => 'y',
+            'ÿ' => 'y',
+            'ç' => 'c',
+            'ñ' => 'n',
+            'À' => 'A',
+            'Á' => 'A',
+            'Â' => 'A',
+            'Ã' => 'A',
+            'Ä' => 'A',
+            'Å' => 'A',
+            'È' => 'E',
+            'É' => 'E',
+            'Ê' => 'E',
+            'Ë' => 'E',
+            'Ì' => 'I',
+            'Í' => 'I',
+            'Î' => 'I',
+            'Ï' => 'I',
+            'Ò' => 'O',
+            'Ó' => 'O',
+            'Ô' => 'O',
+            'Õ' => 'O',
+            'Ö' => 'O',
+            'Ù' => 'U',
+            'Ú' => 'U',
+            'Û' => 'U',
+            'Ü' => 'U',
+            'Ý' => 'Y',
+            'Ç' => 'C',
+            'Ñ' => 'N',
+        ];
+        $string = strtr($string, $accents);
 
-        // Convert the string to lowercase
-        $string = strtolower($string);
+        // Remove disallowed characters and whitespace, preserve casing
+        $string = preg_replace('/["#%\/\\\\:`{}\[\]|;<>?~\s]/', '', $string);
 
-        // Convert the string to PascalCase
-        $words = explode(' ', $string);
-        $pascalCaseWords = array_map('ucfirst', $words);
-        $pascalCaseString = implode('', $pascalCaseWords);
+        return $string;
+    }
+
+    public static function convertToPascalCase($string): string
+    {
+        if (!$string) return '';
+
+        // Replace Portuguese/accented characters with ASCII equivalents
+        $accents = [
+            'à' => 'a',
+            'á' => 'a',
+            'â' => 'a',
+            'ã' => 'a',
+            'ä' => 'a',
+            'å' => 'a',
+            'è' => 'e',
+            'é' => 'e',
+            'ê' => 'e',
+            'ë' => 'e',
+            'ì' => 'i',
+            'í' => 'i',
+            'î' => 'i',
+            'ï' => 'i',
+            'ò' => 'o',
+            'ó' => 'o',
+            'ô' => 'o',
+            'õ' => 'o',
+            'ö' => 'o',
+            'ù' => 'u',
+            'ú' => 'u',
+            'û' => 'u',
+            'ü' => 'u',
+            'ý' => 'y',
+            'ÿ' => 'y',
+            'ç' => 'c',
+            'ñ' => 'n',
+            'À' => 'A',
+            'Á' => 'A',
+            'Â' => 'A',
+            'Ã' => 'A',
+            'Ä' => 'A',
+            'Å' => 'A',
+            'È' => 'E',
+            'É' => 'E',
+            'Ê' => 'E',
+            'Ë' => 'E',
+            'Ì' => 'I',
+            'Í' => 'I',
+            'Î' => 'I',
+            'Ï' => 'I',
+            'Ò' => 'O',
+            'Ó' => 'O',
+            'Ô' => 'O',
+            'Õ' => 'O',
+            'Ö' => 'O',
+            'Ù' => 'U',
+            'Ú' => 'U',
+            'Û' => 'U',
+            'Ü' => 'U',
+            'Ý' => 'Y',
+            'Ç' => 'C',
+            'Ñ' => 'N',
+        ];
+        $string = strtr($string, $accents);
+
+        // Remove any remaining non-alphanumeric characters (except spaces/dashes/underscores used as word separators)
+        $string = preg_replace('/[^a-zA-Z0-9\s\-_]/', '', $string);
+
+        // Split on word separators, lowercase each word, ucfirst, then join
+        $words = preg_split('/[\s_\-]+/', trim($string));
+        $pascalCaseString = implode('', array_map('ucfirst', array_map('strtolower', $words)));
 
         return $pascalCaseString;
     }
@@ -1059,7 +1239,7 @@ class ProductdatatemplatesController extends Controller
         $json = $exporter->exportToJson($pdtId);
 
         $pdt = productdatatemplates::find($pdtId);
-        $fileName = $pdt->pdtNamePt . '_V' . $pdt->editionNumber . '.' . $pdt->versionNumber . '.' . $pdt->revisionNumber . '_' . date('Y-m-d') . '.json';
+        $fileName = $pdt->pdtNamePt . '_V' . $pdt->versionNumber . '.' . $pdt->revisionNumber . '_' . date('Y-m-d') . '.json';
 
         return response()->streamDownload(
             function () use ($json) {
@@ -1079,7 +1259,7 @@ class ProductdatatemplatesController extends Controller
         $xml = $exporter->exportToXml($pdtId);
 
         $pdt = productdatatemplates::find($pdtId);
-        $fileName = $pdt->pdtNamePt . '_V' . $pdt->editionNumber . '.' . $pdt->versionNumber . '.' . $pdt->revisionNumber . '_' . date('Y-m-d') . '.xml';
+        $fileName = $pdt->pdtNamePt . '_V' . $pdt->versionNumber . '.' . $pdt->revisionNumber . '_' . date('Y-m-d') . '.xml';
 
         return response()->streamDownload(
             function () use ($xml) {

@@ -14,7 +14,7 @@
                 <p>O objetivo deste questionário é apoiar o consenso da indústria rumo a PDTs uniformizados a nível nacional</p>
                 <div class="mb-6">
                     <h1 class="flex-none inline">{{ $pdt->pdtNamePt }}</h1>
-                    <p class="flex-none inline"> - V{{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}</p>
+                    <p class="flex-none inline"> - V{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}</p>
                     @if ($pdt->status == 'Active')
                     <span class="status-tag status-tag-active">Ativa</span>
                     @endif
@@ -52,7 +52,7 @@
                                         <td class="text-left content-start bg-slate-300 p-3" colspan="6">
                                             <input class="text-left expand" type="checkbox" name="{{ $group[0]->gopNamePt }}" id="{{ $group[0]->gopNamePt }}" data-toggle="toggle">
                                             <label class="my-auto text-left cursor-pointer" for="{{ $group[0]->gopNamePt }}">Grupo de propriedades -
-                                                <a href="{{ url('datadictionaryviewGOP/' . $group[0]->Id . '-' . $group[0]->GUID) }}">
+                                                <a href="{{ url('datadictionaryviewGOP/' . $group[0]->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::convertToPascalCase($group[0]->gopNamePt)) }}">
                                                     {{ $group[0]->gopNamePt }}
                                                 </a>
                                             </label>
@@ -68,7 +68,7 @@
                                     <!-- Apply the 'master-template-row' class if the property is from master template -->
                                     <tr class="{{ $property->from_master ? 'master-template-row' : '' }}">
                                         <td class="p-1.5 property-td">
-                                            <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . $property->GUID) }}">{{ $property->namePt }}
+                                            <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($property->namePt)) }}">{{ $property->namePt }}
                                                 {{-- Check if the relationToOtherDataDictionaries attribute exists and is not null --}}
                                                 @if(!is_null($property->relationToOtherDataDictionaries))
                                                 @php

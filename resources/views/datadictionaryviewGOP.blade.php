@@ -25,8 +25,8 @@
                         <tr>
                             <th>URI</th>
                             <td>
-                                <a href="https://pdts.pt/datadictionaryviewGOP/{{$gopdd->Id}}-{{$gopdd->GUID}}" target="_blank">
-                                    https://pdts.pt/datadictionaryviewGOP/{{$gopdd->Id}}-{{$gopdd->GUID}}
+                                <a href="https://pdts.pt/datadictionaryviewGOP/{{$gopdd->Id}}-{{\App\Http\Controllers\ProductdatatemplatesController::convertToPascalCase($gopdd->gopNamePt)}}" target="_blank">
+                                    https://pdts.pt/datadictionaryviewGOP/{{$gopdd->Id}}-{{\App\Http\Controllers\ProductdatatemplatesController::convertToPascalCase($gopdd->gopNamePt)}}
                                 </a>
                             </td>
                         </tr>
@@ -111,7 +111,7 @@
                                         @endif
                                         @endforeach
                                         @if ($latestVersion)
-                                        <form class="mb-3" action="{{ url('datadictionaryviewGOP/' . $latestVersion->Id . '-' . $latestVersion->GUID) }}">
+                                        <form class="mb-3" action="{{ url('datadictionaryviewGOP/' . $latestVersion->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::convertToPascalCase($latestVersion->gopNamePt)) }}">
                                             <button class="btn-link" type="submit" style="margin-right: 5px;" >{{ $latestVersion->versionNumber}}.{{$latestVersion->revisionNumber}}, </button>
                                         </form>
                                         @endif
@@ -138,7 +138,7 @@
                                 @endif
                                 @endforeach
                                 @if ($latestVersion)
-                                <form class="mb-3" action="{{ url('datadictionaryviewGOP/' . $latestVersion->Id . '-' . $latestVersion->GUID) }}">
+                                <form class="mb-3" action="{{ url('datadictionaryviewGOP/' . $latestVersion->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::convertToPascalCase($latestVersion->gopNamePt)) }}">
                                     <button class="btn-link" type="submit" style="margin-right: 5px;" >{{ $latestVersion->versionNumber}}.{{$latestVersion->revisionNumber}}, </button>
                                 </form>
                                 @endif
@@ -197,7 +197,7 @@
                     @foreach ($gopinpdts as $goppdts)
                     <tr>
                         <td>
-                            <a href="{{ route('pdtsdownload', ['pdtID' => $goppdts->pdtId]) }}">{{$pdts->where('Id', $goppdts->pdtId)->first()->pdtNamePt}} V{{$pdts->where('Id', $goppdts->pdtId)->first()->editionNumber}}.{{$pdts->where('Id', $goppdts->pdtId)->first()->versionNumber}}.{{$pdts->where('Id', $goppdts->pdtId)->first()->revisionNumber}}</a>
+                            <a href="{{ route('pdtsdownload', ['pdtID' => $goppdts->pdtId]) }}">{{$pdts->where('Id', $goppdts->pdtId)->first()->pdtNamePt}} V{{$pdts->where('Id', $goppdts->pdtId)->first()->versionNumber}}.{{$pdts->where('Id', $goppdts->pdtId)->first()->revisionNumber}}</a>
                         </td>
                         <td>{{$goppdts->definitionPt}}</td>
                     </tr>

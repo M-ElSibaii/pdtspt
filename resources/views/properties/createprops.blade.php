@@ -60,7 +60,7 @@
 <a href="{{ route('properties.editdd', ['propertyddId' => $property->propertyId]) }}" 
    class="btn btn-warning" target="_blank">Edit Dictionary table</a>
 
-<a href="{{ url('datadictionaryview/' . $additionalInfo->Id . '-' . $additionalInfo->GUID) }}" 
+<a href="{{ url('datadictionaryview/' . $additionalInfo->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($additionalInfo->namePt)) }}"
    class="btn btn-warning" target="_blank">Data dictionary view</a>
  </td>
                     </tr>

@@ -59,12 +59,12 @@
                                 <img class="w-auto max-w-[100px] max-h-14" src="{{ asset('/img/' . $pdt->pdtNameEn . '.png') }}" alt="" />
                             </td>
                             <td class="whitespace-normal px-6 py-4 font-medium" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: normal;">
-                            <a href="/pdtview/{{ $pdt->Id }}-{{ $pdt->GUID }}" class="text-blue-500 hover:text-blue-700">                                    {{ $pdt->pdtNamePt }}
+                            <a href="/pdtview/{{ $pdt->Id }}-{{ \App\Http\Controllers\ProductdatatemplatesController::convertToPascalCase($pdt->pdtNamePt) }}" class="text-blue-500 hover:text-blue-700">{{ $pdt->pdtNamePt }}
                                 </a>
                             </td>
                             <td class="whitespace-nowrap px-6 py-4 font-medium">
                                 <div class="flex items-center">
-                                    <span class="mr-1">V{{ $pdt->editionNumber }}.{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}
+                                    <span class="mr-1">V{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}
                                         <br>
                                         @if ($pdt->status == 'InActive')
                                         <span class="status-tag status-tag-inactive">InActiva</span>
@@ -93,7 +93,7 @@
                                                 @foreach($allpdts as $otherPdt)
                                                 @if($otherPdt->GUID == $pdt->GUID && $otherPdt->Id != $pdt->Id)
                                                 <x-dropdown-link :href="route('pdtsdownload', ['pdtID' => $otherPdt->Id])">
-                                                    V{{ $otherPdt->editionNumber }}.{{ $otherPdt->versionNumber }}.{{ $otherPdt->revisionNumber }}
+                                                    V{{ $otherPdt->versionNumber }}.{{ $otherPdt->revisionNumber }}
                                                     @if ($otherPdt->status == 'InActive')
                                                     <span class="status-tag status-tag-inactive">Inativa</span>
                                                     @endif

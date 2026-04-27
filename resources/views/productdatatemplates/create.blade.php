@@ -71,11 +71,6 @@
 
 
                     <div class="form-group">
-                        <label for="revisionNumber">{{ __('editionNumber') }}</label>
-                        <input type="text" class="form-control" id="editionNumber" name="editionNumber" required>
-                    </div>
-
-                    <div class="form-group">
                         <label for="versionNumber">{{ __('versionNumber') }}</label>
                         <input type="text" class="form-control" id="versionNumber" name="versionNumber" required>
                     </div>
@@ -129,11 +124,6 @@
                     </div>
 
                     <!-- Date fields -->
-
-                    <div class="form-group">
-                        <label for="dateOfEdition">{{ __('Date of Edition') }}</label>
-                        <input type="text" class="form-control" id="dateOfEdition" name="dateOfEdition" value="{{ now() }}" readonly>
-                    </div>
 
                     <div class="form-group">
                         <label for="dateOfRevision">{{ __('Date of Revision') }}</label>
