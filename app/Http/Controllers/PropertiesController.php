@@ -34,6 +34,32 @@ class PropertiesController extends Controller
         //}
 
     }
+
+    /**
+     * GET Class Property View (ISO 23387 ClassProperty)
+     * Shows a specific class property usage within a class/group context
+     */
+    public function getClassPropertyView($idSlug)
+    {
+        // Parse ID from {id}-{slug}
+        $id = explode('-', $idSlug)[0];
+
+        $property = properties::where('Id', $id)->first();
+        if (!$property) {
+            abort(404, 'Class Property not found');
+        }
+
+        // Load related data
+        $propertyDefinition = propertiesdatadictionaries::find($property->propertyId);
+        $group = groupofproperties::find($property->gopID);
+        $pdt = productdatatemplates::find($property->pdtID);
+        $referencedocument = $property->referenceDocumentGUID
+            ? \App\Models\referencedocuments::where('GUID', $property->referenceDocumentGUID)->first()
+            : null;
+
+        return view('classpropertyview', compact('property', 'propertyDefinition', 'group', 'pdt', 'referencedocument'));
+    }
+
     public function choosePDT(Request $request)
     {
         // Fetch all PDTs

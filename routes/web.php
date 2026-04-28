@@ -96,6 +96,13 @@ Route::post('/pdtssurvey/{pdtID}', [GroupofpropertiesController::class, 'store']
 Route::post('/pdtssurvey/store', [GroupofpropertiesController::class, 'store'])
     ->middleware(['auth', 'verified'])->name('pdtssurveystore');
 
+
+Route::get(
+    '/classpropertyview/{idSlug}',
+    [PropertiesController::class, 'getClassPropertyView']
+)->name('classpropertyview')
+    ->where('idSlug', '[0-9]+-.*');
+
 Route::get(
     '/datadictionaryview/{idSlug}',
     [PropertiesdatadictionariesController::class, 'getPropertyDataDictionary']
@@ -117,11 +124,6 @@ Route::get(
 Route::post('/comments/{propID}', [GroupofpropertiesController::class, 'getCommentProperty']);
 
 Route::delete('/deletefeedback', [GroupofpropertiesController::class, 'destroyfeedback']);
-
-
-
-
-
 
 
 // Routes accessible only to admins

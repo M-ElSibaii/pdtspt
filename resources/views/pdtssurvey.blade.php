@@ -68,7 +68,7 @@
                                     <!-- Apply the 'master-template-row' class if the property is from master template -->
                                     <tr class="{{ $property->from_master ? 'master-template-row' : '' }}">
                                         <td class="p-1.5 property-td">
-                                            <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($property->namePt)) }}">{{ $property->namePt }}
+                                            <a href="{{ url('classpropertyview/' . $property->propertyId . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($property->namePt)) }}">{{ $property->namePt }}
                                                 {{-- Check if the relationToOtherDataDictionaries attribute exists and is not null --}}
                                                 @if(!is_null($property->relationToOtherDataDictionaries))
                                                 @php

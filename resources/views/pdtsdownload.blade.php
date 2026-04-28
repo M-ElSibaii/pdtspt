@@ -81,24 +81,24 @@
 
         @if($domainUrl === 'bsdd.buildingsmart.org')
             {{-- bsDD link exists: show EN name first, then logo, then PT name --}}
-            <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($property->namePt)) }}">
+            <a href="{{ url('classpropertyview/' . $property->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($property->namePt)) }}">
                 {{ $property->nameEn }}
             </a>
             <a href="{{ $propertyUrl }}" target="_blank">
                 <img src="{{ asset('img/IFCBSDD.png') }}" alt="IFC Logo" style="width:40px; height:auto; margin-left:10px;">
             </a>
-            <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($property->namePt)) }}">
+            <a href="{{ url('classpropertyview/' . $property->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($property->namePt)) }}">
                 {{ $property->namePt }}
             </a>
         @else
             {{-- No bsDD link: original behaviour --}}
-            <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($property->namePt)) }}">
+            <a href="{{ url('classpropertyview/' . $property->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($property->namePt)) }}">
                 {{ $property->namePt }}
             </a>
         @endif
     @else
         {{-- No relation at all: original behaviour --}}
-        <a href="{{ url('datadictionaryview/' . $property->propertyId . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($property->namePt)) }}">
+        <a href="{{ url('classpropertyview/' . $property->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($property->namePt)) }}">
             {{ $property->namePt }}
         </a>
     @endif

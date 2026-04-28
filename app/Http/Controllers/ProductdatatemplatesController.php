@@ -1072,21 +1072,25 @@ class ProductdatatemplatesController extends Controller
     {
         $group = groupofproperties::where('Id', $property->gopID)->value('gopNamePt');
 
-        $ddProperty = propertiesdatadictionaries::where('Id', $property->propertyId)->first();
+        $ddProperty = propertiesdatadictionaries::find($property->propertyId);
 
-        $propertyCode = self::sanitizePascalCase(
-            $ddProperty->namePt ?? $property->descriptionPt
-        );
+        $propertyCode = $ddProperty
+            ? ((string)$ddProperty->Id . '-' . self::sanitizePascalCase($ddProperty->namePt))
+            : ((string)$property->propertyId);
 
-        $ddId = $ddProperty->Id ?? $property->Id;
-        $ddName = $ddProperty->namePt ?? $property->descriptionPt;
+        $classPropertyCode = (string)$property->Id . '-' . $propertyCode;
+
+        // Class Property URI (ISO 23387 ClassProperty) - unique per properties record
+        $classPropertyOwnedUri = $ddProperty
+            ? 'https://pdts.pt/classpropertyview/' . $property->Id . '-' . self::sanitizePascalCase($ddProperty->namePt)
+            : null;
 
         return [
-            'Code'         => (string)$ddId,
+            'Code'         => $classPropertyCode,
             'PropertyCode' => $propertyCode,
             'Description'  => $property->descriptionPt ?: null,
             'PropertySet'  => self::convertToPascalCase($group),
-            'OwnedUri'     => 'https://pdts.pt/datadictionaryview/' . $ddId . '-' . self::sanitizePascalCase($ddName),
+            'OwnedUri'     => $classPropertyOwnedUri,
         ];
     }
 
