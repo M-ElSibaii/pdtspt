@@ -27,6 +27,15 @@
                     <p class="text-gray-500 text-sm mt-2">Date: 09/05/2024</p>
                 </div>
 
+                  <div class="border border-gray-200 rounded-lg p-4">
+                    <a href="img/guia pdts.pdf" download>
+                        <img src="img/guia pdts.png" alt="Publication Thumbnail" class="w-full h-auto rounded-lg">
+                    </a>
+                    <a href="img/guia pdts.pdf" download class="text-xl font-semibold mt-4 block">Guia de Criação de Modelos de Dados de Produto (PDTs) - Um Manual de Implementação Passo a Passo
+                    </a>
+                    <p class="text-gray-500 text-sm mt-2">Date: 04/05/2026</p>
+                </div>
+
 
                 <!-- Add more knowledge containers as necessary -->
 

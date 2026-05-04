@@ -17,6 +17,8 @@ use Carbon\Carbon;
 
 class ProductdatatemplatesController extends Controller
 {
+    private const MASTER_PDT_GUID = '230d9954097541b793f2a1fddb8bd0ad';
+
     public function productDataTemplate($pdtID)
     {
         try {
@@ -687,11 +689,22 @@ class ProductdatatemplatesController extends Controller
             'Properties' => [],
         ];
 
+        $masterPdt = $this->loadLatestMasterPdt();
+        $masterGroups = [];
+        if ($masterPdt) {
+            $masterGroups = DB::select('SELECT * FROM groupofproperties WHERE pdtId = ?', [$masterPdt->Id]);
+        }
+
         foreach ($productDataTemplates as $productDataTemplate) {
             $classData = $this->transformProductDataTemplate($productDataTemplate);
             $jsonData['Classes'][] = $classData;
+
             // Fetch related data using another raw SQL query
             $groupOfProperties = DB::select('SELECT * FROM groupofproperties WHERE pdtId = ?', [$productDataTemplate->Id]);
+
+            if ($masterPdt && $productDataTemplate->GUID !== self::MASTER_PDT_GUID) {
+                $groupOfProperties = $this->mergeMasterGroupsIntoPdtGroups($groupOfProperties, $masterGroups, $productDataTemplate->Id);
+            }
 
             foreach ($groupOfProperties as $group) {
                 $groupData = $this->transformGroupOfProperties($group);
@@ -706,6 +719,52 @@ class ProductdatatemplatesController extends Controller
         }
 
         return $jsonData;
+    }
+
+    private function loadLatestMasterPdt()
+    {
+        return DB::table('productdatatemplates')
+            ->where('GUID', self::MASTER_PDT_GUID)
+            ->orderByDesc('versionNumber')
+            ->orderByDesc('revisionNumber')
+            ->first();
+    }
+
+    private function mergeMasterGroupsIntoPdtGroups(array $pdtGroups, array $masterGroups, int $pdtId): array
+    {
+        $groupMap = [];
+
+        // Process PDT groups (might be objects from collection or arrays)
+        foreach ($pdtGroups as $group) {
+            $guid = is_array($group) ? $group['GUID'] : $group->GUID;
+            $groupMap[$guid] = $group;
+        }
+
+        // Process master groups and merge by GUID
+        foreach ($masterGroups as $masterGroup) {
+            $masterGuid = is_array($masterGroup) ? $masterGroup['GUID'] : $masterGroup->GUID;
+            $masterId = is_array($masterGroup) ? $masterGroup['Id'] : $masterGroup->Id;
+
+            if (isset($groupMap[$masterGuid])) {
+                $currentGroup = $groupMap[$masterGuid];
+                if (!is_array($currentGroup)) {
+                    $currentGroup = (array) $currentGroup;
+                }
+                $currentGroup['mergedGroupIds'] = $currentGroup['mergedGroupIds'] ?? [];
+                $currentGroupId = is_array($currentGroup) ? $currentGroup['Id'] : $currentGroup->Id;
+
+                if ($currentGroupId !== $masterId && !in_array($masterId, $currentGroup['mergedGroupIds'], true)) {
+                    $currentGroup['mergedGroupIds'][] = $masterId;
+                }
+                $groupMap[$masterGuid] = $currentGroup;
+            } else {
+                $clonedGroup = is_array($masterGroup) ? $masterGroup : (array) $masterGroup;
+                $clonedGroup['pdtId'] = $pdtId;
+                $groupMap[$masterGuid] = $clonedGroup;
+            }
+        }
+
+        return array_values($groupMap);
     }
 
     private function transformProductDataTemplate($productDataTemplate)
@@ -740,13 +799,17 @@ class ProductdatatemplatesController extends Controller
 
     private function transformGroupOfProperties($groupOfProperties)
     {
-        // Implement the transformation logic for a group of properties
-        // Use $groupOfProperties and its properties to structure the data
-        $productDataTemplate = productdatatemplates::WHERE("Id", [$groupOfProperties->pdtId])->first();
-        // Assuming $groupOfProperties is an instance of the GroupOfProperties model
-        $pdtId = $groupOfProperties->pdtId;
-        $versionNumber = $groupOfProperties->versionNumber;
-        $revisionNumber = $groupOfProperties->revisionNumber;
+        // Handle both array and object formats
+        $isArray = is_array($groupOfProperties);
+
+        // Helper to get value from array or object
+        $get = function ($key) use ($groupOfProperties, $isArray) {
+            return $isArray ? ($groupOfProperties[$key] ?? null) : ($groupOfProperties->$key ?? null);
+        };
+
+        $pdtId = $get('pdtId');
+        $versionNumber = $get('versionNumber');
+        $revisionNumber = $get('revisionNumber');
 
         // Fetch Group of Properties with the same pdtId and higher version or same version with higher revision (ReplacingObjectCodes)
         $replacingGroups = groupofproperties::where('pdtId', $pdtId)
@@ -780,32 +843,43 @@ class ProductdatatemplatesController extends Controller
 
         $groupData = [
             'ClassType' => 'GroupOfProperties',
-            'ParentClassCode' =>   (string) $productDataTemplate->GUID . '-' . (string) $groupOfProperties->pdtId,
-            'Code' => (string)$groupOfProperties->GUID . '-' . (string)$groupOfProperties->Id,
-            'Name' => $groupOfProperties->gopNamePt,
-            'Status' => $groupOfProperties->status,
-            'Definition' => $groupOfProperties->definitionPt,
-            'ActivationDateUtc' => $groupOfProperties->dateOfVersion,
-            'CountryOfOrigin' => $groupOfProperties->countryOfOrigin,
-            'CreatorLanguageIsoCode' => $groupOfProperties->creatorsLanguage,
-            'DeprecationExplanation' => ($groupOfProperties->depreciationDate != '0000-00-00') ? $groupOfProperties->depreciationDate : null,
-            'DeprecationExplanation' => $groupOfProperties->depreciationExplanation,
-            'DocumentReference' => referencedocuments::where('GUID', $groupOfProperties->referenceDocumentGUID)->value('rdName'),
+            'ParentClassCode' =>   (string) $get('GUID') . '-' . (string) $pdtId,
+            'Code' => (string)$get('GUID') . '-' . (string)$get('Id'),
+            'Name' => $get('gopNamePt'),
+            'Status' => $get('status'),
+            'Definition' => $get('definitionPt'),
+            'ActivationDateUtc' => $get('dateOfVersion'),
+            'CountryOfOrigin' => $get('countryOfOrigin'),
+            'CreatorLanguageIsoCode' => $get('creatorsLanguage'),
+            'DeprecationExplanation' => ($get('depreciationDate') != '0000-00-00') ? $get('depreciationDate') : null,
+            'DocumentReference' => referencedocuments::where('GUID', $get('referenceDocumentGUID'))->value('rdName'),
             'ReplacedObjectCodes' => $replacedCodes,
             'ReplacingObjectCodes' => $replacingCodes,
-            'RevisionDateUtc' => $groupOfProperties->dateOfRevision,
-            'RevisionNumber' => (int)$groupOfProperties->revisionNumber,
-            'Uid' => $groupOfProperties->GUID,
-            'VersionDateUtc' => $groupOfProperties->dateOfVersion,
-            'VersionNumber' => (int)$groupOfProperties->versionNumber,
+            'RevisionDateUtc' => $get('dateOfRevision'),
+            'RevisionNumber' => (int)$get('revisionNumber'),
+            'Uid' => $get('GUID'),
+            'VersionDateUtc' => $get('dateOfVersion'),
+            'VersionNumber' => (int)$get('versionNumber'),
             'ClassProperties' => [],
         ];
 
 
         // Fetch related data using another raw SQL query
-        $classProperties = DB::select('SELECT * FROM properties WHERE gopId = ?', [$groupOfProperties->Id]);
+        $groupIds = [$get('Id')];
+        $mergedGroupIds = $get('mergedGroupIds');
+        if (!empty($mergedGroupIds)) {
+            $groupIds = array_merge($groupIds, (array) $mergedGroupIds);
+        }
 
+        $placeholders = implode(',', array_fill(0, count($groupIds), '?'));
+        $classProperties = DB::select("SELECT * FROM properties WHERE gopId IN ($placeholders)", $groupIds);
+
+        $seenPropertyGuids = [];
         foreach ($classProperties as $property) {
+            if (isset($seenPropertyGuids[$property->GUID])) {
+                continue;
+            }
+            $seenPropertyGuids[$property->GUID] = true;
             $groupData['ClassProperties'][] = $this->transformProperty($property);
         }
 
@@ -1016,8 +1090,15 @@ class ProductdatatemplatesController extends Controller
             'Properties'                 => [],
         ];
 
+        $masterPdt = $this->loadLatestMasterPdt();
+        $masterGroups = [];
+        if ($masterPdt) {
+            $masterGroups = groupofproperties::where('pdtId', $masterPdt->Id)->get();
+        }
+
+        $propertyCount = 0;
         foreach ($productDataTemplates as $productDataTemplate) {
-            $jsonData['Classes'][] = $this->transformProductDataTemplatePSETS($productDataTemplate);
+            $jsonData['Classes'][] = $this->transformProductDataTemplatePSETS($productDataTemplate, $masterPdt, $masterGroups, $propertyCount);
         }
 
         foreach ($propertiesData as $property) {
@@ -1027,8 +1108,12 @@ class ProductdatatemplatesController extends Controller
         return $jsonData;
     }
 
-    private function transformProductDataTemplatePSETS($productDataTemplate)
+    private function transformProductDataTemplatePSETS($productDataTemplate, $masterPdt = null, $masterGroups = [], &$propertyCount = null)
     {
+        if ($propertyCount === null) {
+            $propertyCount = 0;
+        }
+
         // FIX 3: Code is PascalCase of name
         $code = self::convertToPascalCase($productDataTemplate->pdtNamePt);
 
@@ -1058,19 +1143,53 @@ class ProductdatatemplatesController extends Controller
 
         $groupOfProperties = groupofproperties::where('pdtId', $productDataTemplate->Id)->get();
 
+        // Merge master groups if this is not the master itself
+        if ($masterPdt && $productDataTemplate->GUID !== self::MASTER_PDT_GUID) {
+            $groupOfProperties = $this->mergeMasterGroupsIntoPdtGroups($groupOfProperties->toArray(), $masterGroups instanceof \Illuminate\Database\Eloquent\Collection ? $masterGroups->toArray() : $masterGroups, $productDataTemplate->Id);
+        }
+
+        $seenPropertyGuids = [];
+
         foreach ($groupOfProperties as $group) {
-            $classProperties = DB::select('SELECT * FROM properties WHERE gopID = ?', [$group->Id]);
+            // Get group IDs (primary and merged master groups if any) - handle both array and object
+            $primaryGroupId = is_array($group) ? $group['Id'] : $group->Id;
+            $groupIds = [$primaryGroupId];
+
+            $mergedIds = is_array($group) ? ($group['mergedGroupIds'] ?? []) : ($group->mergedGroupIds ?? []);
+            if (!empty($mergedIds)) {
+                $groupIds = array_merge($groupIds, (array) $mergedIds);
+            }
+
+            $placeholders = implode(',', array_fill(0, count($groupIds), '?'));
+            $classProperties = DB::select("SELECT * FROM properties WHERE gopID IN ($placeholders)", $groupIds);
+
             foreach ($classProperties as $property) {
-                $classData['ClassProperties'][] = $this->transformPropertyPSET($property);
+                // Get the property data dictionary for GUID
+                $ddProperty = propertiesdatadictionaries::find($property->propertyId);
+                $propertyGuid = $ddProperty ? $ddProperty->GUID : null;
+
+                // Skip duplicate properties by GUID
+                if ($propertyGuid && isset($seenPropertyGuids[$propertyGuid])) {
+                    continue;
+                }
+                if ($propertyGuid) {
+                    $seenPropertyGuids[$propertyGuid] = true;
+                }
+
+                $propertyCount += 1;
+                $classData['ClassProperties'][] = $this->transformPropertyPSET($property, $propertyCount);
             }
         }
 
         return $classData;
     }
 
-    private function transformPropertyPSET($property)
+    private function transformPropertyPSET($property, int $sequence = 0)
     {
         $group = groupofproperties::where('Id', $property->gopID)->value('gopNamePt');
+        if (!$group) {
+            $group = 'Other';
+        }
 
         $ddProperty = propertiesdatadictionaries::find($property->propertyId);
 
@@ -1080,10 +1199,9 @@ class ProductdatatemplatesController extends Controller
 
         $classPropertyCode = (string)$property->Id . '-' . $propertyCode;
 
-        // Class Property URI (ISO 23387 ClassProperty) - unique per properties record
-        $classPropertyOwnedUri = $ddProperty
-            ? 'https://pdts.pt/classpropertyview/' . $property->Id . '-' . self::sanitizePascalCase($ddProperty->namePt)
-            : null;
+        $uriSequence = $sequence > 0 ? '-' . $sequence : '';
+        $propertyNameSegment = $ddProperty ? self::sanitizePascalCase($ddProperty->namePt) : (string)$property->propertyId;
+        $classPropertyOwnedUri = 'https://pdts.pt/classpropertyview/' . $property->Id . $uriSequence . '-' . $propertyNameSegment;
 
         return [
             'Code'         => $classPropertyCode,
