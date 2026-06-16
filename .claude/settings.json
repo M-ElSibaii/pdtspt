@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c ' *)",
+      "PowerShell(php artisan tinker --execute=\"echo json_encode\\(['properties'=>array_column\\(DB::select\\('DESCRIBE properties'\\),'Field'\\),'dict'=>array_column\\(DB::select\\('DESCRIBE propertiesdatadictionaries'\\),'Field'\\)]\\);\")",
+      "Bash(php -l app/Console/Commands/DedupeDictionaryProperties.php)",
+      "PowerShell(php -l app/Console/Commands/DedupeDictionaryProperties.php)"
+    ]
+  }
+}
