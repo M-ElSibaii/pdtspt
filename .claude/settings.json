@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(php -l app/Services/DictionaryDedupeService.php; php artisan pdts:dedupe-dictionary | Out-File -Encoding utf8 storage/dd_check.txt; \"exit: $LASTEXITCODE\"; Get-Content storage/dd_check.txt | Select-String \"SUMMARY|PLANNED MERGES|Strontium\"; Remove-Item storage/dd_check.txt -Force)",
+      "PowerShell(php -l app/Services/DictionaryDedupeService.php; php artisan pdts:dedupe-dictionary | Out-File -Encoding utf8 storage/dd_check.txt; \"cmd exit: $LASTEXITCODE\"; Get-Content storage/dd_check.txt | Select-String \"SUMMARY\"; Remove-Item storage/dd_check.txt -Force)"
+    ]
+  }
+}
