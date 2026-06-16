@@ -65,6 +65,12 @@
             <a href="{{ route('exportdomainbsdd') }}" class="btn btn-secondary">
                 Export PDTs.pt domain in bsdd JSON format page
             </a>
+            <br>
+            <br>
+            <!-- interactive dedupe of duplicate dictionary property names -->
+            <a href="{{ route('admin.dedupe') }}" class="btn btn-secondary">
+                Review &amp; deduplicate dictionary properties
+            </a>
 
         </div>
     </div>

@@ -8,6 +8,7 @@ use App\Http\Controllers\GroupofpropertiesController;
 use App\Http\Controllers\PropertiesdatadictionariesController;
 use App\Http\Controllers\PropertiesController;
 use App\Http\Controllers\ReferencedocumentsController;
+use App\Http\Controllers\DictionaryDedupeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -146,6 +147,14 @@ Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
 
     Route::post('/admin/update', [UserController::class, 'updateUsers'])
         ->name('update.users');
+
+    // Interactive dictionary deduplication review tool
+    Route::get('/admin/dedupe-dictionary', [DictionaryDedupeController::class, 'index'])
+        ->name('admin.dedupe');
+    Route::get('/admin/dedupe-dictionary/group', [DictionaryDedupeController::class, 'group'])
+        ->name('admin.dedupe.group');
+    Route::post('/admin/dedupe-dictionary/apply', [DictionaryDedupeController::class, 'apply'])
+        ->name('admin.dedupe.apply');
 
     Route::get('/pdtinput',  function () {
         return view('pdtinput');
