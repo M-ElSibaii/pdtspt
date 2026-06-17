@@ -96,6 +96,48 @@
                                 </tbody>
                             </table>
 
+                            {{-- Referenced properties (per-PDT descriptions, editable) --}}
+                            @php
+                                $refRows = collect($actionable)->flatMap(fn($r) => $r['referencingProperties']);
+                            @endphp
+                            <details class="mt-3 text-sm">
+                                <summary class="cursor-pointer font-semibold">
+                                    Referenced properties &amp; their PDTs ({{ $refRows->count() }}) — view / edit descriptions
+                                </summary>
+                                @if ($refRows->isEmpty())
+                                    <p class="ml-4 mt-2 text-gray-600">No <code>properties</code> rows reference these dictionary entries.</p>
+                                @else
+                                    <div class="mt-2 space-y-3">
+                                        @foreach ($refRows as $p)
+                                            <div class="dd-prop border rounded p-3 bg-gray-50" data-property-id="{{ $p->Id }}">
+                                                <div class="flex flex-wrap gap-x-4 gap-y-1 items-baseline mb-2">
+                                                    <span class="font-semibold">
+                                                        PDT: {{ $p->_pdtNamePt ?: $p->_pdtNameEn ?: '—' }}
+                                                        <span class="text-gray-500">(Id={{ $p->pdtID }}@if(isset($p->_pdtVersion)) · v{{ $p->_pdtVersion }}.{{ $p->_pdtRevision }}@endif)</span>
+                                                    </span>
+                                                    <span class="text-gray-600">Group: {{ $p->_gopNamePt ?: $p->_gopNameEn ?: '—' }} (Id={{ $p->gopID }})</span>
+                                                    <span class="text-gray-500">properties.Id={{ $p->Id }} · propertyId={{ $p->propertyId }}</span>
+                                                </div>
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                    <div>
+                                                        <label class="block text-xs font-semibold mb-1">descriptionEn</label>
+                                                        <textarea class="dd-prop-en w-full border rounded p-2 text-sm" rows="3">{{ $p->descriptionEn }}</textarea>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-xs font-semibold mb-1">descriptionPt</label>
+                                                        <textarea class="dd-prop-pt w-full border rounded p-2 text-sm" rows="3">{{ $p->descriptionPt }}</textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-2 flex items-center gap-3">
+                                                    <button type="button" class="btn btn-secondary dd-prop-save">Save description</button>
+                                                    <span class="dd-prop-status text-sm"></span>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </details>
+
                             {{-- Version variants (read-only) --}}
                             @if (!empty($group['versionVariants']))
                                 <div class="mt-3 p-3 rounded bg-gray-50 border text-sm">
@@ -240,6 +282,7 @@
     <script>
         (function () {
             const applyUrl = "{{ route('admin.dedupe.apply') }}";
+            const propUrl = "{{ route('admin.dedupe.property') }}";
             const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
             document.querySelectorAll('.dedupe-card').forEach(function (card) {
@@ -277,6 +320,49 @@
                         const ptTa = card.querySelector('.dd-defpt-text');
                         if (enTa && enTa.disabled) enTa.value = d.en || '';
                         if (ptTa && ptTa.disabled) ptTa.value = d.pt || '';
+                    });
+                });
+
+                // Save edits to a referencing property's per-PDT descriptions.
+                card.querySelectorAll('.dd-prop-save').forEach(function (btn) {
+                    btn.addEventListener('click', function () {
+                        const wrap = btn.closest('.dd-prop');
+                        const propStatus = wrap.querySelector('.dd-prop-status');
+                        propStatus.textContent = 'Saving…';
+                        propStatus.className = 'dd-prop-status text-sm';
+                        btn.disabled = true;
+
+                        const payload = {
+                            propertyId: parseInt(wrap.dataset.propertyId, 10),
+                            descriptionEn: wrap.querySelector('.dd-prop-en').value,
+                            descriptionPt: wrap.querySelector('.dd-prop-pt').value,
+                        };
+
+                        fetch(propUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': csrf,
+                            },
+                            body: JSON.stringify(payload),
+                        })
+                            .then(r => r.json().then(j => ({ ok: r.ok, body: j })))
+                            .then(({ ok, body }) => {
+                                btn.disabled = false;
+                                if (!ok || !body.ok) {
+                                    propStatus.textContent = '✗ ' + (body.error || 'Save failed.');
+                                    propStatus.className = 'dd-prop-status text-sm text-red-700';
+                                    return;
+                                }
+                                propStatus.textContent = '✓ Saved';
+                                propStatus.className = 'dd-prop-status text-sm text-green-700';
+                            })
+                            .catch(err => {
+                                btn.disabled = false;
+                                propStatus.textContent = '✗ ' + err;
+                                propStatus.className = 'dd-prop-status text-sm text-red-700';
+                            });
                     });
                 });
 

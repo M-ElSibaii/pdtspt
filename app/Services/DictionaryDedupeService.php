@@ -519,13 +519,48 @@ class DictionaryDedupeService
     {
         return DB::table(self::PROP_TABLE . ' as p')
             ->leftJoin(self::DICT_TABLE . ' as d', 'd.' . self::DICT_ID, '=', 'p.' . self::PROP_PROPID)
+            ->leftJoin('productdatatemplates as pdt', 'pdt.Id', '=', 'p.pdtID')
+            ->leftJoin('groupofproperties as gop', 'gop.Id', '=', 'p.gopID')
             ->where('p.' . self::PROP_PROPID, $row->{self::DICT_ID})
+            ->orderBy('p.pdtID')
             ->select(
                 'p.*',
                 'd.' . self::DICT_GUID . ' as _dictGuidByPropertyId',
-                'd.' . self::NAME_COL . ' as _dictNameByPropertyId'
+                'd.' . self::NAME_COL . ' as _dictNameByPropertyId',
+                'pdt.pdtNameEn as _pdtNameEn',
+                'pdt.pdtNamePt as _pdtNamePt',
+                'pdt.versionNumber as _pdtVersion',
+                'pdt.revisionNumber as _pdtRevision',
+                'gop.gopNameEn as _gopNameEn',
+                'gop.gopNamePt as _gopNamePt'
             )
             ->get();
+    }
+
+    /**
+     * Update a single properties row's per-PDT descriptions. This is a deliberate,
+     * standalone edit (not part of a merge) so it intentionally writes descriptionPt
+     * as well as descriptionEn. Returns the new values.
+     */
+    public function updatePropertyDescription(int $propertyId, ?string $descriptionEn, ?string $descriptionPt): array
+    {
+        $row = DB::table(self::PROP_TABLE)->where(self::DICT_ID, $propertyId)->first();
+        if (!$row) {
+            throw new \RuntimeException("Properties row Id {$propertyId} no longer exists — please reload.");
+        }
+
+        DB::table(self::PROP_TABLE)
+            ->where(self::DICT_ID, $propertyId)
+            ->update([
+                'descriptionEn' => $descriptionEn,
+                'descriptionPt' => $descriptionPt,
+            ]);
+
+        return [
+            'id'            => $propertyId,
+            'descriptionEn' => $descriptionEn,
+            'descriptionPt' => $descriptionPt,
+        ];
     }
 
     /**

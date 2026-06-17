@@ -33,6 +33,30 @@ class DictionaryDedupeController extends Controller
     }
 
     /**
+     * Edit a single referencing properties row's per-PDT descriptions.
+     */
+    public function updateProperty(Request $request, DictionaryDedupeService $service)
+    {
+        $data = $request->validate([
+            'propertyId'    => 'required|integer',
+            'descriptionEn' => 'nullable|string',
+            'descriptionPt' => 'nullable|string',
+        ]);
+
+        try {
+            $result = $service->updatePropertyDescription(
+                (int) $data['propertyId'],
+                $data['descriptionEn'] ?? null,
+                $data['descriptionPt'] ?? null
+            );
+
+            return response()->json(['ok' => true, 'result' => $result]);
+        } catch (\Throwable $e) {
+            return response()->json(['ok' => false, 'error' => $e->getMessage()], 422);
+        }
+    }
+
+    /**
      * Apply one group's decision. Re-validation, backup and transaction all happen
      * inside the service. Returns the result and the refreshed group analysis.
      */

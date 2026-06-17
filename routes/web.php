@@ -155,6 +155,8 @@ Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
         ->name('admin.dedupe.group');
     Route::post('/admin/dedupe-dictionary/apply', [DictionaryDedupeController::class, 'apply'])
         ->name('admin.dedupe.apply');
+    Route::post('/admin/dedupe-dictionary/property', [DictionaryDedupeController::class, 'updateProperty'])
+        ->name('admin.dedupe.property');
 
     Route::get('/pdtinput',  function () {
         return view('pdtinput');
