@@ -5,12 +5,8 @@
                 {{-- <h1>{{$gopdd->gopNamePt}} </h1> --}}
                 <div class="flex-none inline">
                     <h1 class="flex-none inline">{{ $gopdd->gopNamePt }}</h1>
-                    <p class="flex-none inline"> - V{{ $gopdd->versionNumber }}.{{ $gopdd->revisionNumber }}</p>
-                    @if($gopdd->status == 'Active')
-                    <span class="status-tag status-tag-active">Ativa</span>
-                    @else
-                    <span class="status-tag status-tag-inactive">Inativa</span>
-                    @endif
+                    <p class="flex-none inline"> - <x-version-badge :version="$gopdd->versionNumber" :revision="$gopdd->revisionNumber" /></p>
+                    <x-status-badge :status="$gopdd->status" />
                 </div>
             </div>
             <div class='py-2'>

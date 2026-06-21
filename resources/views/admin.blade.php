@@ -71,6 +71,18 @@
             <a href="{{ route('admin.dedupe') }}" class="btn btn-secondary">
                 Review &amp; deduplicate dictionary properties
             </a>
+            <br>
+            <br>
+            <!-- create a new PDT from a construction object (unified CREATE editor) -->
+            <a href="{{ route('admin.pdt.create') }}" class="btn btn-secondary">
+                Create a new PDT (from construction object)
+            </a>
+            <br>
+            <br>
+            <!-- preview drafts: free-edit, publish, delete -->
+            <a href="{{ route('admin.previews') }}" class="btn btn-secondary">
+                Preview drafts (edit / publish / delete)
+            </a>
 
         </div>
     </div>

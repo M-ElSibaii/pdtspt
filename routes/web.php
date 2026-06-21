@@ -9,6 +9,12 @@ use App\Http\Controllers\PropertiesdatadictionariesController;
 use App\Http\Controllers\PropertiesController;
 use App\Http\Controllers\ReferencedocumentsController;
 use App\Http\Controllers\DictionaryDedupeController;
+use App\Http\Controllers\PreviewWorkflowController;
+use App\Http\Controllers\PdtVersioningController;
+use App\Http\Controllers\PdtCreateController;
+use App\Http\Controllers\ActivePdtEditController;
+use App\Http\Controllers\PropertyPickerController;
+use App\Http\Controllers\AdminLookupController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -157,6 +163,57 @@ Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
         ->name('admin.dedupe.apply');
     Route::post('/admin/dedupe-dictionary/property', [DictionaryDedupeController::class, 'updateProperty'])
         ->name('admin.dedupe.property');
+
+    // Preview workflow: free-edit drafts (status = Preview), hard-delete, publish.
+    Route::get('/admin/previews', [PreviewWorkflowController::class, 'drafts'])
+        ->name('admin.previews');
+    Route::post('/admin/previews/create', [PreviewWorkflowController::class, 'createDraft'])
+        ->name('admin.previews.create');
+    Route::get('/admin/previews/{pdt}', [PreviewWorkflowController::class, 'editor'])
+        ->whereNumber('pdt')->name('admin.previews.editor');
+
+    // Free-edit AJAX (write in place)
+    Route::post('/admin/previews/{pdt}/pdt', [PreviewWorkflowController::class, 'editPdt'])->whereNumber('pdt')->name('admin.previews.editPdt');
+    Route::post('/admin/previews/{pdt}/gop', [PreviewWorkflowController::class, 'editGop'])->whereNumber('pdt')->name('admin.previews.editGop');
+    Route::post('/admin/previews/{pdt}/gop/add', [PreviewWorkflowController::class, 'addGop'])->whereNumber('pdt')->name('admin.previews.addGop');
+    Route::get('/admin/previews/{pdt}/gop/suggestions', [PreviewWorkflowController::class, 'gopSuggestions'])->whereNumber('pdt')->name('admin.previews.gopSuggestions');
+    Route::post('/admin/previews/{pdt}/gop/remove', [PreviewWorkflowController::class, 'removeGop'])->whereNumber('pdt')->name('admin.previews.removeGop');
+    Route::post('/admin/previews/{pdt}/context', [PreviewWorkflowController::class, 'editContext'])->whereNumber('pdt')->name('admin.previews.editContext');
+    Route::post('/admin/previews/{pdt}/context/remove', [PreviewWorkflowController::class, 'removeContext'])->whereNumber('pdt')->name('admin.previews.removeContext');
+    Route::post('/admin/previews/{pdt}/property/edit', [PreviewWorkflowController::class, 'editProperty'])->whereNumber('pdt')->name('admin.previews.editProperty');
+    Route::post('/admin/previews/{pdt}/property/add-existing', [PreviewWorkflowController::class, 'addExistingProperty'])->whereNumber('pdt')->name('admin.previews.addExisting');
+    Route::post('/admin/previews/{pdt}/property/add-new', [PreviewWorkflowController::class, 'addNewProperty'])->whereNumber('pdt')->name('admin.previews.addNew');
+
+    // Hard delete (plan -> confirm -> apply)
+    Route::get('/admin/previews/{pdt}/delete-plan', [PreviewWorkflowController::class, 'deletePlan'])->whereNumber('pdt')->name('admin.previews.deletePlan');
+    Route::post('/admin/previews/{pdt}/delete', [PreviewWorkflowController::class, 'deleteApply'])->whereNumber('pdt')->name('admin.previews.deleteApply');
+
+    // Publish (plan -> per-element divergence decision -> apply)
+    Route::get('/admin/previews/{pdt}/publish-plan', [PreviewWorkflowController::class, 'publishPlan'])->whereNumber('pdt')->name('admin.previews.publishPlan');
+    Route::post('/admin/previews/{pdt}/publish', [PreviewWorkflowController::class, 'publishApply'])->whereNumber('pdt')->name('admin.previews.publishApply');
+
+    // Shared "add from existing" lookups (Preview editor + versioning editor)
+    Route::get('/admin/lookup/properties', [AdminLookupController::class, 'properties'])->name('admin.lookup.properties');
+    Route::get('/admin/lookup/gops', [AdminLookupController::class, 'gops'])->name('admin.lookup.gops');
+
+    // CREATE mode: new PDT from a construction object (select/create) -> Preview draft.
+    Route::get('/admin/pdt/create', [PdtCreateController::class, 'create'])->name('admin.pdt.create');
+    Route::post('/admin/pdt/create', [PdtCreateController::class, 'store'])->name('admin.pdt.create.store');
+
+    // Shared property picker (Active-only, descriptions, exact-nameEn Excel match, gap export).
+    Route::get('/admin/picker/properties', [PropertyPickerController::class, 'properties'])->name('admin.picker.properties');
+    Route::post('/admin/picker/match', [PropertyPickerController::class, 'matchExcel'])->name('admin.picker.match');
+    Route::post('/admin/picker/gap', [PropertyPickerController::class, 'exportGap'])->name('admin.picker.gap');
+
+    // Mode 2: limited in-place edits on an Active PDT (no versioning).
+    Route::get('/admin/pdt/{pdt}/edit', [ActivePdtEditController::class, 'editor'])->whereNumber('pdt')->name('admin.pdt.activeEdit');
+    Route::post('/admin/pdt/{pdt}/edit/context', [ActivePdtEditController::class, 'updateContext'])->whereNumber('pdt')->name('admin.pdt.active.context');
+    Route::post('/admin/pdt/{pdt}/edit/mapping', [ActivePdtEditController::class, 'updateDictMapping'])->whereNumber('pdt')->name('admin.pdt.active.mapping');
+
+    // Staged "create new version" editor for Active PDTs (plan -> diff preview -> commit).
+    Route::get('/admin/pdt/{pdt}/new-version', [PdtVersioningController::class, 'editor'])->whereNumber('pdt')->name('admin.pdt.newVersion');
+    Route::post('/admin/pdt/{pdt}/new-version/preview', [PdtVersioningController::class, 'preview'])->whereNumber('pdt')->name('admin.pdt.newVersion.preview');
+    Route::post('/admin/pdt/{pdt}/new-version/commit', [PdtVersioningController::class, 'commit'])->whereNumber('pdt')->name('admin.pdt.newVersion.commit');
 
     Route::get('/pdtinput',  function () {
         return view('pdtinput');
