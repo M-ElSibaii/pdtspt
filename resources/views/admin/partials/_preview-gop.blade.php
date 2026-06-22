@@ -2,7 +2,7 @@
      field descriptors $gopFields, $ctxFields, $dictFields. --}}
 <div class="js-gop-card mt-4 border rounded shadow-sm" data-gop-id="{{ $gop->Id }}">
     <div class="px-4 py-2 border-b bg-slate-50 flex flex-wrap items-center gap-2">
-        <span class="font-semibold">{{ $gop->gopNamePt ?: $gop->gopNameEn ?: 'Group' }}</span>
+        <span class="font-semibold">{{ $gop->gopNameEn ?: '—' }} <span class="text-gray-400">/</span> {{ $gop->gopNamePt ?: '—' }}</span>
         <span class="text-xs text-gray-500">(Id={{ $gop->Id }} · <x-version-badge :version="$gop->versionNumber" :revision="$gop->revisionNumber" />)</span>
         <button type="button" class="btn btn-secondary js-remove-gop ml-auto" style="color:#7f1d1d;">Remove group</button>
     </div>
@@ -23,7 +23,7 @@
             @php $dictVals = isset($dictRows[$c->propertyId]) ? (array) $dictRows[$c->propertyId] : []; @endphp
             <div class="js-context border rounded p-3 mt-2 bg-gray-50" data-context-id="{{ $c->Id }}">
                 <div class="flex flex-wrap items-center gap-2 mb-2">
-                    <span class="font-semibold">{{ $c->dictNamePt ?: $c->dictNameEn ?: '(unnamed)' }}</span>
+                    <span class="font-semibold">{{ $c->dictNameEn ?: '?' }} <span class="text-gray-400">/</span> {{ $c->dictNamePt ?: '?' }}</span>
                     <span class="text-xs text-gray-500">dict Id={{ $c->propertyId }} · v{{ $c->dictVersion }}.{{ $c->dictRevision }} · {{ $c->dictStatus }}</span>
                     @if ($c->shared)
                         <span class="pe-shared-tag js-shared-tag" title="Shared with another PDT — editing the definition forks a Preview copy">shared (edits fork)</span>

@@ -46,7 +46,9 @@ class SchemaAttributeService
         'listOfReplacedProperties', 'listOfReplacingProperties',
         'depreciationDate', 'depreciationExplanation',
         // Parent links set by the editor hierarchy, not free-typed:
-        'pdtId', 'pdtID', 'gopID', 'propertyId', 'constructionObjectGUID',
+        'pdtId', 'pdtID', 'gopID', 'propertyId',
+        // NOTE: constructionObjectGUID is NOT system — it's the user's choice of construction
+        // object for the PDT (editable via a searchable dropdown), so it stays editable.
     ];
 
     /**
@@ -70,19 +72,23 @@ class SchemaAttributeService
     private const LABELS = [
         'pdtNameEn' => 'Name (EN)', 'pdtNamePt' => 'Name (PT)',
         'gopNameEn' => 'Name (EN)', 'gopNamePt' => 'Name (PT)',
-        'nameEn' => 'Name (EN)', 'namePt' => 'Name (PT)',
-        'nameEnSc' => 'Name EN (short code)', 'namePtSc' => 'Name PT (short code)',
+        // Dictionary names: nameEn/namePt are the CODE (PascalCase, no accents); the *Sc
+        // pair is the human-readable sentence case (spaces & accents allowed).
+        'nameEn' => 'Code (EN) — PascalCase, no accents', 'namePt' => 'Code (PT) — PascalCase, no accents',
+        'nameEnSc' => 'Name (EN) — sentence case', 'namePtSc' => 'Name (PT) — sentence case',
         'constructionObjectNameEn' => 'Name (EN)', 'constructionObjectNamePt' => 'Name (PT)',
         'definitionEn' => 'Definition (EN)', 'definitionPt' => 'Definition (PT)',
         'descriptionEn' => 'Description (EN)', 'descriptionPt' => 'Description (PT)',
         'referenceDocumentGUID' => 'Reference document',
+        'constructionObjectGUID' => 'Construction object',
         'relationToOtherDataDictionaries' => 'Mapping (relation to other data dictionaries)',
     ];
 
     /** Columns that are the element's name/description — surfaced outside the expander. */
     private const PRIMARY = [
         'constructionObjectNameEn', 'constructionObjectNamePt',
-        'pdtNameEn', 'pdtNamePt', 'gopNameEn', 'gopNamePt', 'nameEn', 'namePt',
+        'pdtNameEn', 'pdtNamePt', 'gopNameEn', 'gopNamePt',
+        'nameEnSc', 'namePtSc', 'nameEn', 'namePt',
         'descriptionEn', 'descriptionPt', 'definitionEn', 'definitionPt',
     ];
 

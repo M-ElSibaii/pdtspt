@@ -107,4 +107,6 @@
             });
         })();
     </script>
+
+    @include('admin.partials._refdoc-modal')
 </x-app-layout>

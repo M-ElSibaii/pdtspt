@@ -36,7 +36,10 @@ class GroupofpropertiesController extends Controller
 
         $latestPdt = $pdts->last();
 
-        $masterpdt = productdatatemplates::where('GUID', '230d9954097541b793f2a1fddb8bd0ad')->latest()->first();
+        $masterpdt = productdatatemplates::where('GUID', '230d9954097541b793f2a1fddb8bd0ad')
+            ->orderBy('versionNumber', 'desc')
+            ->orderBy('revisionNumber', 'desc')
+            ->first();
         $pdt_groups = groupofproperties::where('pdtId', $pdtID)->get();
         $master_groups = groupofproperties::where('pdtId', $masterpdt->Id)->get();
 
@@ -127,7 +130,10 @@ class GroupofpropertiesController extends Controller
         $latestPdt = $pdts[$pdtCount - 1];
 
         // Fetch the groups for PDT properties and Master properties
-        $masterpdt = productdatatemplates::where('GUID', '230d9954097541b793f2a1fddb8bd0ad')->latest()->first();
+        $masterpdt = productdatatemplates::where('GUID', '230d9954097541b793f2a1fddb8bd0ad')
+            ->orderBy('versionNumber', 'desc')
+            ->orderBy('revisionNumber', 'desc')
+            ->first();
         $pdt_groups = groupofproperties::where('pdtId', $pdtID)->get();
         $master_groups = groupofproperties::where('pdtId', $masterpdt->Id)->get();
 

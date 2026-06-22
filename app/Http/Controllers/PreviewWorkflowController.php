@@ -31,42 +31,56 @@ class PreviewWorkflowController extends Controller
         $drafts = DB::table(self::PDT)->where('status', 'Preview')
             ->orderByDesc('Id')->get();
 
-        return view('admin.previews-index', ['drafts' => $drafts]);
+        return view('admin.previews-index', [
+            'drafts' => $drafts,
+            'pdtFields' => app(SchemaAttributeService::class)->describe(self::PDT),
+        ]);
     }
 
-    /** Create a brand-new empty Preview PDT (fresh GUID) and open its editor. */
-    public function createDraft(Request $request)
+    /**
+     * Create a Preview PDT draft from the full attribute form. System/lineage fields are
+     * auto-managed; the user-editable attributes come from the form. Mandatory enforced.
+     * Empty enum/optional values are sanitised to valid defaults (the old empty-string
+     * category was an invalid enum value and broke the insert).
+     */
+    public function createDraft(Request $request, SchemaAttributeService $schema)
     {
-        $data = $request->validate([
-            'pdtNameEn' => 'required|string|max:255',
-            'pdtNamePt' => 'required|string|max:255',
-            'category'  => 'nullable|string|max:255',
-        ]);
+        $attrs = (array) $request->input('pdt', []);
+        $set = array_intersect_key($attrs, array_flip($schema->editable(self::PDT)));
 
-        $guid = GuidGenerator::generateUnique();
+        $missing = $schema->missingMandatory(self::PDT, $set);
+        if ($missing) {
+            return redirect()->back()->withInput()->with('error', 'Missing mandatory: ' . implode(', ', $missing));
+        }
+
         $today = Carbon::today()->toDateString();
-        $id = DB::table(self::PDT)->insertGetId([
-            'GUID' => $guid,
+        $row = array_merge([
+            'GUID' => GuidGenerator::generateUnique(),
             'referenceDocumentGUID' => 'n/a',
-            'pdtNameEn' => $data['pdtNameEn'],
-            'pdtNamePt' => $data['pdtNamePt'],
-            'category'  => $data['category'] ?? '',
-            'status'    => 'Preview',
-            'versionNumber' => 1,
-            'revisionNumber' => 0,
-            'descriptionEn' => '',
-            'descriptionPt' => '',
-            // Nullable FK to constructionobjects.GUID — left null until the admin assigns
-            // a construction object in the editor ('n/a' is NOT a valid sentinel here,
-            // unlike referenceDocumentGUID which does have an 'n/a' row).
             'constructionObjectGUID' => null,
-            'dateOfVersion' => $today,
-            'dateOfRevision' => $today,
-            'created_at' => $today,
-            'updated_at' => $today,
-            'depreciationExplanation' => null,
-            'depreciationDate' => null,
-        ], 'Id');
+            'descriptionEn' => '', 'descriptionPt' => '',
+            'category' => 'Construção',
+            'status' => 'Preview', 'versionNumber' => 1, 'revisionNumber' => 0,
+            'dateOfVersion' => $today, 'dateOfRevision' => $today, 'created_at' => $today, 'updated_at' => $today,
+            'depreciationExplanation' => null, 'depreciationDate' => null,
+        ], $set);
+
+        // Sanitise empties so we never write an invalid enum / FK sentinel.
+        if (empty($row['category'])) {
+            $row['category'] = 'Construção';
+        }
+        if (empty($row['referenceDocumentGUID'])) {
+            $row['referenceDocumentGUID'] = 'n/a';
+        }
+        if (empty($row['constructionObjectGUID'])) {
+            $row['constructionObjectGUID'] = null;
+        }
+
+        try {
+            $id = DB::table(self::PDT)->insertGetId($row, 'Id');
+        } catch (\Throwable $e) {
+            return redirect()->back()->withInput()->with('error', 'Could not create draft: ' . $e->getMessage());
+        }
 
         return redirect()->route('admin.previews.editor', ['pdt' => $id]);
     }
@@ -88,11 +102,23 @@ class PreviewWorkflowController extends Controller
             ->leftJoin(self::DICT . ' as d', 'd.Id', '=', 'p.propertyId')
             ->where('p.pdtID', $pdt)
             ->select(
-                'p.Id', 'p.gopID', 'p.propertyId', 'p.GUID', 'p.descriptionEn', 'p.descriptionPt',
-                'p.referenceDocumentGUID', 'p.visualRepresentation',
-                'd.nameEn as dictNameEn', 'd.namePt as dictNamePt', 'd.definitionEn as dictDefEn',
-                'd.definitionPt as dictDefPt', 'd.dataType as dictDataType', 'd.units as dictUnits',
-                'd.status as dictStatus', 'd.versionNumber as dictVersion', 'd.revisionNumber as dictRevision'
+                'p.Id',
+                'p.gopID',
+                'p.propertyId',
+                'p.GUID',
+                'p.descriptionEn',
+                'p.descriptionPt',
+                'p.referenceDocumentGUID',
+                'p.visualRepresentation',
+                'd.nameEn as dictNameEn',
+                'd.namePt as dictNamePt',
+                'd.definitionEn as dictDefEn',
+                'd.definitionPt as dictDefPt',
+                'd.dataType as dictDataType',
+                'd.units as dictUnits',
+                'd.status as dictStatus',
+                'd.versionNumber as dictVersion',
+                'd.revisionNumber as dictRevision'
             )
             ->orderBy('p.Id')
             ->get();
@@ -101,7 +127,7 @@ class PreviewWorkflowController extends Controller
         foreach ($context as $c) {
             $c->shared = $c->propertyId
                 ? DB::table(self::PROP)->where('propertyId', $c->propertyId)
-                    ->where('pdtID', '<>', $pdt)->exists()
+                ->where('pdtID', '<>', $pdt)->exists()
                 : false;
         }
         $contextByGop = $context->groupBy('gopID');

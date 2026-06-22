@@ -21,7 +21,7 @@ class PdtVersioningController extends Controller
     private const PDT  = 'productdatatemplates';
 
     /** Pre-filled staged editor for the Active PDT (its current head). */
-    public function editor(int $pdt, VersioningService $service)
+    public function editor(int $pdt, VersioningService $service, \App\Services\SchemaAttributeService $schema)
     {
         $pdtRow = DB::table(self::PDT)->where('Id', $pdt)->first();
         if (!$pdtRow) {
@@ -37,16 +37,26 @@ class PdtVersioningController extends Controller
             ->where('p.pdtID', $pdt)
             ->select(
                 'p.Id', 'p.gopID', 'p.propertyId', 'p.descriptionEn', 'p.descriptionPt',
-                'd.nameEn as dictNameEn', 'd.namePt as dictNamePt', 'd.definitionEn as dictDefEn',
-                'd.definitionPt as dictDefPt', 'd.dataType as dictDataType', 'd.units as dictUnits',
+                'p.visualRepresentation', 'p.referenceDocumentGUID', 'p.GUID',
+                'd.nameEn as dictNameEn', 'd.namePt as dictNamePt',
+                'd.nameEnSc as dictNameEnSc', 'd.namePtSc as dictNamePtSc',
                 'd.versionNumber as dictVersion', 'd.revisionNumber as dictRevision'
             )
             ->orderBy('p.Id')->get();
+
+        $dictIds = $context->pluck('propertyId')->filter()->unique()->values();
+        $dictRows = $dictIds->isEmpty() ? collect() : DB::table(self::DICT)->whereIn('Id', $dictIds)->get()->keyBy('Id');
 
         return view('admin.pdt-new-version', [
             'pdt' => $pdtRow,
             'gops' => $gops,
             'contextByGop' => $context->groupBy('gopID'),
+            'dictRows' => $dictRows,
+            'pdtFields'  => $schema->describe(self::PDT),
+            'gopFields'  => $schema->describe(self::GOP),
+            'ctxFields'  => $schema->describe(self::PROP),
+            'dictFields' => $schema->describe(self::DICT),
+            'dictEnums'  => \App\Services\BsddEnums::dictionaryFieldEnums(),
         ]);
     }
 
@@ -99,6 +109,7 @@ class PdtVersioningController extends Controller
             'addGops'       => (array) ($s['addGops'] ?? []),
             'gopEdits'      => (array) ($s['gopEdits'] ?? []),
             'propertyEdits' => (array) ($s['propertyEdits'] ?? []),
+            'contextEdits'  => (array) ($s['contextEdits'] ?? []),
         ];
     }
 }

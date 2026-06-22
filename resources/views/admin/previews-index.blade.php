@@ -12,28 +12,29 @@
                 <div class="mt-4 p-3 rounded bg-red-100 text-red-800 text-sm">{{ session('error') }}</div>
             @endif
 
-            {{-- Create a new draft --}}
-            <form method="POST" action="{{ route('admin.previews.create') }}" class="mt-6 border rounded p-4 bg-slate-50">
+            {{-- Create a new draft — full PDT attributes (category is a dropdown; mandatory * enforced) --}}
+            <form method="POST" action="{{ route('admin.previews.create') }}" class="mt-6 border rounded p-4 bg-slate-50" id="create-draft-form">
                 @csrf
                 <div class="font-semibold mb-2">Create a new draft</div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold mb-1">Name (EN)</label>
-                        <input type="text" name="pdtNameEn" required class="w-full border rounded p-2 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold mb-1">Name (PT)</label>
-                        <input type="text" name="pdtNamePt" required class="w-full border rounded p-2 text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold mb-1">Category (optional)</label>
-                        <input type="text" name="category" class="w-full border rounded p-2 text-sm">
-                    </div>
-                </div>
-                <div class="mt-3">
+                @include('admin.partials._attr-fields', ['fields' => $pdtFields, 'values' => old('pdt', []), 'prefix' => 'pdt', 'idAttr' => 'pdt'])
+                <div class="mt-3 flex items-center gap-3">
                     <button type="submit" class="btn btn-secondary">Create draft &amp; open editor</button>
+                    <span id="create-draft-msg" class="text-sm"></span>
                 </div>
             </form>
+            <script>
+                // Block submit on missing mandatory fields, opening the expander if needed.
+                document.getElementById('create-draft-form').addEventListener('submit', function (e) {
+                    const miss = [];
+                    this.querySelectorAll('.js-mandatory').forEach(el => { if (!el.disabled && (el.value || '').trim() === '') miss.push(el.dataset.field); });
+                    if (miss.length) {
+                        e.preventDefault();
+                        this.querySelectorAll('details').forEach(d => { if (d.querySelector('.js-mandatory')) d.open = true; });
+                        document.getElementById('create-draft-msg').textContent = 'Missing mandatory: ' + miss.join(', ');
+                        document.getElementById('create-draft-msg').className = 'text-sm text-red-700';
+                    }
+                });
+            </script>
 
             {{-- Existing drafts --}}
             <div class="mt-6">
@@ -74,4 +75,6 @@
             </div>
         </div>
     </div>
+
+    @include('admin.partials._refdoc-modal')
 </x-app-layout>

@@ -192,6 +192,9 @@ Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
     Route::get('/admin/previews/{pdt}/publish-plan', [PreviewWorkflowController::class, 'publishPlan'])->whereNumber('pdt')->name('admin.previews.publishPlan');
     Route::post('/admin/previews/{pdt}/publish', [PreviewWorkflowController::class, 'publishApply'])->whereNumber('pdt')->name('admin.previews.publishApply');
 
+    // Shared inline "create reference document" (from any editor's ref-doc field)
+    Route::post('/admin/reference-documents/create-ajax', [ReferencedocumentsController::class, 'createAjax'])->name('admin.refdoc.createAjax');
+
     // Shared "add from existing" lookups (Preview editor + versioning editor)
     Route::get('/admin/lookup/properties', [AdminLookupController::class, 'properties'])->name('admin.lookup.properties');
     Route::get('/admin/lookup/gops', [AdminLookupController::class, 'gops'])->name('admin.lookup.gops');

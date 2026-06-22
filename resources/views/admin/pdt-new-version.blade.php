@@ -1,7 +1,6 @@
 <x-app-layout>
     <div style="background-color: white;">
-        <div class="container sm:max-w-full py-9" id="ver-editor"
-             data-pdt-id="{{ $pdt->Id }}">
+        <div class="container sm:max-w-full py-9" id="ver-editor" data-pdt-id="{{ $pdt->Id }}">
 
             {{-- Header --}}
             <div class="flex flex-wrap items-center gap-2 border-b pb-3">
@@ -15,37 +14,17 @@
             </div>
             <p class="text-sm text-gray-600 mt-2">
                 Staged editor — <strong>nothing is written</strong> until you commit. Make all your
-                changes, preview the exact set of rows that will be created/deprecated, then commit
-                once to create a single new version. A name change or adding/removing a GOP bumps the
-                <strong>version</strong>; smaller edits bump the <strong>revision</strong>. The current
-                version is kept as a read-only InActive snapshot.
+                changes, preview the exact rows to be created/deprecated, then commit once. Every level
+                shows its full attribute set (rest behind “All attributes”). A name change or adding/
+                removing a GOP bumps the <strong>version</strong>; smaller edits bump the
+                <strong>revision</strong>. The current version is kept as a read-only InActive snapshot.
             </p>
 
-            {{-- PDT attributes --}}
+            {{-- PDT attributes (full) --}}
             <div class="mt-6 border rounded shadow-sm">
                 <div class="px-4 py-2 border-b bg-slate-50 font-semibold">Template attributes</div>
                 <div class="p-4 js-pdt-attrs">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        @php
-                            $pf = ['pdtNameEn' => 'Name (EN)', 'pdtNamePt' => 'Name (PT)', 'category' => 'Category',
-                                   'referenceDocumentGUID' => 'Reference document GUID', 'constructionObjectGUID' => 'Construction object GUID'];
-                        @endphp
-                        @foreach ($pf as $f => $label)
-                            <div>
-                                <label class="block text-xs font-semibold mb-1">{{ $label }}</label>
-                                <input type="text" class="js-vf w-full border rounded p-2 text-sm" data-field="{{ $f }}"
-                                       value="{{ $pdt->$f }}" data-original="{{ $pdt->$f }}">
-                            </div>
-                        @endforeach
-                        <div class="md:col-span-2">
-                            <label class="block text-xs font-semibold mb-1">Description (EN)</label>
-                            <textarea class="js-vf w-full border rounded p-2 text-sm" data-field="descriptionEn" data-original="{{ $pdt->descriptionEn }}" rows="2">{{ $pdt->descriptionEn }}</textarea>
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-xs font-semibold mb-1">Description (PT)</label>
-                            <textarea class="js-vf w-full border rounded p-2 text-sm" data-field="descriptionPt" data-original="{{ $pdt->descriptionPt }}" rows="2">{{ $pdt->descriptionPt }}</textarea>
-                        </div>
-                    </div>
+                    @include('admin.partials._attr-fields', ['fields' => $pdtFields, 'values' => (array) $pdt, 'prefix' => 'pdt', 'idAttr' => 'pdt'])
                 </div>
             </div>
 
@@ -59,65 +38,55 @@
                 @php $ctx = $contextByGop->get($gop->Id, collect()); @endphp
                 <div class="js-gop mt-4 border rounded shadow-sm" data-gop-id="{{ $gop->Id }}">
                     <div class="px-4 py-2 border-b bg-slate-50 flex flex-wrap items-center gap-2">
-                        <span class="font-semibold">{{ $gop->gopNamePt ?: $gop->gopNameEn }}</span>
+                        <span class="font-semibold">{{ $gop->gopNameEn }} <span class="text-gray-400">/</span> {{ $gop->gopNamePt }}</span>
                         <span class="text-xs text-gray-500">(Id={{ $gop->Id }} · <x-version-badge :version="$gop->versionNumber" :revision="$gop->revisionNumber" />)</span>
                         <label class="ml-auto flex items-center gap-1 text-sm" style="color:#7f1d1d;">
                             <input type="checkbox" class="js-remove-gop"> Drop from new version
                         </label>
                     </div>
                     <div class="p-4">
-                        <div class="js-gop-attrs grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div>
-                                <label class="block text-xs font-semibold mb-1">Group name (EN)</label>
-                                <input type="text" class="js-vf w-full border rounded p-2 text-sm" data-field="gopNameEn" value="{{ $gop->gopNameEn }}" data-original="{{ $gop->gopNameEn }}">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold mb-1">Group name (PT)</label>
-                                <input type="text" class="js-vf w-full border rounded p-2 text-sm" data-field="gopNamePt" value="{{ $gop->gopNamePt }}" data-original="{{ $gop->gopNamePt }}">
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-semibold mb-1">Definition (EN)</label>
-                                <textarea class="js-vf w-full border rounded p-2 text-sm" data-field="definitionEn" data-original="{{ $gop->definitionEn }}" rows="2">{{ $gop->definitionEn }}</textarea>
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-semibold mb-1">Definition (PT)</label>
-                                <textarea class="js-vf w-full border rounded p-2 text-sm" data-field="definitionPt" data-original="{{ $gop->definitionPt }}" rows="2">{{ $gop->definitionPt }}</textarea>
-                            </div>
+                        {{-- Full GOP attributes (item 4) --}}
+                        <div class="js-gop-attrs">
+                            @include('admin.partials._attr-fields', ['fields' => $gopFields, 'values' => (array) $gop, 'prefix' => 'gop' . $gop->Id, 'idAttr' => 'gop' . $gop->Id])
                         </div>
 
                         <div class="mt-4 font-semibold text-sm">Properties ({{ $ctx->count() }})</div>
                         @foreach ($ctx as $c)
+                            @php $dictVals = isset($dictRows[$c->propertyId]) ? (array) $dictRows[$c->propertyId] : []; @endphp
                             <div class="js-prop border rounded p-3 mt-2 bg-gray-50" data-dict-id="{{ $c->propertyId }}" data-context-id="{{ $c->Id }}">
                                 <div class="flex flex-wrap items-center gap-2 mb-2">
-                                    <span class="font-semibold">{{ $c->dictNamePt ?: $c->dictNameEn }}</span>
-                                    <span class="text-xs text-gray-500">dict Id={{ $c->propertyId }} · v{{ $c->dictVersion }}.{{ $c->dictRevision }}</span>
-                                    <label class="flex items-center gap-1 text-xs"><input type="checkbox" class="js-correction"> correction (revision, not version)</label>
+                                    <span class="font-semibold">{{ $c->dictNameEnSc ?: $c->dictNameEn }} <span class="text-gray-400">/</span> {{ $c->dictNamePtSc ?: $c->dictNamePt }}</span>
+                                    <span class="text-xs text-gray-500">code: {{ $c->dictNameEn }} · dict Id={{ $c->propertyId }} · v{{ $c->dictVersion }}.{{ $c->dictRevision }}</span>
                                     <label class="ml-auto flex items-center gap-1 text-sm" style="color:#7f1d1d;">
                                         <input type="checkbox" class="js-remove-ctx" data-context-id="{{ $c->Id }}"> Remove
                                     </label>
                                 </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    <div>
-                                        <label class="block text-xs mb-1">nameEn</label>
-                                        <input type="text" class="js-vf w-full border rounded p-2 text-sm" data-field="nameEn" value="{{ $c->dictNameEn }}" data-original="{{ $c->dictNameEn }}">
+
+                                {{-- CONTEXT: this template's usage (properties table) — can differ from the dictionary --}}
+                                <details class="border rounded bg-white" open>
+                                    <summary class="cursor-pointer text-xs font-semibold p-2">This template's usage <span class="text-gray-400">(context · properties table — description / visual representation / reference document, may differ from the dictionary)</span></summary>
+                                    <div class="js-ctx-attrs p-2">
+                                        @include('admin.partials._attr-fields', ['fields' => $ctxFields, 'values' => (array) $c, 'prefix' => 'ctx' . $c->Id, 'idAttr' => 'ctx' . $c->Id])
                                     </div>
-                                    <div>
-                                        <label class="block text-xs mb-1">namePt</label>
-                                        <input type="text" class="js-vf w-full border rounded p-2 text-sm" data-field="namePt" value="{{ $c->dictNamePt }}" data-original="{{ $c->dictNamePt }}">
+                                </details>
+
+                                {{-- DICTIONARY: the shared definition (propertiesdatadictionaries) --}}
+                                <label class="flex items-start gap-2 text-xs mt-2 mb-1 bg-white border rounded p-2">
+                                    <input type="checkbox" class="js-correction mt-0.5" checked>
+                                    <span><strong>Wording correction</strong> (revision) — fixing wording/attributes; the
+                                    <em>name/code stays locked</em>. <strong>Uncheck</strong> to change the name or meaning
+                                    (a real rename/redefinition → new <em>version</em>).</span>
+                                </label>
+                                <details class="border rounded bg-white">
+                                    <summary class="cursor-pointer text-xs font-semibold p-2">Dictionary definition <span class="text-gray-400">(propertiesdatadictionaries — shared; Code = PascalCase no accents, Name = sentence case)</span></summary>
+                                    <div class="js-def-attrs p-2">
+                                        @include('admin.partials._attr-fields', ['fields' => $dictFields, 'values' => $dictVals, 'prefix' => 'def' . $c->Id, 'idAttr' => 'def' . $c->Id, 'enums' => $dictEnums])
                                     </div>
-                                    <div class="md:col-span-2">
-                                        <label class="block text-xs mb-1">definitionEn</label>
-                                        <textarea class="js-vf w-full border rounded p-2 text-sm" data-field="definitionEn" data-original="{{ $c->dictDefEn }}" rows="2">{{ $c->dictDefEn }}</textarea>
-                                    </div>
-                                    <div class="md:col-span-2">
-                                        <label class="block text-xs mb-1">definitionPt</label>
-                                        <textarea class="js-vf w-full border rounded p-2 text-sm" data-field="definitionPt" data-original="{{ $c->dictDefPt }}" rows="2">{{ $c->dictDefPt }}</textarea>
-                                    </div>
-                                </div>
+                                </details>
                             </div>
                         @endforeach
 
-                        {{-- Add existing property to this GOP (staged) --}}
+                        {{-- Add EXISTING property (staged) --}}
                         <div class="mt-3 border rounded p-3 bg-white">
                             <div class="text-xs font-semibold mb-1">Add an existing dictionary property (staged)</div>
                             <div class="flex items-center gap-2">
@@ -127,29 +96,34 @@
                             <div class="js-existing-results text-sm mt-2"></div>
                             <div class="js-queued-adds text-sm mt-2 flex flex-wrap gap-2"></div>
                         </div>
+
+                        {{-- Create a NEW property from scratch (staged) — item 1 --}}
+                        <details class="mt-2 border rounded p-3 bg-white">
+                            <summary class="cursor-pointer text-xs font-semibold">Create a NEW dictionary property (full attributes, fresh GUID)</summary>
+                            <div class="js-newprop mt-2">
+                                @include('admin.partials._attr-fields', ['fields' => $dictFields, 'values' => [], 'prefix' => 'newp' . $gop->Id, 'idAttr' => 'newp' . $gop->Id, 'enums' => $dictEnums])
+                            </div>
+                            <div class="mt-2 flex items-center gap-3">
+                                <button type="button" class="btn btn-secondary js-queue-newprop">Queue new property</button>
+                                <span class="js-newprop-status text-sm"></span>
+                            </div>
+                            <div class="js-queued-newprops text-sm mt-2 flex flex-wrap gap-2"></div>
+                        </details>
                     </div>
                 </div>
             @endforeach
 
-            {{-- Add a GOP (staged) — from scratch or cloned from an existing group --}}
+            {{-- Add a GOP (staged): from scratch or cloned from existing --}}
             <div class="mt-4 border rounded p-4 bg-slate-50">
                 <div class="font-semibold mb-2">Add a group of properties (staged)</div>
-
                 <div class="mb-3">
                     <div class="text-xs font-semibold mb-1">From scratch</div>
                     <div class="flex flex-wrap items-end gap-3">
-                        <div>
-                            <label class="block text-xs mb-1">Name (EN)</label>
-                            <input type="text" id="addgop-en" class="border rounded p-2 text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs mb-1">Name (PT)</label>
-                            <input type="text" id="addgop-pt" class="border rounded p-2 text-sm">
-                        </div>
+                        <div><label class="block text-xs mb-1">Name (EN)</label><input type="text" id="addgop-en" class="border rounded p-2 text-sm"></div>
+                        <div><label class="block text-xs mb-1">Name (PT)</label><input type="text" id="addgop-pt" class="border rounded p-2 text-sm"></div>
                         <button type="button" class="btn btn-secondary" id="btn-queue-gop">Queue group</button>
                     </div>
                 </div>
-
                 <div>
                     <div class="text-xs font-semibold mb-1">From an existing group (clones its attributes, fresh GUID)</div>
                     <div class="flex items-center gap-2">
@@ -158,7 +132,6 @@
                     </div>
                     <div id="addgop-results" class="text-sm mt-2"></div>
                 </div>
-
                 <div id="queued-gops" class="text-sm mt-3 flex flex-wrap gap-2"></div>
             </div>
         </div>
@@ -195,29 +168,38 @@
                 lookupGops: "{{ route('admin.lookup.gops') }}",
             };
 
-            const addPropQueue = {};  // gopId -> [{id,name}]
-            const addGopQueue = [];   // [{gopNameEn,gopNamePt}] or [{fromGopId,name}]
+            const addPropQueue = {};   // gopId -> [{id,name}]
+            const newPropQueue = {};   // gopId -> [{values}]
+            const addGopQueue = [];
 
-            function postJSON(u, payload) {
-                return fetch(u, { method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf },
-                    body: JSON.stringify(payload || {}) }).then(r => r.json().then(j => ({ ok: r.ok, body: j })));
-            }
-            function getJSON(u) { return fetch(u, { headers: { 'Accept': 'application/json' } }).then(r => r.json().then(j => ({ ok: r.ok, body: j }))); }
-            function escapeHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+            const postJSON = (u, p) => fetch(u, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf }, body: JSON.stringify(p || {}) }).then(r => r.json().then(j => ({ ok: r.ok, body: j })));
+            const getJSON = (u) => fetch(u, { headers: { 'Accept': 'application/json' } }).then(r => r.json().then(j => ({ ok: r.ok, body: j })));
+            const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 
-            // Collect only fields whose value differs from data-original, within a scope.
+            // changed (vs data-original), skipping disabled (e.g. name locked in correction mode)
             function collectChanged(scope) {
                 const out = {};
                 if (!scope) return out;
-                scope.querySelectorAll('.js-vf').forEach(el => {
-                    if (el.value !== (el.dataset.original ?? '')) out[el.dataset.field] = el.value;
+                scope.querySelectorAll('.js-attr').forEach(el => {
+                    if (!el.disabled && el.value !== (el.dataset.original ?? '')) out[el.dataset.field] = el.value;
                 });
                 return out;
             }
+            // all non-empty values (for a brand-new property)
+            function collectAll(scope) {
+                const out = {};
+                scope.querySelectorAll('.js-attr').forEach(el => { if (!el.disabled && (el.value || '').trim() !== '') out[el.dataset.field] = el.value; });
+                return out;
+            }
+            function missingMandatory(scope) {
+                const miss = [];
+                scope.querySelectorAll('.js-mandatory').forEach(el => { if (!el.disabled && (el.value || '').trim() === '') miss.push(el.dataset.field); });
+                return miss;
+            }
+            function setMsg(el, m, good) { if (el) { el.textContent = m; el.className = (el.className.replace(/\btext-(red|green)-700\b/g, '').trim()) + (m ? (good ? ' text-green-700' : ' text-red-700') : ''); } }
 
             function buildStaged() {
-                const staged = { pdt: { attributes: {} }, removeGopIds: [], addGops: [], gopEdits: [], propertyEdits: [] };
+                const staged = { pdt: { attributes: {} }, removeGopIds: [], addGops: [], gopEdits: [], propertyEdits: [], contextEdits: [] };
                 staged.pdt.attributes = collectChanged(root.querySelector('.js-pdt-attrs'));
 
                 root.querySelectorAll('.js-gop').forEach(card => {
@@ -226,106 +208,122 @@
 
                     const attrs = collectChanged(card.querySelector('.js-gop-attrs'));
                     const removeContextIds = [...card.querySelectorAll('.js-remove-ctx:checked')].map(c => parseInt(c.dataset.contextId, 10));
-                    const adds = (addPropQueue[gopId] || []).map(a => a.id);
+                    const existingAdds = (addPropQueue[gopId] || []).map(a => a.id);
+                    const newAdds = (newPropQueue[gopId] || []).map(v => ({ newProperty: v }));
+                    const adds = existingAdds.concat(newAdds);
                     if (Object.keys(attrs).length || removeContextIds.length || adds.length) {
                         staged.gopEdits.push({ gopId, attributes: attrs, addProperties: adds, removeContextIds });
                     }
 
                     card.querySelectorAll('.js-prop').forEach(p => {
-                        if (p.querySelector('.js-remove-ctx').checked) return; // being removed
-                        const values = collectChanged(p);
+                        if (p.querySelector('.js-remove-ctx').checked) return;
+                        // Dictionary definition edits (shared) -> revision/version per correction.
+                        const values = collectChanged(p.querySelector('.js-def-attrs'));
                         if (Object.keys(values).length) {
                             staged.propertyEdits.push({
                                 dictId: parseInt(p.dataset.dictId, 10), gopId,
                                 values, correction: p.querySelector('.js-correction').checked,
                             });
                         }
+                        // Context (this template's usage) edits — distinct from the dictionary.
+                        const ctxVals = collectChanged(p.querySelector('.js-ctx-attrs'));
+                        if (Object.keys(ctxVals).length) {
+                            staged.contextEdits.push({ contextId: parseInt(p.dataset.contextId, 10), attributes: ctxVals });
+                        }
                     });
                 });
 
-                staged.addGops = addGopQueue.map(g => g.fromGopId
-                    ? { fromGopId: g.fromGopId, attributes: {} }
-                    : { attributes: { gopNameEn: g.gopNameEn, gopNamePt: g.gopNamePt } });
+                staged.addGops = addGopQueue.map(g => g.fromGopId ? { fromGopId: g.fromGopId, attributes: {} } : { attributes: { gopNameEn: g.gopNameEn, gopNamePt: g.gopNamePt } });
                 return staged;
             }
 
-            // ---- per-GOP add-existing search + queue ----
+            // ---- per-GOP wiring ----
             root.querySelectorAll('.js-gop').forEach(card => {
                 const gopId = parseInt(card.dataset.gopId, 10);
+
+                // correction toggle locks/unlocks the property name fields (item 5)
+                card.querySelectorAll('.js-prop').forEach(p => {
+                    const cb = p.querySelector('.js-correction');
+                    const defScope = p.querySelector('.js-def-attrs');
+                    const nameEls = [...defScope.querySelectorAll('.js-attr')].filter(el => el.dataset.field === 'nameEn' || el.dataset.field === 'namePt');
+                    const applyLock = () => nameEls.forEach(el => { el.disabled = cb.checked; el.classList.toggle('bg-gray-100', cb.checked); });
+                    cb.addEventListener('change', applyLock);
+                    applyLock(); // default checked => name locked
+                });
+
+                // add-existing search + queue (+ clear on empty — item 6)
                 const results = card.querySelector('.js-existing-results');
                 const queued = card.querySelector('.js-queued-adds');
-
-                function renderQueued() {
-                    const list = addPropQueue[gopId] || [];
-                    queued.innerHTML = list.map((a, i) =>
-                        '<span class="ver-chip">' + escapeHtml(a.name) + ' <button type="button" data-i="' + i + '">×</button></span>'
-                    ).join('');
-                    queued.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
-                        addPropQueue[gopId].splice(parseInt(b.dataset.i, 10), 1); renderQueued();
-                    }));
-                }
-
-                card.querySelector('.js-existing-search').addEventListener('click', function () {
-                    const q = card.querySelector('.js-existing-q').value.trim();
+                const qInput = card.querySelector('.js-existing-q');
+                const renderQueued = () => {
+                    queued.innerHTML = (addPropQueue[gopId] || []).map((a, i) => '<span class="ver-chip">' + esc(a.name) + ' <button type="button" data-i="' + i + '">×</button></span>').join('');
+                    queued.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { addPropQueue[gopId].splice(+b.dataset.i, 1); renderQueued(); }));
+                };
+                qInput.addEventListener('input', () => { if (qInput.value.trim() === '') results.innerHTML = ''; });
+                card.querySelector('.js-existing-search').addEventListener('click', () => {
+                    const q = qInput.value.trim();
+                    if (q === '') { results.innerHTML = ''; return; }
                     results.innerHTML = 'Searching…';
                     getJSON(url.lookupProps + '?q=' + encodeURIComponent(q)).then(({ ok, body }) => {
                         if (!ok) { results.innerHTML = 'Search failed.'; return; }
                         const rows = body.results || [];
-                        if (!rows.length) { results.innerHTML = '<span class="text-gray-600">No matches.</span>'; return; }
-                        results.innerHTML = rows.map(r =>
-                            '<div class="flex items-center gap-2 py-1 border-b"><span class="flex-1">'
-                            + escapeHtml(r.nameEn) + ' / ' + escapeHtml(r.namePt) + ' <span class="text-gray-500 text-xs">(Id=' + r.Id + ')</span></span>'
-                            + '<button type="button" class="btn btn-secondary js-queue" data-id="' + r.Id + '" data-name="' + escapeHtml(r.nameEn) + '">Queue</button></div>'
-                        ).join('');
+                        results.innerHTML = rows.length ? rows.map(r =>
+                            '<div class="flex items-start gap-2 py-1 border-b"><span class="flex-1">' + esc(r.nameEn) + ' / ' + esc(r.namePt)
+                            + ' <span class="text-gray-500 text-xs">(Id=' + r.Id + ')</span><br><span class="text-gray-600 text-xs">' + esc((r.definitionEn || '').slice(0, 140)) + '</span></span>'
+                            + '<button type="button" class="btn btn-secondary js-queue" data-id="' + r.Id + '" data-name="' + esc(r.nameEn) + '">Queue</button></div>').join('')
+                            : '<span class="text-gray-600">No matches — use “Create a NEW dictionary property”.</span>';
                         results.querySelectorAll('.js-queue').forEach(b => b.addEventListener('click', () => {
                             addPropQueue[gopId] = addPropQueue[gopId] || [];
-                            if (!addPropQueue[gopId].some(a => a.id === parseInt(b.dataset.id, 10))) {
-                                addPropQueue[gopId].push({ id: parseInt(b.dataset.id, 10), name: b.dataset.name });
-                                renderQueued();
-                            }
+                            if (!addPropQueue[gopId].some(a => a.id === +b.dataset.id)) { addPropQueue[gopId].push({ id: +b.dataset.id, name: b.dataset.name }); renderQueued(); }
                         }));
                     });
                 });
+
+                // create-new property queue (item 1)
+                const np = card.querySelector('.js-newprop');
+                const npChips = card.querySelector('.js-queued-newprops');
+                const renderNew = () => {
+                    npChips.innerHTML = (newPropQueue[gopId] || []).map((v, i) => '<span class="ver-chip">＋' + esc(v.nameEn || v.namePt || 'new') + ' <button type="button" data-i="' + i + '">×</button></span>').join('');
+                    npChips.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { newPropQueue[gopId].splice(+b.dataset.i, 1); renderNew(); }));
+                };
+                card.querySelector('.js-queue-newprop').addEventListener('click', () => {
+                    const st = card.querySelector('.js-newprop-status');
+                    const miss = missingMandatory(np);
+                    if (miss.length) { np.querySelectorAll('details').forEach(d => { if (d.querySelector('.js-mandatory')) d.open = true; }); setMsg(st, 'Missing: ' + miss.join(', '), false); return; }
+                    newPropQueue[gopId] = newPropQueue[gopId] || [];
+                    newPropQueue[gopId].push(collectAll(np));
+                    np.querySelectorAll('.js-attr').forEach(el => { if (!el.disabled) el.value = ''; });
+                    setMsg(st, '✓ queued', true); renderNew();
+                });
             });
 
-            // ---- queue new GOP ----
+            // ---- add GOP ----
             const queuedGops = document.getElementById('queued-gops');
-            function renderQueuedGops() {
-                queuedGops.innerHTML = addGopQueue.map((g, i) =>
-                    '<span class="ver-chip">' + escapeHtml(g.fromGopId ? ('↳ ' + g.name) : (g.gopNamePt || g.gopNameEn)) + ' <button type="button" data-i="' + i + '">×</button></span>'
-                ).join('');
-                queuedGops.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
-                    addGopQueue.splice(parseInt(b.dataset.i, 10), 1); renderQueuedGops();
-                }));
-            }
-            document.getElementById('btn-queue-gop').addEventListener('click', function () {
-                const en = document.getElementById('addgop-en').value.trim();
-                const pt = document.getElementById('addgop-pt').value.trim();
+            const renderQueuedGops = () => {
+                queuedGops.innerHTML = addGopQueue.map((g, i) => '<span class="ver-chip">' + esc(g.fromGopId ? ('↳ ' + g.name) : (g.gopNamePt || g.gopNameEn)) + ' <button type="button" data-i="' + i + '">×</button></span>').join('');
+                queuedGops.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { addGopQueue.splice(+b.dataset.i, 1); renderQueuedGops(); }));
+            };
+            document.getElementById('btn-queue-gop').addEventListener('click', () => {
+                const en = document.getElementById('addgop-en').value.trim(), pt = document.getElementById('addgop-pt').value.trim();
                 if (!en && !pt) return;
                 addGopQueue.push({ gopNameEn: en, gopNamePt: pt });
-                document.getElementById('addgop-en').value = '';
-                document.getElementById('addgop-pt').value = '';
+                document.getElementById('addgop-en').value = ''; document.getElementById('addgop-pt').value = '';
                 renderQueuedGops();
             });
-
-            // queue GOP from an existing group
             const addgopResults = document.getElementById('addgop-results');
-            document.getElementById('btn-search-gop').addEventListener('click', function () {
-                const q = document.getElementById('addgop-q').value.trim();
+            const addgopQ = document.getElementById('addgop-q');
+            addgopQ.addEventListener('input', () => { if (addgopQ.value.trim() === '') addgopResults.innerHTML = ''; });
+            document.getElementById('btn-search-gop').addEventListener('click', () => {
+                const q = addgopQ.value.trim();
+                if (q === '') { addgopResults.innerHTML = ''; return; }
                 addgopResults.innerHTML = 'Searching…';
                 getJSON(url.lookupGops + '?q=' + encodeURIComponent(q)).then(({ ok, body }) => {
                     if (!ok) { addgopResults.innerHTML = 'Search failed.'; return; }
                     const rows = body.results || [];
-                    if (!rows.length) { addgopResults.innerHTML = '<span class="text-gray-600">No matches.</span>'; return; }
-                    addgopResults.innerHTML = rows.map(r =>
-                        '<div class="flex items-center gap-2 py-1 border-b"><span class="flex-1">'
-                        + escapeHtml(r.gopNameEn) + ' / ' + escapeHtml(r.gopNamePt) + ' <span class="text-gray-500 text-xs">(Id=' + r.Id + ')</span></span>'
-                        + '<button type="button" class="btn btn-secondary js-queue-gop" data-id="' + r.Id + '" data-name="' + escapeHtml(r.gopNameEn) + '">Queue</button></div>'
-                    ).join('');
-                    addgopResults.querySelectorAll('.js-queue-gop').forEach(b => b.addEventListener('click', () => {
-                        addGopQueue.push({ fromGopId: parseInt(b.dataset.id, 10), name: b.dataset.name });
-                        renderQueuedGops();
-                    }));
+                    addgopResults.innerHTML = rows.length ? rows.map(r =>
+                        '<div class="flex items-center gap-2 py-1 border-b"><span class="flex-1">' + esc(r.gopNameEn) + ' / ' + esc(r.gopNamePt) + ' <span class="text-gray-500 text-xs">(Id=' + r.Id + ')</span></span>'
+                        + '<button type="button" class="btn btn-secondary js-queue-gop" data-id="' + r.Id + '" data-name="' + esc(r.gopNameEn) + '">Queue</button></div>').join('') : '<span class="text-gray-600">No matches.</span>';
+                    addgopResults.querySelectorAll('.js-queue-gop').forEach(b => b.addEventListener('click', () => { addGopQueue.push({ fromGopId: +b.dataset.id, name: b.dataset.name }); renderQueuedGops(); }));
                 });
             });
 
@@ -333,14 +331,11 @@
             const modal = document.getElementById('ver-modal');
             const commitBtn = document.getElementById('btn-commit');
             let lastStaged = null;
-
-            document.getElementById('btn-preview').addEventListener('click', function () {
+            document.getElementById('btn-preview').addEventListener('click', () => {
                 lastStaged = buildStaged();
                 modal.style.display = 'flex';
                 const sum = document.getElementById('ver-summary');
-                commitBtn.disabled = true;
-                document.getElementById('ver-status').textContent = '';
-                sum.textContent = 'Planning…';
+                commitBtn.disabled = true; document.getElementById('ver-status').textContent = ''; sum.textContent = 'Planning…';
                 postJSON(url.preview, { staged: lastStaged }).then(({ ok, body }) => {
                     if (!ok || !body.ok) { sum.textContent = body.error || 'Planning failed.'; return; }
                     sum.textContent = (body.summary || []).join('\n');
@@ -348,20 +343,16 @@
                 });
             });
             document.getElementById('btn-cancel').addEventListener('click', () => modal.style.display = 'none');
-
             commitBtn.addEventListener('click', function () {
                 const st = document.getElementById('ver-status');
-                st.textContent = 'Committing…'; st.className = 'text-sm text-green-700';
-                commitBtn.disabled = true;
+                setMsg(st, 'Committing…', true); commitBtn.disabled = true;
                 postJSON(url.commit, { staged: lastStaged }).then(({ ok, body }) => {
-                    if (ok && body.ok) {
-                        window.location = "{{ url('pdtsdownload') }}/" + (body.newPdtId || "{{ $pdt->Id }}");
-                    } else {
-                        st.textContent = '✗ ' + (body.error || 'Commit failed.'); st.className = 'text-sm text-red-700';
-                        commitBtn.disabled = false;
-                    }
+                    if (ok && body.ok) window.location = "{{ url('pdtsdownload') }}/" + (body.newPdtId || "{{ $pdt->Id }}");
+                    else { setMsg(st, '✗ ' + (body.error || 'Commit failed.'), false); commitBtn.disabled = false; }
                 });
             });
         })();
     </script>
+
+    @include('admin.partials._refdoc-modal')
 </x-app-layout>

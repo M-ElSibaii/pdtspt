@@ -38,9 +38,36 @@
 
             $req = $f['mandatory'] ? 'required' : '';
             // js-attr: collectable by the editor's AJAX (data-field); js-mandatory: blocking.
+            // data-original: current value, so staged editors (Mode 4) can diff client-side.
             $cls = 'js-attr ' . ($f['mandatory'] ? 'js-mandatory ' : '') . 'w-full border rounded p-2 text-sm';
             $common = 'class="' . $cls . '" id="' . e($id) . '" name="' . e($inputName)
-                . '" data-field="' . e($name) . '" ' . $req;
+                . '" data-field="' . e($name) . '" data-original="' . e($val) . '" ' . $req;
+
+            // Shared SEARCHABLE lookup for referenceDocumentGUID and constructionObjectGUID.
+            // A text input (type-to-filter via datalist) shows the label; a hidden .js-attr
+            // carries the GUID. min-width:0 keeps the flex row from overflowing the screen.
+            // Ref-doc gets an inline "+ new"; construction object is select-only.
+            if ($name === 'referenceDocumentGUID' || $name === 'constructionObjectGUID') {
+                $isRef = $name === 'referenceDocumentGUID';
+                $opts = $isRef ? \App\Services\RefDocs::all() : \App\Services\ConObjs::all();
+                $listId = 'dl_' . $id;
+                $curLabel = '';
+                foreach ($opts as $o) {
+                    if ((string) $o->GUID === (string) $val) { $curLabel = $o->label; break; }
+                }
+                if ($curLabel === '' && $val !== '' && $val !== 'n/a') { $curLabel = $val; }
+                $dl = '<datalist id="' . e($listId) . '">';
+                foreach ($opts as $o) {
+                    $dl .= '<option data-guid="' . e($o->GUID) . '" value="' . e($o->label) . '"></option>';
+                }
+                $dl .= '</datalist>';
+                $search = '<input type="text" class="js-lookup-search w-full border rounded p-2 text-sm" list="' . e($listId)
+                    . '" data-for="' . e($id) . '" value="' . e($curLabel) . '" placeholder="type to search…" autocomplete="off" style="min-width:0">';
+                $hidden = '<input type="hidden" class="js-attr" id="' . e($id) . '" name="' . e($inputName)
+                    . '" data-field="' . e($name) . '" data-original="' . e($val) . '" value="' . e($val) . '">';
+                $newBtn = $isRef ? '<button type="button" class="btn btn-secondary js-refdoc-new" title="Add a new reference document">+</button>' : '';
+                return '<div class="flex items-center gap-1" style="min-width:0">' . $search . $hidden . $newBtn . '</div>' . $dl;
+            }
 
             // Controlled bSDD vocabulary override (independent of the DB column type).
             if (isset($enums[$name])) {
@@ -91,7 +118,6 @@
         <div class="{{ $f['inputKind'] === 'textarea' ? 'md:col-span-2' : '' }}">
             <label class="block text-xs font-semibold mb-1">
                 {{ $f['label'] }}@if($f['mandatory']) <span class="text-red-600">*</span>@endif
-                @if($f['mandatoryReason'] === 'rule')<span class="text-xs text-gray-400">(rule)</span>@endif
             </label>
             {!! _peField($f, $prefix, $idAttr, $values, $enums, $editableOverride) !!}
         </div>
@@ -106,7 +132,6 @@
                 <label class="block text-xs mb-1">
                     {{ $f['label'] }}@if($f['mandatory']) <span class="text-red-600">*</span>@endif
                     @if($f['system'])<span class="text-xs text-gray-400">(auto)</span>@endif
-                    @if($f['mandatoryReason'] === 'rule')<span class="text-xs text-gray-400">(rule)</span>@endif
                 </label>
                 {!! _peField($f, $prefix, $idAttr, $values, $enums, $editableOverride) !!}
             </div>

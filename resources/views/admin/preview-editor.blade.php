@@ -255,8 +255,14 @@
                     }));
                 }
 
+                // Clear stale results when the search box is emptied (item 6).
+                p.querySelector('.js-pick-q').addEventListener('input', function () {
+                    if (this.value.trim() === '') results.innerHTML = '';
+                });
+
                 p.querySelector('.js-pick-search').addEventListener('click', function () {
                     const q = p.querySelector('.js-pick-q').value.trim();
+                    if (q === '') { results.innerHTML = ''; return; }
                     results.innerHTML = 'Searching…';
                     get(u.pickProps + '?q=' + encodeURIComponent(q)).then(({ ok, body }) => {
                         if (!ok) { results.innerHTML = 'Search failed.'; return; }
@@ -285,6 +291,15 @@
                             counts.textContent = 'Matched/selected ' + body.matchedCount + ' · not found ' + body.unmatchedCount;
                             counts.className = 'js-pick-counts text-gray-700';
                             gapBtn.style.display = lastGap.length ? '' : 'none';
+                            // On-screen "not found" list (item 2), alongside the downloadable gap file.
+                            const nf = p.querySelector('.js-pick-notfound');
+                            const nfList = p.querySelector('.js-pick-notfound-list');
+                            if (lastGap.length) {
+                                nfList.innerHTML = lastGap.map(n => '<li>' + escapeHtml(n) + '</li>').join('');
+                                nf.style.display = '';
+                            } else {
+                                nf.style.display = 'none';
+                            }
                             // Show the matched as a selected list so the admin sees what got picked.
                             results.innerHTML = (body.matchedNames || []).map((n, i) =>
                                 renderRow({ Id: body.matchedIds[i], nameEn: n, namePt: '', versionNumber: '', revisionNumber: '', definitionEn: '' }, true)).join('')
@@ -341,7 +356,7 @@
                 suggestions.forEach((s, i) => {
                     const o = document.createElement('option');
                     o.value = String(i);
-                    o.textContent = (s.gopNamePt || s.gopNameEn || '(unnamed)');
+                    o.textContent = (s.gopNameEn || s.gopNamePt || '(unnamed)');
                     sel.appendChild(o);
                 });
             });
@@ -424,4 +439,6 @@
             });
         })();
     </script>
+
+    @include('admin.partials._refdoc-modal')
 </x-app-layout>

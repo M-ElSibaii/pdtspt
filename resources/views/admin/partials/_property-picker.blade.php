@@ -17,6 +17,12 @@
         <button type="button" class="btn btn-secondary js-pick-gap" style="display:none;">Download missing (Excel)</button>
     </div>
 
+    {{-- On-screen "not found" list from the last Excel match (item 2) --}}
+    <div class="js-pick-notfound text-sm mt-2" style="display:none;">
+        <div class="font-semibold text-red-700">Not found in dictionary (need creating):</div>
+        <ul class="js-pick-notfound-list list-disc ml-5"></ul>
+    </div>
+
     <div class="js-pick-results text-sm mt-2" style="max-height:260px; overflow:auto;"></div>
 
     <div class="mt-2 flex items-center gap-3">

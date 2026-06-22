@@ -30,7 +30,7 @@
             @foreach ($gops as $gop)
                 <div class="mt-4 border rounded shadow-sm">
                     <div class="px-4 py-2 border-b bg-slate-50 flex flex-wrap items-center gap-2">
-                        <span class="font-semibold">{{ $gop->gopNamePt ?: $gop->gopNameEn }}</span>
+                        <span class="font-semibold">{{ $gop->gopNameEn }} <span class="text-gray-400">/</span> {{ $gop->gopNamePt }}</span>
                         <span class="text-xs text-gray-500">(Id={{ $gop->Id }} · <x-version-badge :version="$gop->versionNumber" :revision="$gop->revisionNumber" />) — read-only</span>
                     </div>
                     <div class="p-4">
@@ -46,7 +46,7 @@
                             @php $dictVals = isset($dictRows[$c->propertyId]) ? (array) $dictRows[$c->propertyId] : []; @endphp
                             <div class="js-context border rounded p-3 mt-2 bg-gray-50" data-context-id="{{ $c->Id }}">
                                 <div class="flex flex-wrap items-center gap-2 mb-2">
-                                    <span class="font-semibold">{{ $c->dictNamePt ?: $c->dictNameEn }}</span>
+                                    <span class="font-semibold">{{ $c->dictNameEn }} <span class="text-gray-400">/</span> {{ $c->dictNamePt }}</span>
                                     <span class="text-xs text-gray-500">dict Id={{ $c->propertyId }} · v{{ $c->dictVersion }}.{{ $c->dictRevision }}</span>
                                 </div>
 
@@ -130,4 +130,6 @@
             });
         })();
     </script>
+
+    @include('admin.partials._refdoc-modal')
 </x-app-layout>

@@ -68,6 +68,9 @@ class VersioningService
     /** PDT name fields whose change triggers a VERSION bump. */
     private const PDT_NAME = ['pdtNameEn', 'pdtNamePt'];
 
+    /** Editable fields on a context (properties) row — the PDT-specific usage of a property. */
+    private const CTX_EDITABLE = ['descriptionEn', 'descriptionPt', 'visualRepresentation', 'referenceDocumentGUID'];
+
     // ============================================================ GUID + lineage
 
     public function newGuid(): string
@@ -272,10 +275,11 @@ class VersioningService
         $addGops    = $staged['addGops'] ?? [];
         $gopEdits   = $staged['gopEdits'] ?? [];
         $propEdits  = $staged['propertyEdits'] ?? [];
+        $contextEdits = $staged['contextEdits'] ?? [];
 
         $pdtNameChanged = $this->anyChanged($pdt, $pdtAttrs, self::PDT_NAME);
         $gopAddedRemoved = !empty($addGops) || !empty($removeGops);
-        $anythingNested = $gopAddedRemoved || !empty($gopEdits) || !empty($propEdits)
+        $anythingNested = $gopAddedRemoved || !empty($gopEdits) || !empty($propEdits) || !empty($contextEdits)
             || $this->anyChanged($pdt, $pdtAttrs, ['descriptionEn', 'descriptionPt', 'category', 'referenceDocumentGUID', 'constructionObjectGUID']);
 
         if (!$pdtNameChanged && !$anythingNested) {
@@ -291,6 +295,25 @@ class VersioningService
         $addProperties = [];
         $removeContextIds = [];
         $remap = [];
+        $contextOverrides = [];
+
+        // Context (properties-row) edits — descriptions / visual representation / reference
+        // document on THIS PDT's usage of a property; distinct from the dictionary definition.
+        // Applied to the cloned context row; bumps the containing GOP to a revision.
+        foreach ($contextEdits as $ce) {
+            $cid = (int) ($ce['contextId'] ?? 0);
+            $ctx = DB::table(self::PROP)->where('Id', $cid)->where('pdtID', $pdtId)->first();
+            if (!$ctx) {
+                continue;
+            }
+            $attrs = array_intersect_key($ce['attributes'] ?? [], array_flip(self::CTX_EDITABLE));
+            if (!$attrs) {
+                continue;
+            }
+            $contextOverrides[$cid] = $attrs;
+            $gopBumps[(int) $ctx->gopID] = $gopBumps[(int) $ctx->gopID] ?? 'revision';
+            $summary[] = "EDIT context Id={$cid} (" . implode(', ', array_keys($attrs)) . ")";
+        }
 
         // Property edits → new dict version(s) + remap the matching context row + bump its GOP.
         foreach ($propEdits as $pe) {
@@ -300,6 +323,7 @@ class VersioningService
             if (!$old) {
                 continue;
             }
+            $this->assertDictEnums($pe['values'] ?? []);
             $b = $this->decidePropertyBump($old, $pe['values'] ?? [], (bool) ($pe['correction'] ?? false));
             if ($b === 'none') {
                 continue;
@@ -346,7 +370,13 @@ class VersioningService
             }
             $gopOverrides[$gid] = $ov;
             foreach ($ge['addProperties'] ?? [] as $d) {
-                $addProperties[] = ['gopId' => $gid, 'dictId' => (int) $d];
+                // A scalar/int is an existing dictionary Id; an array with 'newProperty'
+                // is a brand-new dictionary property staged from scratch (fresh GUID, v1.0).
+                if (is_array($d) && !empty($d['newProperty'])) {
+                    $addProperties[] = ['gopId' => $gid, 'newProperty' => $d['newProperty']];
+                } else {
+                    $addProperties[] = ['gopId' => $gid, 'dictId' => (int) $d];
+                }
             }
             $removeContextIds = array_merge($removeContextIds, array_map('intval', $ge['removeContextIds'] ?? []));
         }
@@ -357,6 +387,7 @@ class VersioningService
             'gopBumps'             => $gopBumps,
             'gopOverrides'         => $gopOverrides,
             'contextPropertyRemap' => $remap,
+            'contextOverrides'     => $contextOverrides,
             'addProperties'        => $addProperties,
             'removeContextIds'     => $removeContextIds,
             'removeGopIds'         => $removeGops,
@@ -422,6 +453,9 @@ class VersioningService
                 if (isset($spec['contextPropertyRemap'][$c->Id])) {
                     $cVals['propertyId'] = $spec['contextPropertyRemap'][$c->Id]['propertyId'];
                     $cVals['GUID'] = $spec['contextPropertyRemap'][$c->Id]['GUID'];
+                }
+                if (isset($spec['contextOverrides'][$c->Id])) {
+                    $cVals = array_merge($cVals, $spec['contextOverrides'][$c->Id]); // edited context fields
                 }
                 $ops[] = ['type' => 'insert', 'ref' => null, 'table' => self::PROP, 'values' => $cVals];
             }
@@ -721,8 +755,24 @@ class VersioningService
      * Column values for a brand-new dictionary property (fresh lineage): v1.0, Active,
      * dates today. Only name/definition/attribute fields are taken from $vals.
      */
+    /**
+     * Reject controlled-vocabulary dictionary values outside the bSDD enums (blank allowed;
+     * units is optional). Fires server-side regardless of which editor staged the row, so
+     * the staged new-version path matches Preview's addNewProperty validation. propertyValueKind
+     * has no DB column, so it is not validated.
+     */
+    public function assertDictEnums(array $values): void
+    {
+        foreach (['dataType', 'units'] as $field) {
+            if (array_key_exists($field, $values) && !BsddEnums::isValid($field, $values[$field])) {
+                throw new \RuntimeException("'{$values[$field]}' is not a valid {$field} (must be a bSDD {$field} value).");
+            }
+        }
+    }
+
     public function buildNewDictValues(array $vals, string $guid): array
     {
+        $this->assertDictEnums($vals);
         $today = Carbon::today()->toDateString();
         $row = [
             'GUID' => $guid, 'versionNumber' => 1, 'revisionNumber' => 0, 'status' => self::ST_ACTIVE,
