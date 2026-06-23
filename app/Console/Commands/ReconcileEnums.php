@@ -7,21 +7,22 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Reconcile propertiesdatadictionaries.dataType / units against the bSDD controlled
- * vocabularies (App\Services\BsddEnums). Dry-run by default: scans every row, flags any
- * non-blank value not in the enum, and classifies each flag as AUTO-CORRECTABLE (an exact
- * normalisation — whitespace, case, or CP1252↔UTF-8 mojibake — maps it to a valid value)
- * vs NEEDS-MANUAL-DECISION. Blank units are valid and never flagged.
- *
- * --apply: auto-correct only the unambiguous matches (JSON backup + single transaction,
- * rollback on error), leave manual rows untouched, and write a CSV of the manual rows.
- * Before writing it verifies the units/dataType columns are utf8mb4 so we never add new
- * mojibake on top of old.
+ * Reconcile propertiesdatadictionaries against the bSDD vocabularies:
+ *   - units  -> normalise every non-blank value to a valid code from BsddEnums::units().
+ *               Auto-correct only UNAMBIGUOUS transforms (whitespace, CP1252↔UTF-8 mojibake,
+ *               ASCII-digit→superscript like m2→m², and case ONLY when exactly one
+ *               case-insensitive match exists — so t/T, mV/MV etc. are never mis-folded).
+ *   - PhysicalQuantity -> for any row whose final unit is valid, set "{name} | en.EN" from
+ *               the code→name map; for a blank unit set "without". (Manual/unknown units are
+ *               left untouched and reported.)
+ *   - dataType -> flag any non-blank value not in the 6 valid values.
+ * Blank units are valid and never flagged. Dry-run by default; --apply writes (JSON backup +
+ * transaction, utf8mb4 guard). --report exports all flags/changes to CSV (no writes).
  */
 class ReconcileEnums extends Command
 {
-    protected $signature = 'pdts:reconcile-enums {--apply : Persist the unambiguous auto-corrections (otherwise dry run)} {--report : Export ALL flagged rows to CSV for manual review (no writes)}';
-    protected $description = 'Reconcile dictionary dataType/units against the bSDD enums (dry-run first).';
+    protected $signature = 'pdts:reconcile-enums {--apply : Persist auto-corrections + PhysicalQuantity} {--report : Export the full plan to CSV (no writes)}';
+    protected $description = 'Reconcile dictionary units/dataType + PhysicalQuantity against the bSDD enums (dry-run first).';
 
     private const TABLE = 'propertiesdatadictionaries';
 
@@ -30,98 +31,112 @@ class ReconcileEnums extends Command
         $apply = (bool) $this->option('apply');
         $this->info($apply ? '=== APPLY MODE ===' : '=== DRY RUN (no changes will be written) ===');
 
-        $validDataType = BsddEnums::dataType();
         $validUnits = BsddEnums::units();
+        $unitMap = BsddEnums::unitsMap();
+        $validDataType = BsddEnums::dataType();
 
         $scanned = 0;
-        $flagged = ['dataType' => [], 'units' => []]; // each: [id,nameEn,bad,suggestion,reason,auto]
+        $unitStats = ['valid' => 0, 'auto' => 0, 'manual' => 0, 'blank' => 0];
+        $unitAuto = [];     // [id,nameEn,from,to,reason]
+        $unitManual = [];   // [id,nameEn,bad,reason]
+        $dataTypeFlags = []; // [id,nameEn,bad]
+        $pqChanges = [];    // [id,from,to]  (PhysicalQuantity to set)
+        $plan = [];         // per-id: ['unit'=>?, 'pq'=>?]
 
-        DB::table(self::TABLE)->select('Id', 'nameEn', 'dataType', 'units')->orderBy('Id')
-            ->chunk(500, function ($rows) use (&$scanned, &$flagged, $validDataType, $validUnits) {
+        DB::table(self::TABLE)->select('Id', 'nameEn', 'units', 'physicalQuantity', 'dataType')->orderBy('Id')
+            ->chunk(500, function ($rows) use (&$scanned, &$unitStats, &$unitAuto, &$unitManual, &$dataTypeFlags, &$pqChanges, &$plan, $validUnits, $unitMap, $validDataType) {
                 foreach ($rows as $r) {
                     $scanned++;
-                    foreach (['dataType' => $validDataType, 'units' => $validUnits] as $field => $valid) {
-                        $val = $r->$field;
-                        if ($val === null || trim((string) $val) === '') {
-                            continue; // blank is valid (units especially) — never flag
+                    [$status, $finalUnit, $reason] = $this->unitDecision($r->units, $validUnits);
+                    $unitStats[$status]++;
+
+                    $rowPlan = [];
+                    if ($status === 'auto') {
+                        $unitAuto[] = ['id' => $r->Id, 'nameEn' => $r->nameEn, 'from' => $r->units, 'to' => $finalUnit, 'reason' => $reason];
+                        $rowPlan['unit'] = $finalUnit;
+                    } elseif ($status === 'manual') {
+                        $unitManual[] = ['id' => $r->Id, 'nameEn' => $r->nameEn, 'bad' => $r->units, 'reason' => $reason];
+                    }
+
+                    // PhysicalQuantity target: valid/auto -> "{name} | en.EN"; blank -> "without"; manual -> leave.
+                    $pqTarget = null;
+                    if ($status === 'blank') {
+                        $pqTarget = 'without';
+                    } elseif ($status === 'valid' || $status === 'auto') {
+                        $name = $unitMap[$finalUnit] ?? null;
+                        if ($name !== null) {
+                            $pqTarget = $name . ' | en.EN';
                         }
-                        if (in_array($val, $valid, true)) {
-                            continue; // already valid
-                        }
-                        [$auto, $suggestion, $reason] = $this->evaluate((string) $val, $valid);
-                        $flagged[$field][] = [
-                            'id' => $r->Id, 'nameEn' => $r->nameEn, 'bad' => $val,
-                            'suggestion' => $suggestion, 'reason' => $reason, 'auto' => $auto,
-                        ];
+                    }
+                    if ($pqTarget !== null && (string) $r->physicalQuantity !== $pqTarget) {
+                        $pqChanges[] = ['id' => $r->Id, 'from' => $r->physicalQuantity, 'to' => $pqTarget];
+                        $rowPlan['pq'] = $pqTarget;
+                    }
+
+                    // dataType (report only)
+                    if ($r->dataType !== null && trim((string) $r->dataType) !== '' && !in_array($r->dataType, $validDataType, true)) {
+                        $dataTypeFlags[] = ['id' => $r->Id, 'nameEn' => $r->nameEn, 'bad' => $r->dataType];
+                    }
+
+                    if ($rowPlan) {
+                        $plan[$r->Id] = $rowPlan;
                     }
                 }
             });
 
         // ---- report ----
-        foreach (['dataType', 'units'] as $field) {
-            $list = $flagged[$field];
-            $auto = array_filter($list, fn($f) => $f['auto']);
-            $manual = array_filter($list, fn($f) => !$f['auto']);
-            $this->line('');
-            $this->info("── {$field}: " . count($list) . ' flagged (' . count($auto) . ' auto-correctable, ' . count($manual) . ' manual) ──');
-            foreach (array_slice($list, 0, 60) as $f) {
-                $tag = $f['auto'] ? "AUTO[{$f['reason']}] → '{$f['suggestion']}'" : 'MANUAL';
-                $this->line(sprintf("   Id=%s  %s  bad='%s'  %s", $f['id'], $f['nameEn'], $f['bad'], $tag));
-            }
-            if (count($list) > 60) {
-                $this->line('   … ' . (count($list) - 60) . ' more');
-            }
-        }
-
-        $totalAuto = count(array_filter($flagged['dataType'], fn($f) => $f['auto'])) + count(array_filter($flagged['units'], fn($f) => $f['auto']));
-        $totalManual = count(array_filter($flagged['dataType'], fn($f) => !$f['auto'])) + count(array_filter($flagged['units'], fn($f) => !$f['auto']));
         $this->line('');
-        $this->info("SUMMARY: scanned {$scanned} rows · dataType flagged " . count($flagged['dataType'])
-            . ' · units flagged ' . count($flagged['units']) . " · auto-correctable {$totalAuto} · manual {$totalManual}");
+        $this->info("UNITS: scanned {$scanned} · valid {$unitStats['valid']} · auto-correctable {$unitStats['auto']} · manual {$unitStats['manual']} · blank {$unitStats['blank']}");
+        $this->line('-- unit auto-corrections (sample) --');
+        foreach (array_slice($unitAuto, 0, 40) as $f) {
+            $this->line(sprintf("   Id=%s  '%s' -> '%s'  [%s]", $f['id'], $f['from'], $f['to'], $f['reason']));
+        }
+        if (count($unitAuto) > 40) {
+            $this->line('   … ' . (count($unitAuto) - 40) . ' more');
+        }
+        $this->line('-- unit MANUAL (not auto-correctable; sample) --');
+        foreach (array_slice($unitManual, 0, 40) as $f) {
+            $this->line(sprintf("   Id=%s  %s  bad='%s'  [%s]", $f['id'], $f['nameEn'], $f['bad'], $f['reason']));
+        }
+        if (count($unitManual) > 40) {
+            $this->line('   … ' . (count($unitManual) - 40) . ' more');
+        }
+        $this->line('');
+        $this->info('PhysicalQuantity to set/normalise: ' . count($pqChanges) . ' row(s)');
+        $this->info('dataType flagged (report only): ' . count($dataTypeFlags));
 
-        // Read-only export of every flagged row for manual review (no DB writes).
         if ($this->option('report')) {
-            $stamp = now()->format('Ymd_His');
-            $path = storage_path("app/reconcile_enums_review_{$stamp}.csv");
-            $fh = fopen($path, 'w');
-            fputcsv($fh, ['field', 'Id', 'nameEn', 'badValue', 'classification', 'suggestion']);
-            foreach (['dataType', 'units'] as $field) {
-                foreach ($flagged[$field] as $f) {
-                    fputcsv($fh, [$field, $f['id'], $f['nameEn'], $f['bad'], $f['auto'] ? "AUTO[{$f['reason']}]" : 'MANUAL', $f['suggestion'] ?? '']);
-                }
-            }
-            fclose($fh);
-            $this->info('Review report written: ' . basename($path) . ' (no changes made).');
+            $this->writeReport($unitAuto, $unitManual, $pqChanges, $dataTypeFlags);
         }
 
         if (!$apply) {
             $this->newLine();
-            $this->info('Dry run complete. Re-run with --apply to auto-correct the unambiguous matches.');
+            $this->info('Dry run complete. Re-run with --apply to write the auto-corrections + PhysicalQuantity.');
             return self::SUCCESS;
         }
 
         // ---- apply ----
         if (!$this->columnsAreUtf8mb4()) {
-            $this->error('Aborting: dataType/units columns are not utf8mb4 — fix the column charset first to avoid new mojibake.');
+            $this->error('Aborting: units/physicalQuantity columns are not utf8mb4 — fix charset first.');
             return self::FAILURE;
         }
-
         $stamp = now()->format('Ymd_His');
-        $affectedIds = collect(array_merge($flagged['dataType'], $flagged['units']))->where('auto', true)->pluck('id')->unique()->values();
+        $ids = array_keys($plan);
         $backup = ['generated_at' => now()->toIso8601String(),
-            'rows' => DB::table(self::TABLE)->whereIn('Id', $affectedIds->all() ?: [0])->get(['Id', 'nameEn', 'dataType', 'units'])];
+            'rows' => DB::table(self::TABLE)->whereIn('Id', $ids ?: [0])->get(['Id', 'nameEn', 'units', 'physicalQuantity'])];
         $backupPath = storage_path("app/reconcile_enums_backup_{$stamp}.json");
         file_put_contents($backupPath, json_encode($backup, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
-        $applied = 0;
+        $unitWrites = 0;
+        $pqWrites = 0;
         try {
-            DB::transaction(function () use ($flagged, &$applied) {
-                foreach (['dataType', 'units'] as $field) {
-                    foreach ($flagged[$field] as $f) {
-                        if ($f['auto']) {
-                            DB::table(self::TABLE)->where('Id', $f['id'])->update([$field => $f['suggestion']]);
-                            $applied++;
-                        }
+            DB::transaction(function () use ($plan, &$unitWrites, &$pqWrites) {
+                foreach ($plan as $id => $p) {
+                    $upd = [];
+                    if (array_key_exists('unit', $p)) { $upd['units'] = $p['unit']; $unitWrites++; }
+                    if (array_key_exists('pq', $p)) { $upd['physicalQuantity'] = $p['pq']; $pqWrites++; }
+                    if ($upd) {
+                        DB::table(self::TABLE)->where('Id', $id)->update($upd);
                     }
                 }
             });
@@ -130,55 +145,82 @@ class ReconcileEnums extends Command
             return self::FAILURE;
         }
 
-        // CSV of the manual rows for hand-resolution.
-        $manualRows = collect(array_merge(
-            array_map(fn($f) => $f + ['field' => 'dataType'], array_filter($flagged['dataType'], fn($f) => !$f['auto'])),
-            array_map(fn($f) => $f + ['field' => 'units'], array_filter($flagged['units'], fn($f) => !$f['auto'])),
-        ));
-        $csvPath = storage_path("app/reconcile_enums_manual_{$stamp}.csv");
-        $fh = fopen($csvPath, 'w');
-        fputcsv($fh, ['Id', 'nameEn', 'field', 'badValue']);
-        foreach ($manualRows as $f) {
-            fputcsv($fh, [$f['id'], $f['nameEn'], $f['field'], $f['bad']]);
-        }
-        fclose($fh);
-
-        $this->info("Applied {$applied} auto-correction(s). Manual rows: " . $manualRows->count() . ".");
-        $this->info('Backup: ' . basename($backupPath) . ' · Manual report: ' . basename($csvPath));
+        $this->writeReport($unitAuto, $unitManual, $pqChanges, $dataTypeFlags, $stamp);
+        $this->info("Applied: {$unitWrites} unit correction(s), {$pqWrites} PhysicalQuantity write(s). Manual units left: " . count($unitManual) . '.');
+        $this->info('Backup: ' . basename($backupPath));
         return self::SUCCESS;
     }
 
-    /** [auto, suggestion, reason] — whether a normalisation maps $val to a valid enum value. */
-    private function evaluate(string $val, array $valid): array
+    /** [status, finalUnit, reason]; status = valid|auto|manual|blank. Safe transforms only. */
+    private function unitDecision(?string $val, array $valid): array
     {
-        $trim = trim($val);
-        if ($trim !== $val && in_array($trim, $valid, true)) {
-            return [true, $trim, 'whitespace'];
+        $raw = (string) $val;
+        if (trim($raw) === '') {
+            return ['blank', '', 'blank'];
         }
+        if (in_array($raw, $valid, true)) {
+            return ['valid', $raw, 'exact'];
+        }
+        $bases = array_values(array_unique([trim($raw), trim($this->repair($raw))]));
+        $sup = fn($s) => strtr($s, ['2' => '²', '3' => '³', '4' => '⁴']);
+
+        // Unambiguous non-case transforms first.
+        foreach ($bases as $b) {
+            if (in_array($b, $valid, true)) {
+                return ['auto', $b, $b === trim($raw) ? 'whitespace' : 'encoding'];
+            }
+            $sc = $sup($b);
+            if ($sc !== $b && in_array($sc, $valid, true)) {
+                return ['auto', $sc, 'superscript'];
+            }
+        }
+        // Case match ONLY if exactly one valid code matches case-insensitively (incl. superscript).
+        $ci = [];
         foreach ($valid as $v) {
-            if (strcasecmp($trim, $v) === 0) {
-                return [true, $v, 'case'];
-            }
-        }
-        // CP1252↔UTF-8 mojibake repair (e.g. "ÎÂ°C" → "°C").
-        $rep = @mb_convert_encoding($val, 'Windows-1252', 'UTF-8');
-        if ($rep !== false && mb_check_encoding($rep, 'UTF-8')) {
-            $rt = trim($rep);
-            if (in_array($rt, $valid, true)) {
-                return [true, $rt, 'encoding'];
-            }
-            foreach ($valid as $v) {
-                if (strcasecmp($rt, $v) === 0) {
-                    return [true, $v, 'encoding+case'];
+            foreach ($bases as $b) {
+                if (strcasecmp($b, $v) === 0 || strcasecmp($sup($b), $v) === 0) {
+                    $ci[$v] = true;
                 }
             }
         }
-        return [false, null, 'manual'];
+        $ci = array_keys($ci);
+        if (count($ci) === 1) {
+            return ['auto', $ci[0], 'case'];
+        }
+        return ['manual', $raw, count($ci) > 1 ? 'ambiguous-case' : 'not-found'];
+    }
+
+    private function repair(string $s): string
+    {
+        $r = @mb_convert_encoding($s, 'Windows-1252', 'UTF-8');
+        return ($r !== false && $r !== '' && mb_check_encoding($r, 'UTF-8')) ? $r : $s;
+    }
+
+    private function writeReport(array $unitAuto, array $unitManual, array $pqChanges, array $dataTypeFlags, ?string $stamp = null): void
+    {
+        $stamp = $stamp ?: now()->format('Ymd_His');
+        $path = storage_path("app/reconcile_enums_report_{$stamp}.csv");
+        $fh = fopen($path, 'w');
+        fputcsv($fh, ['section', 'Id', 'nameEn', 'from', 'to', 'reason']);
+        foreach ($unitAuto as $f) {
+            fputcsv($fh, ['unit-auto', $f['id'], $f['nameEn'], $f['from'], $f['to'], $f['reason']]);
+        }
+        foreach ($unitManual as $f) {
+            fputcsv($fh, ['unit-manual', $f['id'], $f['nameEn'], $f['bad'], '', $f['reason']]);
+        }
+        foreach ($pqChanges as $f) {
+            fputcsv($fh, ['physicalQuantity', $f['id'], '', $f['from'], $f['to'], '']);
+        }
+        foreach ($dataTypeFlags as $f) {
+            fputcsv($fh, ['dataType-flag', $f['id'], $f['nameEn'], $f['bad'], '', '']);
+        }
+        fclose($fh);
+        $this->info('Report written: ' . basename($path));
     }
 
     private function columnsAreUtf8mb4(): bool
     {
-        foreach (DB::select("SHOW FULL COLUMNS FROM " . self::TABLE . " WHERE Field IN ('dataType','units')") as $c) {
+        foreach (DB::select("SHOW FULL COLUMNS FROM " . self::TABLE . " WHERE Field IN ('units','physicalQuantity','dataType')") as $c) {
             if ($c->Collation !== null && !str_starts_with((string) $c->Collation, 'utf8mb4')) {
                 return false;
             }

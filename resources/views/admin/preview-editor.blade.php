@@ -441,4 +441,5 @@
     </script>
 
     @include('admin.partials._refdoc-modal')
+    @include('admin.partials._units-autofill')
 </x-app-layout>

@@ -45,6 +45,21 @@ class BsddEnums
         return self::get('units');
     }
 
+    /** code => written-out name map (e.g. "m²" => "square metre"). */
+    public static function unitsMap(): array
+    {
+        return self::all()['unitsMap'] ?? [];
+    }
+
+    /** Written-out name for a unit code, or null. */
+    public static function unitName(?string $code): ?string
+    {
+        if ($code === null || $code === '') {
+            return null;
+        }
+        return self::unitsMap()[$code] ?? null;
+    }
+
     public static function propertyValueKind(): array
     {
         return self::get('propertyValueKind');

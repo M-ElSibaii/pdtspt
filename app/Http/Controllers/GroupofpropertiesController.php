@@ -426,87 +426,10 @@ class GroupofpropertiesController extends Controller
     }
 
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
-    public function createStep1()
-    {
-        // Get the latest versions/revisions of PDTs
-        $pdts = productdatatemplates::get();
-
-
-        return view('groupofproperties.choose_pdt', compact('pdts'));
-    }
-
-    public function createStep2(Request $request)
-    {
-        // Validate the request
-        $request->validate([
-            'pdtId' => 'required|exists:productdatatemplates,Id',
-        ]);
-
-        $pdtId = $request->input('pdtId');
-        $referenceDocuments = ReferenceDocuments::all();
-        // Get the selected PDT and its associated groups of properties
-        $selectedPdt = productdatatemplates::find($pdtId);
-        $associatedGroups = GroupOfProperties::where('pdtId', $pdtId)->get();
-
-        return view('groupofproperties.creategop', compact('selectedPdt', 'associatedGroups', 'referenceDocuments'));
-    }
-    public function create()
-    {
-        //
-    }
-
-    public function storegop(Request $request)
-    {
-        // Validate the request
-        $request->validate([
-            'pdtId' => 'required|exists:productdatatemplates,Id',
-            'gopNameEn' => 'required|string',
-            'gopNamePt' => 'required|string',
-            // Add other fields validation as needed
-        ]);
-
-        // Create a new Group of Properties
-        $groupOfProperties = new GroupOfProperties();
-        $groupOfProperties->pdtId = $request->input('pdtId');
-        $groupOfProperties->gopNameEn = $request->input('gopNameEn');
-        $groupOfProperties->gopNamePt = $request->input('gopNamePt');
-        $groupOfProperties->GUID = $request->input('GUID');
-        // Set other fields as needed
-        $groupOfProperties->definitionEn = $request->input('definitionEn');
-        $groupOfProperties->definitionPt = $request->input('definitionPt');
-        $groupOfProperties->status = $request->input('status');
-        $groupOfProperties->referenceDocumentGUID = $request->input('referenceDocumentGUID');
-        $groupOfProperties->dateOfCreation = $request->input('dateOfCreation');
-        $groupOfProperties->dateofActivation = $request->input('dateofActivation');
-        $groupOfProperties->dateOfLastChange = $request->input('dateOfLastChange');
-        $groupOfProperties->dateOfRevision = $request->input('dateOfRevision');
-        $groupOfProperties->dateOfVersion = $request->input('dateOfVersion');
-        $groupOfProperties->created_at = $request->input('created_at');
-        $groupOfProperties->updated_at = $request->input('updated_at');
-        $groupOfProperties->versionNumber = $request->input('versionNumber');
-        $groupOfProperties->revisionNumber = $request->input('revisionNumber');
-        $groupOfProperties->listOfReplacedProperties = $request->input('listOfReplacedProperties');
-        $groupOfProperties->listOfReplacingProperties = $request->input('listOfReplacingProperties');
-        $groupOfProperties->relationToOtherDataDictionaries = $request->input('relationToOtherDataDictionaries');
-        $groupOfProperties->creatorsLanguage = $request->input('creatorsLanguage');
-        $groupOfProperties->visualRepresentation = $request->input('visualRepresentation');
-        $groupOfProperties->countryOfUse = $request->input('countryOfUse');
-        $groupOfProperties->countryOfOrigin = $request->input('countryOfOrigin');
-        $groupOfProperties->categoryOfGroupOfProperties = $request->input('categoryOfGroupOfProperties');
-        $groupOfProperties->parentGroupOfProperties = $request->input('parentGroupOfProperties');
-        // Add other fields as needed
-
-        $groupOfProperties->save();
-
-        return redirect()->route('groupofproperties.creategop', ['pdtId' => $request->input('pdtId')])
-            ->with('success', 'Group of Properties added successfully!');
-    }
+    // [Legacy GOP create flow (createStep1/createStep2/create/storegop) removed —
+    //  superseded by the unified editor's GOP creation (PreviewService::addGop and the
+    //  staged versioning flow). Shared methods below (getGroupOfProperties, survey,
+    //  comments, datadictionaryviewGOP) are unaffected.]
 
 
 

@@ -218,50 +218,9 @@ Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
     Route::post('/admin/pdt/{pdt}/new-version/preview', [PdtVersioningController::class, 'preview'])->whereNumber('pdt')->name('admin.pdt.newVersion.preview');
     Route::post('/admin/pdt/{pdt}/new-version/commit', [PdtVersioningController::class, 'commit'])->whereNumber('pdt')->name('admin.pdt.newVersion.commit');
 
-    Route::get('/pdtinput',  function () {
-        return view('pdtinput');
-    })
-        ->name('pdtinput');
-
-    // Route for creating data templates
-    Route::get('/productdatatemplates/create', [ProductDataTemplatesController::class, 'create'])
-        ->name('productdatatemplates.create');
-    Route::post('/productdatatemplates/store', [ProductDataTemplatesController::class, 'store'])
-        ->name('productdatatemplates.store');
-
-    // Route for creating groups of properties
-    Route::get('/groupofproperties/choose_pdt', [GroupOfPropertiesController::class, 'createStep1'])
-        ->name('groupofproperties.choose_pdt');
-    Route::get('/groupofproperties/creategop', [GroupOfPropertiesController::class, 'createStep2'])
-        ->name('groupofproperties.creategop');
-    Route::post('/groupofproperties/creategop', [GroupOfPropertiesController::class, 'createStep2'])
-        ->name('groupofproperties.creategop');
-    Route::post('/groupofproperties/storegop', [GroupOfPropertiesController::class, 'storegop'])
-        ->name('groupofproperties.storegop');
-
-    // Route for creating properties
-    Route::get('/properties/choose_pdt', [PropertiesController::class, 'choosePDT'])
-        ->name('properties.choose_pdt');
-
-    Route::match(['get', 'post'], '/properties/createprops', [PropertiesController::class, 'createprops'])->name('properties.createprops');
-    // Route to add new property manually
-    Route::post('/properties/addNew', [PropertiesController::class, 'PropertiesAdded'])->name('properties.addNew');
-    Route::post('/properties/addNewProperty', [PropertiesController::class, 'addPropertyManual'])->name('properties.addPropertyManual');
-
-    // Route to add properties from data dictionary
-
-    Route::post('/properties/addNewPropertyFromDictionary', [PropertiesController::class, 'addFromDictionary'])->name('properties.addFromDataDictionary');
-    Route::post('/properties/addFromDictionary', [PropertiesController::class, 'PropertiesAddedDictionaryPage'])->name('properties.addFromDictionary');
-    Route::post('/properties/uploadExcel', [PropertiesController::class, 'uploadExcel'])->name('properties.uploadExcel');
-    // edit properties
-
-    Route::post('/properties/edit/{propertyId}', [PropertiesController::class, 'updateProperty'])->name('properties.update');
-    Route::get('/properties/edit/{propertyId}', [PropertiesController::class, 'showProperty'])->name('properties.edit');
-
-    // edit properties in data dictionary
-
-    Route::post('/properties/editdd/{propertyddId}', [PropertiesdatadictionariesController::class, 'updateddProperty'])->name('properties.updatedd');
-    Route::get('/properties/editdd/{propertyddId}', [PropertiesdatadictionariesController::class, 'showddProperty'])->name('properties.editdd');
+    // [Legacy "Create / Edit PDTs" tool removed — superseded by the unified editor
+    //  (CREATE / Active edit / Preview / New-version). Its routes, views, controller
+    //  methods and admin button were deleted. Shared controllers/export/API/comments kept.]
 
     // add reference documents
     Route::get('/referencedocuments/list', [ReferenceDocumentsController::class, 'getReferenceDocuments'])->name('referencedocuments.list');
