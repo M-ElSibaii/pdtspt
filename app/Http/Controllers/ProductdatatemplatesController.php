@@ -672,237 +672,6 @@ class ProductdatatemplatesController extends Controller
         );
     }
 
-    private function transformData($productDataTemplates, $propertiesData)
-    {
-        $jsonData = [
-            'ModelVersion' => '2.0',
-            'OrganizationCode' => 'pdtspt',
-            'DictionaryCode' => 'pdtspt',
-            'LanguageIsoCode' => 'pt-PT',
-            'DictionaryName' => 'pdtspt',
-            'DictionaryVersion' => "1.1",
-            'QualityAssuranceProcedure' => "EN ISO 23386:2020",
-
-
-            // Add other top-level keys as needed
-            'Classes' => [],
-            'Properties' => [],
-        ];
-
-        $masterPdt = $this->loadLatestMasterPdt();
-        $masterGroups = [];
-        if ($masterPdt) {
-            $masterGroups = DB::select('SELECT * FROM groupofproperties WHERE pdtId = ?', [$masterPdt->Id]);
-        }
-
-        foreach ($productDataTemplates as $productDataTemplate) {
-            $classData = $this->transformProductDataTemplate($productDataTemplate);
-            $jsonData['Classes'][] = $classData;
-
-            // Fetch related data using another raw SQL query
-            $groupOfProperties = DB::select('SELECT * FROM groupofproperties WHERE pdtId = ?', [$productDataTemplate->Id]);
-
-            if ($masterPdt && $productDataTemplate->GUID !== self::MASTER_PDT_GUID) {
-                $groupOfProperties = $this->mergeMasterGroupsIntoPdtGroups($groupOfProperties, $masterGroups, $productDataTemplate->Id);
-            }
-
-            foreach ($groupOfProperties as $group) {
-                $groupData = $this->transformGroupOfProperties($group);
-                $jsonData['Classes'][] = $groupData;
-            }
-        }
-
-
-        // Transform properties from propertiesdatadictionary
-        foreach ($propertiesData as $property) {
-            $jsonData['Properties'][] = $this->transformPropertyDataDictionary($property);
-        }
-
-        return $jsonData;
-    }
-
-    private function loadLatestMasterPdt()
-    {
-        return DB::table('productdatatemplates')
-            ->where('GUID', self::MASTER_PDT_GUID)
-            ->orderByDesc('versionNumber')
-            ->orderByDesc('revisionNumber')
-            ->first();
-    }
-
-    private function mergeMasterGroupsIntoPdtGroups(array $pdtGroups, array $masterGroups, int $pdtId): array
-    {
-        $groupMap = [];
-
-        // Process PDT groups (might be objects from collection or arrays)
-        foreach ($pdtGroups as $group) {
-            $guid = is_array($group) ? $group['GUID'] : $group->GUID;
-            $groupMap[$guid] = $group;
-        }
-
-        // Process master groups and merge by GUID
-        foreach ($masterGroups as $masterGroup) {
-            $masterGuid = is_array($masterGroup) ? $masterGroup['GUID'] : $masterGroup->GUID;
-            $masterId = is_array($masterGroup) ? $masterGroup['Id'] : $masterGroup->Id;
-
-            if (isset($groupMap[$masterGuid])) {
-                $currentGroup = $groupMap[$masterGuid];
-                if (!is_array($currentGroup)) {
-                    $currentGroup = (array) $currentGroup;
-                }
-                $currentGroup['mergedGroupIds'] = $currentGroup['mergedGroupIds'] ?? [];
-                $currentGroupId = is_array($currentGroup) ? $currentGroup['Id'] : $currentGroup->Id;
-
-                if ($currentGroupId !== $masterId && !in_array($masterId, $currentGroup['mergedGroupIds'], true)) {
-                    $currentGroup['mergedGroupIds'][] = $masterId;
-                }
-                $groupMap[$masterGuid] = $currentGroup;
-            } else {
-                $clonedGroup = is_array($masterGroup) ? $masterGroup : (array) $masterGroup;
-                $clonedGroup['pdtId'] = $pdtId;
-                $groupMap[$masterGuid] = $clonedGroup;
-            }
-        }
-
-        return array_values($groupMap);
-    }
-
-    private function transformProductDataTemplate($productDataTemplate)
-    {
-        // Implement the transformation logic for a product data template
-        // Use $productDataTemplate and its properties to structure the data
-
-        $classData = [
-            'ClassType' => 'Class',
-            'Code' => (string) $productDataTemplate->GUID . '-' . (string) $productDataTemplate->Id,
-            'Name' => $productDataTemplate->pdtNamePt,
-            'Definition' => $productDataTemplate->descriptionPt,
-            'ActivationDateUtc' => $productDataTemplate->dateOfVersion,
-            'DeActivationDateUtc' => $productDataTemplate->depreciationDate,
-            'DeprecationExplanation' => ($productDataTemplate->depreciationDate != '0000-00-00') ? $productDataTemplate->depreciationDate : null,
-            'DocumentReference' => referencedocuments::where('GUID', $productDataTemplate->referenceDocumentGUID)->value('rdName'),
-            'RevisionDateUtc' => $productDataTemplate->dateOfRevision,
-            'RevisionNumber' => $productDataTemplate->revisionNumber,
-            'Status' => $productDataTemplate->status,
-            'Uid' => $productDataTemplate->GUID,
-            'VersionDateUtc' => $productDataTemplate->dateOfVersion,
-            'VersionNumber' => $productDataTemplate->versionNumber,
-
-        ];
-
-
-
-
-        return $classData;
-    }
-
-
-    private function transformGroupOfProperties($groupOfProperties)
-    {
-        // Handle both array and object formats
-        $isArray = is_array($groupOfProperties);
-
-        // Helper to get value from array or object
-        $get = function ($key) use ($groupOfProperties, $isArray) {
-            return $isArray ? ($groupOfProperties[$key] ?? null) : ($groupOfProperties->$key ?? null);
-        };
-
-        $pdtId = $get('pdtId');
-        $versionNumber = $get('versionNumber');
-        $revisionNumber = $get('revisionNumber');
-
-        // Fetch Group of Properties with the same pdtId and higher version or same version with higher revision (ReplacingObjectCodes)
-        $replacingGroups = groupofproperties::where('pdtId', $pdtId)
-            ->where(function ($query) use ($versionNumber, $revisionNumber) {
-                $query->where('versionNumber', '>', $versionNumber)
-                    ->orWhere(function ($query) use ($versionNumber, $revisionNumber) {
-                        $query->where('versionNumber', $versionNumber)
-                            ->where('revisionNumber', '>', $revisionNumber);
-                    });
-            })
-            ->get();
-        // Extract the codes from the result set with the format "GUID-ID"
-        $replacingCodes = $replacingGroups->map(function ($replacingGroup) {
-            return $replacingGroup->GUID . '-' . $replacingGroup->Id;
-        })->toArray();
-        // Fetch Group of Properties with the same pdtId and lower version or same version with lower revision (ReplacedObjectCodes)
-        $replacedGroups = groupofproperties::where('pdtId', $pdtId)
-            ->where(function ($query) use ($versionNumber, $revisionNumber) {
-                $query->where('versionNumber', '<', $versionNumber)
-                    ->orWhere(function ($query) use ($versionNumber, $revisionNumber) {
-                        $query->where('versionNumber', $versionNumber)
-                            ->where('revisionNumber', '<', $revisionNumber);
-                    });
-            })
-            ->get();
-        // Extract the codes from the result set with the format "GUID-ID"
-        $replacedCodes = $replacedGroups->map(function ($replacedGroup) {
-            return $replacedGroup->GUID . '-' . $replacedGroup->Id;
-        })->toArray();
-
-
-        $groupData = [
-            'ClassType' => 'GroupOfProperties',
-            'ParentClassCode' =>   (string) $get('GUID') . '-' . (string) $pdtId,
-            'Code' => (string)$get('GUID') . '-' . (string)$get('Id'),
-            'Name' => $get('gopNamePt'),
-            'Status' => $get('status'),
-            'Definition' => $get('definitionPt'),
-            'ActivationDateUtc' => $get('dateOfVersion'),
-            'CountryOfOrigin' => $get('countryOfOrigin'),
-            'CreatorLanguageIsoCode' => $get('creatorsLanguage'),
-            'DeprecationExplanation' => ($get('depreciationDate') != '0000-00-00') ? $get('depreciationDate') : null,
-            'DocumentReference' => referencedocuments::where('GUID', $get('referenceDocumentGUID'))->value('rdName'),
-            'ReplacedObjectCodes' => $replacedCodes,
-            'ReplacingObjectCodes' => $replacingCodes,
-            'RevisionDateUtc' => $get('dateOfRevision'),
-            'RevisionNumber' => (int)$get('revisionNumber'),
-            'Uid' => $get('GUID'),
-            'VersionDateUtc' => $get('dateOfVersion'),
-            'VersionNumber' => (int)$get('versionNumber'),
-            'ClassProperties' => [],
-        ];
-
-
-        // Fetch related data using another raw SQL query
-        $groupIds = [$get('Id')];
-        $mergedGroupIds = $get('mergedGroupIds');
-        if (!empty($mergedGroupIds)) {
-            $groupIds = array_merge($groupIds, (array) $mergedGroupIds);
-        }
-
-        $placeholders = implode(',', array_fill(0, count($groupIds), '?'));
-        $classProperties = DB::select("SELECT * FROM properties WHERE gopId IN ($placeholders)", $groupIds);
-
-        $seenPropertyGuids = [];
-        foreach ($classProperties as $property) {
-            if (isset($seenPropertyGuids[$property->GUID])) {
-                continue;
-            }
-            $seenPropertyGuids[$property->GUID] = true;
-            $groupData['ClassProperties'][] = $this->transformProperty($property);
-        }
-
-        return $groupData;
-    }
-
-    private function transformProperty($property)
-    {
-        // Implement the transformation logic for a property
-        // Use $property and its properties to structure the data
-        $group = groupofproperties::WHERE('Id', $property->gopID)->value('gopNamePt');
-        $propertyData = [
-
-            'PropertyCode' =>  (string) $property->GUID . '-' . (string) $property->propertyId,
-            'Code' =>  (string) $property->Id,
-            'Description' => $property->descriptionPt,
-            'PropertySet' => self::convertToPascalCase($group),
-
-        ];
-
-        return $propertyData;
-    }
-
     private function transformPropertyDataDictionary($property)
     {
         $propertyRD = properties::where('propertyId', $property->Id)->latest()->value('referenceDocumentGUID') ?? 'n/a';
@@ -914,18 +683,18 @@ class ProductdatatemplatesController extends Controller
         $replacingProperties = propertiesdatadictionaries::where('GUID', $guid)
             ->where(function ($q) use ($versionNumber, $revisionNumber) {
                 $q->where('versionNumber', '>', $versionNumber)
-                  ->orWhere(function ($q2) use ($versionNumber, $revisionNumber) {
-                      $q2->where('versionNumber', $versionNumber)->where('revisionNumber', '>', $revisionNumber);
-                  });
+                    ->orWhere(function ($q2) use ($versionNumber, $revisionNumber) {
+                        $q2->where('versionNumber', $versionNumber)->where('revisionNumber', '>', $revisionNumber);
+                    });
             })->get();
         $replacingCodes = $replacingProperties->map(fn($p) => $this->propertyCodeFor($p))->toArray();
 
         $replacedProperties = propertiesdatadictionaries::where('GUID', $guid)
             ->where(function ($q) use ($versionNumber, $revisionNumber) {
                 $q->where('versionNumber', '<', $versionNumber)
-                  ->orWhere(function ($q2) use ($versionNumber, $revisionNumber) {
-                      $q2->where('versionNumber', $versionNumber)->where('revisionNumber', '<', $revisionNumber);
-                  });
+                    ->orWhere(function ($q2) use ($versionNumber, $revisionNumber) {
+                        $q2->where('versionNumber', $versionNumber)->where('revisionNumber', '<', $revisionNumber);
+                    });
             })->get();
         $replacedCodes = $replacedProperties->map(fn($p) => $this->propertyCodeFor($p))->toArray();
 
@@ -971,12 +740,23 @@ class ProductdatatemplatesController extends Controller
         if (in_array($trimmed, self::BSDD_DATATYPES, true)) return $trimmed;
 
         $map = [
-            'boolean' => 'Boolean', 'bool' => 'Boolean',
-            'character' => 'Character', 'char' => 'Character',
-            'integer' => 'Integer', 'int' => 'Integer', 'number' => 'Integer',
-            'real' => 'Real', 'float' => 'Real', 'double' => 'Real', 'decimal' => 'Real',
-            'string' => 'String', 'text' => 'String', 'varchar' => 'String',
-            'time' => 'Time', 'date' => 'Time', 'datetime' => 'Time',
+            'boolean' => 'Boolean',
+            'bool' => 'Boolean',
+            'character' => 'Character',
+            'char' => 'Character',
+            'integer' => 'Integer',
+            'int' => 'Integer',
+            'number' => 'Integer',
+            'real' => 'Real',
+            'float' => 'Real',
+            'double' => 'Real',
+            'decimal' => 'Real',
+            'string' => 'String',
+            'text' => 'String',
+            'varchar' => 'String',
+            'time' => 'Time',
+            'date' => 'Time',
+            'datetime' => 'Time',
         ];
         return $map[strtolower($trimmed)] ?? 'String';
     }
