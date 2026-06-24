@@ -41,7 +41,12 @@ class GroupofpropertiesController extends Controller
             ->orderBy('revisionNumber', 'desc')
             ->first();
         $pdt_groups = groupofproperties::where('pdtId', $pdtID)->get();
-        $master_groups = groupofproperties::where('pdtId', $masterpdt->Id)->get();
+        // Don't inject the master's groups when the viewed PDT IS the master (any version):
+        // it already contains them, and injecting the LATEST master on top of an OLDER master
+        // version duplicated every group/property. Non-master PDTs still get the common groups.
+        $master_groups = ($pdtGUID === '230d9954097541b793f2a1fddb8bd0ad')
+            ? collect()
+            : groupofproperties::where('pdtId', $masterpdt->Id)->get();
 
         $properties = properties::where('pdtID', $pdtID)->get();
         $properties_dict = propertiesdatadictionaries::all();
@@ -135,7 +140,12 @@ class GroupofpropertiesController extends Controller
             ->orderBy('revisionNumber', 'desc')
             ->first();
         $pdt_groups = groupofproperties::where('pdtId', $pdtID)->get();
-        $master_groups = groupofproperties::where('pdtId', $masterpdt->Id)->get();
+        // Don't inject the master's groups when the viewed PDT IS the master (any version):
+        // it already contains them, and injecting the LATEST master on top of an OLDER master
+        // version duplicated every group/property. Non-master PDTs still get the common groups.
+        $master_groups = ($pdtGUID === '230d9954097541b793f2a1fddb8bd0ad')
+            ? collect()
+            : groupofproperties::where('pdtId', $masterpdt->Id)->get();
 
         // Get all properties linked to the PDT
         $properties = properties::where('pdtID', $pdtID)->get();
