@@ -3,6 +3,13 @@
         <div class="container sm:max-w-full py-9" x-data="{ search: '', selectedCategories: [], showCategories: false }">
             <h1>Os Modelos de Dados dos Produtos</h1>
 
+            @if (Auth::check() && Auth::user()->isAdmin == 1)
+                <div class="my-3 flex flex-wrap gap-2">
+                    <a href="{{ route('admin.pdt.create') }}" class="btn btn-secondary">+ Create PDT</a>
+                    <a href="{{ route('admin.previews') }}" class="btn btn-secondary">Preview drafts</a>
+                </div>
+            @endif
+
             <!-- Search Bar -->
             <div class="my-4">
                 <input
@@ -66,15 +73,7 @@
                                 <div class="flex items-center">
                                     <span class="mr-1">V{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}
                                         <br>
-                                        @if ($pdt->status == 'InActive')
-                                        <span class="status-tag status-tag-inactive">InActiva</span>
-                                        @endif
-                                        @if ($pdt->status == 'Active')
-                                        <span class="status-tag status-tag-active">Activa</span>
-                                        @endif
-                                        @if ($pdt->status == 'Preview')
-                                        <span class="status-tag status-tag-preview">Preview</span>
-                                        @endif
+                                        <x-status-badge :status="$pdt->status" />
                                     </span>
                                     @php
                                     $hasOtherVersions = $allpdts->where('GUID', $pdt->GUID)->where('Id', '!=', $pdt->Id)->isNotEmpty();
@@ -94,15 +93,7 @@
                                                 @if($otherPdt->GUID == $pdt->GUID && $otherPdt->Id != $pdt->Id)
                                                 <x-dropdown-link :href="route('pdtsdownload', ['pdtID' => $otherPdt->Id])">
                                                     V{{ $otherPdt->versionNumber }}.{{ $otherPdt->revisionNumber }}
-                                                    @if ($otherPdt->status == 'InActive')
-                                                    <span class="status-tag status-tag-inactive">Inativa</span>
-                                                    @endif
-                                                    @if ($otherPdt->status == 'Active')
-                                                    <span class="status-tag status-tag-active">Ativa</span>
-                                                    @endif
-                                                    @if ($otherPdt->status == 'Preview')
-                                                    <span class="status-tag status-tag-preview">Preview</span>
-                                                    @endif
+                                                    <x-status-badge :status="$otherPdt->status" />
                                                 </x-dropdown-link>
                                                 @endif
                                                 @endforeach
@@ -117,6 +108,16 @@
                                 <form class="mb-3" action="{{ route('pdtsdownload', ['pdtID' => $pdt->Id]) }}">
                                     <x-button-primary-pdts type="submit" title="Ver" />
                                 </form>
+                                @if (Auth::check() && Auth::user()->isAdmin == 1)
+                                    <div class="flex flex-col gap-1 text-xs">
+                                        @if ($pdt->status == 'Active')
+                                            <a href="{{ route('admin.pdt.activeEdit', ['pdt' => $pdt->Id]) }}" class="text-blue-700 underline">Edit (limited)</a>
+                                            <a href="{{ route('admin.pdt.newVersion', ['pdt' => $pdt->Id]) }}" class="text-blue-700 underline">Create new version</a>
+                                        @elseif ($pdt->status == 'Preview')
+                                            <a href="{{ route('admin.previews.editor', ['pdt' => $pdt->Id]) }}" class="text-blue-700 underline">Edit / Publish / Delete</a>
+                                        @endif
+                                    </div>
+                                @endif
                             </td>
                             <td class="whitespace-nowrap px-6 py-4 font-medium my-auto">
                                 <form class="mb-3" action="{{ route('pdtssurvey', ['pdtID' => $pdt->Id]) }}">

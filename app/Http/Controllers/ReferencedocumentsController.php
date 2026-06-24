@@ -6,10 +6,40 @@ use App\Models\referencedocuments;
 use App\Models\properties;
 use App\Models\propertiesdatadictionaries;
 use App\Models\productdatatemplates;
+use App\Services\GuidGenerator;
+use App\Services\RefDocs;
 use Illuminate\Http\Request;
 
 class ReferencedocumentsController extends Controller
 {
+    /**
+     * AJAX: create a reference document inline (from any editor's shared ref-doc field),
+     * auto-generating the GUID, and return it so the dropdown can select it immediately.
+     */
+    public function createAjax(Request $request)
+    {
+        $data = $request->validate([
+            'name'        => 'required|string|max:255',
+            'title'       => 'required|string|max:255',
+            'description' => 'required|string',
+            'status'      => 'nullable|string|max:50',
+        ]);
+        try {
+            $guid = GuidGenerator::generateUnique();
+            referencedocuments::create([
+                'GUID' => $guid,
+                'rdName' => $data['name'],
+                'title' => $data['title'],
+                'description' => $data['description'],
+                'status' => $data['status'] ?? 'Current',
+            ]);
+            RefDocs::flush();
+            return response()->json(['ok' => true, 'guid' => $guid, 'label' => $data['title']]);
+        } catch (\Throwable $e) {
+            return response()->json(['ok' => false, 'error' => $e->getMessage()], 422);
+        }
+    }
+
     public function getReferenceDocument($rdGUID)
     {
         $rd = referencedocuments::where('GUID', $rdGUID)

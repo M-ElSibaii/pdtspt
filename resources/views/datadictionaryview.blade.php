@@ -5,12 +5,8 @@
                 {{-- <h1>{{$propdd->namePt}} </h1> --}}
                 <div class="flex-none inline">
                     <h1 class="flex-none inline">{{ $propdd->namePt }}</h1>
-                    <p class="flex-none inline"> - V{{ $propdd->versionNumber }}.{{ $propdd->revisionNumber }}</p>
-                    @if($propdd->status == 'Active')
-                    <span class="status-tag status-tag-active">Ativa</span>
-                    @else
-                    <span class="status-tag status-tag-inactive">Inativa</span>
-                    @endif
+                    <p class="flex-none inline"> - <x-version-badge :version="$propdd->versionNumber" :revision="$propdd->revisionNumber" /></p>
+                    <x-status-badge :status="$propdd->status" />
                 </div>
             </div>
             <div class='py-2'>

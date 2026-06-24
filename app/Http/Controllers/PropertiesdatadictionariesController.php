@@ -34,45 +34,9 @@ class PropertiesdatadictionariesController extends Controller
     }
 
 
-    public function showddProperty($propertyddId)
-    {
-        $propertydd = Propertiesdatadictionaries::findOrFail($propertyddId);
-
-        return view('properties.editdd', compact('propertydd'));
-    }
-
-
-
-    public function updateddProperty(Request $request, $propertyddId)
-    {
-        $request->validate([
-            'relationToOtherDataDictionaries' => 'required|string',
-
-
-            // Add validation rules for other fields as needed
-        ]);
-
-        try {
-            $propertydd = Propertiesdatadictionaries::findOrFail($propertyddId);
-
-            // Update property fields based on the form input
-            $propertydd->relationToOtherDataDictionaries = $request->input('relationToOtherDataDictionaries');
-
-            // Add other fields as needed
-            $propertydd->save();
-
-            // Log the update
-            Log::info('Property in dd updated successfully.');
-
-            // Redirect to the edit page with success message
-            return redirect()->route('properties.editdd', ['propertyddId' => $propertydd->Id])
-                ->with('success', 'Property in dd updated successfully.');
-        } catch (\Exception $e) {
-            // Log any exception
-            Log::error('Error updating property: ' . $e->getMessage());
-            // Handle the error as needed (you might want to redirect with an error message)
-        }
-    }
+    // [Legacy showddProperty()/updateddProperty() (old dictionary-mapping edit form) removed
+    //  — superseded by ActivePdtEditController::updateDictMapping (in-place mapping edit) and
+    //  the unified editor. getPropertyDataDictionary above (public datadictionaryview) stays.]
 
     /**
      * Display a listing of the resource.

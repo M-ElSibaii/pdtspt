@@ -56,11 +56,6 @@
                 <x-button-primary-pdts link="{{route('dashboard')}}" type="submit" title="Save" />
             </form>
             <br>
-            <a href="{{ route('pdtinput') }}" class="btn btn-secondary">
-                Create / Edit PDTs
-            </a>
-            <br>
-            <br>
             <!-- export all the pdts with all versions // next step is to filter only the latest version -->
             <a href="{{ route('exportdomainbsdd') }}" class="btn btn-secondary">
                 Export PDTs.pt domain in bsdd JSON format page
@@ -70,6 +65,18 @@
             <!-- interactive dedupe of duplicate dictionary property names -->
             <a href="{{ route('admin.dedupe') }}" class="btn btn-secondary">
                 Review &amp; deduplicate dictionary properties
+            </a>
+            <br>
+            <br>
+            <!-- create a new PDT from a construction object (unified CREATE editor) -->
+            <a href="{{ route('admin.pdt.create') }}" class="btn btn-secondary">
+                Create a new PDT (from construction object)
+            </a>
+            <br>
+            <br>
+            <!-- preview drafts: free-edit, publish, delete -->
+            <a href="{{ route('admin.previews') }}" class="btn btn-secondary">
+                Preview drafts (edit / publish / delete)
             </a>
 
         </div>

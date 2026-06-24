@@ -1,0 +1,617 @@
+Code,Name,Symbol,QUDT
+?,[unknown],NULL,NULL
+',arc minute,',ARCMIN
+%,percent,NULL,PERCENT
+% m/md,% m/md,NULL,NULL
+%/100%,%/100%,NULL,NULL
+%/K,%/K,NULL,NULL
+%/s,percent per second,NULL,NULL
+%obsc/ft,percent obscuration per foot,NULL,NULL
+%obsc/m,percent obscuration per metre,NULL,NULL
+%RH,percent relative humidity,NULL,NULL
+Â°,grad (angel degree),NULL,GRAD
+Â°C,celsius degrees,NULL,DEG_C
+Â°C/h,degrees celsius per hour,NULL,NULL
+Â°C/min,degrees celsius per minute,NULL,NULL
+Â°daysC,degree days celsius,NULL,NULL
+Â°daysF,degree days fahrenheit,NULL,NULL
+Â°dH,Â°dH,NULL,NULL
+Â°F,fahrenheit degrees,NULL,DEG_F
+Â°F/h,degrees fahrenheit per hour,NULL,NULL
+Â°F/min,degrees fahrenheit per minute,NULL,NULL
+ÂµA,microampere,NULL,MicroA
+ÂµF,microfarad,NULL,MicroFARAD
+Âµg/mÂ³,micrograms per cubic metre,NULL,MicroGM-PER-M3
+ÂµH,microhenry,NULL,MicroH
+Âµm,micrometre,NULL,MicroM
+Âµs,microsecond,NULL,MicroSEC
+ÂµS/cm,microsiemens per centimetre,NULL,MicroS-PER-CentiM
+1/h,per hour,NULL,NULL
+1/K,per kelvin,NULL,PER-K
+1/m,per metre,NULL,PER-M
+1/mÂ²,per square metre,NULL,PER-M2
+1/min,per minute,NULL,NULL
+1/s,per second,NULL,NULL
+A,ampere,NULL,A
+A/Â°C,ampere per degree celsius,NULL,A-PER-DEG_C
+A/cm,ampere per centimetre,NULL,A-PER-CentiM
+A/cmÂ²,ampere per square centimetre,NULL,A-PER-CentiM2
+A/J,ampere per joule,NULL,A-PER-J
+A/m,ampere per metre,NULL,A-PER-M
+A/mÂ²,ampere per square metre,NULL,A-PER-M2
+A/mm,ampere per millimetre,NULL,A-PER-MilliM
+A/mmÂ²,ampere per square millimetre,NULL,A-PER-MilliM2
+A/(mÂ²Â·KÂ²),ampere per square metre square kelvin,NULL,A-PER-M2-K2
+A/rad,ampere per radian,NULL,A-PER-RAD
+ACH,air changes per hour,NULL,NULL
+acre,acre,NULL,AC
+AED,uae dirham,NULL,NULL
+AFN,afghani,Af,AFN
+Ah,ampere hour,NULL,A-HR
+AirWatt,AirWatt,NULL,NULL
+ALL,lek,NULL,Lek
+AÂ·mÂ²,ampere square metre,NULL,A-M2
+AÂ·mÂ²/(JÂ·s),ampere square metre per joule second,NULL,A-M2-PER-J-SEC
+AMD,armenian dram,Ô´,AMD
+Ao,angstrom,Ã,ANGSTROM
+AOA,kwanza,Kz,Kwanza
+ar,are,a,ARE
+ARS,argentine peso,NULL,ARS
+As,ampere second,NULL,A-SEC
+At,ampere turn,At,AT
+atm,atmosphere,NULL,ATM
+AUD,australian dollar,NULL,AUD
+AWG,aruban guilder florin,Æ,AWG
+AX,AX,NULL,NULL
+AZN,azerbaijanian manat,Ð¼Ð°Ð½,AZN
+BAM,konvertibilna marka,KM,NULL
+bar,bar,NULL,BAR
+BBD,barbados dollar,NULL,BBD
+bbl,barrel,NULL,BBL
+Bd,Bd,NULL,NULL
+BDT,taka,à§³,BDT
+Bft,beaufort,NULL,BFT
+BGN,bulgarian lev,Ð»Ð²,BulgarianLev
+BHD,bahraini dinar,NULL,BHD
+BIF,burundi franc,NULL,BurundianFranc
+bit,bit,NULL,BIT
+bit/s,bit per second,NULL,BIT-PER-SEC
+BMD,bermudian dollar,NULL,BermudaDollar
+BND,brunei dollar,NULL,BruneiDollar
+BOB,boliviano,NULL,Boliviano
+Bq,becquerel,NULL,BQ
+BRL,brazilian real,R$,BrazilianReal
+BSD,bahamian dollar,NULL,BSD
+BTN,ngultrum,NULL,Ngultrum
+BTU,british thermal unit,NULL,BTU_IT
+BTU/h,btus per hour,NULL,BTU_IT-PER-HR
+BTU/lb,btus per pound,NULL,BTU_IT-PER-LB
+BTU/lb dry,btus per pound dry air,NULL,NULL
+BTU/Wh,energy efficiency ratio,EER,NULL
+BWP,pula,NULL,Pula
+BYR,belarussian ruble,Br,BYR
+byte,byte,NULL,BYTE
+BZD,belize dollar,NULL,BeilzeDollar
+C,coulomb,NULL,C
+CÂ·m,coulomb metre,NULL,C-M
+c/h,c/h,NULL,NULL
+c/min,c/min,NULL,NULL
+CAD,canadian dollar,NULL,CAD
+cal,calorie,NULL,CAL_IT
+cal/cmÂ²,calorie per square centimetre,NULL,NULL
+cal/g,calorie per gram,NULL,CAL_IT-PER-GM
+cd,candela,NULL,CD
+cd/ftÂ²,candelas per square foot,NULL,NULL
+cd/mÂ²,candelas per square metre,NULL,CD-PER-M2
+CDF,congolese franc,NULL,FrancCongolais
+cfh,cubic feet per hour,NULL,NULL
+cfm,cubic feet per minute,NULL,NULL
+cfs,cubic feet per second,NULL,NULL
+CHF,swiss franc,SFr,SwissFranc
+cL,centilitre,NULL,CentiL
+CLP,chilean peso,NULL,ChileanPeso
+cm,centimetre,NULL,CentiM
+cmÂ²,square centimetre,NULL,CentiM2
+cmÂ³,cubic centimetre,NULL,CentiM3
+cmâ´,centimetre to the fourth power,NULL,NULL
+cmHâO,centimetre of water,NULL,CentiM_H2O
+cmHg,centimetre of mercury,NULL,CentiM_HG
+cmÂ²/m,square centimetre per metre,NULL,NULL
+CNY,chinese yuan,å,NULL
+COP,coefficient of performance,NULL,NULL
+cph,cycles per hour,NULL,NULL
+cpm,cycles per minute,NULL,NULL
+CRC,costa rican colon,â¡,CostaRicanColon
+cs,hundredths second,NULL,NULL
+cSt,centistokes,NULL,CentiST
+CTUe,comparative toxic units for ecotoxicity potential,NULL,NULL
+CTUh,comparative toxic units for human toxicity potential,NULL,NULL
+CUP,cuban peso,NULL,CubanPeso
+CVE,cape verde escudo,NULL,CapeVerdeEscudo
+CYP,cyprus pound,NULL,CyprusPound
+CZK,czech koruna,KÄ,CzechKoruna
+day,day,NULL,DAY
+dB,decibel,dB,DeciB
+dB(A),dB(A),NULL,NULL
+dB(A) re 1 pW,dB(A) re 1 pW,NULL,NULL
+dB(C),dB(C),dBc,DeciB_C
+dBÂµV,db microvolt,NULL,NULL
+dBi,dBi,NULL,NULL
+dBmV,db millivolt,NULL,NULL
+dBm,decibel-milliwatts,NULL,DeciB_M
+DCIE,data center infrastructure efficiency,NULL,NULL
+deg,degrees angular,NULL,DEG
+degPh,degrees phase,NULL,NULL
+DJF,djibouti franc,NULL,DjiboutiFranc
+DKK,danish krone,kr,DansihKrone
+dm,decimetre,NULL,DeciM
+DOP,dominican peso,NULL,DominicanPeso
+DPI,dots pre inch,NULL,DPI
+ds,tenths second,NULL,NULL
+DZD,algerian dinar,NULL,DZD
+EGP,egyptian pound,NULL,EgyptianPound
+ERN,nakfa,Nfk,Nakfa
+ETB,ethiopian birr,NULL,EthiopianBirr
+EUR,euro,â¬,Euro
+F,farad,NULL,FARAD
+fc,footcandle,NULL,FC
+FJD,fiji dollar,NULL,FijiDollar
+FKP,falkland islands pound,NULL,FalklandIslandsPound
+fl oz,fluid ounce,NULL,NULL
+fnu,formazin nephelometric unit,NULL,NULL
+Fps,frames per second,fps,FRAME-PER-SEC
+ft,foot,NULL,FT
+ft/min,feet per minute,NULL,FT-PER-MIN
+ft/s,feet per second,NULL,FT-PER-SEC
+ftÂ²,square foot,NULL,FT2
+ftÂ³,cubic foot,NULL,FT3
+ftÂ³ gas,cubic feet natural gas,NULL,NULL
+ftÂ·lbs/sec,foot pounds per second,NULL,FT-LB_F-PER-SEC
+g,gram,NULL,GM
+g/cmÂ³,gram per cubic centimetre,NULL,GM-PER-CentiM3
+g/h,gram per hour,NULL,GM-PER-HR
+g/kg,gram per kilogram,NULL,GM-PER-KG
+g/l,gram per litre,NULL,GM-PER-L
+g/mÂ²,gram per square metre,NULL,GM-PER-M2
+g/mÂ³,gram per cubic metre,NULL,GM-PER-M3
+g/min,gram per minute,NULL,GM-PER-MIN
+g/s,gram per second,NULL,GM-PER-SEC
+gal,gallon,NULL,GAL_IMP
+gal/hr,gallons per hour,gph,NULL
+gal/min,gallons per minute,NULL,NULL
+galUK,imperial gallon,NULL,GAL_UK
+galUK/min,imperial gallons per minute,NULL,GAL_UK-PER-MIN
+GB,gigabyte,NULL,GigaBYTE
+Gbit/s,Gigabits per second,NULL,NULL
+Gbit/sec,Gbit/sec.,NULL,NULL
+GBP,pound sterling,Â£,PoundSterling
+GEL,lari,á,Lari
+gHâO/kgAir,grams of water per kilogram dry air,NULL,NULL
+GHS,cedi (ghana),âµ,Cedi
+GHz,GHz,NULL,NULL
+GIP,gibraltar pound,NULL,GibraltarPound
+GJ,gigajoule,NULL,NULL
+GJ/h,gigajoule per hour,NULL,NULL
+GJ/jaar,GJ/jaar,NULL,NULL
+GJ/yr,Gigajoule per year,NULL,NULL
+GMD,dalasi,NULL,Dalasi
+GNF,guinea franc,NULL,GuineaFranc
+GPa,gigapascal,NULL,GigaPA
+GTQ,quetzal,NULL,NULL
+GW,gigawatt,NULL,NULL
+GYD,guyana dollar,NULL,GuyanaDollar
+h,h,NULL,NULL
+H,henry,NULL,H
+hftÂ³,hecto cubic foot,NULL,NULL
+HKD,hong kong dollar,NULL,HongKongDollar
+hL,hectolitre,NULL,HectoL
+hL/s,hectolitres per second,NULL,NULL
+HNL,lempira,NULL,Lempira
+hp,horsepower,NULL,HP
+hPa,hectopascal,NULL,HectoPA
+hph,horsepower hour,NULL,NULL
+hr,hour,h,HR
+HRC,HRC,NULL,NULL
+HRK,croatian kuna,Kn,CroatianKuna
+HTG,gourde,NULL,HaitiGourde
+HUF,forint,NULL,Forint
+hundred cubic feet natural gas,hundred cubic feet natural gas,NULL,NULL
+Hz,hertz,NULL,HZ
+IDR,rupiah,Rp,Rupiah
+ILS,new israeli shekel,âª,NewIsraeliShekel
+Imp/kWh (kvarh),Imp/kWh (kvarh),NULL,NULL
+in,inch,NULL,IN
+in/wc,inch of water,inHâO,IN_H2O
+inÂ²,square inch,NULL,IN2
+inÂ³,cubic inch,NULL,IN3
+inHg,inches of mercury,NULL,IN_HG
+INR,indian rupee,â¹,IndianRupee
+IQD,iraqi dinar,NULL,IraqiDinar
+IRR,iranian rial,NULL,IranianRial
+ISK,iceland krona,Kr,IcelandKrona
+J,joule,NULL,J
+J/K,joule per kelvin,NULL,J-PER-K
+J/g,joule per gram,NULL,J-PER-GM
+J/h,joule per hour,NULL,J-PER-HR
+J/kg,joule per kilogram,NULL,J-PER-KiloGM
+J/kg dry,joule per kilogram dry air,NULL,NULL
+J/kgÂ·K,joule per kilogram kelvin,NULL,J-PER-KiloGM-K
+J/mÂ²,joule per square metre,NULL,J-PER-M2
+Jaar,Jaar,NULL,NULL
+JMD,jamaican dollar,NULL,JamaicanDollar
+JOD,jordanian dinar,NULL,JordanianDinar
+JPY,yen,Â¥,JapaneseYen
+Js,joule second,NULL,J-SEC
+K,kelvin degrees,NULL,K
+K/h,kelvin per hour,NULL,K-PER-HR
+K/min,kelvin per minute,NULL,K-PER-MIN
+K/s,kelvin per second,NULL,K-PER-SEC
+kA,kA,NULL,KiloA
+kB,kilobyte,NULL,KiloBYTE
+kBit/s,kBit/s,NULL,KiloBIT-PER-SEC
+kBq U235 eq,kilobecquerel U235 equivalent,NULL,NULL
+kBTU,kilobtu,NULL,NULL
+kBTU/ftÂ²,kilobtu per square foot,NULL,NULL
+kBTU/h,kilobtus per hour,NULL,NULL
+kBTU/h/ftÂ²,kilobtus per hour per square foot,NULL,NULL
+kByte,kByte,NULL,NULL
+kcfm,kilocubic feet per minute,NULL,NULL
+kcmil,kcmil,NULL,NULL
+KES,kenyan shilling,Sh,KenyanShilling
+kg,kilogram,NULL,KiloGM
+kg C,kilogram biogenic carbon,NULL,NULL
+kg CFC11 eq,kilogram CFC11 equivalent,NULL,NULL
+kg COâ eq,kilogram CO2 equivalent,NULL,NULL
+kg ethene eq,kilogram ethene equivalent,NULL,NULL
+kg N eq,kilogram nitrogen equivalent,NULL,NULL
+kg NMVOC eq,kilogram NMVOC equivalent,NULL,NULL
+kg Oâ eq,kilogram ozone equivalent,NULL,NULL
+kg POâÂ³â» eq,kilogram PO43 equivalent,NULL,NULL
+kg Sb eq,kilogram antimony equivalent,NULL,NULL
+kg SO2 eq,kilogram SO2 equivalent,NULL,NULL
+kg/24h,kilogram per day,NULL,KiloGM-PER-DAY
+kg/100m,kg/100m, NULL,NULL
+kg/cm/mÂ²,kg/cm/mÂ²,NULL,NULL
+kg/dmÂ³,kilogram per cubic decimetre,NULL,NULL
+kg/h,kilogram per hour,NULL,KiloGM-PER-HR
+kg/km,kilogram per kilomter,NULL,KiloGM-PER-KiloGM
+kg/m,kilogram per metre,NULL,KiloGM-PER-M
+kg/m/s/Pa,kilogram per metre second pascal,NULL,NULL
+kg/mÂ²,kilogram per square metre,NULL,KiloGM-PER-M2
+kg/mÂ³,kilogram per cubic metre,NULL,KiloGM-PER-M3
+kg/min,kilogram per minute,NULL,KiloGM-PER-MIN
+kg/s,kilogram per second,NULL,KiloGM-PER-SEC
+kgÂ·mÂ²,kilogram square metre,NULL,KiloGM-M2
+kgal,kilogallon,NULL,NULL
+kgf,kilogram-force,NULL,KiloGM_F
+kgf/m,kilogram-force per metre,NULL,KiloGM_F-PER-M
+KGS,som,NULL,NULL
+KHR,riel,NULL,Riel
+kHz,kilohertz,NULL,KiloHZ
+kJ,kilojoule,NULL,KiloJ
+kJ/K,kilojoule per degree kelvin,NULL,KiloJ-PER-K
+kJ/h,kilojoule per hour,NULL,NULL
+kJ/kg,kilojoule per kilogram,NULL,KiloJ-PER-KiloGM
+kJ/kg dry,kilojoule per kilogram dry air,NULL,NULL
+kJ/(kgÂ·K),kilojoule per kilogram kelvin,NULL,KiloJ-PER-KiloGM-K
+kJ/mÂ²,kJ/mÂ²,NULL,NULL
+kJ/Ohm,kJ/Ohm,NULL,NULL
+kL,kilolitre,NULL,KiloL
+klb,kilopound,NULL,NULL
+klb/h,kilopounds per hour,NULL,NULL
+km,kilometre,NULL,KiloM
+km/h,kilometre per hour,NULL,KiloM-PER-HR
+km/s,kilometre per second,NULL,KiloM-PER-SEC
+kmÂ²,square kilometre,NULL,NULL
+kN,kilonewton,NULL,KiloN
+kN/m,kilonewton per metre,NULL,NULL
+kN/mÂ²,kilonewton per square metre,NULL,NULL
+kN/mÂ³,kilonewton per cubic metre,NULL,NULL
+kNÂ·m/Â°,kilonewton metre per degree,NULL,KiloN-M-PER-DEG
+knot,knot,NULL,KN
+kOhm,kiloohm,kâ¦,KiloOHM
+kPa,kilopascal,NULL,KiloPA
+kPaÂ·s/mÂ²,kilo pascal second per square metre,NULL,
+kPaÂ·s/mÂ³,kilo pascal second per cubic metre,NULL,
+KPW,north korean won,NULL,NorthKoreanWon
+KRW,south korean won,â©,SouthKoreanWon
+kV,kilovolt,NULL,KiloV
+kVA,kilovolt ampere,NULL,KiloV-A
+kVAh,kilovolt ampere hour,NULL,KiloV-A-HR
+kVAR,kilovolt ampere reactive,NULL,KiloV-A_Reactive
+kVARh,kilovolt ampere reactive hour,NULL,KiloV-A_Reactive-HR
+kW,kilowatt,NULL,KiloW
+kW/(mÂ³/s),kW/(mÂ³/s),NULL,NULL
+kW/ftÂ²,kilowatts per square foot,NULL,NULL
+kW/gal/min,kilowatts per gallons per minute,NULL,NULL
+kW/kcfm,kilowatts per kilocubic feet per minute,NULL,NULL
+kW/mÂ²,kilowatts per square metre,NULL,NULL
+kW/tonne,kilowatt per tonne,NULL,NULL
+KWD,kuwaiti dinar,NULL,KuwaitiDinar
+kWh,kilowatt hour,NULL,KiloW-HR
+kWh/ftÂ²,kilowatt hours per square foot,NULL,NULL
+kWh/mÂ²,kilowatt hours per square metre,NULL,KiloW-HR-PER-M2
+kWh/(mÂ²Â·a),kilowatt hour per square metre per year,NULL,NULL
+kWp,kWp,NULL,NULL
+KYD,cayman islands dollar,NULL,CaymanIslandsDollar
+KZT,tenge,ã,Tenge
+l,litre,NULL,L
+l/h,litre per hour,NULL,L-PER-HR
+l/m,litre per metre,l/m,NULL
+l/min,litre per minute,NULL,L-PER-MIN
+l/s,litre per second,NULL,L-PER-SEC
+LAK,kip,â­,NULL
+lb,pound,NULL,LB
+lb/h,pound per hour,NULL,LB-PER-HR
+lb/min,pound per minute,NULL,LB-PER-MIN
+lb/s,pound per second,NULL,LB-PER-SEC
+lbf,pound force,NULL,LB_F
+LBP,lebanese pound,NULL,LebanesePound
+LKR,sri lanka rupee,Rs,SriLankaRupee
+lm,lumen,NULL,LM
+lm/W,lm/W,NULL,LM-PER-W
+LRD,liberian dollar,NULL,LiberianDollar
+LSL,loti,NULL,Loti
+lx,lux,NULL,LUX
+LYD,libyan dinar,NULL,LibyanDinar
+m,metre,NULL,M
+m rad,m rad,NULL,NULL
+m/h,metre per hour,NULL,M-PER-HR
+m/min,metre per minute,NULL,M-PER-MIN
+m/(NÂ·mÂ²),metre per newton square metre,NULL,NULL
+m/s,metre per second,NULL,M-PER-SEC
+m/sÂ²,metre per square second,NULL,M-PER-SEC2
+mÂ²,square metre,NULL,M2
+mÂ²/h,square metre per hour,NULL,NULL
+mÂ²/l,square metre per litre,NULL,NULL
+mÂ²/m,square metre per metre,NULL,NULL
+mÂ²/N,square metre per newton,NULL,M2-PER-N
+mÂ²Â·K/W,square metre kelvin per watt,NULL,NULL
+mÂ²/s,square metre per second,NULL,M2-PER-SEC
+mÂ³,cubic metre,NULL,M3
+mâ´,metre to the fourth power,NULL,M4
+mÂ³ gas,cubic metre natural gas,NULL,NULL
+mÂ³/h,cubic metre per hour,NULL,M3-PER-HR
+mÂ³/(hÂ·mÂ²) @ 50Pa,cubic metre per hour per square metre at 50 pascal,NULL,NULL
+mÂ³/m,cubic metre per metre,NULL,M3-PER-M
+mÂ³/mÂ²h50Pa,mÂ³/mÂ²h50Pa,NULL,NULL
+mÂ³/mÂ²sPa,cubic metre per square metre second pascal,NULL,NULL
+mÂ³/min,cubic metre per minute,NULL,M3-PER-MIN
+mÂ³/s,cubic metre per second,NULL,M3-PER-SEC
+mA,milliampere,NULL,MilliA
+MAD,moroccan dirham,NULL,MoroccanDirham
+mAh,mAh,NULL,MilliA-HR
+MB,megabyte,NULL,NULL
+mbar,millibar,NULL,MilliBAR
+Mbit/s,Mbit/s,NULL,MegaBIT-PER-SEC
+MBTU,megabtu,MMBTU,NULL
+MBTU/ftÂ²,megabtu per square foot,NULL,NULL
+MBTU/h,megabtus per hour,MMBTU/h,NULL
+Mbyte,Mbyte,NULL,MegaBYTE
+MDL,moldavian leu,NULL,MoldovanLeu
+Megapixel,Megapixel,NULL,NULL
+mg,milligram,NULL,MilliGM
+mg/l,milligram per litre,NULL,MilliGM-PER-L
+mg/dmÂ²,milligram per square decimetre,NULL,NULL
+mg/kg,milligram per kilogram,NULL,MilliGM-PER-KG
+mg/mÂ²/h,milligram per square metre per hour,NULL,NULL
+mg/mÂ³,milligram per cubic metre,NULL,MilliGM-PER-M3
+MGA,malagasy ariary,NULL,MalagasyAriary
+mH,millihenry,NULL,MilliH
+mH2O,mH2O,NULL,NULL
+MHz,megahertz,NULL,MegaHZ
+mile,mile,NULL,MI
+mileÂ²,square mile,NULL,MI2
+million cubic feet natural gas,million cubic feet natural gas,NULL,NULL
+min,minute,NULL,MIN
+MJ,megajoule,NULL,MegaJ
+MJ/K,megajoule per degree kelvin,NULL,MegaJ-PER-K
+MJ/ftÂ²,megajoule per square foot,NULL,NULL
+MJ/h,megajoule per hour,NULL,NULL
+MJ/kg dry,megajoule per kilogram dry air,NULL,NULL
+MJ/mÂ²,megajoule per square metre,NULL,MegaJ-PER-M2
+MKD,denar,Ð´ÐµÐ½,Denar
+ml,millilitre,NULL,MilliL
+mL/s,millilitre per second,NULL,MilliL-PER-SEC
+mm,millimetre,NULL,MilliM
+mm/m,millimetre per metre,NULL,NULL
+mm/min,millimetre per minute,NULL,MilliM-PER-MIN
+mm/s,millimetre per second,NULL,MilliM-PER-SEC
+mm/(mÂ·K),mm/(mÂ·K),NULL,NULL
+mmÂ²,square millimetre,NULL,MilliM2
+mmÂ²/m,square millimetre per metre,NULL,NULL
+mmÂ³,cubic millimetre,NULL,MilliM3
+mmâ´,millimetre to the fourth power,NULL,MilliM4
+mmHg,millimetre of mercury,NULL,MilliM_HG
+MMK,kyat,NULL,Kyat
+MNT,tugrik,â®,NULL
+MN/mÂ²,meganewton per square metre,NULL,NULL
+MN/mÂ³,meganewton per cubic metre,NULL,NULL
+mo,julian month,NULL,MO
+mOhm,mOhm,NULL,NULL
+MOhm,MOhm,NULL,MegaOHM
+mol,mol,NULL,MOL
+mol H+ eq,increase in hydrogen ion concentration,NULL,NULL
+mol N eq,mol nitrogen equivalent,NULL,NULL
+mol/l,mol per litre,NULL,MOL-PER-L
+mol/(mÂ·sÂ·Pa),mol per metre second pascal,NULL,NULL
+mol/mÂ²,mol per square metre,NULL,MOL-PER-M2
+mol/mÂ²/d,mol per square metre per day,NULL,MOL-PER-M2-DAY
+mol/(mÂ³Â·Pa),mol per cubic metre pascal,NULL,MOL-PER-M3-PA
+mol/mÂ²/s,mol per square metre per second,NULL,MOL-PER-M2-SEC
+mol/mÂ³,mol per cubic metre,NULL,MOL-PER-M3
+Month,Month,NULL,MO
+MOP,pataca,NULL,Pataca
+MP,MP,NULL,NULL
+MPa,megapascal,NULL,MegaPA
+MPaÂ·âm,megapascal square root metre,NULL,MegaPA-M0dot5
+mph,miles per hour,NULL,NULL
+MRO,ouguiya,UM,NULL
+ms,millisecond,NULL,MilliSEC
+mS/cm,millisecond per centimetre,NULL,MilliSEC-PER-CentiM
+MUR,mauritius rupee,NULL,MauritiusRupee
+mV,millivolt,NULL,MilliV
+MV,megavolt,NULL,MegaV
+MVA,megavolt ampere,NULL,MegaV-A
+MVAh,megavolt ampere hour,NULL,MegaV-A-HR
+MVAR,megavolt ampere reactive,NULL,MegaV-A_Reactive
+MVARh,megavolt ampere reactive hour,NULL,MegaV-A_Reactive-HR
+MVR,rufiyaa,NULL,Rufiyaa
+mW,milliwatt,NULL,MilliW
+MW,megawatt,NULL,MegaW
+MWh,megawatt hour,NULL,MegaW-HR
+MWh/ftÂ²,megawatt hours per square foot,NULL,NULL
+MWh/mÂ²,megawatt hours per square metre,NULL,NULL
+MWK,kwacha,MK,NULL
+MXN,mexican peso,NULL,MexicanPeso
+MYR,malaysian ringgit,RM,MalaysianRinggit
+MZN,metical,MTn,NULL
+mÎ©,milliohm,mâ¦,NULL
+MÎ©,megaohm,Mâ¦,MegaOHM
+N,newton,NULL,N
+N/m,newton per metre,NULL,N-PER-M
+N/mÂ²,newton per square metre,NULL,N-PER-M2
+N/mm,newton per millimetre,NULL,N-PER-MilliM
+N/mmÂ²,newton per square millimetre,NULL,N-PER-MilliM2
+NAD,namibian dollar,NULL,NamibianDollar
+NGN,naira,â¦,Naira
+NIO,cordoba oro,C$,CordobaOro
+nm,nm,NULL,NULL
+Nm,newton metre,NULL,N-M
+NÂ·mÂ²/rad,newton square metre per radion,NULL,NULL
+nmi,nmi,NULL,NULL
+NOK,norwegian krone,NULL,NorwegianKrone
+NPR,nepalese rupee,NULL,NepaleseRupee
+ns,nanosecond,NULL,NULL
+Ns,newton second,NULL,NULL
+ntu,nephelometric turbidity unit,NULL,NTU
+NZD,new zealand dollar,NULL,NewZealandDollar
+Ohm,ohm,Î©,OHM
+Ohm/km,ohm per kilometre,NULL,NULL
+OhmÂ·m,ohm metre,NULL,OHM-M
+OMR,rial omani,NULL,OmaniRial
+opm,opm,NULL,NULL
+oz,ounce,NULL,OZ
+Pa,pascal,NULL,PA
+PAB,balboa,NULL,PAB
+PaÂ·s,pascal second,NULL,PA-SEC
+PaÂ·âm,Pascal Square Root Metre,NULL,PA-M0dot5
+PB,petabyte,NULL,PetaBYTE
+PEN,nuevo sol,NULL,NuevoSol
+pf,power factor,NULL,NULL
+PGK,kina,NULL,Kina
+pH,ph,NULL,NULL
+phot,phot,NULL,NULL
+PHP,philippine peso,â±,PhilippinePeso
+PKR,pakistan rupee,â¨,PakistanRupee
+PLN,pzloty,zÅ,NULL
+ppb,parts per billion,NULL,PPB
+ppm,parts per million,NULL,PPM
+ppmv,Microlitre per Litre,NULL,MicroL-PER-L
+ppu,parts per unit,NULL,NULL
+psi,pound force per square inch (lbf/inÂ²),NULL,PSI
+psi/Â°F,psi per degree fahrenheit,NULL,NULL
+PSU,practical salinity unit,NULL,PSU
+pt,point,NULL,PT
+PTV,pendulum test value,NULL,NULL
+PUE,power usage effectiveness,NULL,NULL
+px,pixel,NULL,NULL
+PYG,guarani,â²,Guarani
+QAR,qatari rial,NULL,NULL
+qt,quart,NULL,QT_US
+rad,radian,NULL,RAD
+rad/s,radian per second,NULL,RAD-PER-SEC
+rad/sÂ²,radian per square second,NULL,RAD-PER-SEC2
+RON,romanian new leu,NULL,RomanianNeLeu
+rpm,revolution per minute,NULL,REV-PER-MIN
+Rpm,Rates per minute,NULL,NULL
+RSD,serbian dinar,din,SerbianDinar
+RUB,russian ruble,NULL,RussianRuble
+RWF,rwanda franc,NULL,RwandaFranc
+s,second,s,SEC
+S,siemens,NULL,S
+S/m,siemens per metre,NULL,S-PER-M
+SAR,saudi riyal,NULL,SaudiRyal
+SBD,solomon islands dollar,NULL,SolomonIslandsDollar
+SCR,seychelles rupee,NULL,SeychellesRupee
+SDG,sudanese pound,NULL,SudanesePound
+SEK,swedish krona,NULL,SwedishKrona
+SGD,singapore dollar,NULL,SingaporeDollar
+SHP,saint helena pound,NULL,SaintHelenaPound
+SLL,leone,Le,Leone
+SOS,somali shilling,NULL,SomaliShilling
+sr,steradian,NULL,SR
+SRD,surinam dollar,NULL,SurinamDollar
+STD,dobra,Db,Dobra
+SYP,syrian pound,NULL,SyrianPound
+SZL,lilangeni,NULL,Lilangeni
+t,short ton,NULL,TON_SHORT
+T,tesla,NULL,T
+TB,terabyte,NULL,TeraBYTE
+tf,tonne-force,NULL,NULL
+THB,baht,à¸¿,THB
+therm,therm,NULL,NULL
+therm/h,therms per hour,NULL,NULL
+thousand cubic feet natural gas,thousand cubic feet natural gas,NULL,NULL
+TJS,somoni,SM,Somoni
+TMT,manat,NULL,Manat
+TND,tunisian dinar,NULL,TunisianDollar
+tonne,metric tonne,NULL,TONNE
+tonne/h,metric tonne per hour,NULL,TONNE-PER-HR
+tonref,ton of refrigeration,NULL,TON_FG
+tonrefh,tons refrigeration hour,NULL,NULL
+TPI,turns per inch,NULL,NULL
+TRY,turkish lira,â¤,NewTurkishLira
+TTD,trinidad and tobago dollar,NULL,TrinidadAndTobagoDollar
+TWD,taiwan dollar,NULL,NewTaiwanDollar
+TZS,tanzanian shilling,NULL,TanzanianShilling
+UAH,hryvnia,â´,Hryvnia
+u,atomic mass unit,Î¼,AMU
+UGX,uganda shilling,NULL,UgandaShilling
+unitless,unitless,-,NULL
+USD,us dollar,$,USDollar
+UYU,peso uruguayo,NULL,UruguayPeso
+UZS,uzbekistan som,NULL,UzbekistanSom
+V,V,NULL,V
+V/K,volt per degree kelvin,NULL,V-PER-K
+V/m,volt per metre,NULL,V-PER-M
+VA,volt ampere,NULL,V-A
+VAh,volt ampere hour,NULL,V-A-HR
+VAR,volt ampere reactive,NULL,V-A_Reactive
+VARh,volt ampere reactive hour,NULL,V-A_Reactive-HR
+VEF,bolivar fuerte,NULL,NULL
+VND,dong,â«,VietnameseDong
+Volt,volt,V,V
+VUV,vatu,Vt,Vatu
+W,watt,NULL,W
+W/cfm,watt per cubic feet per minute,NULL,NULL
+W/ftÂ²,watt per square foot,NULL,NULL
+W/ftÂ² irr,watt per square foot irradiance,NULL,NULL
+W/K,W/K,NULL,W-PER-K
+W/m,W/m,NULL,W-PER-M
+W/mÂ²,watt per square metre,NULL,W-PER-M2
+W/mÂ² irr,watt per square metre irradiance,NULL,NULL
+W/(mÂ²Â·K),watt per square metre kelvin,NULL,W-PER-M2-K
+W/(mÂ²Â·KÂ²),watt per square metre square kelvin,NULL,NULL
+W/mÂ³/s,watt per cubic metre per second,NULL,NULL
+W/(mÂ·K),watt per metre kelvin,NULL,W-PER-M-K
+Wb,weber,NULL,WB
+Wh,watt hour,NULL,W-HR
+Wh/ftÂ²,watt hours per square foot,NULL,NULL
+Wh/mÂ²,watt hours per square metre,NULL,NULL
+Wh/Â°C,watt hours per celsius,NULL,NULL
+wk,week,NULL,NULL
+Wp,Wp,NULL,NULL
+WST,tala,NULL,NULL
+XAF,cfa franc bceao,NULL,XAF
+XCD,east caribbean dollar,NULL,EastCaribbeanDollar
+XPF,cfp franc,NULL,XPF
+yd,yard,NULL,YD
+ydÂ²,square yard,NULL,YD2
+ydÂ³,cubic yard,NULL,YD3
+YER,yemeni rial,NULL,YemeniRial
+yr,year,NULL,YR
+ZAR,rand,NULL,SouthAfricanRand
+ZMW,zambian kwacha,ZK,ZambianKwacha
+ZWL,zimbabwe dollar,NULL,ZimbabweDollar
+Î¼T,micro tesla,NULL,MicroT
