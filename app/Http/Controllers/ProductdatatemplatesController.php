@@ -831,159 +831,135 @@ class ProductdatatemplatesController extends Controller
 
     private function transformPropertyDataDictionary($property)
     {
-        // get referencedocument of the property from properties table
-        $propertyRD = properties::where('propertyId', $property->Id)->latest()->value('referenceDocumentGUID') ?? "n/a";
+        $propertyRD = properties::where('propertyId', $property->Id)->latest()->value('referenceDocumentGUID') ?? 'n/a';
 
         $guid = $property->GUID;
         $versionNumber = $property->versionNumber;
         $revisionNumber = $property->revisionNumber;
 
-        // ReplacingObjectCodes: same GUID, higher version/revision
         $replacingProperties = propertiesdatadictionaries::where('GUID', $guid)
-            ->where(function ($query) use ($versionNumber, $revisionNumber) {
-                $query->where('versionNumber', '>', $versionNumber)
-                    ->orWhere(function ($query) use ($versionNumber, $revisionNumber) {
-                        $query->where('versionNumber', $versionNumber)
-                            ->where('revisionNumber', '>', $revisionNumber);
-                    });
+            ->where(function ($q) use ($versionNumber, $revisionNumber) {
+                $q->where('versionNumber', '>', $versionNumber)
+                  ->orWhere(function ($q2) use ($versionNumber, $revisionNumber) {
+                      $q2->where('versionNumber', $versionNumber)->where('revisionNumber', '>', $revisionNumber);
+                  });
             })->get();
+        $replacingCodes = $replacingProperties->map(fn($p) => $this->propertyCodeFor($p))->toArray();
 
-        $replacingCodes = $replacingProperties->map(fn($p) => self::sanitizePascalCase($p->namePt))->toArray();
-
-        // ReplacedObjectCodes: same GUID, lower version/revision
         $replacedProperties = propertiesdatadictionaries::where('GUID', $guid)
-            ->where(function ($query) use ($versionNumber, $revisionNumber) {
-                $query->where('versionNumber', '<', $versionNumber)
-                    ->orWhere(function ($query) use ($versionNumber, $revisionNumber) {
-                        $query->where('versionNumber', $versionNumber)
-                            ->where('revisionNumber', '<', $revisionNumber);
-                    });
+            ->where(function ($q) use ($versionNumber, $revisionNumber) {
+                $q->where('versionNumber', '<', $versionNumber)
+                  ->orWhere(function ($q2) use ($versionNumber, $revisionNumber) {
+                      $q2->where('versionNumber', $versionNumber)->where('revisionNumber', '<', $revisionNumber);
+                  });
             })->get();
+        $replacedCodes = $replacedProperties->map(fn($p) => $this->propertyCodeFor($p))->toArray();
 
-        $replacedCodes = $replacedProperties->map(fn($p) => self::sanitizePascalCase($p->namePt))->toArray();
-
-        // FIX 3: Code is PascalCase of namePt (not GUID+Id)
-        $code = self::sanitizePascalCase($property->namePt);
-
-        // FIX 4: OwnedUri for properties: https://pdts.pt/datadictionaryview/Id-namePt
+        $code = $this->propertyCodeFor($property);
         $ownedUri = 'https://pdts.pt/datadictionaryview/' . $property->Id . '-' . self::sanitizePascalCase($property->namePt);
 
-        // FIX 2: Map dataType from DB to bSDD allowed values
-        $dataType = $this->mapDataType($property->dataType);
-
-        $propertyData = [
-            'Code'                      => $property->Id . '-' . $code,
-            'Name'                      => $property->namePt,
-            'Definition'                => $property->definitionPt,
-            'DataType'                  => $dataType, // FIX 2: now included
-            'Units'                     => $property->units ? [$property->units] : [],
-            'ActivationDateUtc'         => ($property->dateOfVersion && $property->dateOfVersion !== '0000-00-00') ? $property->dateOfVersion : null,
-            'CountryOfOrigin'           => $property->countryOfOrigin,
-            'CreatorLanguageIsoCode'    => $property->creatorsLanguage,
-            'DeActivationDateUtc'       => ($property->depreciationDate && $property->depreciationDate !== '0000-00-00') ? $property->depreciationDate : null,
-            'DeprecationExplanation'    => $property->depreciationExplanation ?: null,
-            'DocumentReference'         => $propertyRD !== "n/a" ? referencedocuments::where('GUID', $propertyRD)->value('rdName') : null,
-            'IsDynamic'                 => (bool)($property->dynamicProperty ?? false),
-            'OwnedUri'                  => $ownedUri, // FIX 4
-            'PhysicalQuantity'          => $property->physicalQuantity,
-            'ReplacedObjectCodes'       => $replacedCodes,
-            'ReplacingObjectCodes'      => $replacingCodes,
-            'RevisionDateUtc'           => $property->dateOfRevision ?: null,
-            'RevisionNumber'            => (int)$property->revisionNumber,
-            'Status'                    => $property->status,
-            'TextFormat'                => $property->textFormat ?: null,
-            'Uid'                       => $property->GUID,
-            'VersionDateUtc'            => ($property->dateOfVersion && $property->dateOfVersion !== '0000-00-00') ? $property->dateOfVersion : null,
-            'VersionNumber'             => (int)$property->versionNumber,
-            'VisualRepresentationUri'   => $ownedUri ?: null,
+        return [
+            'Code'                    => $code,
+            'Name'                    => $property->namePt,
+            'Definition'              => $property->definitionPt,
+            'DataType'                => $this->mapDataType($property->dataType),
+            'Units'                   => $property->units ? [$property->units] : [],
+            'ActivationDateUtc'       => ($property->dateOfVersion && $property->dateOfVersion !== '0000-00-00') ? $property->dateOfVersion : null,
+            'CountryOfOrigin'         => $property->countryOfOrigin,
+            'CreatorLanguageIsoCode'  => $property->creatorsLanguage,
+            'DeActivationDateUtc'     => ($property->depreciationDate && $property->depreciationDate !== '0000-00-00') ? $property->depreciationDate : null,
+            'DeprecationExplanation'  => $property->depreciationExplanation ?: null,
+            'DocumentReference'       => $propertyRD !== 'n/a' ? referencedocuments::where('GUID', $propertyRD)->value('rdName') : null,
+            'IsDynamic'               => (bool) ($property->dynamicProperty ?? false),
+            'OwnedUri'                => $ownedUri,
+            'PhysicalQuantity'        => $property->physicalQuantity,
+            'ReplacedObjectCodes'     => $replacedCodes,
+            'ReplacingObjectCodes'    => $replacingCodes,
+            'RevisionDateUtc'         => $property->dateOfRevision ?: null,
+            'RevisionNumber'          => (int) $property->revisionNumber,
+            'Status'                  => $property->status,
+            'TextFormat'              => $property->textFormat ?: null,
+            'Uid'                     => $property->GUID,
+            'VersionDateUtc'          => ($property->dateOfVersion && $property->dateOfVersion !== '0000-00-00') ? $property->dateOfVersion : null,
+            'VersionNumber'           => (int) $property->versionNumber,
+            'VisualRepresentationUri' => $ownedUri ?: null,
         ];
-
-        return $propertyData;
     }
 
     /**
-     * FIX 2: Map your DB dataType values to bSDD allowed values.
-     * bSDD only accepts: Boolean, Character, Integer, Real, String, Time
+     * Map DB dataType to a bSDD-allowed value.
+     * If the stored value is ALREADY a valid bSDD type, keep it as-is.
      */
     private function mapDataType(?string $dataType): string
     {
-        if (!$dataType) return 'String'; // safe default
+        if (!$dataType) return 'String';
+        $trimmed = trim($dataType);
+        if (in_array($trimmed, self::BSDD_DATATYPES, true)) return $trimmed;
 
         $map = [
-            'boolean'   => 'Boolean',
-            'bool'      => 'Boolean',
-            'character' => 'Character',
-            'char'      => 'Character',
-            'integer'   => 'Integer',
-            'int'       => 'Integer',
-            'number'    => 'Integer',
-            'real'      => 'Real',
-            'float'     => 'Real',
-            'double'    => 'Real',
-            'decimal'   => 'Real',
-            'string'    => 'String',
-            'text'      => 'String',
-            'varchar'   => 'String',
-            'time'      => 'Time',
-            'date'      => 'Time',
-            'datetime'  => 'Time',
+            'boolean' => 'Boolean', 'bool' => 'Boolean',
+            'character' => 'Character', 'char' => 'Character',
+            'integer' => 'Integer', 'int' => 'Integer', 'number' => 'Integer',
+            'real' => 'Real', 'float' => 'Real', 'double' => 'Real', 'decimal' => 'Real',
+            'string' => 'String', 'text' => 'String', 'varchar' => 'String',
+            'time' => 'Time', 'date' => 'Time', 'datetime' => 'Time',
         ];
-
-        return $map[strtolower(trim($dataType))] ?? 'String';
+        return $map[strtolower($trimmed)] ?? 'String';
     }
 
     public function exportDataToJsonPSETS()
     {
-        // FIX 1: Only the latest version of each PDT (max versionNumber, then max revisionNumber)
-        $productDataTemplates = DB::select('
-        SELECT pdt.*
-        FROM productdatatemplates pdt
-        INNER JOIN (
-            SELECT GUID, MAX(versionNumber) as maxVersion
-            FROM productdatatemplates
-            GROUP BY GUID
-        ) latest ON pdt.GUID = latest.GUID AND pdt.versionNumber = latest.maxVersion
-        INNER JOIN (
-            SELECT GUID, versionNumber, MAX(revisionNumber) as maxRevision
-            FROM productdatatemplates
-            GROUP BY GUID, versionNumber
-        ) latestRev ON pdt.GUID = latestRev.GUID
-            AND pdt.versionNumber = latestRev.versionNumber
-            AND pdt.revisionNumber = latestRev.maxRevision
-    ');
+        // Latest ACTIVE version of each PDT (max version, then max revision), Active only.
+        $productDataTemplates = DB::select("
+            SELECT pdt.*
+            FROM productdatatemplates pdt
+            INNER JOIN (
+                SELECT GUID, MAX(versionNumber) AS maxVersion
+                FROM productdatatemplates
+                WHERE status = 'Active'
+                GROUP BY GUID
+            ) latest ON pdt.GUID = latest.GUID AND pdt.versionNumber = latest.maxVersion
+            INNER JOIN (
+                SELECT GUID, versionNumber, MAX(revisionNumber) AS maxRevision
+                FROM productdatatemplates
+                WHERE status = 'Active'
+                GROUP BY GUID, versionNumber
+            ) latestRev ON pdt.GUID = latestRev.GUID
+                AND pdt.versionNumber = latestRev.versionNumber
+                AND pdt.revisionNumber = latestRev.maxRevision
+            WHERE pdt.status = 'Active'
+        ");
 
-        // FIX 1: Same for properties data dictionary
-        $propertiesData = DB::select('
-        SELECT p.*
-        FROM propertiesdatadictionaries p
-        INNER JOIN (
-            SELECT GUID, MAX(versionNumber) as maxVersion
-            FROM propertiesdatadictionaries
-            GROUP BY GUID
-        ) latest ON p.GUID = latest.GUID AND p.versionNumber = latest.maxVersion
-        INNER JOIN (
-            SELECT GUID, versionNumber, MAX(revisionNumber) as maxRevision
-            FROM propertiesdatadictionaries
-            GROUP BY GUID, versionNumber
-        ) latestRev ON p.GUID = latestRev.GUID
-            AND p.versionNumber = latestRev.versionNumber
-            AND p.revisionNumber = latestRev.maxRevision
-    ');
+        // Latest ACTIVE version of each dictionary property.
+        $propertiesData = DB::select("
+            SELECT p.*
+            FROM propertiesdatadictionaries p
+            INNER JOIN (
+                SELECT GUID, MAX(versionNumber) AS maxVersion
+                FROM propertiesdatadictionaries
+                WHERE status = 'Active'
+                GROUP BY GUID
+            ) latest ON p.GUID = latest.GUID AND p.versionNumber = latest.maxVersion
+            INNER JOIN (
+                SELECT GUID, versionNumber, MAX(revisionNumber) AS maxRevision
+                FROM propertiesdatadictionaries
+                WHERE status = 'Active'
+                GROUP BY GUID, versionNumber
+            ) latestRev ON p.GUID = latestRev.GUID
+                AND p.versionNumber = latestRev.versionNumber
+                AND p.revisionNumber = latestRev.maxRevision
+            WHERE p.status = 'Active'
+        ");
 
-        $groupsOfProperties = DB::select('SELECT * FROM groupofproperties');
+        $jsonData = $this->transformDataPSETS($productDataTemplates, $propertiesData);
 
-        $jsonData = $this->transformDataPSETS($productDataTemplates, $propertiesData, $groupsOfProperties);
+        // Guard: fail loudly on any duplicate code BEFORE writing the file.
+        $this->assertDistinctCodes($jsonData);
 
         $tempFilePath = tempnam(sys_get_temp_dir(), 'PDTs.pt_Domain_bsdd_PSETS_');
         file_put_contents($tempFilePath, json_encode($jsonData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
-        $currentDate = Carbon::now()->format('Y-m-d');
-        $fileName = 'PDTs.pt_Domain_bsdd_PSETS_' . $currentDate . '.json';
-
-        $headers = [
-            'Content-Type'        => 'application/json',
-            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
-        ];
+        $fileName = 'PDTs.pt_Domain_bsdd_PSETS_' . Carbon::now()->format('Y-m-d') . '.json';
 
         return response()->streamDownload(
             function () use ($tempFilePath) {
@@ -991,33 +967,68 @@ class ProductdatatemplatesController extends Controller
                 unlink($tempFilePath);
             },
             $fileName,
-            $headers
+            [
+                'Content-Type'        => 'application/json',
+                'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+            ]
         );
     }
 
     private function transformDataPSETS($productDataTemplates, $propertiesData)
     {
         $jsonData = [
-            'ModelVersion'               => '2.0',
-            'OrganizationCode'           => 'pdtspt',
-            'DictionaryCode'             => 'pdtspt',
-            'LanguageIsoCode'            => 'pt-PT',
-            'LanguageOnly'               => false,
-            'UseOwnUri'                  => true,  // FIX 4: tell bSDD we supply our own URIs
-            'DictionaryUri'              => 'https://pdts.pt', // FIX 4: base URI
-            'DictionaryName'             => 'PDTs.pt',
-            'DictionaryVersion'          => '0.1',
-            'MoreInfoUrl'                => 'https://pdts.pt',
-            'ChangeRequestEmailAddress'  => 'pdts.portugal@gmail.com',
-            'License'                    => 'CC BY',
-            'LicenseUrl'                 => 'https://creativecommons.org/share-your-work/cclicenses/',
-            'QualityAssuranceProcedure'  => 'EN ISO 23386:2020',
-            'Classes'                    => [],
-            'Properties'                 => [],
+            'ModelVersion'              => '2.0',
+            'OrganizationCode'          => 'pdtspt',
+            'DictionaryCode'            => 'pdtspt',
+            'LanguageIsoCode'           => 'pt-PT',
+            'LanguageOnly'              => false,
+            'UseOwnUri'                 => true,
+            'DictionaryUri'             => 'https://pdts.pt',
+            'DictionaryName'            => 'PDTs.pt',
+            'DictionaryVersion'         => '0.1',
+            'MoreInfoUrl'               => 'https://pdts.pt',
+            'ChangeRequestEmailAddress' => 'pdts.portugal@gmail.com',
+            'License'                   => 'CC BY',
+            'LicenseUrl'                => 'https://creativecommons.org/share-your-work/cclicenses/',
+            'QualityAssuranceProcedure' => 'EN ISO 23386:2020',
+            'Classes'                   => [],
+            'Properties'                => [],
         ];
 
-        foreach ($productDataTemplates as $productDataTemplate) {
-            $jsonData['Classes'][] = $this->transformProductDataTemplatePSETS($productDataTemplate);
+        $masterPdt = $this->loadLatestMasterPdt();
+        $masterGroups = [];
+        if ($masterPdt) {
+            $masterGroups = groupofproperties::where('pdtId', $masterPdt->Id)->get();
+        }
+
+        // Disambiguate PDT codes if two PDTs PascalCase to the same string.
+        $seenPdtCodes = [];
+        $seenGroupGuids = [];
+
+        // Iterate the MASTER PDT first so its own GOP classes are emitted (and
+        // parented to the master) before any child references the same-GUID
+        // groups and hits the already-seen guard. Otherwise a master group would
+        // get ParentClassCode = whichever child happened to be iterated first.
+        usort($productDataTemplates, function ($a, $b) {
+            $aMaster = ($a->GUID === self::MASTER_PDT_GUID) ? 0 : 1;
+            $bMaster = ($b->GUID === self::MASTER_PDT_GUID) ? 0 : 1;
+            return $aMaster <=> $bMaster;
+        });
+
+        foreach ($productDataTemplates as $pdt) {
+            [$pdtClass, $pdtCode] = $this->transformProductDataTemplatePSETS($pdt, $masterPdt, $masterGroups, $seenPdtCodes);
+            $jsonData['Classes'][] = $pdtClass;
+
+            // Emit each of this PDT's groups as its own GroupOfProperties class.
+            $groups = $this->resolvePdtGroups($pdt, $masterPdt, $masterGroups);
+            foreach ($groups as $group) {
+                $gopGuid = is_array($group) ? ($group['GUID'] ?? null) : ($group->GUID ?? null);
+                // One GOP class per group GUID across the whole export.
+                if ($gopGuid && isset($seenGroupGuids[$gopGuid])) continue;
+                if ($gopGuid) $seenGroupGuids[$gopGuid] = true;
+
+                $jsonData['Classes'][] = $this->transformGroupOfPropertiesPSETS($group, $pdtCode);
+            }
         }
 
         foreach ($propertiesData as $property) {
@@ -1027,73 +1038,320 @@ class ProductdatatemplatesController extends Controller
         return $jsonData;
     }
 
-    private function transformProductDataTemplatePSETS($productDataTemplate)
+    /**
+     * @return array{0: array, 1: string}  [classData, pdtCode]
+     */
+    private function transformProductDataTemplatePSETS($pdt, $masterPdt, $masterGroups, array &$seenPdtCodes)
     {
-        // FIX 3: Code is PascalCase of name
-        $code = self::convertToPascalCase($productDataTemplate->pdtNamePt);
+        $code = self::convertToPascalCase($pdt->pdtNamePt) ?: ('Pdt' . $pdt->Id);
+        if (isset($seenPdtCodes[$code])) {
+            $code = $code . '-' . $pdt->Id; // collision-safe
+        }
+        $seenPdtCodes[$code] = true;
 
-        // FIX 4: OwnedUri for PDTs: https://pdts.pt/pdtview/Id-pdtNamePt
-        $ownedUri = 'https://pdts.pt/pdtview/' . $productDataTemplate->Id . '-' . self::convertToPascalCase($productDataTemplate->pdtNamePt);
+        $ownedUri = 'https://pdts.pt/pdtview/' . $pdt->Id . '-' . self::convertToPascalCase($pdt->pdtNamePt);
 
         $classData = [
             'ClassType'              => 'Class',
-            'Code'                   => $code, // FIX 3
-            'Name'                   => $productDataTemplate->pdtNamePt,
-            'Definition'             => $productDataTemplate->descriptionPt,
-            'OwnedUri'               => $ownedUri, // FIX 4
-            'ActivationDateUtc'      => ($productDataTemplate->dateOfVersion && $productDataTemplate->dateOfVersion !== '0000-00-00') ? $productDataTemplate->dateOfVersion : null,
-            'DeActivationDateUtc'    => ($productDataTemplate->depreciationDate && $productDataTemplate->depreciationDate !== '0000-00-00') ? $productDataTemplate->depreciationDate : null,
-            'DeprecationExplanation' => ($productDataTemplate->depreciationDate && $productDataTemplate->depreciationDate !== '0000-00-00') ? $productDataTemplate->depreciationExplanation : null,
-            'DocumentReference'      => ($productDataTemplate->referenceDocumentGUID && $productDataTemplate->referenceDocumentGUID !== "n/a")
-                ? referencedocuments::where('GUID', $productDataTemplate->referenceDocumentGUID)->value('rdName')
-                : null,
-            'RevisionDateUtc'        => $productDataTemplate->dateOfRevision ?: null,
-            'RevisionNumber'         => (int)$productDataTemplate->revisionNumber,
-            'Status'                 => $productDataTemplate->status,
-            'Uid'                    => $productDataTemplate->GUID,
-            'VersionDateUtc'         => ($productDataTemplate->dateOfVersion && $productDataTemplate->dateOfVersion !== '0000-00-00') ? $productDataTemplate->dateOfVersion : null,
-            'VersionNumber'          => (int)$productDataTemplate->versionNumber,
+            'Code'                   => $code,
+            'Name'                   => $pdt->pdtNamePt,
+            'Definition'             => $pdt->descriptionPt,
+            'OwnedUri'               => $ownedUri,
+            'ActivationDateUtc'      => ($pdt->dateOfVersion && $pdt->dateOfVersion !== '0000-00-00') ? $pdt->dateOfVersion : null,
+            'DeActivationDateUtc'    => ($pdt->depreciationDate && $pdt->depreciationDate !== '0000-00-00') ? $pdt->depreciationDate : null,
+            'DeprecationExplanation' => ($pdt->depreciationDate && $pdt->depreciationDate !== '0000-00-00') ? $pdt->depreciationExplanation : null,
+            'DocumentReference'      => ($pdt->referenceDocumentGUID && $pdt->referenceDocumentGUID !== 'n/a')
+                ? referencedocuments::where('GUID', $pdt->referenceDocumentGUID)->value('rdName') : null,
+            'RevisionDateUtc'        => $pdt->dateOfRevision ?: null,
+            'RevisionNumber'         => (int) $pdt->revisionNumber,
+            'Status'                 => $pdt->status,
+            'Uid'                    => $pdt->GUID,
+            'VersionDateUtc'         => ($pdt->dateOfVersion && $pdt->dateOfVersion !== '0000-00-00') ? $pdt->dateOfVersion : null,
+            'VersionNumber'          => (int) $pdt->versionNumber,
             'ClassProperties'        => [],
         ];
 
-        $groupOfProperties = groupofproperties::where('pdtId', $productDataTemplate->Id)->get();
+        // Attach every property (deduped by dict GUID within this class) to the PDT,
+        // with PropertySet = the group it belongs to.
+        $groups = $this->resolvePdtGroups($pdt, $masterPdt, $masterGroups);
+        $classData['ClassProperties'] = $this->buildClassPropertiesForGroups($groups, $code);
 
-        foreach ($groupOfProperties as $group) {
-            $classProperties = DB::select('SELECT * FROM properties WHERE gopID = ?', [$group->Id]);
-            foreach ($classProperties as $property) {
-                $classData['ClassProperties'][] = $this->transformPropertyPSET($property);
+        // Master-as-parent: link non-master PDTs to the master class.
+        if ($pdt->GUID !== self::MASTER_PDT_GUID) {
+            [$masterCode, $masterUri] = $this->masterClassCodeAndUri();
+            if ($masterCode && $masterUri) {
+                $classData['ClassRelations'] = [[
+                    'RelationType'     => 'IsChildOf',
+                    'RelatedClassUri'  => $masterUri,   // UseOwnUri=true, so our own URI
+                    'RelatedClassName' => $masterCode,
+                    'OwnedUri'         => 'https://pdts.pt/classrelation/' . $pdt->Id . '-ischildof-master',
+                ]];
             }
         }
 
-        return $classData;
+        return [$classData, $code];
     }
 
-    private function transformPropertyPSET($property)
+
+    // ---------------------------------------------------------------------
+    // bSDD PSETS export helpers
+    // ---------------------------------------------------------------------
+
+    private const BSDD_DATATYPES = ['Boolean', 'Character', 'Integer', 'Real', 'String', 'Time'];
+
+    private const MASTER_PDT_GUID = '230d9954097541b793f2a1fddb8bd0ad';
+
+    /**
+     * Canonical property code — the single source of truth.
+     * Used for Property.Code AND every ClassProperty.PropertyCode that points
+     * at it, so a property reads identically under a PDT and under a GOP.
+     */
+    private function propertyCodeFor($ddRow): string
     {
-        $group = groupofproperties::where('Id', $property->gopID)->value('gopNamePt');
+        $id     = is_array($ddRow) ? ($ddRow['Id'] ?? null)     : ($ddRow->Id ?? null);
+        $namePt = is_array($ddRow) ? ($ddRow['namePt'] ?? null) : ($ddRow->namePt ?? null);
+        return $id . '-' . self::sanitizePascalCase($namePt);
+    }
 
-        $ddProperty = propertiesdatadictionaries::find($property->propertyId);
+    /** GOP class code: "{gopId}-{PascalCaseName}" — gopId guarantees uniqueness. */
+    private function gopCodeFor($gopId, $gopNamePt): string
+    {
+        $nameCode = self::convertToPascalCase($gopNamePt) ?: 'Other';
+        return $gopId ? ($gopId . '-' . $nameCode) : $nameCode;
+    }
 
-        $propertyCode = $ddProperty
-            ? ((string)$ddProperty->Id . '-' . self::sanitizePascalCase($ddProperty->namePt))
-            : ((string)$property->propertyId);
+    /**
+     * Latest ACTIVE version of a dictionary property by GUID — the row that
+     * actually appears in Properties[]. A membership (properties.propertyId) may
+     * point at a superseded or InActive version; resolving here keeps every
+     * ClassProperty.PropertyCode pointing at a Property that is really exported.
+     */
+    private function latestActiveDictionaryProperty($guid)
+    {
+        return propertiesdatadictionaries::where('GUID', $guid)
+            ->where('status', 'Active')
+            ->orderByRaw('versionNumber DESC, revisionNumber DESC')
+            ->first();
+    }
 
-        $classPropertyCode = (string)$property->Id . '-' . $propertyCode;
+    /**
+     * Latest version of the master PDT (or null if none).
+     *
+     * Deliberate divergence from Iso23387Exporter::getLatestPdt(), which does NOT
+     * filter by status: this bSDD export is Active-only everywhere (the master
+     * class is emitted from the Active productDataTemplates query), so the master
+     * used for the inline merge + IsChildOf relation must be the SAME row that is
+     * emitted as a class — i.e. the latest ACTIVE master. Otherwise a Preview/
+     * InActive latest master would be merged/referenced but never emitted,
+     * breaking the IsChildOf target.
+     */
+    private function loadLatestMasterPdt()
+    {
+        return DB::table('productdatatemplates')
+            ->where('GUID', self::MASTER_PDT_GUID)
+            ->where('status', 'Active')
+            ->orderByRaw('versionNumber DESC, revisionNumber DESC')
+            ->first();
+    }
 
-        // Class Property URI (ISO 23387 ClassProperty) - unique per properties record
-        $classPropertyOwnedUri = $ddProperty
-            ? 'https://pdts.pt/classpropertyview/' . $property->Id . '-' . self::sanitizePascalCase($ddProperty->namePt)
-            : null;
+    /**
+     * Merge the master PDT's groups into a child PDT's group list.
+     *
+     * Mirrors the inline merge in Iso23387Exporter::buildLibraryStructure():
+     *   $childGroups->merge($masterGroups)->unique('Id')->values()
+     * i.e. child groups first, master appended, first occurrence per Id wins
+     * (child wins on conflict). Dedup key is Id (the specific-row identity), NOT
+     * GUID: in our snapshot-clone versioning model multiple GOP rows can share a
+     * lineage GUID, so deduping by GUID could wrongly collapse two genuinely
+     * different master groups.
+     */
+    private function mergeMasterGroupsIntoPdtGroups(array $pdtGroups, array $masterGroups, $pdtId): array
+    {
+        $merged = [];
+        $seenIds = [];
+        foreach (array_merge($pdtGroups, $masterGroups) as $group) {
+            $id = is_array($group) ? ($group['Id'] ?? null) : ($group->Id ?? null);
+            if ($id !== null && isset($seenIds[$id])) continue;
+            if ($id !== null) $seenIds[$id] = true;
+            $merged[] = $group;
+        }
+        return $merged;
+    }
+
+    /**
+     * Resolve the (possibly master-merged) group list for a PDT, as objects/arrays.
+     */
+    private function resolvePdtGroups($pdt, $masterPdt, $masterGroups)
+    {
+        $groups = groupofproperties::where('pdtId', $pdt->Id)->get();
+        if ($masterPdt && $pdt->GUID !== self::MASTER_PDT_GUID) {
+            $groups = $this->mergeMasterGroupsIntoPdtGroups(
+                $groups->toArray(),
+                $masterGroups instanceof \Illuminate\Database\Eloquent\Collection ? $masterGroups->toArray() : $masterGroups,
+                $pdt->Id
+            );
+        }
+        return $groups;
+    }
+
+    /**
+     * Resolve the master PDT's emitted Class Code + URI, so children can
+     * reference it via an IsChildOf relation.
+     *
+     * @return array{0: ?string, 1: ?string, 2?: object}
+     */
+    private function masterClassCodeAndUri(): array
+    {
+        $master = $this->loadLatestMasterPdt();
+        if (!$master) return [null, null];
+
+        $code = self::convertToPascalCase($master->pdtNamePt) ?: ('Pdt' . $master->Id);
+        $uri  = 'https://pdts.pt/pdtview/' . $master->Id . '-' . self::convertToPascalCase($master->pdtNamePt);
+        return [$code, $uri, $master];
+    }
+
+    private function transformGroupOfPropertiesPSETS($group, string $pdtCode): array
+    {
+        $get = function ($key) use ($group) {
+            return is_array($group) ? ($group[$key] ?? null) : ($group->$key ?? null);
+        };
+
+        $gopId     = $get('Id');
+        $gopGuid   = $get('GUID');
+        $gopNamePt = $get('gopNamePt');
+        $groupCode = $this->gopCodeFor($gopId, $gopNamePt);
+
+        return [
+            'ClassType'         => 'GroupOfProperties',
+            'Code'              => $groupCode,
+            'Name'              => $gopNamePt,
+            'Definition'        => $get('definitionPt'),
+            'Status'            => $get('status'),
+            'OwnedUri'          => 'https://pdts.pt/datadictionaryviewGOP/' . $groupCode,
+            'ActivationDateUtc' => ($get('dateOfVersion') && $get('dateOfVersion') !== '0000-00-00') ? $get('dateOfVersion') : null,
+            'Uid'               => $gopGuid,
+            'VersionNumber'     => (int) $get('versionNumber'),
+            'RevisionNumber'    => (int) $get('revisionNumber'),
+            'ParentClassCode'   => $pdtCode,
+            'ClassProperties'   => $this->buildClassPropertiesForGroups([$group], $groupCode),
+        ];
+    }
+
+    /**
+     * Build ClassProperty entries for the given group list, deduping by dict GUID
+     * within the scope, and disambiguating ClassProperty.Code only on real collision.
+     */
+    private function buildClassPropertiesForGroups($groups, string $ownerClassCode): array
+    {
+        // Pass 1: gather rows. Resolve each membership to the LATEST ACTIVE
+        // dictionary version (the one actually in Properties[]); skip any whose
+        // dictionary property has no Active version — it would dangle in bSDD.
+        $rows = [];
+        foreach ($groups as $group) {
+            $primaryGroupId = is_array($group) ? $group['Id'] : $group->Id;
+            $groupNamePt    = is_array($group) ? ($group['gopNamePt'] ?? null) : ($group->gopNamePt ?? null);
+
+            $groupIds = [$primaryGroupId];
+            $mergedIds = is_array($group) ? ($group['mergedGroupIds'] ?? []) : ($group->mergedGroupIds ?? []);
+            if (!empty($mergedIds)) $groupIds = array_merge($groupIds, (array) $mergedIds);
+
+            $psetCode = $this->gopCodeFor($primaryGroupId, $groupNamePt);
+
+            $placeholders = implode(',', array_fill(0, count($groupIds), '?'));
+            $classProperties = DB::select("SELECT * FROM properties WHERE gopID IN ($placeholders)", $groupIds);
+
+            foreach ($classProperties as $property) {
+                $ddRow = propertiesdatadictionaries::find($property->propertyId);
+                $ddProperty = $ddRow ? $this->latestActiveDictionaryProperty($ddRow->GUID) : null;
+                if (!$ddProperty) continue; // no Active dictionary version -> would dangle, skip
+                $rows[] = ['property' => $property, 'dd' => $ddProperty, 'guid' => $ddProperty->GUID, 'pset' => $psetCode];
+            }
+        }
+
+        // Pass 2: emit, skipping dict-GUID duplicates within this scope.
+        $seen = [];
+        $out = [];
+        foreach ($rows as $r) {
+            if (isset($seen[$r['guid']])) continue;
+            $seen[$r['guid']] = true;
+            $out[] = $this->buildClassProperty($r['property'], $r['dd'], $r['pset'], $ownerClassCode);
+        }
+        return $out;
+    }
+
+    private function buildClassProperty($property, $ddProperty, string $psetCode, string $ownerClassCode): array
+    {
+        $propertyCode = $this->propertyCodeFor($ddProperty);
+
+        // ClassProperty.Code: unique within the class via properties.Id.
+        $classPropertyCode = (string) $property->Id . '-' . $propertyCode;
+
+        $nameSegment = self::sanitizePascalCase(
+            is_array($ddProperty) ? ($ddProperty['namePt'] ?? null) : $ddProperty->namePt
+        );
+
+        // OwnedUri must be GLOBALLY unique. A property is listed both on its PDT
+        // class and on its GOP class (and master properties repeat across
+        // children), so scope the URI to the owning class code.
+        $ownedUri = 'https://pdts.pt/classpropertyview/' . $ownerClassCode . '/' . $property->Id . '-' . $nameSegment;
 
         return [
             'Code'         => $classPropertyCode,
             'PropertyCode' => $propertyCode,
             'Description'  => $property->descriptionPt ?: null,
-            'PropertySet'  => self::convertToPascalCase($group),
-            'OwnedUri'     => $classPropertyOwnedUri,
+            'PropertySet'  => $psetCode,
+            'OwnedUri'     => $ownedUri,
         ];
     }
 
+    /**
+     * Fail loudly if any duplicate Code would be sent to bSDD.
+     * - Property.Code unique across Properties[]
+     * - Class.Code unique across Classes[]
+     * - ClassProperty.Code unique within each class
+     */
+    private function assertDistinctCodes(array $jsonData): void
+    {
+        $dups = [];
+
+        $propCodes = array_map(fn($p) => $p['Code'], $jsonData['Properties']);
+        foreach (array_count_values($propCodes) as $c => $n) {
+            if ($n > 1) $dups[] = "Property.Code '$c' x$n";
+        }
+
+        $classCodes = array_map(fn($c) => $c['Code'], $jsonData['Classes']);
+        foreach (array_count_values($classCodes) as $c => $n) {
+            if ($n > 1) $dups[] = "Class.Code '$c' x$n";
+        }
+
+        foreach ($jsonData['Classes'] as $class) {
+            $cpCodes = array_map(fn($cp) => $cp['Code'], $class['ClassProperties'] ?? []);
+            foreach (array_count_values($cpCodes) as $c => $n) {
+                if ($n > 1) $dups[] = "ClassProperty.Code '$c' x$n in class '{$class['Code']}'";
+            }
+        }
+
+        // OwnedUri must be globally unique across everything bSDD ingests.
+        $ownedUris = [];
+        foreach ($jsonData['Classes'] as $class) {
+            if (!empty($class['OwnedUri'])) $ownedUris[] = $class['OwnedUri'];
+            foreach ($class['ClassProperties'] ?? [] as $cp) {
+                if (!empty($cp['OwnedUri'])) $ownedUris[] = $cp['OwnedUri'];
+            }
+        }
+        foreach ($jsonData['Properties'] as $p) {
+            if (!empty($p['OwnedUri'])) $ownedUris[] = $p['OwnedUri'];
+        }
+        foreach (array_count_values($ownedUris) as $u => $n) {
+            if ($n > 1) $dups[] = "OwnedUri '$u' x$n";
+        }
+
+        if (!empty($dups)) {
+            throw new \RuntimeException(
+                "bSDD export aborted — duplicate codes (bSDD rejects these):\n - " . implode("\n - ", $dups)
+            );
+        }
+    }
 
     public static function sanitizePascalCase($string): string
     {
