@@ -583,41 +583,6 @@ class ProductdatatemplatesController extends Controller
     // TO DO : 
     // add remaining properties in each section
 
-    public function exportDataToJson()
-    {
-        // Fetch data using raw SQL queries
-        $productDataTemplates = DB::select('SELECT * FROM productdatatemplates');
-
-        // Fetch properties from propertiesdatadictionary
-        $propertiesData = DB::select('SELECT * FROM propertiesdatadictionaries');
-
-        // Transform data into the desired JSON format
-        $jsonData = $this->transformData($productDataTemplates, $propertiesData);
-
-        // Save JSON data to a temporary file
-        $tempFilePath = tempnam(sys_get_temp_dir(), 'PDTs.pt_Domain_bsdd_');
-        file_put_contents($tempFilePath, json_encode($jsonData, JSON_PRETTY_PRINT));
-
-
-        // Add the current date to the file name
-        $currentDate = Carbon::now()->format('Y-m-d');
-        $fileName = 'PDTs.pt_Domain_bsdd_' . $currentDate . '.json';
-        // Stream download the file to the user
-        $headers = [
-            'Content-Type' => 'application/json',
-            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
-        ];
-
-        return response()->streamDownload(
-            function () use ($tempFilePath) {
-                readfile($tempFilePath);
-                unlink($tempFilePath); // Delete the temporary file after streaming
-            },
-            $fileName,
-            $headers
-        );
-    }
-
     private function transformPropertyDataDictionary($property)
     {
         $propertyRD = properties::where('propertyId', $property->Id)->latest()->value('referenceDocumentGUID') ?? 'n/a';
