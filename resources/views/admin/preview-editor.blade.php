@@ -33,6 +33,7 @@
                         <button type="button" class="btn btn-secondary js-save-pdt">Save template attributes</button>
                         <span class="js-pdt-status text-sm"></span>
                     </div>
+                    <x-relation-editor entity-type="pdt" :guid="$pdt->GUID" title="Template relationships (EN ISO 23387)" />
                 </div>
             </div>
 

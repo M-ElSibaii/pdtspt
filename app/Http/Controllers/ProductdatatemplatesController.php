@@ -1007,24 +1007,77 @@ class ProductdatatemplatesController extends Controller
 
         $rels = \App\Models\EntityRelationship::where('sourceEntityType', \App\Models\EntityRelationship::TYPE_PDT)
             ->where('sourceGuid', $pdt->GUID)
-            ->where('relationType', \App\Models\EntityRelationship::REL_IS_SUBTYPE_OF)
+            ->whereIn('relationType', [\App\Models\EntityRelationship::REL_IS_SUBTYPE_OF, \App\Models\EntityRelationship::REL_HAS_PART])
             ->where('targetEntityType', \App\Models\EntityRelationship::TYPE_PDT)
+            ->orderByRaw("FIELD(relationType,'IsSubtypeOf') DESC")
+            ->orderByRaw('position IS NULL, position')
             ->get();
 
         $out = [];
         foreach ($rels as $r) {
             [$code, $uri] = $this->resolvePdtClassRef($r->targetGuid, $r->targetVersionNumber, $r->targetRevisionNumber);
             if (!$code || !$uri) continue;
-            // Preserve the legacy OwnedUri spelling for the master target.
-            $suffix = ($r->targetGuid === self::MASTER_PDT_GUID) ? 'ischildof-master' : ('ischildof-' . $r->targetGuid);
+            // IsSubtypeOf -> bSDD IsChildOf; HasPart -> bSDD HasPart.
+            $bsddType = $r->relationType === \App\Models\EntityRelationship::REL_HAS_PART ? 'HasPart' : 'IsChildOf';
+            // Preserve the legacy OwnedUri spelling for the master IsChildOf target.
+            if ($bsddType === 'IsChildOf' && $r->targetGuid === self::MASTER_PDT_GUID) {
+                $suffix = 'ischildof-master';
+            } else {
+                $suffix = strtolower($bsddType) . '-' . $r->targetGuid;
+            }
             $out[] = [
-                'RelationType'     => 'IsChildOf',
+                'RelationType'     => $bsddType,
                 'RelatedClassUri'  => $uri,   // UseOwnUri=true, so our own URI
                 'RelatedClassName' => $code,
                 'OwnedUri'         => 'https://pdts.pt/classrelation/' . $pdt->Id . '-' . $suffix,
             ];
         }
         return $out;
+    }
+
+    /**
+     * GOP-level ClassRelations from the store (R-23387-7): IsSubtypeOf -> IsChildOf,
+     * HasPart -> HasPart, both targeting other GOP lineages. Returns [] when none.
+     */
+    private function buildGopClassRelations($group): array
+    {
+        $guid = is_array($group) ? ($group['GUID'] ?? null) : ($group->GUID ?? null);
+        $gopId = is_array($group) ? ($group['Id'] ?? null) : ($group->Id ?? null);
+        if (!$guid) return [];
+
+        $rels = \App\Models\EntityRelationship::where('sourceEntityType', \App\Models\EntityRelationship::TYPE_GOP)
+            ->where('sourceGuid', $guid)
+            ->whereIn('relationType', [\App\Models\EntityRelationship::REL_IS_SUBTYPE_OF, \App\Models\EntityRelationship::REL_HAS_PART])
+            ->where('targetEntityType', \App\Models\EntityRelationship::TYPE_GOP)
+            ->orderByRaw("FIELD(relationType,'IsSubtypeOf') DESC")
+            ->orderByRaw('position IS NULL, position')
+            ->get();
+
+        $out = [];
+        foreach ($rels as $r) {
+            [$code, $uri] = $this->resolveGopClassRef($r->targetGuid);
+            if (!$code || !$uri) continue;
+            $bsddType = $r->relationType === \App\Models\EntityRelationship::REL_HAS_PART ? 'HasPart' : 'IsChildOf';
+            $out[] = [
+                'RelationType'     => $bsddType,
+                'RelatedClassUri'  => $uri,
+                'RelatedClassName' => $code,
+                'OwnedUri'         => 'https://pdts.pt/classrelation/gop-' . $gopId . '-' . strtolower($bsddType) . '-' . $r->targetGuid,
+            ];
+        }
+        return $out;
+    }
+
+    /** Resolve a GOP lineage GUID to its emitted [classCode, ownedUri] (latest active). */
+    private function resolveGopClassRef(string $guid): array
+    {
+        $g = DB::table('groupofproperties')->where('GUID', $guid)
+            ->orderByRaw("FIELD(status,'Active') DESC")
+            ->orderByRaw('versionNumber DESC, revisionNumber DESC')
+            ->first();
+        if (!$g) return [null, null];
+        $code = $this->gopCodeFor($g->Id, $g->gopNamePt);
+        return [$code, 'https://pdts.pt/datadictionaryviewGOP/' . $code];
     }
 
     /** True once any PDT IsSubtypeOf edge exists (store is authoritative). Memoized per request. */
@@ -1085,7 +1138,7 @@ class ProductdatatemplatesController extends Controller
         $gopNamePt = $get('gopNamePt');
         $groupCode = $this->gopCodeFor($gopId, $gopNamePt);
 
-        return [
+        $classData = [
             'ClassType'         => 'GroupOfProperties',
             'Code'              => $groupCode,
             'Name'              => $gopNamePt,
@@ -1099,6 +1152,15 @@ class ProductdatatemplatesController extends Controller
             'ParentClassCode'   => $pdtCode,
             'ClassProperties'   => $this->buildClassPropertiesForGroups([$group], $groupCode),
         ];
+
+        // GOP subtype/part relations from the store (R-23387-7); omit key when none
+        // so output stays byte-identical to baseline until relations are added.
+        $gopRelations = $this->buildGopClassRelations($group);
+        if (!empty($gopRelations)) {
+            $classData['ClassRelations'] = $gopRelations;
+        }
+
+        return $classData;
     }
 
     /**

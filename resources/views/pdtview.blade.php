@@ -123,6 +123,12 @@
                      
                     </tbody>
                 </table>
+
+                @if (Auth::check() && Auth::user()->isAdmin == 1 && $objectType)
+                    {{-- Object Type relationships (EN ISO 23387 R-23387-7), admin-editable. --}}
+                    <x-relation-editor entity-type="objecttype" :guid="$objectType->GUID" title="Object Type relationships ({{ $objectType->constructionObjectNamePt }})" />
+                @endif
+
                 <br>
                      <form class="mb-3" action="{{ route('pdtsdownload', ['pdtID' => $pdt->Id]) }}">
                                     <x-button-primary-pdts type="submit" title="Ver PDT" />

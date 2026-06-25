@@ -15,6 +15,7 @@ use App\Http\Controllers\PdtCreateController;
 use App\Http\Controllers\ActivePdtEditController;
 use App\Http\Controllers\PropertyPickerController;
 use App\Http\Controllers\AdminLookupController;
+use App\Http\Controllers\RelationshipController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -195,6 +196,13 @@ Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
     // Shared "add from existing" lookups (Preview editor + versioning editor)
     Route::get('/admin/lookup/properties', [AdminLookupController::class, 'properties'])->name('admin.lookup.properties');
     Route::get('/admin/lookup/gops', [AdminLookupController::class, 'gops'])->name('admin.lookup.gops');
+
+    // Generic self-referential relationships (EN ISO 23387:2025 R-23387-7).
+    Route::get('/admin/relations/search/{entityType}', [RelationshipController::class, 'search'])->name('admin.relations.search');
+    Route::get('/admin/relations/{entityType}/{guid}', [RelationshipController::class, 'index'])->name('admin.relations.index')->where('guid', '[0-9a-fA-F]{32}');
+    Route::post('/admin/relations', [RelationshipController::class, 'store'])->name('admin.relations.store');
+    Route::post('/admin/relations/reorder', [RelationshipController::class, 'reorder'])->name('admin.relations.reorder');
+    Route::delete('/admin/relations/{id}', [RelationshipController::class, 'destroy'])->whereNumber('id')->name('admin.relations.destroy');
 
     // CREATE mode: new PDT from a construction object (select/create) -> Preview draft.
     Route::get('/admin/pdt/create', [PdtCreateController::class, 'create'])->name('admin.pdt.create');
