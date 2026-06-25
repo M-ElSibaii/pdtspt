@@ -70,12 +70,24 @@
                             </tr>
                             @if($objectType)
                             <tr>
-                                <th>ObjectType (Tipo de Construção)</th>
+                                <th>ObjectType (Tipo de Objeto)</th>
                                 <td>
                                     <strong>{{$objectType->constructionObjectNamePt}}</strong>
                                     (EN: {{$objectType->constructionObjectNameEn}})<br/>
                                     GUID: {{$objectType->GUID}}<br/>
                                     Descrição: {{$objectType->descriptionPt}}
+                                </td>
+                            </tr>
+                            @endif
+                            @if(!empty($subtypeParents))
+                            <tr>
+                                <th>Subtipo de (Object Type)</th>
+                                <td>
+                                    @foreach($subtypeParents as $parent)
+                                        <a href="{{ url('pdtview/' . $parent['pdtId'] . '-' . \App\Http\Controllers\ProductdatatemplatesController::convertToPascalCase($parent['name'])) }}">
+                                            {{ $parent['name'] }}
+                                        </a>@if(!$loop->last), @endif
+                                    @endforeach
                                 </td>
                             </tr>
                             @endif

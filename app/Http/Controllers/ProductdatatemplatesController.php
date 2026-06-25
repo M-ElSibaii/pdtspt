@@ -19,6 +19,9 @@ class ProductdatatemplatesController extends Controller
 {
     private const MASTER_PDT_GUID = '230d9954097541b793f2a1fddb8bd0ad';
 
+    /** Memoized: has the relationship store been seeded with any PDT IsSubtypeOf edge? */
+    private ?bool $pdtSubtypeSeeded = null;
+
     public function productDataTemplate($pdtID)
     {
         try {
@@ -129,7 +132,21 @@ class ProductdatatemplatesController extends Controller
             }
         }
 
-        return view('pdtview', compact('pdt', 'groupsOfProperties', 'pdtVersions', 'objectType', 'masterPropertiesCount'));
+        // Subtype/parent relations (EN ISO 23387:2025 R-23387-7), read-only display.
+        // Resolves each IsSubtypeOf target lineage to its latest-Active PDT for linking.
+        $subtypeParents = [];
+        $relSvc = new \App\Services\RelationshipService();
+        foreach ($relSvc->relationsFrom(\App\Models\EntityRelationship::TYPE_PDT, $pdt->GUID, \App\Models\EntityRelationship::REL_IS_SUBTYPE_OF) as $rel) {
+            if ($rel->targetEntityType !== \App\Models\EntityRelationship::TYPE_PDT) continue;
+            $target = productdatatemplates::where('GUID', $rel->targetGuid)
+                ->orderByRaw('versionNumber DESC, revisionNumber DESC')
+                ->first();
+            if ($target) {
+                $subtypeParents[] = ['name' => $target->pdtNamePt ?: $target->pdtNameEn, 'pdtId' => $target->Id, 'guid' => $target->GUID];
+            }
+        }
+
+        return view('pdtview', compact('pdt', 'groupsOfProperties', 'pdtVersions', 'objectType', 'masterPropertiesCount', 'subtypeParents'));
     }
 
 
@@ -841,17 +858,12 @@ class ProductdatatemplatesController extends Controller
         $groups = $this->resolvePdtGroups($pdt, $masterPdt, $masterGroups);
         $classData['ClassProperties'] = $this->buildClassPropertiesForGroups($groups, $code);
 
-        // Master-as-parent: link non-master PDTs to the master class.
-        if ($pdt->GUID !== self::MASTER_PDT_GUID) {
-            [$masterCode, $masterUri] = $this->masterClassCodeAndUri();
-            if ($masterCode && $masterUri) {
-                $classData['ClassRelations'] = [[
-                    'RelationType'     => 'IsChildOf',
-                    'RelatedClassUri'  => $masterUri,   // UseOwnUri=true, so our own URI
-                    'RelatedClassName' => $masterCode,
-                    'OwnedUri'         => 'https://pdts.pt/classrelation/' . $pdt->Id . '-ischildof-master',
-                ]];
-            }
+        // Subtype/parent links. Read from the generic relationship store (R-23387-7);
+        // IsSubtypeOf -> bSDD IsChildOf. Falls back to the legacy MASTER_PDT_GUID
+        // synthesis when the store has not been seeded, so output is unchanged then.
+        $relations = $this->buildPdtClassRelations($pdt);
+        if (!empty($relations)) {
+            $classData['ClassRelations'] = $relations;
         }
 
         return [$classData, $code];
@@ -977,6 +989,89 @@ class ProductdatatemplatesController extends Controller
         $code = self::convertToPascalCase($master->pdtNamePt) ?: ('Pdt' . $master->Id);
         $uri  = 'https://pdts.pt/pdtview/' . $master->Id . '-' . self::convertToPascalCase($master->pdtNamePt);
         return [$code, $uri, $master];
+    }
+
+    /**
+     * Build the bSDD ClassRelations for a PDT from the generic relationship store
+     * (EN ISO 23387:2025 R-23387-7). PDT-level IsSubtypeOf edges map to bSDD IsChildOf.
+     *
+     * If the store has NOT been seeded with any PDT subtype edge, falls back to the
+     * legacy MASTER_PDT_GUID synthesis so the export is byte-identical pre-seed.
+     * Returns [] when the PDT has no parent (e.g. the master itself).
+     */
+    private function buildPdtClassRelations($pdt): array
+    {
+        if (!$this->pdtSubtypeStoreSeeded()) {
+            return $this->legacyMasterRelation($pdt);
+        }
+
+        $rels = \App\Models\EntityRelationship::where('sourceEntityType', \App\Models\EntityRelationship::TYPE_PDT)
+            ->where('sourceGuid', $pdt->GUID)
+            ->where('relationType', \App\Models\EntityRelationship::REL_IS_SUBTYPE_OF)
+            ->where('targetEntityType', \App\Models\EntityRelationship::TYPE_PDT)
+            ->get();
+
+        $out = [];
+        foreach ($rels as $r) {
+            [$code, $uri] = $this->resolvePdtClassRef($r->targetGuid, $r->targetVersionNumber, $r->targetRevisionNumber);
+            if (!$code || !$uri) continue;
+            // Preserve the legacy OwnedUri spelling for the master target.
+            $suffix = ($r->targetGuid === self::MASTER_PDT_GUID) ? 'ischildof-master' : ('ischildof-' . $r->targetGuid);
+            $out[] = [
+                'RelationType'     => 'IsChildOf',
+                'RelatedClassUri'  => $uri,   // UseOwnUri=true, so our own URI
+                'RelatedClassName' => $code,
+                'OwnedUri'         => 'https://pdts.pt/classrelation/' . $pdt->Id . '-' . $suffix,
+            ];
+        }
+        return $out;
+    }
+
+    /** True once any PDT IsSubtypeOf edge exists (store is authoritative). Memoized per request. */
+    private function pdtSubtypeStoreSeeded(): bool
+    {
+        if ($this->pdtSubtypeSeeded === null) {
+            $this->pdtSubtypeSeeded = \App\Models\EntityRelationship::where('sourceEntityType', \App\Models\EntityRelationship::TYPE_PDT)
+                ->where('relationType', \App\Models\EntityRelationship::REL_IS_SUBTYPE_OF)
+                ->where('targetEntityType', \App\Models\EntityRelationship::TYPE_PDT)
+                ->exists();
+        }
+        return $this->pdtSubtypeSeeded;
+    }
+
+    /** Legacy synthesis: non-master PDT -> master class, identical to the pre-store behaviour. */
+    private function legacyMasterRelation($pdt): array
+    {
+        if ($pdt->GUID === self::MASTER_PDT_GUID) return [];
+        [$masterCode, $masterUri] = $this->masterClassCodeAndUri();
+        if (!$masterCode || !$masterUri) return [];
+        return [[
+            'RelationType'     => 'IsChildOf',
+            'RelatedClassUri'  => $masterUri,
+            'RelatedClassName' => $masterCode,
+            'OwnedUri'         => 'https://pdts.pt/classrelation/' . $pdt->Id . '-ischildof-master',
+        ]];
+    }
+
+    /**
+     * Resolve a target PDT lineage GUID (+optional version pin) to its emitted
+     * [classCode, ownedUri]. NULL pin -> latest active of the lineage.
+     */
+    private function resolvePdtClassRef(string $guid, ?int $ver, ?int $rev): array
+    {
+        $q = DB::table('productdatatemplates')->where('GUID', $guid);
+        if ($ver !== null) {
+            $q->where('versionNumber', $ver);
+            if ($rev !== null) $q->where('revisionNumber', $rev);
+        } else {
+            $q->where('status', 'Active');
+        }
+        $t = $q->orderByRaw('versionNumber DESC, revisionNumber DESC')->first();
+        if (!$t) return [null, null];
+
+        $code = self::convertToPascalCase($t->pdtNamePt) ?: ('Pdt' . $t->Id);
+        $uri  = 'https://pdts.pt/pdtview/' . $t->Id . '-' . self::convertToPascalCase($t->pdtNamePt);
+        return [$code, $uri];
     }
 
     private function transformGroupOfPropertiesPSETS($group, string $pdtCode): array
