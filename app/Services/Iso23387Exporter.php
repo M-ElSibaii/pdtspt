@@ -7,6 +7,7 @@ use App\Models\groupofproperties;
 use App\Models\propertiesdatadictionaries;
 use App\Models\referencedocuments;
 use App\Models\constructionobjects;
+use App\Models\EntityRelationship;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use DOMDocument;
@@ -27,6 +28,126 @@ class Iso23387Exporter
     private const NAMESPACE_URI = 'https://standards.iso.org/iso/23387/ed-2/en/';
     private const NAMESPACE_PREFIX = 'dt';
     private const MASTER_PDT_GUID = '230d9954097541b793f2a1fddb8bd0ad';
+
+    private ?RelationshipService $relSvc = null;
+    private function relationshipService(): RelationshipService
+    {
+        return $this->relSvc ??= new RelationshipService();
+    }
+
+    private ?PropertyDependencyService $depSvc = null;
+    private function propertyDependencyService(): PropertyDependencyService
+    {
+        return $this->depSvc ??= new PropertyDependencyService();
+    }
+
+    /**
+     * Render a stored 32-hex GUID as dashed-UUID (8-4-4-4-12) so ISO output validates
+     * against the ed-2 XSD's GUID pattern. The database is NOT changed — this is an
+     * emit-time representation only. Already-dashed or non-standard values pass through.
+     */
+    public static function toDashedGuid(?string $guid): ?string
+    {
+        if (!$guid) return $guid;
+        $h = strtolower($guid);
+        if (preg_match('/^[0-9a-f]{32}$/', $h)) {
+            return substr($h, 0, 8) . '-' . substr($h, 8, 4) . '-' . substr($h, 12, 4)
+                . '-' . substr($h, 16, 4) . '-' . substr($h, 20);
+        }
+        return $guid;
+    }
+
+    /**
+     * Recursively dash every structural GUID value (keys dt:GUID / GUID), leaving any
+     * _raw debug subtree (used by the API) untouched so it still mirrors the database.
+     */
+    private function dashGuids($node)
+    {
+        if (!is_array($node)) return $node;
+        $out = [];
+        foreach ($node as $k => $v) {
+            if ($k === '_raw') {
+                $out[$k] = $v;
+            } elseif (($k === 'dt:GUID' || $k === 'GUID') && is_string($v)) {
+                $out[$k] = self::toDashedGuid($v);
+            } else {
+                $out[$k] = $this->dashGuids($v);
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * XSD ReferenceType refs for a subject's IsSubtypeOf (0..1) + HasPart (0..*) from the
+     * relationship store. Targets are referenced EXTERNALLY by referenceURI (Annex E d),
+     * so a single-subject Library stays keyref-valid without bundling the parent.
+     */
+    private function subjectRelationRefs(string $entityType, string $guid): array
+    {
+        $out = ['IsSubtypeOfRef' => null, 'HasPartRef' => []];
+        foreach ($this->relationshipService()->relationsFrom($entityType, $guid) as $r) {
+            if ($r->targetEntityType !== $entityType) continue;
+            $uri = $this->subjectUri($r->targetEntityType, $r->targetGuid);
+            if (!$uri) continue;
+            if ($r->relationType === EntityRelationship::REL_IS_SUBTYPE_OF && !$out['IsSubtypeOfRef']) {
+                $out['IsSubtypeOfRef'] = ['referenceURI' => $uri];
+            } elseif ($r->relationType === EntityRelationship::REL_HAS_PART) {
+                $out['HasPartRef'][] = ['referenceURI' => $uri];
+            }
+        }
+        return $out;
+    }
+
+    /** Property IsSpecializationOf (0..1) ref, by referenceURI. */
+    private function propertySpecializationRef(string $guid): ?array
+    {
+        foreach ($this->relationshipService()->relationsFrom('property', $guid) as $r) {
+            if ($r->relationType === EntityRelationship::REL_IS_SPECIALIZATION && $r->targetEntityType === 'property') {
+                $uri = $this->subjectUri('property', $r->targetGuid);
+                if ($uri) return ['referenceURI' => $uri];
+            }
+        }
+        return null;
+    }
+
+    /** Map a stored dataType to the ed-2 XSD DataType enum (defaults to STRING). */
+    private function mapIsoDataType(?string $dataType): string
+    {
+        $valid = ['BOOLEAN', 'INTEGER', 'RATIONAL', 'REAL', 'COMPLEX', 'STRING', 'DATETIME'];
+        $t = strtoupper(trim((string) $dataType));
+        if (in_array($t, $valid, true)) return $t;
+        $map = [
+            'BOOL' => 'BOOLEAN',
+            'INT' => 'INTEGER', 'NUMBER' => 'INTEGER',
+            'FLOAT' => 'REAL', 'DOUBLE' => 'REAL', 'DECIMAL' => 'REAL',
+            'CHARACTER' => 'STRING', 'CHAR' => 'STRING', 'TEXT' => 'STRING', 'VARCHAR' => 'STRING',
+            'TIME' => 'DATETIME', 'DATE' => 'DATETIME',
+        ];
+        return $map[$t] ?? 'STRING';
+    }
+
+    /** Resolve a target lineage GUID to its public pdts.pt URI (latest active row). */
+    private function subjectUri(string $entityType, string $guid): ?string
+    {
+        switch ($entityType) {
+            case 'pdt':
+                $r = DB::table('productdatatemplates')->where('GUID', $guid)
+                    ->orderByRaw("FIELD(status,'Active') DESC")->orderByRaw('versionNumber DESC, revisionNumber DESC')->first();
+                return $r ? 'https://pdts.pt/pdtview/' . $r->Id . '-' . $this->convertToPascalCase($r->pdtNamePt) : null;
+            case 'gop':
+                $r = DB::table('groupofproperties')->where('GUID', $guid)
+                    ->orderByRaw("FIELD(status,'Active') DESC")->orderByRaw('versionNumber DESC, revisionNumber DESC')->first();
+                return $r ? 'https://pdts.pt/datadictionaryviewGOP/' . $r->Id . '-' . $this->convertToPascalCase($r->gopNamePt) : null;
+            case 'property':
+                $r = DB::table('propertiesdatadictionaries')->where('GUID', $guid)
+                    ->orderByRaw("FIELD(status,'Active') DESC")->orderByRaw('versionNumber DESC, revisionNumber DESC')->first();
+                return $r ? 'https://pdts.pt/datadictionaryview/' . $r->Id . '-' . $this->sanitizePascalCase($r->namePt) : null;
+            case 'objecttype':
+                $r = DB::table('constructionobjects')->where('GUID', $guid)->first();
+                return $r ? 'https://pdts.pt/objecttype/' . $guid : null;
+        }
+        return null;
+    }
 
 
     private function  sanitizePascalCase($string): string
@@ -172,7 +293,7 @@ class Iso23387Exporter
      */
     public function exportToJson($pdtId): string
     {
-        $structure = $this->buildLibraryStructure($pdtId);
+        $structure = $this->dashGuids($this->buildLibraryStructure($pdtId));
         return json_encode($structure, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
@@ -180,10 +301,11 @@ class Iso23387Exporter
     {
         $structure = $this->buildLibraryStructure($pdtId);
 
-        // Attach raw data
+        // Attach raw data (GUID lookups must run on the un-dashed structure).
         $structure = $this->attachRawData($structure, $pdtId);
 
-        return $structure;
+        // Dash structural GUIDs for emission; _raw subtrees keep DB-native values.
+        return $this->dashGuids($structure);
     }
 
     private function attachRawData($structure, $pdtId)
@@ -262,7 +384,7 @@ class Iso23387Exporter
      */
     public function exportToXml($pdtId): string
     {
-        $structure = $this->buildLibraryStructure($pdtId);
+        $structure = $this->dashGuids($this->buildLibraryStructure($pdtId));
         return $this->structureToXml($structure);
     }
 
@@ -300,23 +422,32 @@ class Iso23387Exporter
         $groupsOfProperties = $this->loadGroupsOfProperties($pdt->Id);
         $properties = $this->loadPropertiesByPdt($pdt->Id);
 
-        // Include Master Data Template properties if this is not the Master itself
-        if ($pdt->GUID !== self::MASTER_PDT_GUID) {
+        // EN ISO 23387:2025 R-23387-7 inheritance: inline the groups + properties of every
+        // IsSubtypeOf ancestor (latest active), collapsed BY GUID LINEAGE (nearest/self wins).
+        // Master is now just the first ancestor on the chain (seeded as an IsSubtypeOf edge),
+        // no longer special-cased. Mirrors ProductdatatemplatesController::resolvePdtGroups so
+        // both exporters agree on a PDT's effective property/group set.
+        $ancestors = $this->relationshipService()->subtypeAncestors('pdt', $pdt->GUID);
+        if (empty($ancestors) && !$this->relationshipService()->relationsFrom('pdt', $pdt->GUID, EntityRelationship::REL_IS_SUBTYPE_OF)->count()
+            && $pdt->GUID !== self::MASTER_PDT_GUID) {
+            // Legacy fallback (store unseeded): original single-master merge.
             $masterPdt = $this->getLatestPdt(self::MASTER_PDT_GUID);
-
-            $masterGroupsOfProperties = $this->loadGroupsOfProperties($masterPdt->Id);
-            $masterProperties = $this->loadPropertiesByPdt($masterPdt->Id);
-            // Merge but keep unique GOPs/Properties based on ID
-            $groupsOfProperties = $groupsOfProperties
-                ->merge($masterGroupsOfProperties)
-                ->unique('Id')
-                ->values();
-
-            $properties = $properties
-                ->merge($masterProperties)
-                ->unique('Id')
-                ->values();
+            if ($masterPdt) {
+                $groupsOfProperties = $groupsOfProperties->merge($this->loadGroupsOfProperties($masterPdt->Id));
+                $properties = $properties->merge($this->loadPropertiesByPdt($masterPdt->Id));
+            }
+        } else {
+            foreach ($ancestors as $aGuid) {
+                $aPdt = DB::table('productdatatemplates')->where('GUID', $aGuid)->where('status', 'Active')
+                    ->orderByRaw('versionNumber DESC, revisionNumber DESC')->first();
+                if (!$aPdt) continue;
+                $groupsOfProperties = $groupsOfProperties->merge($this->loadGroupsOfProperties($aPdt->Id));
+                $properties = $properties->merge($this->loadPropertiesByPdt($aPdt->Id));
+            }
         }
+        // Collapse duplicates by GUID lineage (NOT by name, NOT by Id).
+        $groupsOfProperties = $groupsOfProperties->unique('GUID')->values();
+        $properties = $properties->unique('GUID')->values();
 
         $referenceDocuments = $this->loadReferenceDocuments($pdtId);
 
@@ -326,12 +457,11 @@ class Iso23387Exporter
             $objectType = $this->loadObjectType($pdt->constructionObjectGUID);
         }
 
+        // Per XSD, the Library element permits only a GUID attribute and Name/subject/etc.
+        // children — NOT dateOfCreation, URI, or Definition. Keep just GUID + Name.
         $library = [
             'dt:GUID' => $pdt->GUID,
-            'dateOfCreation' => $this->formatDate($pdt->dateOfVersion ?? $pdt->dateOfRevision),
             'Name' => $this->buildMultilingualNames($pdt->pdtNameEn, $pdt->pdtNamePt),
-            'Definition' => $this->buildMultilingualDefinitions($pdt->descriptionEn, $pdt->descriptionPt),
-            'URI' => 'https://pdts.pt/pdtview/' . $pdt->Id . '-' . $this->convertToPascalCase($pdt->pdtNamePt)
         ];
 
         $library['DataTemplates'] = [$this->buildDataTemplate($pdt, $groupsOfProperties, $properties)];
@@ -400,6 +530,13 @@ class Iso23387Exporter
             $template['DeprecationExplanation'] = $pdt->depreciationExplanation;
         }
 
+        // SubjectType relationships (R-23387-7): IsSubtypeOfRef (0..1) + HasPartRef (0..*),
+        // by referenceURI. Per XSD these come AFTER ConceptType elements and BEFORE the
+        // DataTemplate refs (HasObjectTypeRef/HasPropertyRef/HasGroupOfPropertiesRef).
+        $rel = $this->subjectRelationRefs('pdt', $pdt->GUID);
+        if ($rel['IsSubtypeOfRef']) $template['IsSubtypeOfRef'] = $rel['IsSubtypeOfRef'];
+        if (!empty($rel['HasPartRef'])) $template['HasPartRef'] = $rel['HasPartRef'];
+
         // FIX #1: ADD HasObjectTypeRef FIRST (before properties and groups)
         // Per XSD lines 170-172, order is: HasObjectTypeRef, HasPropertyRef, HasGroupOfPropertiesRef
         if ($pdt->constructionObjectGUID) {
@@ -423,7 +560,7 @@ class Iso23387Exporter
         // Attributes
         $template['dt:GUID'] = $pdt->GUID;
         $template['dateOfCreation'] = $this->formatDate($pdt->dateOfVersion ?? $pdt->dateOfRevision);
-        $template['URI'] = 'https://pdts.pt/pdtview/' . $pdt->Id . '-' . $this->convertToPascalCase($pdt->pdtNamePt);
+        // No URI attribute on the subject (XSD allows only GUID + dateOfCreation).
 
         return $template;
     }
@@ -481,16 +618,20 @@ class Iso23387Exporter
             $element['Status'] = $gop->status;
         }
 
+        // SubjectType relationships (R-23387-7): IsSubtypeOfRef/HasPartRef BEFORE HasPropertyRef.
+        $rel = $this->subjectRelationRefs('gop', $gop->GUID);
+        if ($rel['IsSubtypeOfRef']) $element['IsSubtypeOfRef'] = $rel['IsSubtypeOfRef'];
+        if (!empty($rel['HasPartRef'])) $element['HasPartRef'] = $rel['HasPartRef'];
+
         // REQUIRED for GroupOfProperties: HasPropertyRef (1..*)
         $propGuids = $this->getPropertyGuidsForGop($gop->Id);
         if (!empty($propGuids)) {
             $element['HasPropertyRef'] = $propGuids;
         }
 
-        // Attributes
+        // Attributes (XSD: only GUID + dateOfCreation on a subject — no URI).
         $element['dt:GUID'] = $gop->GUID;
         $element['dateOfCreation'] = $this->formatDate($gop->dateOfVersion);
-        $element['URI'] = 'https://pdts.pt/datadictionaryviewGOP/' . $gop->Id  . '-' . $this->convertToPascalCase($gop->gopNamePt);
 
         return $element;
     }
@@ -548,10 +689,9 @@ class Iso23387Exporter
             $element['Status'] = $prop->status;
         }
 
-        // REQUIRED: DataType (1..1) - XSD mandates this element
-        $dataTypeName = $prop->dataType && $prop->dataType !== '' ? $prop->dataType : 'STRING';
+        // REQUIRED: DataType (1..1). XSD enum: BOOLEAN|INTEGER|RATIONAL|REAL|COMPLEX|STRING|DATETIME.
         $element['DataType'] = [
-            'name' => $dataTypeName
+            'name' => $this->mapIsoDataType($prop->dataType ?? null)
         ];
 
         // OPTIONAL: DimensionRef (0..1)
@@ -564,10 +704,31 @@ class Iso23387Exporter
             $element['Units'] = $prop->units;
         }
 
-        // Attributes
+        // IsDependentOnRef (0..*, R-23387-8): one ReferenceType per target, by referenceURI.
+        // The XSD's IsDependentOnRef is a plain ReferenceType and CANNOT carry the kind or the
+        // function expression — so those live in JSON/API only (_dependencyDetails), not the XML.
+        $depRefs = [];
+        $depDetails = [];
+        foreach ($this->propertyDependencyService()->dependenciesFor($prop->GUID) as $d) {
+            $tDetails = [];
+            foreach ($d->targets as $t) {
+                $uri = $this->subjectUri('property', $t->targetPropertyGuid);
+                if (!$uri) continue;
+                $depRefs[] = ['referenceURI' => $uri];
+                $tDetails[] = ['referenceURI' => $uri, 'isPreferred' => (bool) $t->isPreferred, 'position' => $t->position];
+            }
+            $depDetails[] = ['dependencyKind' => $d->dependencyKind, 'expression' => $d->expression, 'targets' => $tDetails];
+        }
+        if (!empty($depRefs)) $element['IsDependentOnRef'] = $depRefs;
+        if (!empty($depDetails)) $element['_dependencyDetails'] = $depDetails; // JSON/API only
+
+        // IsSpecializationOfRef (0..1) — LAST per PropertyType sequence (R-23387-7).
+        $spec = $this->propertySpecializationRef($prop->GUID);
+        if ($spec) $element['IsSpecializationOfRef'] = $spec;
+
+        // Attributes (XSD ConceptType: only GUID + dateOfCreation + optional about — no referenceURI).
         $element['dt:GUID'] = $prop->GUID;
         $element['dateOfCreation'] = $this->formatDate($prop->dateOfVersion);
-        $element['referenceURI'] = 'https://pdts.pt/datadictionaryview/' . $prop->Id . '-' . $this->sanitizePascalCase($prop->namePt);
 
         return $element;
     }
@@ -959,6 +1120,11 @@ class Iso23387Exporter
             $element['Status'] = $objectType->status;
         }
 
+        // SubjectType relationships (R-23387-7): IsSubtypeOfRef/HasPartRef for object types.
+        $rel = $this->subjectRelationRefs('objecttype', $objectType->GUID);
+        if ($rel['IsSubtypeOfRef']) $element['IsSubtypeOfRef'] = $rel['IsSubtypeOfRef'];
+        if (!empty($rel['HasPartRef'])) $element['HasPartRef'] = $rel['HasPartRef'];
+
         // Attributes
         $element['dt:GUID'] = $objectType->GUID;
         $element['dateOfCreation'] = $this->formatDate($objectType->dateOfVersion ?? $objectType->dateOfRevision ?? $objectType->created_at ?? null);
@@ -1058,10 +1224,6 @@ class Iso23387Exporter
         if (isset($dtData['dateOfCreation'])) {
             $dt->setAttribute('dateOfCreation', $dtData['dateOfCreation']);
         }
-        if (isset($dtData['URI'])) {
-            $dt->setAttribute('URI', $dtData['URI']);
-        }
-
         // Name elements
         if (isset($dtData['Name'])) {
             foreach ($dtData['Name'] as $name) {
@@ -1113,38 +1275,53 @@ class Iso23387Exporter
             $this->appendTextElement($dom, $dt, 'DeprecationExplanation', $dtData['DeprecationExplanation']);
         }
 
+        // SubjectType relationships FIRST (per XSD: SubjectType content precedes DataTemplate content).
+        if (isset($dtData['IsSubtypeOfRef'])) {
+            $dt->appendChild($this->buildRefElement($dom, 'IsSubtypeOfRef', $dtData['IsSubtypeOfRef']));
+        }
+        if (isset($dtData['HasPartRef'])) {
+            foreach ($dtData['HasPartRef'] as $ref) {
+                $dt->appendChild($this->buildRefElement($dom, 'HasPartRef', $ref));
+            }
+        }
+
         // FIX: CORRECT ORDER - HasObjectTypeRef comes FIRST (per XSD line 170)
         if (isset($dtData['HasObjectTypeRef'])) {
-            $ref = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':HasObjectTypeRef');
-            $ref->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $dtData['HasObjectTypeRef']['dt:GUID']);
-            $dt->appendChild($ref);
+            $dt->appendChild($this->buildRefElement($dom, 'HasObjectTypeRef', $dtData['HasObjectTypeRef']));
         }
 
         // FIX: HasPropertyRef comes SECOND (per XSD line 171)
         if (isset($dtData['HasPropertyRef'])) {
             foreach ($dtData['HasPropertyRef'] as $ref) {
-                $refElem = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':HasPropertyRef');
-                $refElem->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $ref['dt:GUID']);
-                if (isset($ref['referenceURI'])) {
-                    $refElem->setAttribute('referenceURI', $ref['referenceURI']);
-                }
-                $dt->appendChild($refElem);
+                $dt->appendChild($this->buildRefElement($dom, 'HasPropertyRef', $ref));
             }
         }
 
         // FIX: HasGroupOfPropertiesRef comes THIRD (per XSD line 172)
         if (isset($dtData['HasGroupOfPropertiesRef'])) {
             foreach ($dtData['HasGroupOfPropertiesRef'] as $ref) {
-                $refElem = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':HasGroupOfPropertiesRef');
-                $refElem->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $ref['dt:GUID']);
-                if (isset($ref['referenceURI'])) {
-                    $refElem->setAttribute('referenceURI', $ref['referenceURI']);
-                }
-                $dt->appendChild($refElem);
+                $dt->appendChild($this->buildRefElement($dom, 'HasGroupOfPropertiesRef', $ref));
             }
         }
 
         return $dt;
+    }
+
+    /**
+     * Build a ReferenceType element with namespace-qualified dt:GUID and/or dt:referenceURI
+     * (both are global, qualified attributes in the ed-2 XSD). $ref may carry 'dt:GUID'
+     * and/or 'referenceURI'.
+     */
+    private function buildRefElement($dom, string $name, array $ref): DOMElement
+    {
+        $el = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':' . $name);
+        if (!empty($ref['dt:GUID'])) {
+            $el->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $ref['dt:GUID']);
+        }
+        if (!empty($ref['referenceURI'])) {
+            $el->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':referenceURI', $ref['referenceURI']);
+        }
+        return $el;
     }
 
     /**
@@ -1208,6 +1385,16 @@ class Iso23387Exporter
             $this->appendTextElement($dom, $objType, 'Status', $objTypeData['Status']);
         }
 
+        // SubjectType relationships (R-23387-7)
+        if (isset($objTypeData['IsSubtypeOfRef'])) {
+            $objType->appendChild($this->buildRefElement($dom, 'IsSubtypeOfRef', $objTypeData['IsSubtypeOfRef']));
+        }
+        if (isset($objTypeData['HasPartRef'])) {
+            foreach ($objTypeData['HasPartRef'] as $ref) {
+                $objType->appendChild($this->buildRefElement($dom, 'HasPartRef', $ref));
+            }
+        }
+
         return $objType;
     }
 
@@ -1223,9 +1410,6 @@ class Iso23387Exporter
         }
         if (isset($gopData['dateOfCreation'])) {
             $gop->setAttribute('dateOfCreation', $gopData['dateOfCreation']);
-        }
-        if (isset($gopData['URI'])) {
-            $gop->setAttribute('URI', $gopData['URI']);
         }
 
         // Name elements
@@ -1274,15 +1458,20 @@ class Iso23387Exporter
             $this->appendTextElement($dom, $gop, 'Status', $gopData['Status']);
         }
 
+        // SubjectType relationships FIRST (R-23387-7): before HasPropertyRef per XSD.
+        if (isset($gopData['IsSubtypeOfRef'])) {
+            $gop->appendChild($this->buildRefElement($dom, 'IsSubtypeOfRef', $gopData['IsSubtypeOfRef']));
+        }
+        if (isset($gopData['HasPartRef'])) {
+            foreach ($gopData['HasPartRef'] as $ref) {
+                $gop->appendChild($this->buildRefElement($dom, 'HasPartRef', $ref));
+            }
+        }
+
         // HasPropertyRef
         if (isset($gopData['HasPropertyRef'])) {
             foreach ($gopData['HasPropertyRef'] as $ref) {
-                $refElem = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':HasPropertyRef');
-                $refElem->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $ref['dt:GUID']);
-                if (isset($ref['referenceURI'])) {
-                    $refElem->setAttribute('referenceURI', $ref['referenceURI']);
-                }
-                $gop->appendChild($refElem);
+                $gop->appendChild($this->buildRefElement($dom, 'HasPropertyRef', $ref));
             }
         }
 
@@ -1301,9 +1490,6 @@ class Iso23387Exporter
         }
         if (isset($propData['dateOfCreation'])) {
             $prop->setAttribute('dateOfCreation', $propData['dateOfCreation']);
-        }
-        if (isset($propData['referenceURI'])) {
-            $prop->setAttribute('referenceURI', $propData['referenceURI']);
         }
 
         // Name elements
@@ -1345,30 +1531,34 @@ class Iso23387Exporter
             $this->appendTextElement($dom, $prop, 'Status', $propData['Status']);
         }
 
-        // DataType
+        // ReferenceDocumentRef is a ConceptType element — must precede DataType (XSD order).
+        if (isset($propData['ReferenceDocumentRef'])) {
+            $prop->appendChild($this->buildRefElement($dom, 'ReferenceDocumentRef', $propData['ReferenceDocumentRef']));
+        }
+
+        // DataType (required, 1..1)
         if (isset($propData['DataType'])) {
             $dataType = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':DataType');
             $dataType->setAttribute('name', $propData['DataType']['name']);
             $prop->appendChild($dataType);
         }
 
-        // dimension
-
-        if (isset($propData['Dimension'])) {
-            $this->appendTextElement($dom, $prop, 'Dimension', $propData['Dimension']);
+        // IsDependentOnRef (0..*, R-23387-8) — in the PropertyType choice, after DataType
+        // and before IsSpecializationOfRef. (_dependencyDetails is JSON-only, not emitted here.)
+        if (isset($propData['IsDependentOnRef'])) {
+            foreach ($propData['IsDependentOnRef'] as $ref) {
+                $prop->appendChild($this->buildRefElement($dom, 'IsDependentOnRef', $ref));
+            }
         }
 
-        // ReferenceDocumentRef
-        if (isset($propData['ReferenceDocumentRef'])) {
-            $ref = $dom->createElementNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':ReferenceDocumentRef');
-            $ref->setAttributeNS(self::NAMESPACE_URI, self::NAMESPACE_PREFIX . ':GUID', $propData['ReferenceDocumentRef']['dt:GUID']);
-            $prop->appendChild($ref);
+        // IsSpecializationOfRef (0..1) — LAST in PropertyType sequence (R-23387-7).
+        if (isset($propData['IsSpecializationOfRef'])) {
+            $prop->appendChild($this->buildRefElement($dom, 'IsSpecializationOfRef', $propData['IsSpecializationOfRef']));
         }
 
-        // Units
-        if (isset($propData['Units'])) {
-            $this->appendTextElement($dom, $prop, 'Units', $propData['Units']);
-        }
+        // NOTE: legacy 'Dimension'/'Units' text elements were not valid PropertyType
+        // children per the XSD (need DimensionRef/UnitRef ReferenceType) and are omitted
+        // here for compliance; revisit when unit/dimension dictionaries are exported.
 
         return $prop;
     }
@@ -1406,14 +1596,14 @@ class Iso23387Exporter
             $this->appendTextElement($dom, $refDoc, 'Status', $refDocData['Status']);
         }
 
-        // URI
-        if (isset($refDocData['URI'])) {
-            $this->appendTextElement($dom, $refDoc, 'URI', $refDocData['URI']);
-        }
-
-        // Language
+        // Language (1..*) MUST precede URI per ReferenceDocumentType sequence.
         if (isset($refDocData['Language'])) {
             $this->appendTextElement($dom, $refDoc, 'Language', $refDocData['Language']);
+        }
+
+        // URI (0..1) — last in the sequence.
+        if (isset($refDocData['URI'])) {
+            $this->appendTextElement($dom, $refDoc, 'URI', $refDocData['URI']);
         }
 
         return $refDoc;

@@ -132,6 +132,36 @@ class RelationshipService
             ->first();
     }
 
+    /**
+     * Ordered IsSubtypeOf ancestor lineage GUIDs for a source (nearest parent first),
+     * walking the full transitive chain (A->B->C returns [B, C]). Same-kind only
+     * (PDT->PDT, GOP->GOP, ObjectType->ObjectType). Cycle-guarded: stops if a GUID
+     * repeats. IsSubtypeOf is 0..1 so each hop has at most one parent.
+     *
+     * This is the generalization of the old single-master merge: master is now just
+     * the first ancestor on this chain (seeded as an IsSubtypeOf edge in Phase 1).
+     */
+    public function subtypeAncestors(string $entityType, string $guid): array
+    {
+        $out = [];
+        $seen = [$guid => true];
+        $current = $guid;
+        while (true) {
+            $edge = EntityRelationship::where('sourceEntityType', $entityType)
+                ->where('sourceGuid', $current)
+                ->where('relationType', EntityRelationship::REL_IS_SUBTYPE_OF)
+                ->where('targetEntityType', $entityType)
+                ->first();
+            if (!$edge) break;
+            $t = $edge->targetGuid;
+            if (isset($seen[$t])) break; // cycle guard
+            $seen[$t] = true;
+            $out[] = $t;
+            $current = $t;
+        }
+        return $out;
+    }
+
     // ---------------------------------------------------------------- internals
 
     private function assertEntityType(string $t): void

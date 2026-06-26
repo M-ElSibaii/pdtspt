@@ -532,7 +532,8 @@ class DictionaryDedupeService
                 'pdt.versionNumber as _pdtVersion',
                 'pdt.revisionNumber as _pdtRevision',
                 'gop.gopNameEn as _gopNameEn',
-                'gop.gopNamePt as _gopNamePt'
+                'gop.gopNamePt as _gopNamePt',
+                'd.namePt as _dictNamePtByPropertyId'
             )
             ->get();
     }

@@ -777,32 +777,30 @@ class ProductdatatemplatesController extends Controller
             'Properties'                => [],
         ];
 
-        $masterPdt = $this->loadLatestActiveMasterPdt();
-        $masterGroups = [];
-        if ($masterPdt) {
-            $masterGroups = groupofproperties::where('pdtId', $masterPdt->Id)->get();
-        }
-
         // Disambiguate PDT codes if two PDTs PascalCase to the same string.
         $seenPdtCodes = [];
         $seenGroupGuids = [];
 
-        // Iterate the MASTER PDT first so its own GOP classes are emitted (and
-        // parented to the master) before any child references the same-GUID
-        // groups and hits the already-seen guard. Otherwise a master group would
-        // get ParentClassCode = whichever child happened to be iterated first.
-        usort($productDataTemplates, function ($a, $b) {
-            $aMaster = ($a->GUID === self::MASTER_PDT_GUID) ? 0 : 1;
-            $bMaster = ($b->GUID === self::MASTER_PDT_GUID) ? 0 : 1;
-            return $aMaster <=> $bMaster;
-        });
+        // Emit ANCESTORS before descendants (parents-before-children) so an inherited
+        // GOP class is parented to the ancestor that owns it, not whichever child first
+        // references the same-GUID group. Depth = number of IsSubtypeOf ancestors; roots
+        // (incl. master, depth 0) sort first. Generalizes the old master-first rule.
+        $seeded = $this->pdtSubtypeStoreSeeded();
+        $svc = $this->relationshipService();
+        $depth = [];
+        foreach ($productDataTemplates as $p) {
+            $depth[$p->GUID] = $seeded
+                ? count($svc->subtypeAncestors(\App\Models\EntityRelationship::TYPE_PDT, $p->GUID))
+                : ($p->GUID === self::MASTER_PDT_GUID ? 0 : 1);
+        }
+        usort($productDataTemplates, fn($a, $b) => ($depth[$a->GUID] ?? 0) <=> ($depth[$b->GUID] ?? 0));
 
         foreach ($productDataTemplates as $pdt) {
-            [$pdtClass, $pdtCode] = $this->transformProductDataTemplatePSETS($pdt, $masterPdt, $masterGroups, $seenPdtCodes);
+            [$pdtClass, $pdtCode] = $this->transformProductDataTemplatePSETS($pdt, $seenPdtCodes);
             $jsonData['Classes'][] = $pdtClass;
 
-            // Emit each of this PDT's groups as its own GroupOfProperties class.
-            $groups = $this->resolvePdtGroups($pdt, $masterPdt, $masterGroups);
+            // Emit each of this PDT's (inherited) groups as its own GroupOfProperties class.
+            $groups = $this->resolvePdtGroups($pdt);
             foreach ($groups as $group) {
                 $gopGuid = is_array($group) ? ($group['GUID'] ?? null) : ($group->GUID ?? null);
                 // One GOP class per group GUID across the whole export.
@@ -823,7 +821,7 @@ class ProductdatatemplatesController extends Controller
     /**
      * @return array{0: array, 1: string}  [classData, pdtCode]
      */
-    private function transformProductDataTemplatePSETS($pdt, $masterPdt, $masterGroups, array &$seenPdtCodes)
+    private function transformProductDataTemplatePSETS($pdt, array &$seenPdtCodes)
     {
         $code = self::convertToPascalCase($pdt->pdtNamePt) ?: ('Pdt' . $pdt->Id);
         if (isset($seenPdtCodes[$code])) {
@@ -854,8 +852,8 @@ class ProductdatatemplatesController extends Controller
         ];
 
         // Attach every property (deduped by dict GUID within this class) to the PDT,
-        // with PropertySet = the group it belongs to.
-        $groups = $this->resolvePdtGroups($pdt, $masterPdt, $masterGroups);
+        // with PropertySet = the group it belongs to. Groups include inherited ones.
+        $groups = $this->resolvePdtGroups($pdt);
         $classData['ClassProperties'] = $this->buildClassPropertiesForGroups($groups, $code);
 
         // Subtype/parent links. Read from the generic relationship store (R-23387-7);
@@ -959,20 +957,57 @@ class ProductdatatemplatesController extends Controller
         return $merged;
     }
 
-    /**
-     * Resolve the (possibly master-merged) group list for a PDT, as objects/arrays.
-     */
-    private function resolvePdtGroups($pdt, $masterPdt, $masterGroups)
+    private ?\App\Services\RelationshipService $relSvc = null;
+    private function relationshipService(): \App\Services\RelationshipService
     {
-        $groups = groupofproperties::where('pdtId', $pdt->Id)->get();
-        if ($masterPdt && $pdt->GUID !== self::MASTER_PDT_GUID) {
-            $groups = $this->mergeMasterGroupsForPsets(
-                $groups->toArray(),
-                $masterGroups instanceof \Illuminate\Database\Eloquent\Collection ? $masterGroups->toArray() : $masterGroups,
-                $pdt->Id
-            );
+        return $this->relSvc ??= new \App\Services\RelationshipService();
+    }
+
+    /**
+     * Resolve a PDT's effective group list = its own groups + the groups inherited
+     * from every IsSubtypeOf ancestor (latest active), collapsed by GOP GUID lineage
+     * (nearest/self wins). This is the general R-23387-7 inheritance rule; the master
+     * is now just the first ancestor on the chain (seeded as an IsSubtypeOf edge).
+     *
+     * Collapse is BY GUID ONLY — never by name. Two same-named groups with different
+     * GUIDs are different groups and both remain (see the GOP name-collision report).
+     *
+     * Legacy fallback: when the relationship store has no PDT IsSubtypeOf edge, falls
+     * back to the original single-master merge so behaviour is unchanged pre-seed.
+     */
+    private function resolvePdtGroups($pdt)
+    {
+        $selfGroups = groupofproperties::where('pdtId', $pdt->Id)->get()->toArray();
+
+        if (!$this->pdtSubtypeStoreSeeded()) {
+            $master = $this->loadLatestActiveMasterPdt();
+            if ($master && $pdt->GUID !== self::MASTER_PDT_GUID) {
+                $masterGroups = groupofproperties::where('pdtId', $master->Id)->get()->toArray();
+                return $this->mergeMasterGroupsForPsets($selfGroups, $masterGroups, $pdt->Id);
+            }
+            return $selfGroups;
         }
-        return $groups;
+
+        $merged = [];
+        $seenGuids = [];
+        $append = function ($groups) use (&$merged, &$seenGuids) {
+            foreach ($groups as $g) {
+                $guid = is_array($g) ? ($g['GUID'] ?? null) : ($g->GUID ?? null);
+                if ($guid !== null && isset($seenGuids[$guid])) continue; // collapse by GUID lineage
+                if ($guid !== null) $seenGuids[$guid] = true;
+                $merged[] = $g;
+            }
+        };
+        $append($selfGroups);
+
+        foreach ($this->relationshipService()->subtypeAncestors(\App\Models\EntityRelationship::TYPE_PDT, $pdt->GUID) as $aGuid) {
+            $aPdt = DB::table('productdatatemplates')
+                ->where('GUID', $aGuid)->where('status', 'Active')
+                ->orderByRaw('versionNumber DESC, revisionNumber DESC')->first();
+            if (!$aPdt) continue;
+            $append(groupofproperties::where('pdtId', $aPdt->Id)->get()->toArray());
+        }
+        return $merged;
     }
 
     /**

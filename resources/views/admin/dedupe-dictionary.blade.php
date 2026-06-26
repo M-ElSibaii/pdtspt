@@ -112,10 +112,10 @@
                                             <div class="dd-prop border rounded p-3 bg-gray-50" data-property-id="{{ $p->Id }}">
                                                 <div class="flex flex-wrap gap-x-4 gap-y-1 items-baseline mb-2">
                                                     <span class="font-semibold">
-                                                        PDT: {{ $p->_pdtNamePt ?: $p->_pdtNameEn ?: '—' }}
-                                                        <span class="text-gray-500">(Id={{ $p->pdtID }}@if(isset($p->_pdtVersion)) · v{{ $p->_pdtVersion }}.{{ $p->_pdtRevision }}@endif)</span>
+                                                        {{ $p->_dictNameByPropertyId ?: '—' }} <span class="text-gray-400">/</span> {{ $p->_dictNamePtByPropertyId ?: ($p->_dictNameByPropertyId ?: '—') }}
                                                     </span>
-                                                    <span class="text-gray-600">Group: {{ $p->_gopNamePt ?: $p->_gopNameEn ?: '—' }} (Id={{ $p->gopID }})</span>
+                                                    <span class="text-gray-600">PDT: {{ $p->_pdtNameEn ?: ($p->_pdtNamePt ?: '—') }} <span class="text-gray-400">/</span> {{ $p->_pdtNamePt ?: ($p->_pdtNameEn ?: '—') }} (Id={{ $p->pdtID }}@if(isset($p->_pdtVersion)) · v{{ $p->_pdtVersion }}.{{ $p->_pdtRevision }}@endif)</span>
+                                                    <span class="text-gray-600">Group: {{ $p->_gopNameEn ?: ($p->_gopNamePt ?: '—') }} <span class="text-gray-400">/</span> {{ $p->_gopNamePt ?: ($p->_gopNameEn ?: '—') }} (Id={{ $p->gopID }})</span>
                                                     <span class="text-gray-500">properties.Id={{ $p->Id }} · propertyId={{ $p->propertyId }}</span>
                                                 </div>
                                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">

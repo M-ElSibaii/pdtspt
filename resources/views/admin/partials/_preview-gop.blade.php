@@ -57,6 +57,7 @@
                     </div>
                     @if (!empty($dictVals['GUID']))
                         <x-relation-editor entity-type="property" :guid="$dictVals['GUID']" title="Property relationships (EN ISO 23387)" />
+                        <x-property-dependency-editor :guid="$dictVals['GUID']" />
                     @endif
                 </details>
             </div>

@@ -27,6 +27,10 @@
                 </div>
             </div>
 
+            {{-- Relationships ARE editable on an Active PDT: GUID-lineage, so they apply
+                 across versions and need no new draft/version. --}}
+            <x-relation-editor entity-type="pdt" :guid="$pdt->GUID" title="Template relationships (editable on Active)" />
+
             @foreach ($gops as $gop)
                 <div class="mt-4 border rounded shadow-sm">
                     <div class="px-4 py-2 border-b bg-slate-50 flex flex-wrap items-center gap-2">
@@ -40,6 +44,8 @@
                                 @include('admin.partials._attr-fields', ['fields' => $gopFields, 'values' => (array) $gop, 'prefix' => 'gop' . $gop->Id, 'idAttr' => 'gop' . $gop->Id, 'editableOverride' => []])
                             </div>
                         </details>
+
+                        <x-relation-editor entity-type="gop" :guid="$gop->GUID" title="Group relationships (editable on Active)" />
 
                         <div class="mt-3 font-semibold text-sm">Properties</div>
                         @foreach ($contextByGop->get($gop->Id, collect()) as $c)

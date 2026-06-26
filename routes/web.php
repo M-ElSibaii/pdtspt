@@ -16,6 +16,7 @@ use App\Http\Controllers\ActivePdtEditController;
 use App\Http\Controllers\PropertyPickerController;
 use App\Http\Controllers\AdminLookupController;
 use App\Http\Controllers\RelationshipController;
+use App\Http\Controllers\PropertyDependencyController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -203,6 +204,11 @@ Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
     Route::post('/admin/relations', [RelationshipController::class, 'store'])->name('admin.relations.store');
     Route::post('/admin/relations/reorder', [RelationshipController::class, 'reorder'])->name('admin.relations.reorder');
     Route::delete('/admin/relations/{id}', [RelationshipController::class, 'destroy'])->whereNumber('id')->name('admin.relations.destroy');
+
+    // Property dependencies (EN ISO 23387:2025 R-23387-8).
+    Route::get('/admin/property-dependencies/{guid}', [PropertyDependencyController::class, 'index'])->name('admin.propdeps.index')->where('guid', '[0-9a-fA-F]{32}');
+    Route::post('/admin/property-dependencies', [PropertyDependencyController::class, 'store'])->name('admin.propdeps.store');
+    Route::delete('/admin/property-dependencies/{id}', [PropertyDependencyController::class, 'destroy'])->whereNumber('id')->name('admin.propdeps.destroy');
 
     // CREATE mode: new PDT from a construction object (select/create) -> Preview draft.
     Route::get('/admin/pdt/create', [PdtCreateController::class, 'create'])->name('admin.pdt.create');
