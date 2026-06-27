@@ -60,8 +60,8 @@
                             @foreach($group as $propertyGroup)
                             @foreach($joined_properties as $property)
                             @if($property->gopID == $propertyGroup->Id)
-                            <!-- Apply the 'master-template-row' class if the property is from master template -->
-                            <tr class="{{ $property->from_master ? 'master-template-row' : '' }}">
+                            <!-- Row colour-coded by inheritance source (IsSubtypeOf chain); see legend under the table -->
+                            <tr @if($property->is_inherited && isset($sourceColors[$property->inherited_from])) style="background-color: {{ $sourceColors[$property->inherited_from] }};" @endif>
                                <td class="p-1.5 property-td">
     @if(!is_null($property->relationToOtherDataDictionaries))
         @php
@@ -141,7 +141,19 @@
                         @endforeach
                     </table>
                 </div>
-                <h6 style="padding-top: 5px"> Nota: As propriedades do modelo de dados mestre são destacadas a cinzento </h6>
+                @if(!empty($inheritedFrom))
+                <div style="padding-top: 8px; font-size: 0.85rem;">
+                    <strong>Código de cores — origem das propriedades (relação IsSubtypeOf):</strong>
+                    <div style="display:flex; flex-wrap:wrap; gap:14px; margin-top:6px; align-items:center;">
+                        <span><span style="display:inline-block; width:16px; height:16px; border:1px solid #cbd5e1; background:#ffffff; vertical-align:middle; margin-right:4px;"></span>Próprio (deste modelo)</span>
+                        @foreach($inheritedFrom as $src)
+                        <span><span style="display:inline-block; width:16px; height:16px; border:1px solid #cbd5e1; background:{{ $sourceColors[$src] }}; vertical-align:middle; margin-right:4px;"></span>Herdado de: {{ $src }}</span>
+                        @endforeach
+                    </div>
+                </div>
+                @else
+                <h6 style="padding-top: 5px"> Nota: Este modelo de dados não herda propriedades de supertipos. </h6>
+                @endif
 
                 <div class="my-6 text-end">
                     <a href="/dashboard">
@@ -160,6 +172,7 @@
         <th style="width: 7%;">Unidade</th>
         <th style="width: 40%;">Descrição</th>
         <th style="width: 16%;">Documento de referência</th>
+        <th>Origem</th>
     </tr>
     @foreach($sorted_combined_groups as $group)
     @foreach($group as $propertyGroup)
@@ -201,6 +214,7 @@
                     n/a
                 @endif
             </td>
+            <td>{{ $property->is_inherited ? ('Herdado de: ' . $property->inherited_from) : 'Próprio' }}</td>
         </tr>
 
     @endif

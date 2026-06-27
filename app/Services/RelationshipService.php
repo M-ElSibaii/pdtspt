@@ -55,19 +55,25 @@ class RelationshipService
         $this->assertLineageExists($sourceEntityType, $sourceGuid);
         $this->assertLineageExists($targetEntityType, $targetGuid);
 
-        // Idempotency: reuse an existing live edge.
-        $existing = EntityRelationship::where([
+        // Find any existing edge INCLUDING soft-deleted ones. The unique DB index covers
+        // trashed rows too, so a previously-removed edge must be RESTORED rather than
+        // re-inserted (otherwise the insert hits the unique constraint and the user can't
+        // re-add a relation they once removed).
+        $existing = EntityRelationship::withTrashed()->where([
             'sourceEntityType' => $sourceEntityType,
             'sourceGuid'       => $sourceGuid,
             'relationType'     => $relationType,
             'targetEntityType' => $targetEntityType,
             'targetGuid'       => $targetGuid,
         ])->first();
-        if ($existing) {
+
+        // Already live -> idempotent.
+        if ($existing && !$existing->trashed()) {
             return $existing;
         }
 
-        // 0..1 cardinality for subtype/specialization.
+        // 0..1 cardinality for subtype/specialization — count only LIVE edges (a trashed
+        // row, including the one we may be about to restore, must not block).
         if (in_array($relationType, EntityRelationship::SINGLE_PARENT_RELATIONS, true)) {
             $count = EntityRelationship::where([
                 'sourceEntityType' => $sourceEntityType,
@@ -88,6 +94,18 @@ class RelationshipService
                 "Adding {$relationType} {$sourceEntityType}:{$sourceGuid} -> "
                 . "{$targetEntityType}:{$targetGuid} would create a cycle."
             );
+        }
+
+        // Restore + refresh a previously-removed edge, or create a fresh one.
+        if ($existing) {
+            $existing->restore();
+            $existing->fill([
+                'targetVersionNumber'  => $targetVersionNumber,
+                'targetRevisionNumber' => $targetRevisionNumber,
+                'position'             => $position,
+                'note'                 => $note,
+            ])->save();
+            return $existing;
         }
 
         return EntityRelationship::create([

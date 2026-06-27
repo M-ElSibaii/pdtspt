@@ -95,8 +95,8 @@
                                 <th>Grupos de Propriedades</th>
                                 <td>
                                     {{ count($groupsOfProperties) }} grupos
-                                    @if($masterPropertiesCount > 0)
-                                    <br/><small style="color: #666;">+ Grupos de Propriedades do Master Data Template</small>
+                                    @if($inheritedGroupCount > 0)
+                                    <br/><small style="color: #666;">(inclui {{ $inheritedGroupCount }} herdado(s) de supertipos — IsSubtypeOf)</small>
                                     @endif
                                 </td>
                             </tr>
@@ -124,10 +124,8 @@
                     </tbody>
                 </table>
 
-                @if (Auth::check() && Auth::user()->isAdmin == 1 && $objectType)
-                    {{-- Object Type relationships (EN ISO 23387 R-23387-7), admin-editable. --}}
-                    <x-relation-editor entity-type="objecttype" :guid="$objectType->GUID" title="Object Type relationships ({{ $objectType->constructionObjectNamePt }})" />
-                @endif
+                {{-- Relationship EDITING lives in the limited-edit / preview editors, not on
+                     this public view. This page only DISPLAYS the subtype line (read-only). --}}
 
                 <br>
                      <form class="mb-3" action="{{ route('pdtsdownload', ['pdtID' => $pdt->Id]) }}">

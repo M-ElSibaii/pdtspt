@@ -107,29 +107,17 @@ class ProductdatatemplatesController extends Controller
     {
         $pdt = productdatatemplates::where('Id', $id)->firstOrFail();
 
-        // Load related data
-        $groupsOfProperties = groupofproperties::where('pdtId', $id)->get();
+        // Effective groups = own + inherited from IsSubtypeOf ancestors (transitive,
+        // collapsed by GUID), via the shared resolver — so the page matches the exports.
+        $ownGroupCount = groupofproperties::where('pdtId', $id)->count();
+        $groupsOfProperties = (new \App\Services\PdtInheritanceService())->groups($pdt);
+        $inheritedGroupCount = $groupsOfProperties->count() - $ownGroupCount;
         $pdtVersions = productdatatemplates::where('GUID', $pdt->GUID)->get();
 
         // Load ObjectType if exists
         $objectType = null;
         if ($pdt->constructionObjectGUID) {
             $objectType = constructionobjects::where('GUID', $pdt->constructionObjectGUID)->first();
-        }
-
-        // Load Master properties info (count)
-        $masterPropertiesCount = 0;
-        if ($pdt->GUID !== '230d9954097541b793f2a1fddb8bd0ad') {
-            $masterPdt = productdatatemplates::where('GUID', '230d9954097541b793f2a1fddb8bd0ad')
-                ->orderByRaw('versionNumber DESC, revisionNumber DESC')
-                ->first();
-            if ($masterPdt) {
-                $masterPropertiesCount = DB::table('properties')
-                    ->where('pdtID', $masterPdt->Id)
-                    ->select('GUID')
-                    ->distinct()
-                    ->count();
-            }
         }
 
         // Subtype/parent relations (EN ISO 23387:2025 R-23387-7), read-only display.
@@ -146,7 +134,7 @@ class ProductdatatemplatesController extends Controller
             }
         }
 
-        return view('pdtview', compact('pdt', 'groupsOfProperties', 'pdtVersions', 'objectType', 'masterPropertiesCount', 'subtypeParents'));
+        return view('pdtview', compact('pdt', 'groupsOfProperties', 'pdtVersions', 'objectType', 'inheritedGroupCount', 'subtypeParents'));
     }
 
 

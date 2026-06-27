@@ -40,13 +40,11 @@ class GroupofpropertiesController extends Controller
             ->orderBy('versionNumber', 'desc')
             ->orderBy('revisionNumber', 'desc')
             ->first();
-        $pdt_groups = groupofproperties::where('pdtId', $pdtID)->get();
-        // Don't inject the master's groups when the viewed PDT IS the master (any version):
-        // it already contains them, and injecting the LATEST master on top of an OLDER master
-        // version duplicated every group/property. Non-master PDTs still get the common groups.
-        $master_groups = ($pdtGUID === '230d9954097541b793f2a1fddb8bd0ad')
-            ? collect()
-            : groupofproperties::where('pdtId', $masterpdt->Id)->get();
+        // Effective groups = own + inherited from every IsSubtypeOf ancestor (transitive,
+        // collapsed by GUID) via the shared resolver — so the download/review page reflects
+        // the same inheritance as the bSDD and ISO exports (R-23387-7). The master is just
+        // one ancestor on that chain now.
+        $inherited_groups = (new \App\Services\PdtInheritanceService())->groups($pdt);
 
         $properties = properties::where('pdtID', $pdtID)->get();
         $properties_dict = propertiesdatadictionaries::all();
@@ -74,12 +72,39 @@ class GroupofpropertiesController extends Controller
             'properties.visualRepresentation'
         )->get();
 
-        $joined_properties->each(function ($property) use ($masterpdt) {
+        // Attribute every group to its owning PDT: own (this PDT) vs inherited from a
+        // specific supertype in the IsSubtypeOf chain. A property's source follows the group
+        // it appears under (gopID), so two supertypes in the chain are each named distinctly
+        // — not lumped as "master". Builds $gopSource[gopId] and the ordered $inheritedFrom list.
+        $ownGopIds = groupofproperties::where('pdtId', $pdtID)->pluck('Id')->flip();
+        $pdtNameCache = [];
+        $gopSource = [];
+        foreach ($inherited_groups as $g) {
+            $isOwn = isset($ownGopIds[$g->Id]);
+            $name = null;
+            if (!$isOwn) {
+                if (!array_key_exists($g->pdtId, $pdtNameCache)) {
+                    $owner = productdatatemplates::where('Id', $g->pdtId)->first();
+                    $pdtNameCache[$g->pdtId] = $owner ? ($owner->pdtNamePt ?: $owner->pdtNameEn) : 'Supertipo';
+                }
+                $name = $pdtNameCache[$g->pdtId];
+            }
+            $gopSource[$g->Id] = ['inherited' => !$isOwn, 'name' => $name];
+        }
+        // Ordered, de-duplicated list of supertypes that actually contributed groups.
+        $inheritedFrom = collect($gopSource)->filter(fn($s) => $s['inherited'])
+            ->pluck('name')->filter()->unique()->values()->all();
+        $sourceColors = \App\Services\PdtInheritanceService::sourceColors($inheritedFrom);
+
+        $joined_properties->each(function ($property) use ($gopSource, $masterpdt) {
+            $src = $gopSource[$property->gopID] ?? null;
+            $property->is_inherited   = $src ? $src['inherited'] : false;
+            $property->inherited_from = $src ? $src['name'] : null;
+            // Kept for any legacy consumers.
             $property->from_master = ($property->pdtID == $masterpdt->Id);
         });
 
-        $merged_groups = $pdt_groups->merge($master_groups);
-        $combined_groups = $merged_groups->groupBy('gopNamePt');
+        $combined_groups = $inherited_groups->groupBy('gopNamePt');
 
         $group_order = [
             'Dados de classificação',
@@ -107,7 +132,7 @@ class GroupofpropertiesController extends Controller
             return 0; // Default ordering for others
         });
 
-        return view('pdtsdownload', compact('sorted_combined_groups', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'latestPdt'));
+        return view('pdtsdownload', compact('sorted_combined_groups', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'latestPdt', 'inheritedFrom', 'sourceColors'));
     }
 
 
@@ -139,13 +164,10 @@ class GroupofpropertiesController extends Controller
             ->orderBy('versionNumber', 'desc')
             ->orderBy('revisionNumber', 'desc')
             ->first();
-        $pdt_groups = groupofproperties::where('pdtId', $pdtID)->get();
-        // Don't inject the master's groups when the viewed PDT IS the master (any version):
-        // it already contains them, and injecting the LATEST master on top of an OLDER master
-        // version duplicated every group/property. Non-master PDTs still get the common groups.
-        $master_groups = ($pdtGUID === '230d9954097541b793f2a1fddb8bd0ad')
-            ? collect()
-            : groupofproperties::where('pdtId', $masterpdt->Id)->get();
+        // Effective groups = own + inherited from every IsSubtypeOf ancestor (transitive,
+        // collapsed by GUID) via the shared resolver — same inheritance as the exports
+        // (R-23387-7). Master is just one ancestor on that chain.
+        $inherited_groups = (new \App\Services\PdtInheritanceService())->groups($pdt);
 
         // Get all properties linked to the PDT
         $properties = properties::where('pdtID', $pdtID)->get();
@@ -176,16 +198,36 @@ class GroupofpropertiesController extends Controller
         )
             ->get();
 
-        // Mark properties from the master template with `from_master` flag
-        $joined_properties->each(function ($property) use ($masterpdt) {
-            $property->from_master = ($property->pdtID == $masterpdt->Id); // Set true if from master, false otherwise
+        // Attribute groups to own vs each IsSubtypeOf supertype (same as the download page),
+        // for colour-coded rows + a colour legend.
+        $ownGopIds = groupofproperties::where('pdtId', $pdtID)->pluck('Id')->flip();
+        $pdtNameCache = [];
+        $gopSource = [];
+        foreach ($inherited_groups as $g) {
+            $isOwn = isset($ownGopIds[$g->Id]);
+            $name = null;
+            if (!$isOwn) {
+                if (!array_key_exists($g->pdtId, $pdtNameCache)) {
+                    $owner = productdatatemplates::where('Id', $g->pdtId)->first();
+                    $pdtNameCache[$g->pdtId] = $owner ? ($owner->pdtNamePt ?: $owner->pdtNameEn) : 'Supertipo';
+                }
+                $name = $pdtNameCache[$g->pdtId];
+            }
+            $gopSource[$g->Id] = ['inherited' => !$isOwn, 'name' => $name];
+        }
+        $inheritedFrom = collect($gopSource)->filter(fn($s) => $s['inherited'])
+            ->pluck('name')->filter()->unique()->values()->all();
+        $sourceColors = \App\Services\PdtInheritanceService::sourceColors($inheritedFrom);
+
+        $joined_properties->each(function ($property) use ($gopSource, $masterpdt) {
+            $src = $gopSource[$property->gopID] ?? null;
+            $property->is_inherited   = $src ? $src['inherited'] : false;
+            $property->inherited_from = $src ? $src['name'] : null;
+            $property->from_master = ($property->pdtID == $masterpdt->Id); // legacy
         });
 
-        // Merge PDT and Master Groups
-        $merged_groups = $pdt_groups->merge($master_groups);
-
         // Combine groups with similar names by grouping by gopNamePt
-        $combinedGroups = $merged_groups->groupBy('gopNamePt');
+        $combinedGroups = $inherited_groups->groupBy('gopNamePt');
 
         $group_order = [
             'Dados de classificação',
@@ -219,7 +261,7 @@ class GroupofpropertiesController extends Controller
         $answers = Answers::where('users_id', Auth::id())->get();
 
 
-        return view('pdtssurvey', compact('combined_groups', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'comments', 'answers', 'properties', 'latestPdt'));
+        return view('pdtssurvey', compact('combined_groups', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'comments', 'answers', 'properties', 'latestPdt', 'inheritedFrom', 'sourceColors'));
     }
 
 
