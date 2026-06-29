@@ -64,6 +64,6 @@
         @endforeach
 
         {{-- Add properties (reworked picker) --}}
-        @include('admin.partials._property-picker', ['gopId' => $gop->Id, 'gopNameEn' => $gop->gopNameEn, 'dictFields' => $dictFields, 'dictEnums' => $dictEnums])
+        @include('admin.partials._property-picker', ['gopId' => $gop->Id, 'gopNameEn' => $gop->gopNameEn, 'gopNamePt' => $gop->gopNamePt, 'dictFields' => $dictFields, 'dictEnums' => $dictEnums])
     </div>
 </div>

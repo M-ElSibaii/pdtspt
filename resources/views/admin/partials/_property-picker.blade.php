@@ -1,5 +1,5 @@
 {{-- Reworked property picker for one GOP. Expects $gopId and $dictFields. --}}
-<div class="js-picker border rounded p-3 bg-white mt-3" data-gop-id="{{ $gopId }}" data-gop-name="{{ $gopNameEn }}">
+<div class="js-picker border rounded p-3 bg-white mt-3" data-gop-id="{{ $gopId }}" data-gop-name="{{ $gopNameEn }}" data-gop-name-pt="{{ $gopNamePt ?? '' }}">
     <div class="font-semibold text-sm mb-2">Add properties to this group</div>
 
     {{-- Search Active dictionary (with definitions) --}}

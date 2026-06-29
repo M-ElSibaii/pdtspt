@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\DB;
  * reworked from the original PropertiesController::addFromDictionary / uploadExcel:
  *   - lists ONLY Active dictionary properties, latest row per GUID lineage;
  *   - carries definitions so rows are distinguishable (not just names);
- *   - matches uploaded names STRICTLY on nameEn, exact (case- and accent-sensitive, no
- *     fuzzy, no namePt fallback) — done in PHP with === to avoid the DB collation's
- *     case/accent-insensitive comparison the old whereIn() relied on;
+ *   - matches uploaded names exactly (case- and accent-sensitive, no fuzzy) against EITHER
+ *     the English (nameEn) or Portuguese (namePt) code — done in PHP with === to avoid the
+ *     DB collation's case/accent-insensitive comparison the old whereIn() relied on;
  *   - produces the gap list (uploaded names with no Active dictionary match) for export.
  */
 class PropertyPickerService
@@ -36,7 +36,7 @@ class PropertyPickerService
     }
 
     /**
-     * Exact-nameEn match of uploaded names against Active dictionary properties.
+     * Exact match of uploaded names against Active dictionary properties (nameEn or namePt).
      *
      * @param  string[] $names  raw uploaded names
      * @return array{matchedIds:int[], matchedRows:array, unmatched:string[], matchedCount:int, unmatchedCount:int}
@@ -54,14 +54,17 @@ class PropertyPickerService
 
         // Compare against row values directly (not array keys) — PHP would coerce a
         // numeric-looking nameEn used as an array key to an int and break strict ===.
-        // Compare on surrounding-whitespace-trimmed values: some stored nameEn have stray
+        // Compare on surrounding-whitespace-trimmed values: some stored names have stray
         // leading/trailing spaces (a data defect), which must not defeat a legitimate
-        // match. Internal case & accents stay strict (no fuzzy, no namePt fallback).
+        // match. Internal case & accents stay strict (no fuzzy); EN and PT are both accepted.
         $active = $this->activeProperties();
         $matchedRows = [];
         $unmatched = [];
         foreach ($clean as $name) {
-            $hit = $active->first(fn($r) => trim((string) $r->nameEn) === $name);
+            // Match the uploaded name against the English OR Portuguese code (either may be
+            // used in the sheet). Case & accents stay strict; only outer whitespace is trimmed.
+            $hit = $active->first(fn($r) => trim((string) $r->nameEn) === $name
+                || trim((string) $r->namePt) === $name);
             if ($hit) {
                 $matchedRows[] = $hit;
             } else {

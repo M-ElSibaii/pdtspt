@@ -278,7 +278,8 @@
                     if (!file) { setStatus(counts, 'Choose a file first.', false); return; }
                     const fd = new FormData();
                     fd.append('excelFile', file);
-                    fd.append('groupName', p.dataset.gopName || ''); // match only this group's sheet
+                    fd.append('groupName', p.dataset.gopName || ''); // match this group's sheet (EN)
+                    fd.append('groupNamePt', p.dataset.gopNamePt || ''); // or its PT name
                     counts.textContent = 'Matching…';
                     fetch(u.pickMatch, { method: 'POST', headers: { 'X-CSRF-TOKEN': csrf, 'Accept': 'application/json' }, body: fd })
                         .then(r => r.json()).then(body => {
@@ -296,7 +297,7 @@
                             const nf = p.querySelector('.js-pick-notfound');
                             const nfList = p.querySelector('.js-pick-notfound-list');
                             if (lastGap.length) {
-                                nfList.innerHTML = lastGap.map(n => '<li>' + escapeHtml(n) + '</li>').join('');
+                                nfList.innerHTML = lastGap.map(n => '<li>' + esc(n) + '</li>').join('');
                                 nf.style.display = '';
                             } else {
                                 nf.style.display = 'none';

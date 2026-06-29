@@ -41,6 +41,7 @@ class PropertyPickerController extends Controller
         $request->validate([
             'excelFile' => 'required|mimes:xlsx,xls,csv|max:4096',
             'groupName' => 'nullable|string',
+            'groupNamePt' => 'nullable|string',
         ]);
 
         $file = $request->file('excelFile');
@@ -53,13 +54,20 @@ class PropertyPickerController extends Controller
             return response()->json(['ok' => false, 'error' => 'Could not read the file: ' . $e->getMessage()], 422);
         }
 
-        $norm = fn($s) => strtolower(preg_replace('/[^a-zA-Z]/', '', (string) $s));
-        $wanted = $norm($request->input('groupName', ''));
+        // Normalise to lower-case letters only (drops spaces/accents/punctuation) so a sheet
+        // named in either language matches its group. mb_strtolower + accent-folding keeps
+        // accented PT names comparable (e.g. "Dimensões" ~ "dimensoes").
+        $norm = fn($s) => preg_replace('/[^a-z]/', '', $this->foldAccents(mb_strtolower((string) $s)));
+        // The group can match its English OR Portuguese name (either may be the sheet title).
+        $wantedSet = array_values(array_filter([
+            $norm($request->input('groupName', '')),
+            $norm($request->input('groupNamePt', '')),
+        ], fn($w) => $w !== ''));
 
         $names = [];
         $sheetMatched = false;
         foreach ($sheetNames as $idx => $sheetName) {
-            if ($wanted !== '' && $norm($sheetName) === $wanted) {
+            if (!empty($wantedSet) && in_array($norm($sheetName), $wantedSet, true)) {
                 $sheetMatched = true;
                 foreach (($excelData[$idx] ?? []) as $row) {
                     foreach ((array) $row as $cell) {
@@ -84,6 +92,19 @@ class PropertyPickerController extends Controller
             'unmatched'      => $result['unmatched'],
             'matchedCount'   => $result['matchedCount'],
             'unmatchedCount' => $result['unmatchedCount'],
+        ]);
+    }
+
+    /** Fold common Latin accents to ASCII so accented sheet/group names compare equal. */
+    private function foldAccents(string $s): string
+    {
+        return strtr($s, [
+            'à' => 'a', 'á' => 'a', 'â' => 'a', 'ã' => 'a', 'ä' => 'a', 'å' => 'a',
+            'è' => 'e', 'é' => 'e', 'ê' => 'e', 'ë' => 'e',
+            'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i',
+            'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'õ' => 'o', 'ö' => 'o',
+            'ù' => 'u', 'ú' => 'u', 'û' => 'u', 'ü' => 'u',
+            'ç' => 'c', 'ñ' => 'n', 'ý' => 'y', 'ÿ' => 'y',
         ]);
     }
 
