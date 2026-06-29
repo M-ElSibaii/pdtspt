@@ -16,6 +16,10 @@
         <span class="js-pick-counts text-gray-600"></span>
         <button type="button" class="btn btn-secondary js-pick-gap" style="display:none;">Download missing (Excel)</button>
     </div>
+    <p class="text-xs text-gray-500 mt-1">
+        Excel structure: each sheet name must match a group of properties name. Inside each
+        sheet, list the property names in a single column with no header/title row — one name per row.
+    </p>
 
     {{-- On-screen "not found" list from the last Excel match (item 2) --}}
     <div class="js-pick-notfound text-sm mt-2" style="display:none;">

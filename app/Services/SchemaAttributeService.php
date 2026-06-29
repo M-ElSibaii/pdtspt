@@ -80,7 +80,7 @@ class SchemaAttributeService
         'definitionEn' => 'Definition (EN)', 'definitionPt' => 'Definition (PT)',
         'descriptionEn' => 'Description (EN)', 'descriptionPt' => 'Description (PT)',
         'referenceDocumentGUID' => 'Reference document',
-        'constructionObjectGUID' => 'Construction object',
+        'constructionObjectGUID' => 'Object Type',
         'relationToOtherDataDictionaries' => 'Mapping (relation to other data dictionaries)',
     ];
 

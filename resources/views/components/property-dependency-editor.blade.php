@@ -1,6 +1,6 @@
 @props([
     'guid',  // source property lineage GUID
-    'title' => 'Property dependencies (EN ISO 23387 R-23387-8)',
+    'title' => 'Property dependencies',
 ])
 
 <div class="js-propdep-editor mt-4 border rounded shadow-sm" data-guid="{{ $guid }}">

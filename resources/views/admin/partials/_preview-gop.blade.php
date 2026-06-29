@@ -17,7 +17,7 @@
             <span class="js-gop-status text-sm"></span>
         </div>
 
-        <x-relation-editor entity-type="gop" :guid="$gop->GUID" title="Group relationships (EN ISO 23387)" />
+        <x-relation-editor entity-type="gop" :guid="$gop->GUID" title="Group relationships" />
 
         {{-- Properties --}}
         <div class="mt-4 font-semibold text-sm">Properties ({{ $context->count() }})</div>
@@ -56,7 +56,7 @@
                         <span class="js-def-status text-sm"></span>
                     </div>
                     @if (!empty($dictVals['GUID']))
-                        <x-relation-editor entity-type="property" :guid="$dictVals['GUID']" title="Property relationships (EN ISO 23387)" />
+                        <x-relation-editor entity-type="property" :guid="$dictVals['GUID']" title="Property relationships" />
                         <x-property-dependency-editor :guid="$dictVals['GUID']" />
                     @endif
                 </details>

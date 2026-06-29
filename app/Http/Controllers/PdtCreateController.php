@@ -42,12 +42,12 @@ class PdtCreateController extends Controller
         $errors = [];
         if ($coMode === 'new') {
             foreach ($schema->missingMandatory(self::CO, $coInput) as $f) {
-                $errors[] = "Construction object: '{$f}' is required.";
+                $errors[] = "Object Type: '{$f}' is required.";
             }
         } else {
             $coGuid = $request->input('constructionObjectGUID');
             if (!$coGuid || !DB::table(self::CO)->where('GUID', $coGuid)->exists()) {
-                $errors[] = 'Please select an existing construction object (or create a new one).';
+                $errors[] = 'Please select an existing Object Type (or create a new one).';
             }
         }
         foreach ($schema->missingMandatory(self::PDT, $pdtInput) as $f) {

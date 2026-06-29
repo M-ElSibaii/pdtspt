@@ -22,31 +22,75 @@
             <p class="text-sm text-gray-600 my-2"><strong>Formato:</strong> JSON (estrutura EN ISO 23387)</p>
             <p class="text-sm text-gray-600 my-2"><strong>Content-Type:</strong> application/json</p>
             <p class="text-sm text-gray-600 my-2"><strong>Estrutura:</strong></p>
+            <p class="text-sm text-gray-600 my-2">Os GUIDs são emitidos no formato UUID com hífens (8-4-4-4-12) para validarem contra o padrão do XSD ed-2. O elemento <code>Library</code> só admite o atributo <code>dt:GUID</code> e os elementos <code>Name</code> (sem <code>dateOfCreation</code>, <code>URI</code> ou <code>Definition</code> ao nível da Library).</p>
             <div style="background-color: #F0F4F8; margin: 10px 0;">
-                <pre><code>{"Library":{
-    "dt:GUID": "...",
-    "dateOfCreation": "2026-03-31T12:00:00Z",
-    "Name": [...],
-    "Definition": [...],
-    "URI": "https://pdts.pt/pdtview/{id}-{slug}",
+                <pre><code>{"Library": {
+    "dt:GUID": "8d2f...-...-...-...-...",
+    "Name": [
+      { "language": "pt", "value": "..." },
+      { "language": "en", "value": "..." }
+    ],
     "DataTemplates": [{
-        "dt:GUID": "...",
         "Name": [...],
         "Definition": [...],
+        "ReferenceDocumentRef": { "dt:GUID": "..." },
+        "MajorVersion": 1,
+        "MinorVersion": 0,
+        "Status": "Active",
+        "IsSubtypeOfRef": { "referenceURI": "https://pdts.pt/pdtview/{id}-{slug}" },
+        "HasPartRef": [ { "referenceURI": "..." } ],
         "HasObjectTypeRef": { "dt:GUID": "..." },
-        "HasPropertyRef": [
-          { "dt:GUID": "...", "referenceURI": "..." }],
-        "HasGroupOfPropertiesRef": [
-          { "dt:GUID": "...", "referenceURI": "..." }]}],
+        "HasPropertyRef": [ { "dt:GUID": "...", "referenceURI": "..." } ],
+        "HasGroupOfPropertiesRef": [ { "dt:GUID": "...", "referenceURI": "..." } ],
+        "dt:GUID": "...",
+        "dateOfCreation": "2026-03-31T12:00:00Z"
+    }],
     "ObjectType": {
-      "dt:GUID": "...",
-      "Name": [...],
-      "Definition": [...]},
-    "GroupOfProperties": [...],
-    "Properties": [...],
-    "ReferenceDocuments": [...]}}</code></pre>
+        "Name": [...],
+        "Definition": [...],
+        "dt:GUID": "...",
+        "dateOfCreation": "..."
+    },
+    "GroupOfProperties": [{
+        "Name": [...],
+        "Definition": [...],
+        "IsSubtypeOfRef": { "referenceURI": "..." },
+        "HasPartRef": [ { "referenceURI": "..." } ],
+        "HasPropertyRef": [ { "dt:GUID": "...", "referenceURI": "..." } ],
+        "dt:GUID": "...",
+        "dateOfCreation": "..."
+    }],
+    "Properties": [{
+        "Name": [...],
+        "Definition": [...],
+        "LanguageOfCreator": "pt-PT",
+        "CountryOfOrigin": "PT",
+        "MajorVersion": 1,
+        "MinorVersion": 1,
+        "Status": "Active",
+        "DataType": {},
+        "IsDependentOnRef": [ { "referenceURI": "..." } ],
+        "_dependencyDetails": [ {
+          "dependencyKind": "...", "expression": "...",
+          "targets": [ { "referenceURI": "...", "isPreferred": true, "position": 0 } ]
+        } ],
+        "IsSpecializationOfRef": { "referenceURI": "..." },
+        "dt:GUID": "...",
+        "dateOfCreation": "..."
+    }],
+ 
+    "ReferenceDocuments": [{
+        "Name": [...],
+        "Definition": [...],
+        "Status": "...",
+        "URI": "https://pdts.pt/referencedocumentview/{guid}",
+        "Language": "en",
+        "dt:GUID": "...",
+        "dateOfCreation": "..."
+    }]
+}}</code></pre>
             </div>
-            <p class="text-sm text-gray-600 my-2"><strong>Exemplo:</strong> <code>GET /api/1/json</code></p>
+           <p class="text-sm text-gray-600 my-2"><strong>Exemplo:</strong> <code>GET /api/1/json</code></p>
 
             <!-- XML Export Endpoint -->
             <h2 class="my-4 mt-8">Exportar Modelo de Dados de Produto como XML (estrutura EN ISO 23387)</h2>
@@ -60,36 +104,59 @@
             <div style="background-color: #F0F4F8; margin: 10px 0;">
                 <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;dt:Library xmlns:dt="https://standards.iso.org/iso/23387/ed-2/en/"
-            dt:GUID="..."
-            dateOfCreation="2026-03-31T12:00:00Z"
-            URI="https://pdts.pt/pdtview/{id}-{slug}"&gt;
+            dt:GUID="8d2f...-...-...-...-..."&gt;
     &lt;dt:Name language="pt"&gt;...&lt;/dt:Name&gt;
     &lt;dt:Name language="en"&gt;...&lt;/dt:Name&gt;
-    &lt;dt:Definition language="pt"&gt;...&lt;/dt:Definition&gt;
-    &lt;dt:Definition language="en"&gt;...&lt;/dt:Definition&gt;
-    &lt;dt:DataTemplate dt:GUID="..."&gt;
+    &lt;dt:DataTemplate dt:GUID="..." dateOfCreation="2026-03-31T12:00:00Z"&gt;
         &lt;dt:Name language="pt"&gt;...&lt;/dt:Name&gt;
         &lt;dt:Name language="en"&gt;...&lt;/dt:Name&gt;
         &lt;dt:Definition language="pt"&gt;...&lt;/dt:Definition&gt;
         &lt;dt:Definition language="en"&gt;...&lt;/dt:Definition&gt;
+        &lt;dt:ReferenceDocumentRef dt:GUID="..."/&gt;
+        &lt;dt:MajorVersion&gt;1&lt;/dt:MajorVersion&gt;
+        &lt;dt:MinorVersion&gt;0&lt;/dt:MinorVersion&gt;
+        &lt;dt:Status&gt;Active&lt;/dt:Status&gt;
+        &lt;dt:IsSubtypeOfRef dt:referenceURI="https://pdts.pt/pdtview/{id}-{slug}"/&gt;
+        &lt;dt:HasPartRef dt:referenceURI="..."/&gt;
         &lt;dt:HasObjectTypeRef dt:GUID="..."/&gt;
-        &lt;dt:HasPropertyRef dt:GUID="..." referenceURI="..."/&gt;
-        &lt;dt:HasPropertyRef dt:GUID="..." referenceURI="..."/&gt;
-        &lt;dt:HasGroupOfPropertiesRef dt:GUID="..." referenceURI="..."/&gt;
+        &lt;dt:HasPropertyRef dt:GUID="..." dt:referenceURI="..."/&gt;
+        &lt;dt:HasGroupOfPropertiesRef dt:GUID="..." dt:referenceURI="..."/&gt;
     &lt;/dt:DataTemplate&gt;
-    &lt;dt:ObjectType dt:GUID="..."&gt;
+    &lt;dt:ObjectType dt:GUID="..." dateOfCreation="..."&gt;
         &lt;dt:Name language="en"&gt;...&lt;/dt:Name&gt;
         &lt;dt:Definition language="en"&gt;...&lt;/dt:Definition&gt;
+        &lt;dt:IsSubtypeOfRef dt:referenceURI="..."/&gt;
     &lt;/dt:ObjectType&gt;
-    &lt;dt:GroupOfProperties dt:GUID="..."&gt;  ...
+    &lt;dt:GroupOfProperties dt:GUID="..." dateOfCreation="..."&gt;
+        &lt;dt:Name language="pt"&gt;...&lt;/dt:Name&gt;
+        &lt;dt:Definition language="pt"&gt;...&lt;/dt:Definition&gt;
+        &lt;dt:IsSubtypeOfRef dt:referenceURI="..."/&gt;
+        &lt;dt:HasPropertyRef dt:GUID="..." dt:referenceURI="..."/&gt;
     &lt;/dt:GroupOfProperties&gt;
-    &lt;dt:Property dt:GUID="..."&gt;  ...
+    &lt;dt:Property dt:GUID="..." dateOfCreation="..."&gt;
+        &lt;dt:Name language="pt"&gt;...&lt;/dt:Name&gt;
+        &lt;dt:Definition language="pt"&gt;...&lt;/dt:Definition&gt;
+        &lt;dt:LanguageOfCreator&gt;pt-PT&lt;/dt:LanguageOfCreator&gt;
+        &lt;dt:CountryOfOrigin&gt;PT&lt;/dt:CountryOfOrigin&gt;
+        &lt;dt:MajorVersion&gt;1&lt;/dt:MajorVersion&gt;
+        &lt;dt:MinorVersion&gt;1&lt;/dt:MinorVersion&gt;
+        &lt;dt:Status&gt;Active&lt;/dt:Status&gt;
+        &lt;dt:ReferenceDocumentRef dt:GUID="..."/&gt;
+        &lt;dt:DataType&gt;
+        &lt;/dt:DataType&gt;
+        &lt;dt:IsDependentOnRef dt:referenceURI="..."/&gt;
+        &lt;dt:IsSpecializationOfRef dt:referenceURI="..."/&gt;
     &lt;/dt:Property&gt;
-    &lt;dt:ReferenceDocument dt:GUID="..."&gt;  ...
+    &lt;dt:ReferenceDocument dt:GUID="..." dateOfCreation="..."&gt;
+        &lt;dt:Name language="en"&gt;...&lt;/dt:Name&gt;
+        &lt;dt:Definition language="en"&gt;...&lt;/dt:Definition&gt;
+        &lt;dt:Status&gt;...&lt;/dt:Status&gt;
+        &lt;dt:Language&gt;en&lt;/dt:Language&gt;
+        &lt;dt:URI&gt;https://pdts.pt/referencedocumentview/{guid}&lt;/dt:URI&gt;
     &lt;/dt:ReferenceDocument&gt;
 &lt;/dt:Library&gt;</code></pre>
             </div>
-            <p class="text-sm text-gray-600 my-2"><strong>Exemplo:</strong> <code>GET /api/1/xml</code></p></code></pre>
+           <p class="text-sm text-gray-600 my-2"><strong>Exemplo:</strong> <code>GET /api/1/xml</code></p>
           
 
             <!-- Additional Endpoints -->

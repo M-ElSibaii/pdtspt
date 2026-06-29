@@ -1,7 +1,7 @@
 @props([
     'entityType',   // 'pdt' | 'gop' | 'property' | 'objecttype'
     'guid',         // source lineage GUID
-    'title' => 'Relationships (EN ISO 23387)',
+    'title' => 'Relationships',
 ])
 
 @php

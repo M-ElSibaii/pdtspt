@@ -3,7 +3,7 @@
         <div class="container sm:max-w-full py-9" id="create-pdt">
             <h1>Create a Product Data Template</h1>
             <p class="text-sm text-gray-600 mt-1">
-                A PDT starts from a <strong>Construction Object</strong>. Select an existing one or
+                A PDT starts from an <strong> Object Type</strong>. Select an existing one or
                 create a new one, then fill the PDT. Both are created as a <strong>Preview</strong>
                 draft — you'll add groups &amp; properties next, then publish. Fields marked
                 <span class="text-red-600">*</span> are mandatory.
@@ -19,9 +19,9 @@
             <form method="POST" action="{{ route('admin.pdt.create.store') }}" id="create-form">
                 @csrf
 
-                {{-- ---------- Step 1: Construction Object ---------- --}}
+                {{-- ---------- Step 1: Object Type ---------- --}}
                 <div class="mt-6 border rounded shadow-sm">
-                    <div class="px-4 py-2 border-b bg-slate-50 font-semibold">1 · Construction Object</div>
+                    <div class="px-4 py-2 border-b bg-slate-50 font-semibold">1 · Object Type</div>
                     <div class="p-4">
                         <div class="flex flex-wrap gap-4 mb-3">
                             <label class="flex items-center gap-1"><input type="radio" name="co_mode" value="existing" class="js-co-mode" checked> Use existing</label>
@@ -29,7 +29,7 @@
                         </div>
 
                         <div class="js-co-existing">
-                            <label class="block text-xs font-semibold mb-1">Construction object <span class="text-red-600">*</span></label>
+                            <label class="block text-xs font-semibold mb-1">Object type <span class="text-red-600">*</span></label>
                             <select name="constructionObjectGUID" class="w-full border rounded p-2 text-sm">
                                 <option value="">— select —</option>
                                 @foreach ($existingCos as $co)
@@ -94,7 +94,7 @@
                 const mode = root.querySelector('.js-co-mode:checked').value;
                 if (mode === 'existing') {
                     const sel = existing.querySelector('select[name="constructionObjectGUID"]');
-                    if (sel && !sel.value) missing.push('Construction object');
+                    if (sel && !sel.value) missing.push('Object Type');
                 }
                 if (missing.length) {
                     e.preventDefault();

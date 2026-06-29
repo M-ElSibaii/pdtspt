@@ -70,7 +70,7 @@
             <br>
             <!-- create a new PDT from a construction object (unified CREATE editor) -->
             <a href="{{ route('admin.pdt.create') }}" class="btn btn-secondary">
-                Create a new PDT (from construction object)
+                Create a new PDT (from Object Type)
             </a>
             <br>
             <br>
