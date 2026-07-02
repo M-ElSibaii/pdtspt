@@ -694,15 +694,18 @@ class Iso23387Exporter
             'name' => $this->mapIsoDataType($prop->dataType ?? null)
         ];
 
-        // OPTIONAL: DimensionRef (0..1)
-        if ($prop->dimension && $prop->dimension !== '') {
-            $element['Dimension'] = $prop->dimension;
-        }
-
-        // OPTIONAL: Units - only if it exists
-        if ($prop->units && $prop->units !== '') {
-            $element['Units'] = $prop->units;
-        }
+        // OPTIONAL unit/quantity/dimension references (0..* choice, after DataType).
+        // Resolved from the ISO 23387 reference tables via the property's stored unit code
+        // (units -> physical_quantity -> dimension). Reference-only: we carry the stable
+        // GUIDs (and QUDT referenceURI where sourced) but do NOT emit local Unit/QuantityKind/
+        // Dimension concepts yet (physics deferred). "without" for unit-less/text properties.
+        $refs = $this->unitReferenceData($prop->units ?? null);
+        if (!empty($refs['DimensionRef']))     $element['DimensionRef'] = $refs['DimensionRef'];
+        if (!empty($refs['UnitRef']))          $element['UnitRef'] = $refs['UnitRef'];
+        if (!empty($refs['QuantityKindRef']))  $element['QuantityKindRef'] = $refs['QuantityKindRef'];
+        // ISO 23386 "physical quantity | language" (JSON/API only — XSD has no free-text slot).
+        $element['_physicalQuantity'] = $refs['_physicalQuantity'];
+        if (!empty($refs['_unitUnmapped'])) $element['_unitUnmapped'] = $refs['_unitUnmapped'];
 
         // IsDependentOnRef (0..*, R-23387-8): one ReferenceType per target, by referenceURI.
         // The XSD's IsDependentOnRef is a plain ReferenceType and CANNOT carry the kind or the
@@ -731,6 +734,75 @@ class Iso23387Exporter
         $element['dateOfCreation'] = $this->formatDate($prop->dateOfVersion);
 
         return $element;
+    }
+
+    /** @var array<string,object>|null Cache of units keyed by code. */
+    private ?array $unitByCode = null;
+    /** @var array<string,object>|null Cache of physical_quantities keyed by guid. */
+    private ?array $pqByGuid = null;
+    /** @var array<string,object>|null Cache of dimensions keyed by guid. */
+    private ?array $dimByGuid = null;
+
+    /**
+     * Resolve a stored unit code to ISO 23387 UnitRef / QuantityKindRef / DimensionRef
+     * (reference-only, by stable GUID + optional QUDT referenceURI) plus the ISO 23386
+     * "physical quantity | language" annotation.
+     *
+     *  - blank code            -> physical quantity "without", no refs (unit-less/text).
+     *  - code found in tables   -> UnitRef + QuantityKindRef (+ DimensionRef once physics set).
+     *  - code NOT in tables     -> no refs, flagged (_unitUnmapped); never fabricated.
+     */
+    private function unitReferenceData($code): array
+    {
+        $out = ['DimensionRef' => null, 'UnitRef' => [], 'QuantityKindRef' => [], '_physicalQuantity' => \App\Console\Commands\SeedUnitsReference::WITHOUT];
+
+        $code = trim((string) $code);
+        if ($code === '') {
+            return $out; // ISO 23386 unit-less
+        }
+
+        $this->loadReferenceMaps();
+        $unit = $this->unitByCode[$code] ?? null;
+        if (!$unit) {
+            // Unknown unit — do not guess. Flag for the Stage 4 cleanup / review.
+            $out['_physicalQuantity'] = null;
+            $out['_unitUnmapped'] = $code;
+            return $out;
+        }
+
+        // Identity/OwnedUri = our resolvable pdts.pt page (R-LD-2), consistent with the GUID.
+        // QUDT stays an on-page external authority, not the ref target.
+        $out['UnitRef'][] = [
+            'dt:GUID' => self::toDashedGuid($unit->guid),
+            'referenceURI' => \App\Services\UnitsReference::unitUri($unit->code),
+        ];
+
+        $pq = $unit->physical_quantity_guid ? ($this->pqByGuid[$unit->physical_quantity_guid] ?? null) : null;
+        if ($pq) {
+            $out['QuantityKindRef'][] = [
+                'dt:GUID' => self::toDashedGuid($pq->guid),
+                'referenceURI' => \App\Services\UnitsReference::quantityKindUri($pq->name),
+            ];
+            $out['_physicalQuantity'] = $pq->name . ' | ' . $pq->languageIsoCode;
+
+            $dim = $pq->dimension_guid ? ($this->dimByGuid[$pq->dimension_guid] ?? null) : null;
+            if ($dim && !empty($dim->canonical)) {
+                $out['DimensionRef'] = [
+                    'dt:GUID' => self::toDashedGuid($dim->guid),
+                    'referenceURI' => \App\Services\UnitsReference::dimensionUri($dim->canonical),
+                ];
+            }
+        }
+
+        return $out;
+    }
+
+    private function loadReferenceMaps(): void
+    {
+        if ($this->unitByCode !== null) return;
+        $this->unitByCode = DB::table('units')->get()->keyBy('code')->all();
+        $this->pqByGuid = DB::table('physical_quantities')->get()->keyBy('guid')->all();
+        $this->dimByGuid = DB::table('dimensions')->get()->keyBy('guid')->all();
     }
 
     /**
@@ -1543,6 +1615,22 @@ class Iso23387Exporter
             $prop->appendChild($dataType);
         }
 
+        // Unit / quantity / dimension refs (PropertyType choice, after DataType). Order among
+        // choice members is unconstrained by the XSD; we emit Dimension, Unit, then QuantityKind.
+        if (isset($propData['DimensionRef'])) {
+            $prop->appendChild($this->buildRefElement($dom, 'DimensionRef', $propData['DimensionRef']));
+        }
+        if (isset($propData['UnitRef'])) {
+            foreach ($propData['UnitRef'] as $ref) {
+                $prop->appendChild($this->buildRefElement($dom, 'UnitRef', $ref));
+            }
+        }
+        if (isset($propData['QuantityKindRef'])) {
+            foreach ($propData['QuantityKindRef'] as $ref) {
+                $prop->appendChild($this->buildRefElement($dom, 'QuantityKindRef', $ref));
+            }
+        }
+
         // IsDependentOnRef (0..*, R-23387-8) — in the PropertyType choice, after DataType
         // and before IsSpecializationOfRef. (_dependencyDetails is JSON-only, not emitted here.)
         if (isset($propData['IsDependentOnRef'])) {
@@ -1556,9 +1644,9 @@ class Iso23387Exporter
             $prop->appendChild($this->buildRefElement($dom, 'IsSpecializationOfRef', $propData['IsSpecializationOfRef']));
         }
 
-        // NOTE: legacy 'Dimension'/'Units' text elements were not valid PropertyType
-        // children per the XSD (need DimensionRef/UnitRef ReferenceType) and are omitted
-        // here for compliance; revisit when unit/dimension dictionaries are exported.
+        // Legacy free-text 'Dimension'/'Units' are gone: units/quantity/dimension now emit
+        // as XSD ReferenceType (DimensionRef/UnitRef/QuantityKindRef) above, resolved from
+        // the ISO 23387 reference tables. No free-text unit can leak here.
 
         return $prop;
     }

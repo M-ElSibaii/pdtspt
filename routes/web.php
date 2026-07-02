@@ -129,6 +129,16 @@ Route::get(
     [ReferencedocumentsController::class, 'getReferenceDocument']
 )->name('referencedocumentview');
 
+// ISO 23387 reference-layer dereferenceable pages (R-LD-2/3/4). Catch-all constraints so
+// codes/names with "/" (e.g. "kg/m³") resolve as a single path value. JSON via content
+// negotiation (Accept: application/json, ?format=json, or a .json suffix).
+Route::get('/unit/{code}', [\App\Http\Controllers\UnitsReferenceController::class, 'unit'])
+    ->name('reference.unit')->where('code', '.*');
+Route::get('/quantitykind/{name}', [\App\Http\Controllers\UnitsReferenceController::class, 'quantityKind'])
+    ->name('reference.quantitykind')->where('name', '.*');
+Route::get('/dimension/{canonical}', [\App\Http\Controllers\UnitsReferenceController::class, 'dimension'])
+    ->name('reference.dimension')->where('canonical', '.*');
+
 
 Route::post('/comments/{propID}', [GroupofpropertiesController::class, 'getCommentProperty']);
 

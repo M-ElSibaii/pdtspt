@@ -28,6 +28,19 @@
             $inputName = $prefix . '[' . $name . ']';
             $id = $idAttr . '_' . $name;
 
+            // physicalQuantity & dimension are AUTO-DERIVED from the selected unit and must
+            // never be user-editable (ISO 23387 reference layer). Render read-only but still
+            // collectable/submittable (readonly, NOT disabled; keeps js-attr) so the value the
+            // autofill script writes is persisted. See _units-autofill.
+            if ($name === 'physicalQuantity' || $name === 'dimension') {
+                $autoCls = ($name === 'physicalQuantity' ? 'js-auto-pq' : 'js-auto-dim')
+                    . ' js-attr w-full border rounded p-2 text-sm bg-gray-100 text-gray-600';
+                return '<input type="text" class="' . $autoCls . '" id="' . e($id) . '" name="' . e($inputName)
+                    . '" data-field="' . e($name) . '" data-original="' . e($val) . '" value="' . e($val)
+                    . '" readonly title="Auto-filled from the selected unit (not editable)" '
+                    . 'placeholder="' . ($name === 'physicalQuantity' ? 'set from unit' : 'set from unit (if any)') . '">';
+            }
+
             // Locked = system field, or (in override mode) not on the allow-list.
             $locked = $f['system'] || ($editableOverride !== null && !in_array($name, $editableOverride, true));
             if ($locked) {

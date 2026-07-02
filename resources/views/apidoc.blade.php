@@ -69,6 +69,10 @@
         "MinorVersion": 1,
         "Status": "Active",
         "DataType": {},
+        "DimensionRef": { "dt:GUID": "..." },
+        "UnitRef": [ { "dt:GUID": "...", "referenceURI": "..." } ],
+        "QuantityKindRef": [ { "dt:GUID": "...", "referenceURI": "..." } ],
+        "_physicalQuantity": "millimetre | en.EN",
         "IsDependentOnRef": [ { "referenceURI": "..." } ],
         "_dependencyDetails": [ {
           "dependencyKind": "...", "expression": "...",
@@ -91,6 +95,11 @@
 }}</code></pre>
             </div>
            <p class="text-sm text-gray-600 my-2"><strong>Exemplo:</strong> <code>GET /api/1/json</code></p>
+           <p class="text-sm text-gray-600 my-2"><strong>Unidades / grandeza física / dimensão:</strong>
+              a unidade é referenciada por <code>UnitRef</code> (GUID estável, e <code>referenceURI</code> QUDT quando disponível);
+              a grandeza física por <code>QuantityKindRef</code> e a dimensão por <code>DimensionRef</code>.
+              O campo <code>_physicalQuantity</code> apresenta o par ISO 23386 "grandeza física | idioma"
+              (ex. <code>"millimetre | en.EN"</code>), ou <code>"without"</code> para propriedades sem unidade / de texto.</p>
 
             <!-- XML Export Endpoint -->
             <h2 class="my-4 mt-8">Exportar Modelo de Dados de Produto como XML (estrutura EN ISO 23387)</h2>
@@ -142,8 +151,10 @@
         &lt;dt:MinorVersion&gt;1&lt;/dt:MinorVersion&gt;
         &lt;dt:Status&gt;Active&lt;/dt:Status&gt;
         &lt;dt:ReferenceDocumentRef dt:GUID="..."/&gt;
-        &lt;dt:DataType&gt;
-        &lt;/dt:DataType&gt;
+        &lt;dt:DataType name="STRING"/&gt;
+        &lt;dt:DimensionRef dt:GUID="..."/&gt;
+        &lt;dt:UnitRef dt:GUID="..." dt:referenceURI="..."/&gt;
+        &lt;dt:QuantityKindRef dt:GUID="..." dt:referenceURI="..."/&gt;
         &lt;dt:IsDependentOnRef dt:referenceURI="..."/&gt;
         &lt;dt:IsSpecializationOfRef dt:referenceURI="..."/&gt;
     &lt;/dt:Property&gt;
