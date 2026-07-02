@@ -24,9 +24,19 @@ class UnitsReferenceController extends Controller
             || str_ends_with((string) $request->path(), '.json');
     }
 
+    /**
+     * Strip a trailing ".json" suffix from a path value (content negotiation).
+     * NOTE: must NOT use rtrim($v, '.json') — that strips any trailing '.','j','s','o','n'
+     * characters (e.g. "min" -> "mi"), which caused the JSON pages to 404.
+     */
+    private function stripJson(string $value): string
+    {
+        return str_ends_with($value, '.json') ? substr($value, 0, -5) : $value;
+    }
+
     public function unit(Request $request, string $code)
     {
-        $code = rtrim($code, '.json');
+        $code = $this->stripJson($code);
         $unit = Unit::where('code', $code)->first();
         abort_if(!$unit, 404, "Unknown unit: {$code}");
 
@@ -64,7 +74,7 @@ class UnitsReferenceController extends Controller
 
     public function quantityKind(Request $request, string $name)
     {
-        $name = rtrim($name, '.json');
+        $name = $this->stripJson($name);
         $quantity = PhysicalQuantity::where('name', $name)->first();
         abort_if(!$quantity, 404, "Unknown physical quantity: {$name}");
 
@@ -97,7 +107,7 @@ class UnitsReferenceController extends Controller
 
     public function dimension(Request $request, string $canonical)
     {
-        $canonical = rtrim($canonical, '.json');
+        $canonical = $this->stripJson($canonical);
         $dimension = Dimension::where('canonical', $canonical)->first();
         abort_if(!$dimension, 404, "Unknown dimension: {$canonical}");
 

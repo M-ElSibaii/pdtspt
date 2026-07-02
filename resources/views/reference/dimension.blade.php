@@ -26,7 +26,7 @@
                 @endforelse
             </ul>
             <p class="text-sm text-gray-500 mt-3">Representação legível por máquina / machine-readable:
-                <a href="{{ \App\Services\UnitsReference::dimensionUri($dimension->canonical) }}?format=json">JSON</a></p>
+                <a href="?format=json">JSON</a></p>
         </div>
     </div>
 </x-app-layout>
