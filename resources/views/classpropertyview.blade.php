@@ -65,7 +65,7 @@
                         </tr>
                         <tr>
                             <th>Unidades</th>
-                            <td>{{$propertyDefinition->units ?? 'N/A'}}</td>
+                            <td><x-reference-link type="unit" :value="$propertyDefinition->units" placeholder="N/A" /></td>
                         </tr>
                         <tr>
                             <th>Tipo de dados</th>

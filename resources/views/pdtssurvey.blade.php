@@ -104,7 +104,7 @@
 
                                         </td>
                                         <td class="p-1.5">
-                                            {{ $property->units ? $property->units : 'Sem unidade' }}
+                                            <x-reference-link type="unit" :value="$property->units" placeholder="Sem unidade" />
                                         </td>
                                         <td class="p-1.5">
                                             <div class="flex flex-col">

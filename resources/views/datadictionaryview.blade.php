@@ -52,7 +52,7 @@
                         </tr>
                         <tr>
                             <th>Unidades</th>
-                            <td>{{$propdd->units}}</td>
+                            <td><x-reference-link type="unit" :value="$propdd->units" /></td>
                         </tr>
                               <tr>
                             <th>Representação Visual</th>
@@ -192,11 +192,11 @@
                         </tr>
                         <tr>
                             <th>Quantidade física</th>
-                            <td>{{$propdd->physicalQuantity}}</td>
+                            <td><x-reference-link type="quantitykind" :value="$propdd->physicalQuantity" /></td>
                         </tr>
                         <tr>
                             <th>Dimensão</th>
-                            <td>{{$propdd->dimension}}</td>
+                            <td><x-reference-link type="dimension" :value="$propdd->dimension" /></td>
                         </tr>
                         <tr>
                             <th>Tipo de dados</th>

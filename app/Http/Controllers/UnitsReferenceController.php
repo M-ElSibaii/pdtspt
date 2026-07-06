@@ -34,6 +34,94 @@ class UnitsReferenceController extends Controller
         return str_ends_with($value, '.json') ? substr($value, 0, -5) : $value;
     }
 
+    /**
+     * API collection: all units, each with its identity URI, physical quantity, dimension and
+     * QUDT authority link. Eager-loads the quantity+dimension chain to avoid N+1.
+     */
+    public function units()
+    {
+        $units = Unit::with('physicalQuantity.dimension')->orderBy('code')->get();
+
+        return response()->json($units->map(function ($unit) {
+            $quantity = $unit->physicalQuantity;
+            $dimension = $quantity ? $quantity->dimension : null;
+            $authority = UnitsReference::qudtAuthority($unit->reference_uri, $unit->code, 'unit');
+
+            return [
+                '@id' => UnitsReference::unitUri($unit->code),
+                'type' => 'Unit',
+                'guid' => $unit->guid,
+                'code' => $unit->code,
+                'name' => $unit->name,
+                'physicalQuantity' => $quantity ? [
+                    'name' => $quantity->name,
+                    'languageIsoCode' => $quantity->languageIsoCode,
+                    '@id' => UnitsReference::quantityKindUri($quantity->name),
+                ] : null,
+                'dimension' => $dimension ? [
+                    'canonical' => $dimension->canonical,
+                    '@id' => UnitsReference::dimensionUri($dimension->canonical),
+                ] : null,
+                'sameAs' => $authority['reference'],
+            ];
+        })->all(), 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * API collection: all physical quantities (quantity kinds), each with its identity URI and
+     * dimension link. Eager-loads the dimension to avoid N+1.
+     */
+    public function quantityKinds()
+    {
+        $quantities = PhysicalQuantity::with('dimension')->orderBy('name')->get();
+
+        return response()->json($quantities->map(function ($quantity) {
+            $dimension = $quantity->dimension;
+            $authority = UnitsReference::qudtAuthority($quantity->reference_uri, $quantity->name, 'quantitykind');
+
+            return [
+                '@id' => UnitsReference::quantityKindUri($quantity->name),
+                'type' => 'QuantityKind',
+                'guid' => $quantity->guid,
+                'name' => $quantity->name,
+                'languageIsoCode' => $quantity->languageIsoCode,
+                'dimension' => $dimension ? [
+                    'canonical' => $dimension->canonical,
+                    '@id' => UnitsReference::dimensionUri($dimension->canonical),
+                ] : null,
+                'sameAs' => $authority['reference'],
+            ];
+        })->all(), 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * API collection: all dimensions, each with its identity URI and the 7 SI exponents
+     * (ISO 80000 order).
+     */
+    public function dimensions()
+    {
+        $dimensions = Dimension::orderBy('canonical')->get();
+
+        return response()->json($dimensions->map(function ($dimension) {
+            return [
+                '@id' => UnitsReference::dimensionUri($dimension->canonical),
+                'type' => 'Dimension',
+                'guid' => $dimension->guid,
+                'canonical' => $dimension->canonical,
+                'exponents' => [
+                    'Length' => $dimension->exp_length,
+                    'Mass' => $dimension->exp_mass,
+                    'Time' => $dimension->exp_time,
+                    'ElectricCurrent' => $dimension->exp_electric_current,
+                    'ThermodynamicTemperature' => $dimension->exp_thermodynamic_temperature,
+                    'AmountOfSubstance' => $dimension->exp_amount_of_substance,
+                    'LuminousIntensity' => $dimension->exp_luminous_intensity,
+                ],
+                'sameAs' => $dimension->reference_uri,
+            ];
+        })->all(), 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
     public function unit(Request $request, string $code)
     {
         $code = $this->stripJson($code);

@@ -12,6 +12,7 @@ use App\Http\Controllers\ProductdatatemplatesController;
 use App\Http\Controllers\GroupofpropertiesController;
 use App\Http\Controllers\PropertiesdatadictionariesController;
 use App\Http\Controllers\ReferencedocumentsController;
+use App\Http\Controllers\UnitsReferenceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,6 +48,13 @@ Route::get('/referenceDocuments/{GUID}', [ProductdatatemplatesController::class,
 Route::get('/groupsOfProperties', [ProductdatatemplatesController::class, 'groupsOfProperties']);
 
 Route::get('/groupsOfProperties/{Id}', [ProductdatatemplatesController::class, 'groupOfProperties']);
+
+// ISO 23387 units reference collections
+Route::get('/units', [UnitsReferenceController::class, 'units']);
+
+Route::get('/quantityKinds', [UnitsReferenceController::class, 'quantityKinds']);
+
+Route::get('/dimensions', [UnitsReferenceController::class, 'dimensions']);
 
 // Specific routes BEFORE generic catch-all
 Route::get('/{pdtID}/json', [ProductdatatemplatesController::class, 'productDataTemplateJson']);

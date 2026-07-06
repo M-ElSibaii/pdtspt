@@ -219,6 +219,65 @@
                 <pre><code>GET /api/constructionObjects</code></pre>
             </div>
 
+            <!-- Units reference collections (ISO 23387) -->
+            <h2 class="my-4 mt-8">Obter Todas as Unidades</h2>
+            <p class="mb-4">Retorna todas as unidades (ISO 23387 UnitType), cada uma com o seu URI de identidade resolúvel (<code>@id</code>), grandeza física e dimensão associadas, e a ligação à autoridade externa QUDT (<code>sameAs</code>, quando disponível).</p>
+            <div style="background-color: #F0F4F8;">
+                <pre><code>GET /api/units</code></pre>
+            </div>
+            <p class="text-sm text-gray-600 my-2"><strong>Formato:</strong> JSON</p>
+            <div style="background-color: #F0F4F8; margin: 10px 0;">
+                <pre><code>[{
+    "@id": "https://pdts.pt/unit/mm",
+    "type": "Unit",
+    "guid": "...",
+    "code": "mm",
+    "name": "millimetre",
+    "physicalQuantity": { "name": "length", "languageIsoCode": "en.EN", "@id": "https://pdts.pt/quantitykind/length" },
+    "dimension": { "canonical": "L", "@id": "https://pdts.pt/dimension/L" },
+    "sameAs": "http://qudt.org/vocab/unit/MilliM"
+}]</code></pre>
+            </div>
+            <p class="text-sm text-gray-600 my-2"><strong>Detalhe:</strong> siga o <code>@id</code> de cada unidade para <code>GET /api/unit/{code}</code> (representação completa, incl. escala/base/coeficiente).</p>
+
+            <h2 class="my-4 mt-8">Obter Todas as Grandezas Físicas</h2>
+            <p class="mb-4">Retorna todas as grandezas físicas (ISO 23387 QuantityKindType), cada uma com o seu URI de identidade (<code>@id</code>) e a dimensão associada.</p>
+            <div style="background-color: #F0F4F8;">
+                <pre><code>GET /api/quantityKinds</code></pre>
+            </div>
+            <p class="text-sm text-gray-600 my-2"><strong>Formato:</strong> JSON</p>
+            <div style="background-color: #F0F4F8; margin: 10px 0;">
+                <pre><code>[{
+    "@id": "https://pdts.pt/quantitykind/length",
+    "type": "QuantityKind",
+    "guid": "...",
+    "name": "length",
+    "languageIsoCode": "en.EN",
+    "dimension": { "canonical": "L", "@id": "https://pdts.pt/dimension/L" },
+    "sameAs": null
+}]</code></pre>
+            </div>
+
+            <h2 class="my-4 mt-8">Obter Todas as Dimensões</h2>
+            <p class="mb-4">Retorna todas as dimensões (ISO 23387 DimensionType), cada uma com o seu URI de identidade (<code>@id</code>) e os 7 expoentes SI (ordem ISO 80000).</p>
+            <div style="background-color: #F0F4F8;">
+                <pre><code>GET /api/dimensions</code></pre>
+            </div>
+            <p class="text-sm text-gray-600 my-2"><strong>Formato:</strong> JSON</p>
+            <div style="background-color: #F0F4F8; margin: 10px 0;">
+                <pre><code>[{
+    "@id": "https://pdts.pt/dimension/L",
+    "type": "Dimension",
+    "guid": "...",
+    "canonical": "L",
+    "exponents": {
+      "Length": "1.000", "Mass": "0.000", "Time": "0.000", "ElectricCurrent": "0.000",
+      "ThermodynamicTemperature": "0.000", "AmountOfSubstance": "0.000", "LuminousIntensity": "0.000"
+    },
+    "sameAs": null
+}]</code></pre>
+            </div>
+
         </div>
     </div>
 </x-app-layout>
