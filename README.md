@@ -1,91 +1,138 @@
 # PDTs.pt
 
-Welcome to the PDTs.pt open-source project repository! PDTs.pt is a Product Data Templates (PDT) query platform built using Laravel, designed to facilitate the creation, viewing, and extraction of PDTs. This platform serves as a valuable tool for industries to manage and utilize PDTs effectively, in compliance with relevant ISO standards.
+Welcome to the **PDTs.pt** open-source repository. PDTs.pt is a Product Data Templates (PDT) platform built with Laravel that lets industry create, review, query, view, and export PDTs in compliance with the relevant ISO standards. It is the reference implementation for Portugal's product-data-template layer.
 
 ## Key Features
 
-- **Product Data Templates (PDT) Management**: Query, view, and give feedback on PDTs.
-- **API Access**: Extract data using our comprehensive API gateways.
-- **PDT View and Download**: View PDTs and download in various formats including XLSX, text, and JSON.
-- **User Feedback**: Provide feedback and answer surveys to help us improve the platform.
-- **Standards Compliance**: Our data model complies with EN ISO 23387:2020 and our data dictionary adheres to EN ISO 23386:2020 standards.
+- **PDT authoring & lifecycle** – create PDTs from construction objects, edit as free "Preview" drafts, publish, and cut new versions of active PDTs (staged plan → diff → commit).
+- **Query, view & download** – browse PDTs, groups of properties, and the shared data dictionary, then download a PDT as **XLSX, XML, or JSON**.
+- **ISO 23387 reference layer** – resolvable identity pages for **units**, **physical quantities (quantity kinds)**, and **dimensions**, each citing QUDT as the external authority, available as HTML or JSON via content negotiation.
+- **Relationships & dependencies** – model ISO 23387 entity relationships (IsSubtypeOf, HasPart, …) and property dependencies between properties.
+- **API access** – a read API for PDTs, the data dictionary, reference documents, groups of properties, construction objects, and the units reference tables.
+- **Standards compliance** – the data model follows **EN ISO 23387** and the data dictionary follows **EN ISO 23386**.
 
-## Laravel Structure
+## Tech Stack
 
-PDTs.pt is built using Laravel, which follows the Model-View-Controller (MVC) architectural pattern. Here's a brief overview of the structure and where to find key components:
+| Layer           | Technology                                                                                 |
+| --------------- | ------------------------------------------------------------------------------------------ |
+| Framework       | Laravel 9 (PHP 8.0.2+)                                                                     |
+| Auth            | Laravel Breeze + Sanctum                                                                   |
+| Database        | MySQL                                                                                      |
+| Exports         | PhpSpreadsheet, `maatwebsite/excel` (XLSX), custom XML/JSON exporters (`Iso23387Exporter`) |
+| Front-end build | Vite 4, Tailwind CSS 3, Alpine.js 3, Axios                                                 |
 
-- **Controllers**: Located in the `app/Http/Controllers` directory, controllers handle the logic of the application. For example, `PropertiesController.php` manages property-related operations.
-- **Models**: Found in the `app/Models` directory, models represent the data structure of the application. For instance, `Properties.php` defines the properties and relationships of the PDTs.
-- **Views**: Stored in the `resources/views` directory, views handle the presentation layer. Blade templates like `properties.blade.php` are used to render HTML content.
-- **Routes**: Defined in the `routes/web.php` file, routes map URLs to controllers. API routes are located in the `routes/api.php` file.
+## Project Structure
 
-### Connecting to the Database
+PDTs.pt follows Laravel's Model-View-Controller pattern.
 
-To connect to the database, configure your database settings in the `.env` file:
-
-```plaintext
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=pdt_database
-DB_USERNAME=your_username
-DB_PASSWORD=your_password
-```
-
-Ensure you have the necessary database and user permissions set up.
-
-## API Documentation
-
-Our platform includes an API page that provides detailed documentation on how to use the API gateways. To access the API documentation, visit `/api/documentation` on the platform.
-
-### Example API Usage
-
-#### Product Data Template API
-
-**Get Product Data Template**  
-Returns the product data template with the specified ID, with property groups, properties, data dictionary property attributes and relevant reference documents.
-
-```
-GET /api/{pdtID}
-```
+- **Controllers** (`app/Http/Controllers`) – request handling, e.g. `ProductdatatemplatesController` (view/query/export), `PreviewWorkflowController` (draft editor), `PdtCreateController`, `PdtVersioningController`, `UnitsReferenceController` (reference layer), `RelationshipController`.
+- **Models** (`app/Models`) – e.g. `productdatatemplates`, `properties`, `propertiesdatadictionaries`, `groupofproperties`, `constructionobjects`, `referencedocuments`, and the reference-layer models `Unit`, `PhysicalQuantity`, `Dimension`.
+- **Services** (`app/Services`) – domain logic, e.g. `Iso23387Exporter`, `UnitsReference`, `RelationshipService`, `VersioningService`, `PdtInheritanceService`, `PropertyPickerService`.
+- **Views** (`resources/views`) – Blade templates; the ISO 23387 reference pages live in `resources/views/reference/`.
+- **Routes** – web routes in `routes/web.php`, API routes in `routes/api.php`.
+- **Console commands** (`app/Console/Commands`) – seeding & data-reconciliation tools (see below).
 
 ## Getting Started
 
-To get started with PDTs.pt, clone this repository and follow the installation steps:
+**Requirements:** PHP 8.0.2+, Composer, Node.js + npm, and MySQL.
 
-1. **Clone the repository**:
+1. **Clone the repository**
+
     ```bash
     git clone https://github.com/M-ElSibaii/pdtspt.git
+    cd pdtspt
     ```
 
-2. **Install dependencies**:
+2. **Install dependencies**
+
     ```bash
-    cd pdtspt
     composer install
     npm install
     ```
 
-3. **Configure the environment**:
+3. **Configure the environment**
+
     ```bash
     cp .env.example .env
     php artisan key:generate
     ```
 
-4. **Set up the database**:
+    Set your database connection in `.env`:
+
+    ```dotenv
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=pdt_database
+    DB_USERNAME=your_username
+    DB_PASSWORD=your_password
+    ```
+
+4. **Set up the database**
+
     ```bash
     php artisan migrate --seed
     ```
 
-5. **Run the development server**:
+5. **Build front-end assets**
+
+    ```bash
+    npm run dev      # watch/hot-reload during development
+    # npm run build  # production build
+    ```
+
+6. **Run the development server**
+
     ```bash
     php artisan serve
     ```
 
 Visit `http://localhost:8000` to access the application.
 
+## API
+
+The API is served under the `/api` prefix and returns JSON. Interactive documentation lives at **`/apidoc`** on the platform.
+
+### Product Data Templates
+
+| Method & path                   | Description                                                                                                          |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `GET /api/{pdtID}`              | Full PDT with property groups, properties, data-dictionary attributes, reference documents, and construction object. |
+| `GET /api/{pdtID}/json`         | PDT exported as EN ISO 23387 JSON.                                                                                   |
+| `GET /api/{pdtID}/xml`          | PDT exported as EN ISO 23387 XML.                                                                                    |
+| `GET /api/productDataTemplates` | All PDTs.                                                                                                            |
+| `GET /api/constructionObjects`  | All construction objects.                                                                                            |
+
+### Data dictionary, reference documents & groups
+
+| Method & path                        | Description                        |
+| ------------------------------------ | ---------------------------------- |
+| `GET /api/dataDictionary`            | All data-dictionary properties.    |
+| `GET /api/dataDictionary/{Id}`       | A single data-dictionary property. |
+| `GET /api/referenceDocuments`        | All reference documents.           |
+| `GET /api/referenceDocuments/{GUID}` | A single reference document.       |
+| `GET /api/groupsOfProperties`        | All groups of properties.          |
+| `GET /api/groupsOfProperties/{Id}`   | A single group of properties.      |
+
+### ISO 23387 units reference layer
+
+| Method & path            | Description                                                                         |
+| ------------------------ | ----------------------------------------------------------------------------------- |
+| `GET /api/units`         | All units, each with its identity URI, physical quantity, dimension, and QUDT link. |
+| `GET /api/quantityKinds` | All physical quantities (quantity kinds).                                           |
+| `GET /api/dimensions`    | All dimensions with their 7 SI exponents (ISO 80000 order).                         |
+
+Each reference entity also resolves as a **dereferenceable page** on the platform, as HTML or (via `Accept: application/json`, `?format=json`, or a `.json` suffix) JSON:
+
+```
+GET /unit/{code}            e.g. /unit/mm
+GET /quantitykind/{name}    e.g. /quantitykind/length
+GET /dimension/{canonical}  e.g. /dimension/L
+```
+
 ## Contributing
 
-We welcome contributions from the community! If you have suggestions, bug reports, or feature requests, please open an issue or submit a pull request. Together, we can make PDTs.pt a valuable resource for managing Product Data Templates.
+Contributions are welcome. If you have suggestions, bug reports, or feature requests, please open an issue or submit a pull request.
 
 ## License
 
@@ -93,6 +140,6 @@ PDTs.pt is open-source software licensed under the [MIT license](LICENSE).
 
 ## Contact
 
-For any inquiries or support, please contact us at [pdts.portugal@gmail.com](mailto:pdts.portugal@gmail.com).
+For any inquiries or support, contact us at [pdts.portugal@gmail.com](mailto:pdts.portugal@gmail.com).
 
-Thank you for using PDTs.pt! We look forward to your feedback and contributions.
+Thank you for using PDTs.pt — we look forward to your feedback and contributions.
