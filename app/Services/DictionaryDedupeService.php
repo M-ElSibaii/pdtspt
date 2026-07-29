@@ -249,36 +249,64 @@ class DictionaryDedupeService
     }
 
     /**
-     * KEEP SEPARATE: optionally rename one or more nameEn values so the rows are no
-     * longer duplicates. New names are validated to be non-empty, unique in the
+     * KEEP SEPARATE: edit the name fields (nameEn, namePt, nameEnSc, namePtSc) on one
+     * or more rows so they are no longer duplicates. Only the fields actually supplied
+     * per row are written. nameEn (the grouping key) must stay non-empty, unique in the
      * table, and unique amongst the submitted renames.
+     *
+     * decision.renames shape:
+     *   { "<dictId>": { nameEn?, namePt?, nameEnSc?, namePtSc? }, ... }
+     * A bare string value is still accepted and treated as { nameEn: value } for
+     * backward compatibility.
      */
     private function applyKeepSeparate(array $decision, array $group): array
     {
-        $renames = collect($decision['renames'] ?? [])
-            ->mapWithKeys(fn($v, $id) => [(int) $id => trim((string) $v)])
-            ->filter(fn($v) => $v !== '');
+        $allowed = ['nameEn', 'namePt', 'nameEnSc', 'namePtSc'];
 
-        if ($renames->isEmpty()) {
-            return ['action' => 'keep_separate', 'name' => $group['name'], 'message' => 'Kept separate — no renames applied.'];
+        $renames = [];
+        foreach ((array) ($decision['renames'] ?? []) as $id => $fields) {
+            $id = (int) $id;
+            if (!is_array($fields)) {
+                $fields = ['nameEn' => (string) $fields];   // legacy bare-string = nameEn
+            }
+            $clean = [];
+            foreach ($allowed as $f) {
+                if (array_key_exists($f, $fields)) {
+                    $clean[$f] = trim((string) $fields[$f]);
+                }
+            }
+            if (!empty($clean)) {
+                $renames[$id] = $clean;
+            }
         }
 
-        // No collisions amongst the submitted new names.
-        if ($renames->values()->duplicates()->isNotEmpty()) {
-            throw new \RuntimeException('Two rows were given the same new name.');
+        if (empty($renames)) {
+            return ['action' => 'keep_separate', 'name' => $group['name'], 'message' => 'Kept separate — no changes applied.'];
         }
 
-        foreach ($renames as $id => $newName) {
+        // Validate ownership + nameEn rules (nameEn is the grouping key).
+        $newNameEns = [];
+        foreach ($renames as $id => $fields) {
             if (!in_array($id, $group['actionableIds'], true)) {
-                throw new \RuntimeException("Cannot rename Id {$id}: it is not part of this group.");
+                throw new \RuntimeException("Cannot edit Id {$id}: it is not part of this group.");
             }
-            if ($this->nameExists($newName, $id)) {
-                throw new \RuntimeException("The name '{$newName}' is already taken by another property.");
+            if (array_key_exists('nameEn', $fields)) {
+                $newName = $fields['nameEn'];
+                if ($newName === '') {
+                    throw new \RuntimeException("nameEn cannot be empty (Id {$id}).");
+                }
+                if ($this->nameExists($newName, $id)) {
+                    throw new \RuntimeException("The name '{$newName}' is already taken by another property.");
+                }
+                $newNameEns[] = $newName;
             }
+        }
+        if (collect($newNameEns)->duplicates()->isNotEmpty()) {
+            throw new \RuntimeException('Two rows were given the same new nameEn.');
         }
 
         $before = DB::table(self::DICT_TABLE)
-            ->whereIn(self::DICT_ID, $renames->keys()->all())
+            ->whereIn(self::DICT_ID, array_keys($renames))
             ->get();
 
         $backupPath = $this->writeBackupFile([
@@ -286,23 +314,23 @@ class DictionaryDedupeService
             'action'       => 'keep_separate',
             'name'         => $group['name'],
             'renamed_from' => $before,
-            'renamed_to'   => $renames->all(),
+            'renamed_to'   => $renames,
         ]);
 
         DB::transaction(function () use ($renames) {
-            foreach ($renames as $id => $newName) {
+            foreach ($renames as $id => $fields) {
                 DB::table(self::DICT_TABLE)
                     ->where(self::DICT_ID, $id)
-                    ->update([self::NAME_COL => $newName]);
+                    ->update($fields);
             }
         });
 
         return [
             'action'   => 'keep_separate',
             'name'      => $group['name'],
-            'renamed'   => $renames->count(),
+            'renamed'   => count($renames),
             'backup'    => basename($backupPath),
-            'message'   => 'Kept separate — renamed ' . $renames->count() . ' row(s).',
+            'message'   => 'Kept separate — updated ' . count($renames) . ' row(s).',
         ];
     }
 
@@ -498,6 +526,9 @@ class DictionaryDedupeService
             'id'                    => (int) $row->{self::DICT_ID},
             'guid'                  => $row->{self::DICT_GUID},
             'nameEn'                => $row->{self::NAME_COL},
+            'namePt'                => $row->namePt ?? null,
+            'nameEnSc'              => $row->nameEnSc ?? null,
+            'namePtSc'              => $row->namePtSc ?? null,
             'versionNumber'         => $row->versionNumber ?? null,
             'revisionNumber'        => $row->revisionNumber ?? null,
             'definitionEn'          => $row->definitionEn ?? null,
@@ -565,6 +596,118 @@ class DictionaryDedupeService
     }
 
     /**
+     * Update the dictionary-level general definition (definitionEn/definitionPt) of one
+     * `propertiesdatadictionaries` row. Used by the "deduped properties" review page.
+     */
+    public function updateDictDefinition(int $dictId, ?string $definitionEn, ?string $definitionPt): array
+    {
+        $row = DB::table(self::DICT_TABLE)->where(self::DICT_ID, $dictId)->first();
+        if (!$row) {
+            throw new \RuntimeException("Dictionary row Id {$dictId} no longer exists — please reload.");
+        }
+
+        DB::table(self::DICT_TABLE)
+            ->where(self::DICT_ID, $dictId)
+            ->update([
+                'definitionEn' => $definitionEn,
+                'definitionPt' => $definitionPt,
+            ]);
+
+        return [
+            'id'           => $dictId,
+            'definitionEn' => $definitionEn,
+            'definitionPt' => $definitionPt,
+        ];
+    }
+
+    /**
+     * Every dictionary row that is referenced by at least $minRefs properties rows
+     * (i.e. shared across multiple PDT/group contexts — the result of dedup merges,
+     * plus any naturally reused property). Returns the dictionary row (with its general
+     * definition) together with all of its in-context instances and their per-PDT
+     * descriptions, ready for the manual-review page.
+     *
+     * Resolved in three queries (no N+1): the shared Ids, the dictionary rows, and all
+     * referencing properties joined to their PDT/group in one pass.
+     *
+     * Each returned row carries a `needsAttention` flag: true when any instance is
+     * missing a description, or the instances disagree with each other.
+     *
+     * @return array<int,array>
+     */
+    public function sharedProperties(int $minRefs = 2): array
+    {
+        $ids = DB::table(self::PROP_TABLE)
+            ->select(self::PROP_PROPID)
+            ->whereNotNull(self::PROP_PROPID)
+            ->groupBy(self::PROP_PROPID)
+            ->havingRaw('COUNT(*) >= ?', [$minRefs])
+            ->pluck(self::PROP_PROPID)
+            ->map(fn($i) => (int) $i)
+            ->all();
+
+        if (empty($ids)) {
+            return [];
+        }
+
+        $dictRows = DB::table(self::DICT_TABLE)
+            ->whereIn(self::DICT_ID, $ids)
+            ->orderBy(self::NAME_COL)
+            ->orderBy(self::DICT_ID)
+            ->get();
+
+        $propsByDict = DB::table(self::PROP_TABLE . ' as p')
+            ->leftJoin('productdatatemplates as pdt', 'pdt.Id', '=', 'p.pdtID')
+            ->leftJoin('groupofproperties as gop', 'gop.Id', '=', 'p.gopID')
+            ->whereIn('p.' . self::PROP_PROPID, $ids)
+            ->orderBy('pdt.pdtNameEn')
+            ->orderBy('p.pdtID')
+            ->select(
+                'p.Id',
+                'p.' . self::PROP_PROPID . ' as propertyId',
+                'p.pdtID',
+                'p.gopID',
+                'p.descriptionEn',
+                'p.descriptionPt',
+                'pdt.pdtNameEn as _pdtNameEn',
+                'pdt.pdtNamePt as _pdtNamePt',
+                'pdt.versionNumber as _pdtVersion',
+                'pdt.revisionNumber as _pdtRevision',
+                'gop.gopNameEn as _gopNameEn',
+                'gop.gopNamePt as _gopNamePt'
+            )
+            ->get()
+            ->groupBy('propertyId');
+
+        $out = [];
+        foreach ($dictRows as $row) {
+            $refs = collect($propsByDict->get($row->{self::DICT_ID}, collect()))->values();
+
+            $en = $refs->map(fn($r) => trim((string) $r->descriptionEn));
+            $pt = $refs->map(fn($r) => trim((string) $r->descriptionPt));
+            $needsAttention = $en->contains('') || $pt->contains('')
+                || $en->unique()->count() > 1 || $pt->unique()->count() > 1;
+
+            $out[] = [
+                'id'             => (int) $row->{self::DICT_ID},
+                'guid'           => $row->{self::DICT_GUID},
+                'nameEn'         => $row->nameEn,
+                'namePt'         => $row->namePt,
+                'nameEnSc'       => $row->nameEnSc,
+                'namePtSc'       => $row->namePtSc,
+                'definitionEn'   => $row->definitionEn,
+                'definitionPt'   => $row->definitionPt,
+                'status'         => $row->status,
+                'refCount'       => $refs->count(),
+                'needsAttention' => $needsAttention,
+                'refs'           => $refs->all(),
+            ];
+        }
+
+        return $out;
+    }
+
+    /**
      * A referencing property disagrees with itself when the dictionary row its
      * propertyId points to is missing, or has a different GUID than the property's
      * own GUID.
@@ -598,6 +741,65 @@ class DictionaryDedupeService
             return (string) ($spec['value'] ?? '');
         }
         return $survivorValue;
+    }
+
+    /**
+     * Path to the JSON file holding non-DB review state (which shared properties the
+     * reviewer has marked "dealt with"). Deliberately outside the database.
+     */
+    public function reviewStatePath(): string
+    {
+        return storage_path('app/dedupe_review_state.json');
+    }
+
+    /**
+     * Load the review state.
+     *
+     * @return array{dealtWith: array<int,bool>}
+     */
+    public function reviewState(): array
+    {
+        $path = $this->reviewStatePath();
+        $dealt = [];
+        if (is_file($path)) {
+            $data = json_decode((string) file_get_contents($path), true);
+            foreach ((array) ($data['dealtWith'] ?? []) as $id => $v) {
+                if ($v) {
+                    $dealt[(int) $id] = true;
+                }
+            }
+        }
+        return ['dealtWith' => $dealt];
+    }
+
+    /**
+     * Mark / unmark one shared property (dictionary Id) as dealt-with, persisting to the
+     * review-state file. Returns the updated state.
+     *
+     * @return array{dealtWith: array<int,bool>}
+     */
+    public function setDealtWith(int $dictId, bool $dealt): array
+    {
+        $state = $this->reviewState();
+        if ($dealt) {
+            $state['dealtWith'][$dictId] = true;
+        } else {
+            unset($state['dealtWith'][$dictId]);
+        }
+
+        // JSON object keys must be strings; ksort for a stable, human-diffable file.
+        $out = [];
+        foreach (array_keys($state['dealtWith']) as $id) {
+            $out[(string) $id] = true;
+        }
+        ksort($out, SORT_NUMERIC);
+
+        file_put_contents(
+            $this->reviewStatePath(),
+            json_encode(['dealtWith' => (object) $out], JSON_PRETTY_PRINT)
+        );
+
+        return $state;
     }
 
     private function writeBackupFile(array $payload): string

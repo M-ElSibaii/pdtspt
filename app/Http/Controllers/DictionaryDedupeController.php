@@ -33,6 +33,65 @@ class DictionaryDedupeController extends Controller
     }
 
     /**
+     * Review page: every dictionary property shared across 2+ contexts (dedup
+     * survivors + naturally reused properties), with its general definition and all
+     * in-context instances/descriptions, all editable in place.
+     */
+    public function deduped(DictionaryDedupeService $service)
+    {
+        $schemaError = $service->schemaError();
+        $rows = $schemaError ? [] : $service->sharedProperties(2);
+
+        return view('admin.deduped-properties', [
+            'rows'        => $rows,
+            'schemaError' => $schemaError,
+            'dealtWith'   => $service->reviewState()['dealtWith'],
+        ]);
+    }
+
+    /**
+     * Toggle the (file-backed, non-DB) "dealt with" flag for one shared property.
+     */
+    public function reviewState(Request $request, DictionaryDedupeService $service)
+    {
+        $data = $request->validate([
+            'dictId'    => 'required|integer',
+            'dealtWith' => 'required|boolean',
+        ]);
+
+        try {
+            $service->setDealtWith((int) $data['dictId'], (bool) $data['dealtWith']);
+            return response()->json(['ok' => true]);
+        } catch (\Throwable $e) {
+            return response()->json(['ok' => false, 'error' => $e->getMessage()], 422);
+        }
+    }
+
+    /**
+     * Edit a dictionary row's general definition (definitionEn/definitionPt).
+     */
+    public function updateDict(Request $request, DictionaryDedupeService $service)
+    {
+        $data = $request->validate([
+            'dictId'       => 'required|integer',
+            'definitionEn' => 'nullable|string',
+            'definitionPt' => 'nullable|string',
+        ]);
+
+        try {
+            $result = $service->updateDictDefinition(
+                (int) $data['dictId'],
+                $data['definitionEn'] ?? null,
+                $data['definitionPt'] ?? null
+            );
+
+            return response()->json(['ok' => true, 'result' => $result]);
+        } catch (\Throwable $e) {
+            return response()->json(['ok' => false, 'error' => $e->getMessage()], 422);
+        }
+    }
+
+    /**
      * Edit a single referencing properties row's per-PDT descriptions.
      */
     public function updateProperty(Request $request, DictionaryDedupeService $service)

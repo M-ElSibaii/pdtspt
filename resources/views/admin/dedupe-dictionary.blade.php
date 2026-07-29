@@ -1,7 +1,12 @@
 <x-app-layout>
     <div style="background-color: white;">
         <div class="container py-9">
-            <h1>Review &amp; deduplicate dictionary properties</h1>
+            <div class="flex flex-wrap items-center gap-3">
+                <h1 class="mb-0">Review &amp; deduplicate dictionary properties</h1>
+                <a href="{{ route('admin.dedupe.deduped') }}" class="btn btn-secondary ml-auto">
+                    View deduped &amp; shared properties →
+                </a>
+            </div>
             <p class="text-sm text-gray-600 mt-1">
                 Groups of <code>propertiesdatadictionaries</code> rows that share the exact same
                 <strong>nameEn</strong>. Resolve one group at a time. Version variants (same GUID,
@@ -245,14 +250,39 @@
                                     {{-- KEEP SEPARATE panel --}}
                                     <div class="dd-panel dd-panel-keep_separate" style="display:none;">
                                         <p class="text-sm text-gray-600 mb-2">
-                                            These are genuinely different properties. Optionally rename one or more so they
-                                            are no longer duplicates (new name must be unique). Leave blank to keep as-is.
+                                            These are genuinely different properties. Edit the name fields so they are no
+                                            longer duplicates — <strong>nameEn</strong> must stay unique and non-empty.
+                                            Only the fields you change are written.
                                         </p>
                                         @foreach ($actionable as $row)
-                                            <div class="flex items-center gap-2 text-sm mb-1">
-                                                <span class="w-40">Id={{ $row['id'] }} ({{ $row['nameEn'] }})</span>
-                                                <input type="text" class="dd-rename border rounded p-1 flex-1"
-                                                       data-id="{{ $row['id'] }}" placeholder="New nameEn (optional)">
+                                            <div class="dd-rename-row border rounded p-3 mb-2 bg-white" data-id="{{ $row['id'] }}">
+                                                <div class="text-xs text-gray-500 mb-2">Id={{ $row['id'] }}</div>
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
+                                                    <label class="block">
+                                                        <span class="block text-xs font-semibold mb-1">nameEn</span>
+                                                        <input type="text" class="dd-rename-field border rounded p-1 w-full text-sm"
+                                                               data-field="nameEn" data-orig="{{ $row['nameEn'] }}"
+                                                               value="{{ $row['nameEn'] }}">
+                                                    </label>
+                                                    <label class="block">
+                                                        <span class="block text-xs font-semibold mb-1">namePt</span>
+                                                        <input type="text" class="dd-rename-field border rounded p-1 w-full text-sm"
+                                                               data-field="namePt" data-orig="{{ $row['namePt'] ?? '' }}"
+                                                               value="{{ $row['namePt'] ?? '' }}">
+                                                    </label>
+                                                    <label class="block">
+                                                        <span class="block text-xs font-semibold mb-1">nameEnSc</span>
+                                                        <input type="text" class="dd-rename-field border rounded p-1 w-full text-sm"
+                                                               data-field="nameEnSc" data-orig="{{ $row['nameEnSc'] ?? '' }}"
+                                                               value="{{ $row['nameEnSc'] ?? '' }}">
+                                                    </label>
+                                                    <label class="block">
+                                                        <span class="block text-xs font-semibold mb-1">namePtSc</span>
+                                                        <input type="text" class="dd-rename-field border rounded p-1 w-full text-sm"
+                                                               data-field="namePtSc" data-orig="{{ $row['namePtSc'] ?? '' }}"
+                                                               value="{{ $row['namePtSc'] ?? '' }}">
+                                                    </label>
+                                                </div>
                                             </div>
                                         @endforeach
                                     </div>
@@ -398,8 +428,15 @@
                         }
                     } else if (action === 'keep_separate') {
                         const renames = {};
-                        card.querySelectorAll('.dd-rename').forEach(function (input) {
-                            if (input.value.trim() !== '') renames[input.dataset.id] = input.value.trim();
+                        card.querySelectorAll('.dd-rename-row').forEach(function (rowEl) {
+                            const fields = {};
+                            rowEl.querySelectorAll('.dd-rename-field').forEach(function (input) {
+                                // Only send fields the admin actually changed.
+                                if (input.value !== input.dataset.orig) {
+                                    fields[input.dataset.field] = input.value.trim();
+                                }
+                            });
+                            if (Object.keys(fields).length > 0) renames[rowEl.dataset.id] = fields;
                         });
                         decision.renames = renames;
                     }

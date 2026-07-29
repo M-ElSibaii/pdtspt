@@ -130,6 +130,17 @@ GET /quantitykind/{name}    e.g. /quantitykind/length
 GET /dimension/{canonical}  e.g. /dimension/L
 ```
 
+# Rebuild the reference layer (units from bsDD, dimensions, quantity kinds)
+
+php artisan units:seed-reference
+php artisan dimensions:derive --apply
+php artisan units:map-qudt --apply
+php artisan properties:reconcile-units --apply
+
+# Re-run the dictionary dedup
+
+php artisan pdts:dedupe-dictionary
+
 ## Contributing
 
 Contributions are welcome. If you have suggestions, bug reports, or feature requests, please open an issue or submit a pull request.

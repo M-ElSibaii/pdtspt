@@ -172,6 +172,19 @@ Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
         ->name('admin.dedupe.apply');
     Route::post('/admin/dedupe-dictionary/property', [DictionaryDedupeController::class, 'updateProperty'])
         ->name('admin.dedupe.property');
+    // Deduped/shared properties: dictionary definition + all in-context descriptions, editable.
+    Route::get('/admin/dedupe-dictionary/deduped', [DictionaryDedupeController::class, 'deduped'])
+        ->name('admin.dedupe.deduped');
+    Route::post('/admin/dedupe-dictionary/dict', [DictionaryDedupeController::class, 'updateDict'])
+        ->name('admin.dedupe.dict');
+    Route::post('/admin/dedupe-dictionary/review-state', [DictionaryDedupeController::class, 'reviewState'])
+        ->name('admin.dedupe.reviewState');
+
+    // Interactive API tester (admin). Calls the site's own origin by default so it
+    // behaves identically on localhost and once live on pdts.pt.
+    Route::get('/admin/api-tester', function () {
+        return view('admin.api-tester');
+    })->name('admin.api-tester');
 
     // Preview workflow: free-edit drafts (status = Preview), hard-delete, publish.
     Route::get('/admin/previews', [PreviewWorkflowController::class, 'drafts'])

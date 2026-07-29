@@ -78,6 +78,12 @@
             <a href="{{ route('admin.previews') }}" class="btn btn-secondary">
                 Preview drafts (edit / publish / delete)
             </a>
+            <br>
+            <br>
+            <!-- interactive API tester -->
+            <a href="{{ route('admin.api-tester') }}" class="btn btn-secondary">
+                API tester (test all endpoints)
+            </a>
 
         </div>
     </div>
