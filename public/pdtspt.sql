@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 20, 2026 at 12:42 PM
+-- Generation Time: Aug 20, 2026 at 01:15 PM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.1.6
 
@@ -20,6 +20,38 @@ SET time_zone = "+00:00";
 --
 -- Database: `pdtspt`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `answers`
+--
+
+CREATE TABLE `answers` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `users_id` bigint(20) UNSIGNED NOT NULL,
+  `answer` enum('yes','no','no_opinion') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `properties_Id` int(10) UNSIGNED NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `comments`
+--
+
+CREATE TABLE `comments` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `parent_id` int(10) UNSIGNED DEFAULT NULL,
+  `users_id` bigint(20) UNSIGNED NOT NULL,
+  `properties_Id` int(10) UNSIGNED NOT NULL,
+  `body` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `published_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT '2026-07-07 08:34:54',
+  `updated_at` timestamp NULL DEFAULT '2026-07-07 08:34:54'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -41,6 +73,23 @@ CREATE TABLE `constructionobjects` (
   `revisionNumber` int(11) NOT NULL,
   `descriptionEn` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `descriptionPt` text COLLATE utf8mb4_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `contacts`
+--
+
+CREATE TABLE `contacts` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subject` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `message` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -87,6 +136,22 @@ CREATE TABLE `entity_relationships` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `failed_jobs`
+--
+
+CREATE TABLE `failed_jobs` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `uuid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `connection` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `exception` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `failed_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `groupofproperties`
 --
 
@@ -120,6 +185,49 @@ CREATE TABLE `groupofproperties` (
   `created_at` date NOT NULL DEFAULT '2026-07-07',
   `depreciationExplanation` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `depreciationDate` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `migrations`
+--
+
+CREATE TABLE `migrations` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `batch` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `password_resets`
+--
+
+CREATE TABLE `password_resets` (
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `personal_access_tokens`
+--
+
+CREATE TABLE `personal_access_tokens` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `tokenable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tokenable_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `abilities` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `last_used_at` timestamp NULL DEFAULT NULL,
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -301,9 +409,47 @@ CREATE TABLE `units` (
   `offset` varchar(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email_verified_at` timestamp NULL DEFAULT NULL,
+  `profession` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'n/a',
+  `institute` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'n/a',
+  `isAdmin` tinyint(1) NOT NULL DEFAULT 0,
+  `subscribe` tinyint(1) NOT NULL DEFAULT 1,
+  `photo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `answers`
+--
+ALTER TABLE `answers`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `answers_properties_id_foreign` (`properties_Id`),
+  ADD KEY `answers_users_id_foreign` (`users_id`);
+
+--
+-- Indexes for table `comments`
+--
+ALTER TABLE `comments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `comments_properties_id_foreign` (`properties_Id`),
+  ADD KEY `comments_users_id_foreign` (`users_id`);
 
 --
 -- Indexes for table `constructionobjects`
@@ -311,6 +457,12 @@ CREATE TABLE `units` (
 ALTER TABLE `constructionobjects`
   ADD PRIMARY KEY (`GUID`),
   ADD KEY `constructionobjects_referencedocumentguid_foreign` (`referenceDocumentGUID`);
+
+--
+-- Indexes for table `contacts`
+--
+ALTER TABLE `contacts`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `dimensions`
@@ -329,6 +481,13 @@ ALTER TABLE `entity_relationships`
   ADD KEY `entity_rel_target_idx` (`targetEntityType`,`targetGuid`);
 
 --
+-- Indexes for table `failed_jobs`
+--
+ALTER TABLE `failed_jobs`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`);
+
+--
 -- Indexes for table `groupofproperties`
 --
 ALTER TABLE `groupofproperties`
@@ -336,6 +495,26 @@ ALTER TABLE `groupofproperties`
   ADD KEY `groupofproperties_pdtid_index` (`pdtId`),
   ADD KEY `groupofproperties_referencedocumentguid_foreign` (`referenceDocumentGUID`),
   ADD KEY `gop_lineage_idx` (`GUID`,`versionNumber`,`revisionNumber`);
+
+--
+-- Indexes for table `migrations`
+--
+ALTER TABLE `migrations`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `password_resets`
+--
+ALTER TABLE `password_resets`
+  ADD PRIMARY KEY (`email`);
+
+--
+-- Indexes for table `personal_access_tokens`
+--
+ALTER TABLE `personal_access_tokens`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
+  ADD KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`);
 
 --
 -- Indexes for table `physical_quantities`
@@ -403,8 +582,33 @@ ALTER TABLE `units`
   ADD KEY `units_physical_quantity_guid_foreign` (`physical_quantity_guid`);
 
 --
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `users_email_unique` (`email`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `answers`
+--
+ALTER TABLE `answers`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `comments`
+--
+ALTER TABLE `comments`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `contacts`
+--
+ALTER TABLE `contacts`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `entity_relationships`
@@ -413,10 +617,28 @@ ALTER TABLE `entity_relationships`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `failed_jobs`
+--
+ALTER TABLE `failed_jobs`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `groupofproperties`
 --
 ALTER TABLE `groupofproperties`
   MODIFY `Id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `migrations`
+--
+ALTER TABLE `migrations`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `personal_access_tokens`
+--
+ALTER TABLE `personal_access_tokens`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `productdatatemplates`
@@ -449,8 +671,28 @@ ALTER TABLE `property_dependency_targets`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `answers`
+--
+ALTER TABLE `answers`
+  ADD CONSTRAINT `answers_properties_id_foreign` FOREIGN KEY (`properties_Id`) REFERENCES `properties` (`Id`),
+  ADD CONSTRAINT `answers_users_id_foreign` FOREIGN KEY (`users_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `comments`
+--
+ALTER TABLE `comments`
+  ADD CONSTRAINT `comments_properties_id_foreign` FOREIGN KEY (`properties_Id`) REFERENCES `properties` (`Id`),
+  ADD CONSTRAINT `comments_users_id_foreign` FOREIGN KEY (`users_id`) REFERENCES `users` (`id`);
 
 --
 -- Constraints for table `constructionobjects`
