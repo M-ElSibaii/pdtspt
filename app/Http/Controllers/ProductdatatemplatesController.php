@@ -617,7 +617,7 @@ class ProductdatatemplatesController extends Controller
         $code = $this->propertyCodeFor($property);
         $ownedUri = 'https://pdts.pt/datadictionaryview/' . $property->Id . '-' . self::sanitizePascalCase($property->namePt);
 
-        return [
+        $data = [
             'Code'                    => $code,
             'Name'                    => $property->namePt,
             'Definition'              => $property->definitionPt,
@@ -643,6 +643,47 @@ class ProductdatatemplatesController extends Controller
             'VersionNumber'           => (int) $property->versionNumber,
             'VisualRepresentationUri' => $ownedUri ?: null,
         ];
+
+        // ISO 23386 "relation to other data dictionaries" -> bSDD PropertyRelations.
+        $relations = $this->buildPropertyRelations($property);
+        if (!empty($relations)) {
+            $data['PropertyRelations'] = $relations;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Map propertiesdatadictionaries.relationToOtherDataDictionaries onto bSDD
+     * PropertyRelations (RelationType IsEqualTo).
+     *
+     * Stored as a list of "(value, source)" tuples, e.g.
+     *   (https://identifier.buildingsmart.org/uri/buildingsmart/ifc/4.3/prop/FireRating, bsdd.buildingsmart.org)
+     *   (https://.../prop/ClimateChange, bsdd.buildingsmart.org), (0q8OlTYA9AMQ262TdhWLUy, ISO 22057:2021)
+     * and occasionally as a bare URI with no parentheses. Only http(s) values are
+     * emitted — bSDD requires RelatedPropertyUri to be a resolvable URI, so
+     * non-URI identifiers (ISO 22057 codes) are skipped.
+     */
+    private function buildPropertyRelations($property): array
+    {
+        $raw = trim((string) ($property->relationToOtherDataDictionaries ?? ''));
+        if ($raw === '' || strtolower($raw) === 'n/a') return [];
+
+        if (!preg_match_all('~https?://[^\s,()]+~i', $raw, $m)) return [];
+
+        $relations = [];
+        $seen = [];
+        foreach ($m[0] as $uri) {
+            $uri = rtrim($uri, ".,;");
+            if ($uri === '' || isset($seen[$uri])) continue;
+            $seen[$uri] = true;
+            $relations[] = [
+                'RelationType'       => 'IsEqualTo',
+                'RelatedPropertyUri' => $uri,
+            ];
+        }
+
+        return $relations;
     }
 
     /**
