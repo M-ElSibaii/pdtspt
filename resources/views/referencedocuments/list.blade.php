@@ -39,7 +39,7 @@
                                     <td style="padding: 8px; border-bottom: 1px solid #ddd;">{{ $document->title }}</td>
                                     <td style="padding: 8px; border-bottom: 1px solid #ddd;">
                                         <a
-                                            href="{{ route('referencedocumentview', ['rdGUID' => $document->GUID]) }}"
+                                            href="{{ Uri::buildLink('doc', $document) }}"
                                             style="color: blue; text-decoration: underline;">
                                             {{ __('View') }}
                                         </a>

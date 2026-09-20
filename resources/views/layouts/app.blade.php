@@ -465,10 +465,10 @@
 </body>
 <footer class="bg-neutral-200 text-center lg:text-left flex flex-rows">
     <div class="p-4 grow text-center text-neutral-700">
-        © 2021 Universidade do Minho. Todos os direitos reservados &middot;
-        <a class="text-neutral-800" href="{{route('privacypolicy')}}">Política de privacidade</a>
+        © 2021 Universidade do Minho. {{ Lg::t('Todos os direitos reservados') }} &middot;
+        <a class="text-neutral-800" href="{{ route('privacypolicy') }}">{{ Lg::t('Política de privacidade') }}</a>
     </div>
-    <p class="p-4 flex-none"><a href="#">Back to top</a></p>
+    <p class="p-4 flex-none"><a href="#">{{ Lg::t('Back to top') }}</a></p>
 </footer>
 
 </html>

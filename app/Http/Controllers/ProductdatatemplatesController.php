@@ -55,7 +55,7 @@ class ProductdatatemplatesController extends Controller
             'Name' => $this->buildMultilingualNames($gop->gopNameEn, $gop->gopNamePt),
             'Definition' => $this->buildMultilingualDefinitions($gop->definitionEn, $gop->definitionPt),
             'dt:GUID' => $gop->GUID,
-            'referenceURI' => 'https://pdts.pt/groupofpropertiesview/' . $gop->Id . '-' . $this->convertToPascalCase($gop->gopNamePt)
+            'referenceURI' => \App\Services\UriService::build(\App\Services\UriService::GROUP, $gop)
         ];
     }
 
@@ -130,7 +130,7 @@ class ProductdatatemplatesController extends Controller
                 ->orderByRaw('versionNumber DESC, revisionNumber DESC')
                 ->first();
             if ($target) {
-                $subtypeParents[] = ['name' => $target->pdtNamePt ?: $target->pdtNameEn, 'pdtId' => $target->Id, 'guid' => $target->GUID];
+                $subtypeParents[] = ['name' => $target->pdtNamePt ?: $target->pdtNameEn, 'pdtId' => $target->Id, 'guid' => $target->GUID, 'record' => $target];
             }
         }
 
@@ -391,7 +391,7 @@ class ProductdatatemplatesController extends Controller
                                 ['language' => 'en', 'value' => $refDoc->description ?? $refDoc->title ?? 'Referenced document']
                             ],
                             'URI' => [
-                                ['language' => 'en', 'value' => 'https://pdts.pt/referencedocumentview/' . $refDoc->GUID . '-' . str_replace(' ', '', $refDoc->rdName ?? '')]
+                                ['language' => 'en', 'value' => \App\Services\UriService::build(\App\Services\UriService::DOCUMENT, $refDoc)]
                             ],
                             'Status' => $refDoc->status ?? 'Active',
                             'Language' => 'en',
@@ -414,7 +414,7 @@ class ProductdatatemplatesController extends Controller
                         'dateOfCreation' => $this->formatDate($pdt->dateOfVersion ?? $pdt->dateOfRevision),
                         'Name' => $this->buildMultilingualNames($pdt->pdtNameEn, $pdt->pdtNamePt),
                         'Definition' => $this->buildMultilingualDefinitions($pdt->descriptionEn, $pdt->descriptionPt),
-                        'URI' => "https://pdts.pt/pdtview/{$pdt->Id}-" . self::convertToPascalCase($pdt->pdtNamePt),
+                        'URI' => \App\Services\UriService::build(\App\Services\UriService::DATA_TEMPLATE, $pdt),
                         'HasObjectTypeRef' => $hasObjectTypeRef,
                     ],
                     'rawData' => $pdtData,
@@ -592,30 +592,16 @@ class ProductdatatemplatesController extends Controller
     {
         $propertyRD = properties::where('propertyId', $property->Id)->latest()->value('referenceDocumentGUID') ?? 'n/a';
 
-        $guid = $property->GUID;
-        $versionNumber = $property->versionNumber;
-        $revisionNumber = $property->revisionNumber;
-
-        $replacingProperties = propertiesdatadictionaries::where('GUID', $guid)
-            ->where(function ($q) use ($versionNumber, $revisionNumber) {
-                $q->where('versionNumber', '>', $versionNumber)
-                    ->orWhere(function ($q2) use ($versionNumber, $revisionNumber) {
-                        $q2->where('versionNumber', $versionNumber)->where('revisionNumber', '>', $revisionNumber);
-                    });
-            })->get();
-        $replacingCodes = $replacingProperties->map(fn($p) => $this->propertyCodeFor($p))->toArray();
-
-        $replacedProperties = propertiesdatadictionaries::where('GUID', $guid)
-            ->where(function ($q) use ($versionNumber, $revisionNumber) {
-                $q->where('versionNumber', '<', $versionNumber)
-                    ->orWhere(function ($q2) use ($versionNumber, $revisionNumber) {
-                        $q2->where('versionNumber', $versionNumber)->where('revisionNumber', '<', $revisionNumber);
-                    });
-            })->get();
-        $replacedCodes = $replacedProperties->map(fn($p) => $this->propertyCodeFor($p))->toArray();
+        // Only the latest version of each property is exported, and every version of a
+        // property shares one code (its name). ReplacedObjectCodes / ReplacingObjectCodes
+        // would therefore name the property itself or objects absent from the dictionary,
+        // so they are emitted empty. Version history stays reachable through the pinned
+        // /v{n} identifiers.
+        $replacedCodes = [];
+        $replacingCodes = [];
 
         $code = $this->propertyCodeFor($property);
-        $ownedUri = 'https://pdts.pt/datadictionaryview/' . $property->Id . '-' . self::sanitizePascalCase($property->namePt);
+        $ownedUri = \App\Services\UriService::build(\App\Services\UriService::PROPERTY, $property);
 
         $data = [
             'Code'                    => $code,
@@ -741,31 +727,19 @@ class ProductdatatemplatesController extends Controller
             WHERE pdt.status = 'Active'
         ");
 
-        // Latest ACTIVE version of each dictionary property.
-        $propertiesData = DB::select("
-            SELECT p.*
-            FROM propertiesdatadictionaries p
-            INNER JOIN (
-                SELECT GUID, MAX(versionNumber) AS maxVersion
-                FROM propertiesdatadictionaries
-                WHERE status = 'Active'
-                GROUP BY GUID
-            ) latest ON p.GUID = latest.GUID AND p.versionNumber = latest.maxVersion
-            INNER JOIN (
-                SELECT GUID, versionNumber, MAX(revisionNumber) AS maxRevision
-                FROM propertiesdatadictionaries
-                WHERE status = 'Active'
-                GROUP BY GUID, versionNumber
-            ) latestRev ON p.GUID = latestRev.GUID
-                AND p.versionNumber = latestRev.versionNumber
-                AND p.revisionNumber = latestRev.maxRevision
-            WHERE p.status = 'Active'
-        ");
+        // Properties[] is NOT every dictionary property: it is exactly the latest Active
+        // version of each property that the exported templates actually use. It is
+        // collected while the classes are built (see buildClassPropertiesForGroups), so a
+        // property that no exported template carries is not published.
+        $jsonData = $this->transformDataPSETS($productDataTemplates);
 
-        $jsonData = $this->transformDataPSETS($productDataTemplates, $propertiesData);
-
-        // Guard: fail loudly on any duplicate code BEFORE writing the file.
-        $this->assertDistinctCodes($jsonData);
+        // Guard: fail loudly on any duplicate code / OwnedUri BEFORE writing the file.
+        // Name-only codes that collide are data defects to reconcile, never renamed here.
+        try {
+            $this->assertDistinctCodes($jsonData);
+        } catch (\RuntimeException $e) {
+            return response($e->getMessage(), 409)->header('Content-Type', 'text/plain; charset=utf-8');
+        }
 
         $tempFilePath = tempnam(sys_get_temp_dir(), 'PDTs.pt_Domain_bsdd_PSETS_');
         file_put_contents($tempFilePath, json_encode($jsonData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
@@ -785,8 +759,19 @@ class ProductdatatemplatesController extends Controller
         );
     }
 
-    private function transformDataPSETS($productDataTemplates, $propertiesData)
+    /**
+     * Latest Active dictionary rows actually used by the exported classes, keyed by GUID.
+     * Filled by buildClassPropertiesForGroups() so Properties[] carries exactly what the
+     * ClassProperties point at — no more, no less.
+     *
+     * @var array<string,object>
+     */
+    private array $exportedProperties = [];
+
+    private function transformDataPSETS($productDataTemplates)
     {
+        $this->exportedProperties = [];
+
         $jsonData = [
             'ModelVersion'              => '2.0',
             'OrganizationCode'          => 'pdtspt',
@@ -794,10 +779,10 @@ class ProductdatatemplatesController extends Controller
             'LanguageIsoCode'           => 'pt-PT',
             'LanguageOnly'              => false,
             'UseOwnUri'                 => true,
-            'DictionaryUri'             => 'https://pdts.pt',
+            'DictionaryUri'             => \App\Services\UriService::dictionaryUri(),
             'DictionaryName'            => 'PDTs.pt',
-            'DictionaryVersion'         => '0.1',
-            'MoreInfoUrl'               => 'https://pdts.pt',
+            'DictionaryVersion'         => \App\Services\UriService::dictionaryVersion(),
+            'MoreInfoUrl'               => \App\Services\UriService::base(),
             'ChangeRequestEmailAddress' => 'pdts.portugal@gmail.com',
             'License'                   => 'CC BY',
             'LicenseUrl'                => 'https://creativecommons.org/share-your-work/cclicenses/',
@@ -806,8 +791,6 @@ class ProductdatatemplatesController extends Controller
             'Properties'                => [],
         ];
 
-        // Disambiguate PDT codes if two PDTs PascalCase to the same string.
-        $seenPdtCodes = [];
         $seenGroupGuids = [];
 
         // Emit ANCESTORS before descendants (parents-before-children) so an inherited
@@ -825,7 +808,7 @@ class ProductdatatemplatesController extends Controller
         usort($productDataTemplates, fn($a, $b) => ($depth[$a->GUID] ?? 0) <=> ($depth[$b->GUID] ?? 0));
 
         foreach ($productDataTemplates as $pdt) {
-            [$pdtClass, $pdtCode] = $this->transformProductDataTemplatePSETS($pdt, $seenPdtCodes);
+            [$pdtClass, $pdtCode] = $this->transformProductDataTemplatePSETS($pdt);
             $jsonData['Classes'][] = $pdtClass;
 
             // Emit each of this PDT's (inherited) groups as its own GroupOfProperties class.
@@ -840,7 +823,10 @@ class ProductdatatemplatesController extends Controller
             }
         }
 
-        foreach ($propertiesData as $property) {
+        // Only the properties the classes above actually reference.
+        $properties = array_values($this->exportedProperties);
+        usort($properties, fn($a, $b) => strcmp((string) $a->namePt, (string) $b->namePt));
+        foreach ($properties as $property) {
             $jsonData['Properties'][] = $this->transformPropertyDataDictionary($property);
         }
 
@@ -850,15 +836,12 @@ class ProductdatatemplatesController extends Controller
     /**
      * @return array{0: array, 1: string}  [classData, pdtCode]
      */
-    private function transformProductDataTemplatePSETS($pdt, array &$seenPdtCodes)
+    private function transformProductDataTemplatePSETS($pdt)
     {
-        $code = self::convertToPascalCase($pdt->pdtNamePt) ?: ('Pdt' . $pdt->Id);
-        if (isset($seenPdtCodes[$code])) {
-            $code = $code . '-' . $pdt->Id; // collision-safe
-        }
-        $seenPdtCodes[$code] = true;
-
-        $ownedUri = 'https://pdts.pt/pdtview/' . $pdt->Id . '-' . self::convertToPascalCase($pdt->pdtNamePt);
+        // Code = the PDT's name, per the identifier scheme. Two latest-active PDTs with
+        // one name are NOT disambiguated here: assertDistinctCodes() reports them.
+        $code = \App\Services\UriService::codeFor(\App\Services\UriService::DATA_TEMPLATE, $pdt);
+        $ownedUri = \App\Services\UriService::build(\App\Services\UriService::DATA_TEMPLATE, $pdt);
 
         $classData = [
             'ClassType'              => 'Class',
@@ -883,7 +866,9 @@ class ProductdatatemplatesController extends Controller
         // Attach every property (deduped by dict GUID within this class) to the PDT,
         // with PropertySet = the group it belongs to. Groups include inherited ones.
         $groups = $this->resolvePdtGroups($pdt);
-        $classData['ClassProperties'] = $this->buildClassPropertiesForGroups($groups, $code);
+        $classData['ClassProperties'] = $this->buildClassPropertiesForGroups(
+            $groups, \App\Services\UriService::DATA_TEMPLATE, $pdt
+        );
 
         // Subtype/parent links. Read from the generic relationship store (R-23387-7);
         // IsSubtypeOf -> bSDD IsChildOf. Falls back to the legacy MASTER_PDT_GUID
@@ -910,16 +895,15 @@ class ProductdatatemplatesController extends Controller
      */
     private function propertyCodeFor($ddRow): string
     {
-        $id     = is_array($ddRow) ? ($ddRow['Id'] ?? null)     : ($ddRow->Id ?? null);
-        $namePt = is_array($ddRow) ? ($ddRow['namePt'] ?? null) : ($ddRow->namePt ?? null);
-        return $id . '-' . self::sanitizePascalCase($namePt);
+        // Name only, per the identifier scheme: unique because only the latest version
+        // of each property is exported. Collisions are reported, not patched.
+        return \App\Services\UriService::codeFor(\App\Services\UriService::PROPERTY, $ddRow);
     }
 
-    /** GOP class code: "{gopId}-{PascalCaseName}" — gopId guarantees uniqueness. */
-    private function gopCodeFor($gopId, $gopNamePt): string
+    /** GOP class code: "{gopId}-{Name}" — names repeat, the id makes it unique. */
+    private function gopCodeFor($group): string
     {
-        $nameCode = self::convertToPascalCase($gopNamePt) ?: 'Other';
-        return $gopId ? ($gopId . '-' . $nameCode) : $nameCode;
+        return \App\Services\UriService::codeFor(\App\Services\UriService::GROUP, $group);
     }
 
     /**
@@ -1050,9 +1034,11 @@ class ProductdatatemplatesController extends Controller
         $master = $this->loadLatestActiveMasterPdt();
         if (!$master) return [null, null];
 
-        $code = self::convertToPascalCase($master->pdtNamePt) ?: ('Pdt' . $master->Id);
-        $uri  = 'https://pdts.pt/pdtview/' . $master->Id . '-' . self::convertToPascalCase($master->pdtNamePt);
-        return [$code, $uri, $master];
+        return [
+            \App\Services\UriService::codeFor(\App\Services\UriService::DATA_TEMPLATE, $master),
+            \App\Services\UriService::build(\App\Services\UriService::DATA_TEMPLATE, $master),
+            $master,
+        ];
     }
 
     /**
@@ -1060,7 +1046,7 @@ class ProductdatatemplatesController extends Controller
      * (EN ISO 23387:2025 R-23387-7). PDT-level IsSubtypeOf edges map to bSDD IsChildOf.
      *
      * If the store has NOT been seeded with any PDT subtype edge, falls back to the
-     * legacy MASTER_PDT_GUID synthesis so the export is byte-identical pre-seed.
+     * legacy MASTER_PDT_GUID synthesis.
      * Returns [] when the PDT has no parent (e.g. the master itself).
      */
     private function buildPdtClassRelations($pdt): array
@@ -1077,23 +1063,19 @@ class ProductdatatemplatesController extends Controller
             ->orderByRaw('position IS NULL, position')
             ->get();
 
+        $sourceUri = \App\Services\UriService::build(\App\Services\UriService::DATA_TEMPLATE, $pdt);
+
         $out = [];
         foreach ($rels as $r) {
             [$code, $uri] = $this->resolvePdtClassRef($r->targetGuid, $r->targetVersionNumber, $r->targetRevisionNumber);
             if (!$code || !$uri) continue;
             // IsSubtypeOf -> bSDD IsChildOf; HasPart -> bSDD HasPart.
             $bsddType = $r->relationType === \App\Models\EntityRelationship::REL_HAS_PART ? 'HasPart' : 'IsChildOf';
-            // Preserve the legacy OwnedUri spelling for the master IsChildOf target.
-            if ($bsddType === 'IsChildOf' && $r->targetGuid === self::MASTER_PDT_GUID) {
-                $suffix = 'ischildof-master';
-            } else {
-                $suffix = strtolower($bsddType) . '-' . $r->targetGuid;
-            }
             $out[] = [
                 'RelationType'     => $bsddType,
                 'RelatedClassUri'  => $uri,   // UseOwnUri=true, so our own URI
                 'RelatedClassName' => $code,
-                'OwnedUri'         => 'https://pdts.pt/classrelation/' . $pdt->Id . '-' . $suffix,
+                'OwnedUri'         => \App\Services\UriService::relationUri($sourceUri, $bsddType, $uri),
             ];
         }
         return $out;
@@ -1106,7 +1088,6 @@ class ProductdatatemplatesController extends Controller
     private function buildGopClassRelations($group): array
     {
         $guid = is_array($group) ? ($group['GUID'] ?? null) : ($group->GUID ?? null);
-        $gopId = is_array($group) ? ($group['Id'] ?? null) : ($group->Id ?? null);
         if (!$guid) return [];
 
         $rels = \App\Models\EntityRelationship::where('sourceEntityType', \App\Models\EntityRelationship::TYPE_GOP)
@@ -1117,6 +1098,8 @@ class ProductdatatemplatesController extends Controller
             ->orderByRaw('position IS NULL, position')
             ->get();
 
+        $sourceUri = \App\Services\UriService::build(\App\Services\UriService::GROUP, $group);
+
         $out = [];
         foreach ($rels as $r) {
             [$code, $uri] = $this->resolveGopClassRef($r->targetGuid);
@@ -1126,7 +1109,7 @@ class ProductdatatemplatesController extends Controller
                 'RelationType'     => $bsddType,
                 'RelatedClassUri'  => $uri,
                 'RelatedClassName' => $code,
-                'OwnedUri'         => 'https://pdts.pt/classrelation/gop-' . $gopId . '-' . strtolower($bsddType) . '-' . $r->targetGuid,
+                'OwnedUri'         => \App\Services\UriService::relationUri($sourceUri, $bsddType, $uri),
             ];
         }
         return $out;
@@ -1135,13 +1118,10 @@ class ProductdatatemplatesController extends Controller
     /** Resolve a GOP lineage GUID to its emitted [classCode, ownedUri] (latest active). */
     private function resolveGopClassRef(string $guid): array
     {
-        $g = DB::table('groupofproperties')->where('GUID', $guid)
-            ->orderByRaw("FIELD(status,'Active') DESC")
-            ->orderByRaw('versionNumber DESC, revisionNumber DESC')
-            ->first();
+        $g = \App\Services\UriService::latestOfLineage(\App\Services\UriService::GROUP, $guid);
         if (!$g) return [null, null];
-        $code = $this->gopCodeFor($g->Id, $g->gopNamePt);
-        return [$code, 'https://pdts.pt/datadictionaryviewGOP/' . $code];
+
+        return [$this->gopCodeFor($g), \App\Services\UriService::build(\App\Services\UriService::GROUP, $g)];
     }
 
     /** True once any PDT IsSubtypeOf edge exists (store is authoritative). Memoized per request. */
@@ -1156,23 +1136,29 @@ class ProductdatatemplatesController extends Controller
         return $this->pdtSubtypeSeeded;
     }
 
-    /** Legacy synthesis: non-master PDT -> master class, identical to the pre-store behaviour. */
+    /** Legacy synthesis: non-master PDT -> master class, used before the store is seeded. */
     private function legacyMasterRelation($pdt): array
     {
         if ($pdt->GUID === self::MASTER_PDT_GUID) return [];
         [$masterCode, $masterUri] = $this->masterClassCodeAndUri();
         if (!$masterCode || !$masterUri) return [];
+
+        $sourceUri = \App\Services\UriService::build(\App\Services\UriService::DATA_TEMPLATE, $pdt);
+
         return [[
             'RelationType'     => 'IsChildOf',
             'RelatedClassUri'  => $masterUri,
             'RelatedClassName' => $masterCode,
-            'OwnedUri'         => 'https://pdts.pt/classrelation/' . $pdt->Id . '-ischildof-master',
+            'OwnedUri'         => \App\Services\UriService::relationUri($sourceUri, 'IsChildOf', $masterUri),
         ]];
     }
 
     /**
      * Resolve a target PDT lineage GUID (+optional version pin) to its emitted
      * [classCode, ownedUri]. NULL pin -> latest active of the lineage.
+     *
+     * The target is always referenced by its canonical (unversioned) URI: only the
+     * latest version of each PDT is in the dictionary, so that is the class bSDD knows.
      */
     private function resolvePdtClassRef(string $guid, ?int $ver, ?int $rev): array
     {
@@ -1186,9 +1172,10 @@ class ProductdatatemplatesController extends Controller
         $t = $q->orderByRaw('versionNumber DESC, revisionNumber DESC')->first();
         if (!$t) return [null, null];
 
-        $code = self::convertToPascalCase($t->pdtNamePt) ?: ('Pdt' . $t->Id);
-        $uri  = 'https://pdts.pt/pdtview/' . $t->Id . '-' . self::convertToPascalCase($t->pdtNamePt);
-        return [$code, $uri];
+        return [
+            \App\Services\UriService::codeFor(\App\Services\UriService::DATA_TEMPLATE, $t),
+            \App\Services\UriService::build(\App\Services\UriService::DATA_TEMPLATE, $t),
+        ];
     }
 
     private function transformGroupOfPropertiesPSETS($group, string $pdtCode): array
@@ -1197,28 +1184,24 @@ class ProductdatatemplatesController extends Controller
             return is_array($group) ? ($group[$key] ?? null) : ($group->$key ?? null);
         };
 
-        $gopId     = $get('Id');
-        $gopGuid   = $get('GUID');
-        $gopNamePt = $get('gopNamePt');
-        $groupCode = $this->gopCodeFor($gopId, $gopNamePt);
+        $groupCode = $this->gopCodeFor($group);
 
         $classData = [
             'ClassType'         => 'GroupOfProperties',
             'Code'              => $groupCode,
-            'Name'              => $gopNamePt,
+            'Name'              => $get('gopNamePt'),
             'Definition'        => $get('definitionPt'),
             'Status'            => $get('status'),
-            'OwnedUri'          => 'https://pdts.pt/datadictionaryviewGOP/' . $groupCode,
+            'OwnedUri'          => \App\Services\UriService::build(\App\Services\UriService::GROUP, $group),
             'ActivationDateUtc' => ($get('dateOfVersion') && $get('dateOfVersion') !== '0000-00-00') ? $get('dateOfVersion') : null,
-            'Uid'               => $gopGuid,
+            'Uid'               => $get('GUID'),
             'VersionNumber'     => (int) $get('versionNumber'),
             'RevisionNumber'    => (int) $get('revisionNumber'),
             'ParentClassCode'   => $pdtCode,
-            'ClassProperties'   => $this->buildClassPropertiesForGroups([$group], $groupCode),
+            'ClassProperties'   => $this->buildClassPropertiesForGroups([$group], \App\Services\UriService::GROUP, $group),
         ];
 
-        // GOP subtype/part relations from the store (R-23387-7); omit key when none
-        // so output stays byte-identical to baseline until relations are added.
+        // GOP subtype/part relations from the store (R-23387-7); omit key when none.
         $gopRelations = $this->buildGopClassRelations($group);
         if (!empty($gopRelations)) {
             $classData['ClassRelations'] = $gopRelations;
@@ -1229,9 +1212,14 @@ class ProductdatatemplatesController extends Controller
 
     /**
      * Build ClassProperty entries for the given group list, deduping by dict GUID
-     * within the scope, and disambiguating ClassProperty.Code only on real collision.
+     * within the owner class. $ownerEntity/$owner is the class they are listed under
+     * (a PDT or a group) — it scopes the ClassProperty OwnedUri, which bSDD requires to
+     * be unique across the whole dictionary.
+     *
+     * Every dictionary property reached here is recorded in $exportedProperties, so
+     * Properties[] ends up holding exactly the properties the classes use.
      */
-    private function buildClassPropertiesForGroups($groups, string $ownerClassCode): array
+    private function buildClassPropertiesForGroups($groups, string $ownerEntity, $owner): array
     {
         // Pass 1: gather rows. Resolve each membership to the LATEST ACTIVE
         // dictionary version (the one actually in Properties[]); skip any whose
@@ -1239,22 +1227,29 @@ class ProductdatatemplatesController extends Controller
         $rows = [];
         foreach ($groups as $group) {
             $primaryGroupId = is_array($group) ? $group['Id'] : $group->Id;
-            $groupNamePt    = is_array($group) ? ($group['gopNamePt'] ?? null) : ($group->gopNamePt ?? null);
 
             $groupIds = [$primaryGroupId];
             $mergedIds = is_array($group) ? ($group['mergedGroupIds'] ?? []) : ($group->mergedGroupIds ?? []);
             if (!empty($mergedIds)) $groupIds = array_merge($groupIds, (array) $mergedIds);
 
-            $psetCode = $this->gopCodeFor($primaryGroupId, $groupNamePt);
+            $psetCode = $this->gopCodeFor($group);
 
             $placeholders = implode(',', array_fill(0, count($groupIds), '?'));
             $classProperties = DB::select("SELECT * FROM properties WHERE gopID IN ($placeholders)", $groupIds);
 
             foreach ($classProperties as $property) {
-                $ddRow = propertiesdatadictionaries::find($property->propertyId);
-                $ddProperty = $ddRow ? $this->latestActiveDictionaryProperty($ddRow->GUID) : null;
+                $ddRow = $this->dictionaryRow($property->propertyId);
+                $ddProperty = $ddRow ? $this->latestActiveDictionaryPropertyCached($ddRow->GUID) : null;
                 if (!$ddProperty) continue; // no Active dictionary version -> would dangle, skip
-                $rows[] = ['property' => $property, 'dd' => $ddProperty, 'guid' => $ddProperty->GUID, 'pset' => $psetCode];
+                $rows[] = [
+                    'property' => $property,
+                    // The class property's canonical code carries the name of the
+                    // dictionary row it points at — the same code its page resolves by.
+                    'classProp' => ['Id' => $property->Id, 'namePt' => $ddRow->namePt],
+                    'dd' => $ddProperty,
+                    'guid' => $ddProperty->GUID,
+                    'pset' => $psetCode,
+                ];
             }
         }
 
@@ -1264,33 +1259,43 @@ class ProductdatatemplatesController extends Controller
         foreach ($rows as $r) {
             if (isset($seen[$r['guid']])) continue;
             $seen[$r['guid']] = true;
-            $out[] = $this->buildClassProperty($r['property'], $r['dd'], $r['pset'], $ownerClassCode);
+            $this->exportedProperties[$r['guid']] = $r['dd'];
+            $out[] = $this->buildClassProperty($r['property'], $r['classProp'], $r['dd'], $r['pset'], $ownerEntity, $owner);
         }
         return $out;
     }
 
-    private function buildClassProperty($property, $ddProperty, string $psetCode, string $ownerClassCode): array
+    /** @var array<int,object|null> */
+    private array $ddById = [];
+    /** @var array<string,object|null> */
+    private array $latestDdByGuid = [];
+
+    private function dictionaryRow($id)
     {
-        $propertyCode = $this->propertyCodeFor($ddProperty);
+        if (!$id) return null;
+        return $this->ddById[$id] ??= propertiesdatadictionaries::find($id);
+    }
 
-        // ClassProperty.Code: unique within the class via properties.Id.
-        $classPropertyCode = (string) $property->Id . '-' . $propertyCode;
+    private function latestActiveDictionaryPropertyCached(string $guid)
+    {
+        if (!array_key_exists($guid, $this->latestDdByGuid)) {
+            $this->latestDdByGuid[$guid] = $this->latestActiveDictionaryProperty($guid);
+        }
+        return $this->latestDdByGuid[$guid];
+    }
 
-        $nameSegment = self::sanitizePascalCase(
-            is_array($ddProperty) ? ($ddProperty['namePt'] ?? null) : $ddProperty->namePt
-        );
-
-        // OwnedUri must be GLOBALLY unique. A property is listed both on its PDT
-        // class and on its GOP class (and master properties repeat across
-        // children), so scope the URI to the owning class code.
-        $ownedUri = 'https://pdts.pt/classpropertyview/' . $ownerClassCode . '/' . $property->Id . '-' . $nameSegment;
-
+    private function buildClassProperty($property, array $classProp, $ddProperty, string $psetCode, string $ownerEntity, $owner): array
+    {
         return [
-            'Code'         => $classPropertyCode,
-            'PropertyCode' => $propertyCode,
+            // {classPropertyId}-{Name}: unique within the class (and globally).
+            'Code'         => \App\Services\UriService::codeFor(\App\Services\UriService::CLASS_PROPERTY, $classProp),
+            'PropertyCode' => $this->propertyCodeFor($ddProperty),
             'Description'  => $property->descriptionPt ?: null,
             'PropertySet'  => $psetCode,
-            'OwnedUri'     => $ownedUri,
+            // The class property is listed under its PDT class AND its group class, so
+            // the owner is appended to keep OwnedUri unique; the leading id still
+            // resolves to the one class-property page.
+            'OwnedUri'     => \App\Services\UriService::classPropertyInContext($classProp, $ownerEntity, $owner),
         ];
     }
 
@@ -1304,14 +1309,27 @@ class ProductdatatemplatesController extends Controller
     {
         $dups = [];
 
-        $propCodes = array_map(fn($p) => $p['Code'], $jsonData['Properties']);
-        foreach (array_count_values($propCodes) as $c => $n) {
-            if ($n > 1) $dups[] = "Property.Code '$c' x$n";
+        // Name the colliding records, so the report can be acted on directly.
+        $byCode = [];
+        foreach ($jsonData['Properties'] as $p) {
+            $byCode[$p['Code']][] = "Uid {$p['Uid']} (v{$p['VersionNumber']}.{$p['RevisionNumber']}) \"{$p['Name']}\"";
+        }
+        foreach ($byCode as $c => $records) {
+            if (count($records) > 1) {
+                $dups[] = "Property.Code '$c' is claimed by " . count($records) . " different properties:\n     "
+                    . implode("\n     ", $records);
+            }
         }
 
-        $classCodes = array_map(fn($c) => $c['Code'], $jsonData['Classes']);
-        foreach (array_count_values($classCodes) as $c => $n) {
-            if ($n > 1) $dups[] = "Class.Code '$c' x$n";
+        $byCode = [];
+        foreach ($jsonData['Classes'] as $c) {
+            $byCode[$c['Code']][] = "{$c['ClassType']} Uid {$c['Uid']} \"{$c['Name']}\"";
+        }
+        foreach ($byCode as $c => $records) {
+            if (count($records) > 1) {
+                $dups[] = "Class.Code '$c' is claimed by " . count($records) . " classes:\n     "
+                    . implode("\n     ", $records);
+            }
         }
 
         foreach ($jsonData['Classes'] as $class) {
@@ -1328,6 +1346,9 @@ class ProductdatatemplatesController extends Controller
             foreach ($class['ClassProperties'] ?? [] as $cp) {
                 if (!empty($cp['OwnedUri'])) $ownedUris[] = $cp['OwnedUri'];
             }
+            foreach ($class['ClassRelations'] ?? [] as $rel) {
+                if (!empty($rel['OwnedUri'])) $ownedUris[] = $rel['OwnedUri'];
+            }
         }
         foreach ($jsonData['Properties'] as $p) {
             if (!empty($p['OwnedUri'])) $ownedUris[] = $p['OwnedUri'];
@@ -1336,9 +1357,23 @@ class ProductdatatemplatesController extends Controller
             if ($n > 1) $dups[] = "OwnedUri '$u' x$n";
         }
 
+        // Every entry bSDD ingests must carry an OwnedUri.
+        foreach ($jsonData['Classes'] as $class) {
+            if (empty($class['OwnedUri'])) $dups[] = "Class '{$class['Code']}' has no OwnedUri";
+            foreach ($class['ClassProperties'] ?? [] as $cp) {
+                if (empty($cp['OwnedUri'])) $dups[] = "ClassProperty '{$cp['Code']}' in '{$class['Code']}' has no OwnedUri";
+            }
+        }
+        foreach ($jsonData['Properties'] as $p) {
+            if (empty($p['OwnedUri'])) $dups[] = "Property '{$p['Code']}' has no OwnedUri";
+        }
+
         if (!empty($dups)) {
             throw new \RuntimeException(
-                "bSDD export aborted — duplicate codes (bSDD rejects these):\n - " . implode("\n - ", $dups)
+                "bSDD export aborted — the dictionary would contain duplicate or missing identifiers, "
+                . "which bSDD rejects. Codes follow the identifier scheme and are never renamed "
+                . "automatically: reconcile the records below (Admin > Dedupe dictionary) and export again.\n\n - "
+                . implode("\n\n - ", $dups)
             );
         }
     }

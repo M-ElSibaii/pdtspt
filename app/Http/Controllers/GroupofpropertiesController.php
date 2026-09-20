@@ -78,6 +78,7 @@ class GroupofpropertiesController extends Controller
         // — not lumped as "master". Builds $gopSource[gopId] and the ordered $inheritedFrom list.
         $ownGopIds = groupofproperties::where('pdtId', $pdtID)->pluck('Id')->flip();
         $pdtNameCache = [];
+        $inheritedFromLabels = [];
         $gopSource = [];
         foreach ($inherited_groups as $g) {
             $isOwn = isset($ownGopIds[$g->Id]);
@@ -86,6 +87,10 @@ class GroupofpropertiesController extends Controller
                 if (!array_key_exists($g->pdtId, $pdtNameCache)) {
                     $owner = productdatatemplates::where('Id', $g->pdtId)->first();
                     $pdtNameCache[$g->pdtId] = $owner ? ($owner->pdtNamePt ?: $owner->pdtNameEn) : 'Supertipo';
+                    // Display label in the page language; the PT name stays the grouping key.
+                    $inheritedFromLabels[$pdtNameCache[$g->pdtId]] = $owner
+                        ? \App\Support\Lang::f($owner, 'pdtName')
+                        : \App\Support\Lang::pick('Supertipo', 'Supertype');
                 }
                 $name = $pdtNameCache[$g->pdtId];
             }
@@ -132,7 +137,7 @@ class GroupofpropertiesController extends Controller
             return 0; // Default ordering for others
         });
 
-        return view('pdtsdownload', compact('sorted_combined_groups', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'latestPdt', 'inheritedFrom', 'sourceColors'));
+        return view('pdtsdownload', compact('sorted_combined_groups', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'latestPdt', 'inheritedFrom', 'inheritedFromLabels', 'sourceColors'));
     }
 
 
@@ -202,6 +207,7 @@ class GroupofpropertiesController extends Controller
         // for colour-coded rows + a colour legend.
         $ownGopIds = groupofproperties::where('pdtId', $pdtID)->pluck('Id')->flip();
         $pdtNameCache = [];
+        $inheritedFromLabels = [];
         $gopSource = [];
         foreach ($inherited_groups as $g) {
             $isOwn = isset($ownGopIds[$g->Id]);
@@ -210,6 +216,10 @@ class GroupofpropertiesController extends Controller
                 if (!array_key_exists($g->pdtId, $pdtNameCache)) {
                     $owner = productdatatemplates::where('Id', $g->pdtId)->first();
                     $pdtNameCache[$g->pdtId] = $owner ? ($owner->pdtNamePt ?: $owner->pdtNameEn) : 'Supertipo';
+                    // Display label in the page language; the PT name stays the grouping key.
+                    $inheritedFromLabels[$pdtNameCache[$g->pdtId]] = $owner
+                        ? \App\Support\Lang::f($owner, 'pdtName')
+                        : \App\Support\Lang::pick('Supertipo', 'Supertype');
                 }
                 $name = $pdtNameCache[$g->pdtId];
             }
@@ -261,7 +271,7 @@ class GroupofpropertiesController extends Controller
         $answers = Answers::where('users_id', Auth::id())->get();
 
 
-        return view('pdtssurvey', compact('combined_groups', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'comments', 'answers', 'properties', 'latestPdt', 'inheritedFrom', 'sourceColors'));
+        return view('pdtssurvey', compact('combined_groups', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'comments', 'answers', 'properties', 'latestPdt', 'inheritedFrom', 'inheritedFromLabels', 'sourceColors'));
     }
 
 

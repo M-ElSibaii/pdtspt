@@ -1,23 +1,29 @@
 <x-app-layout>
+    @php
+        // A property's bSDD link, if its relationToOtherDataDictionaries names one.
+        $bsddLink = function ($property) {
+            if (is_null($property->relationToOtherDataDictionaries)) return null;
+            foreach (explode('),(', trim($property->relationToOtherDataDictionaries, '()')) as $relation) {
+                $parts = explode(', ', $relation);
+                if (isset($parts[1]) && trim($parts[1]) === 'bsdd.buildingsmart.org') {
+                    return trim($parts[0]);
+                }
+            }
+            return null;
+        };
+        $pdtName = Lg::f($pdt, 'pdtName');
+        $fileStem = $pdtName . '_V' . $pdt->versionNumber . '.' . $pdt->revisionNumber;
+    @endphp
     <div style="background-color: white;">
         <div class="container sm:max-w-full py-4">
-            <h3>{{ __("Modelo de Dados do Produto baseado na EN ISO 23387") }}</h3>
+            <h3>{{ Lg::t('Modelo de Dados do Produto baseado na EN ISO 23387') }}</h3>
             <div>
                 <div class="flex flex-row">
                     <div class="grow block py-2">
                         <div class="flex-none inline">
-                            <h1 class="flex-none inline">{{ $pdt->pdtNamePt }}</h1>
+                            <h1 class="flex-none inline"><a href="{{ Uri::buildLink('dt', $pdt) }}">{{ $pdtName }}</a></h1>
                             <p class="flex-none inline"> - V{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}</p>
-                            @if ($pdt->status == 'Active')
-                            <span class="status-tag status-tag-active">Ativa</span>
-                            @endif
-                            @if ($pdt->status == 'Preview')
-                            <span class="status-tag status-tag-inactive">Inativa</span>
-                            @endif
-                            @if ($pdt->status == 'InActive')
-                            <span class="status-tag status-tag-inactive">Inativa</span>
-                            @endif
-
+                            <x-status-badge :status="$pdt->status" />
                         </div>
                     </div>
                     <div class="flex flex-row gap-2 py-2">
@@ -36,10 +42,10 @@
                     <table class="table-auto" id="tblpdts" cellpadding="0" cellspacing="0">
                         <thead class="sticky top-0 z-50">
                             <tr>
-                                <th>Propriedade</th>
-                                <th>Unidade</th>
-                                <th>Descrição</th>
-                                <th>Documento de referência</th>
+                                <th>{{ Lg::t('Propriedade') }}</th>
+                                <th>{{ Lg::t('Unidade') }}</th>
+                                <th>{{ Lg::t('Descrição') }}</th>
+                                <th>{{ Lg::t('Documento de referência') }}</th>
                             </tr>
                         </thead>
                         @foreach($sorted_combined_groups as $group)
@@ -47,9 +53,9 @@
                             <tr>
                                 <td class="text-left content-start bg-slate-300 p-3" colspan="5">
                                     <input class="text-left expand" type="checkbox" name="{{ $group[0]->gopNamePt }}" id="{{ $group[0]->gopNamePt }}" data-toggle="toggle">
-                                    <label class="my-auto text-left cursor-pointer" for="{{ $group[0]->gopNamePt }}">Grupo de propriedades -
-                                        <a href="{{ url('datadictionaryviewGOP/' . $group[0]->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::convertToPascalCase($group[0]->gopNamePt)) }}">
-                                            {{ $group[0]->gopNamePt }}
+                                    <label class="my-auto text-left cursor-pointer" for="{{ $group[0]->gopNamePt }}">{{ Lg::t('Grupo de propriedades') }} -
+                                        <a href="{{ Uri::buildLink('gop', $group[0]) }}">
+                                            {{ Lg::f($group[0], 'gopName') }}
                                         </a>
                                     </label>
                                 </td>
@@ -60,58 +66,27 @@
                             @foreach($group as $propertyGroup)
                             @foreach($joined_properties as $property)
                             @if($property->gopID == $propertyGroup->Id)
+                            @php
+                                $bsdd = $bsddLink($property);
+                                $referenceDoc = $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first();
+                            @endphp
                             <!-- Row colour-coded by inheritance source (IsSubtypeOf chain); see legend under the table -->
                             <tr @if($property->is_inherited && isset($sourceColors[$property->inherited_from])) style="background-color: {{ $sourceColors[$property->inherited_from] }};" @endif>
-                               <td class="p-1.5 property-td">
-    @if(!is_null($property->relationToOtherDataDictionaries))
-        @php
-            $relations = explode('),(', trim($property->relationToOtherDataDictionaries, '()'));
-            $propertyUrl = null;
-            $domainUrl = null;
-
-            foreach ($relations as $relation) {
-                $parts = explode(', ', $relation);
-                if (isset($parts[1]) && trim($parts[1]) === 'bsdd.buildingsmart.org') {
-                    $propertyUrl = trim($parts[0]);
-                    $domainUrl = trim($parts[1]);
-                    break;
-                }
-            }
-        @endphp
-
-        @if($domainUrl === 'bsdd.buildingsmart.org')
-            {{-- bsDD link exists: show EN name first, then logo, then PT name --}}
-            <a href="{{ url('classpropertyview/' . $property->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($property->namePt)) }}">
-                {{ $property->nameEn }}
-            </a>
-            <a href="{{ $propertyUrl }}" target="_blank">
-                <img src="{{ asset('img/IFCBSDD.png') }}" alt="IFC Logo" style="width:40px; height:auto; margin-left:10px;">
-            </a>
-            <a href="{{ url('classpropertyview/' . $property->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($property->namePt)) }}">
-                {{ $property->namePt }}
-            </a>
-        @else
-            {{-- No bsDD link: original behaviour --}}
-            <a href="{{ url('classpropertyview/' . $property->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($property->namePt)) }}">
-                {{ $property->namePt }}
-            </a>
-        @endif
-    @else
-        {{-- No relation at all: original behaviour --}}
-        <a href="{{ url('classpropertyview/' . $property->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($property->namePt)) }}">
-            {{ $property->namePt }}
-        </a>
-    @endif
-
-    @if($property->status == 'InActive')
-        <span class="status-tag status-tag-inactive">Inativa</span>
-    @endif
-</td>
+                                <td class="p-1.5 property-td">
+                                    <a href="{{ Uri::buildLink('classprop', $property) }}">{{ Lg::f($property, 'name') }}</a>
+                                    @if($bsdd)
+                                        <a href="{{ $bsdd }}" target="_blank">
+                                            <img src="{{ asset('img/IFCBSDD.png') }}" alt="IFC Logo" style="width:40px; height:auto; margin-left:10px;">
+                                        </a>
+                                    @endif
+                                    @if($property->status == 'InActive')
+                                        <span class="status-tag status-tag-inactive">{{ Lg::t('Inativa') }}</span>
+                                    @endif
+                                </td>
                                 <td class="p-1.5"><x-reference-link type="unit" :value="$property->units" placeholder="Sem unidade" /></td>
                                 <td class="p-1.5">
                                     <div class="flex flex-col">
-
-                                        <p><span style="color: darkgrey;"> {{ $property->namePtSc }}:</span><br>{{ $property->descriptionPt }}</p>
+                                        <p><span style="color: darkgrey;"> {{ Lg::fSc($property, 'name') }}:</span><br>{{ Lg::f($property, 'description') }}</p>
                                         @if($property->visualRepresentation == "TRUE")
                                         <div class="col-sm">
                                             <img src="{{ asset ('img/'.$property->nameEn.'.png')}}" alt='{{$property->nameEn}}' class="property-image">
@@ -119,20 +94,15 @@
                                         @endif
                                     </div>
                                 </td>
-                                @php
-                                $referenceDoc = $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first();
-                                @endphp
-                                @if ($referenceDoc && ($referenceDoc->rdName == 'n/a' || !$referenceDoc->rdName))
                                 <td class="p-1.5">
-                                    <a>n/a</a>
+                                    @if (!$referenceDoc || $referenceDoc->rdName == 'n/a' || !$referenceDoc->rdName)
+                                        <a>n/a</a>
+                                    @else
+                                        <a href="{{ Uri::buildLink('doc', $referenceDoc) }}">
+                                            <p title="{{ $referenceDoc->title }}">{{ $referenceDoc->rdName }}</p>
+                                        </a>
+                                    @endif
                                 </td>
-                                @else
-                                <td class="p-1.5">
-                                    <a href="{{ route('referencedocumentview', ['rdGUID' => $property->referenceDocumentGUID]) }}">
-                                        <p title="{{ $referenceDoc->title }}">{{ $referenceDoc->rdName }}</p>
-                                    </a>
-                                </td>
-                                @endif
                             </tr>
                             @endif
                             @endforeach
@@ -143,92 +113,63 @@
                 </div>
                 @if(!empty($inheritedFrom))
                 <div style="padding-top: 8px; font-size: 0.85rem;">
-                    <strong>Código de cores — origem das propriedades (relação IsSubtypeOf):</strong>
+                    <strong>{{ Lg::t('Código de cores — origem das propriedades (relação IsSubtypeOf):') }}</strong>
                     <div style="display:flex; flex-wrap:wrap; gap:14px; margin-top:6px; align-items:center;">
-                        <span><span style="display:inline-block; width:16px; height:16px; border:1px solid #cbd5e1; background:#ffffff; vertical-align:middle; margin-right:4px;"></span>Próprio (deste modelo)</span>
+                        <span><span style="display:inline-block; width:16px; height:16px; border:1px solid #cbd5e1; background:#ffffff; vertical-align:middle; margin-right:4px;"></span>{{ Lg::t('Próprio (deste modelo)') }}</span>
                         @foreach($inheritedFrom as $src)
-                        <span><span style="display:inline-block; width:16px; height:16px; border:1px solid #cbd5e1; background:{{ $sourceColors[$src] }}; vertical-align:middle; margin-right:4px;"></span>Herdado de: {{ $src }}</span>
+                        <span><span style="display:inline-block; width:16px; height:16px; border:1px solid #cbd5e1; background:{{ $sourceColors[$src] }}; vertical-align:middle; margin-right:4px;"></span>{{ Lg::t('Herdado de: :source', ['source' => $inheritedFromLabels[$src] ?? $src]) }}</span>
                         @endforeach
                     </div>
                 </div>
                 @else
-                <h6 style="padding-top: 5px"> Nota: Este modelo de dados não herda propriedades de supertipos. </h6>
+                <h6 style="padding-top: 5px">{{ Lg::t('Nota: Este modelo de dados não herda propriedades de supertipos.') }}</h6>
                 @endif
 
                 <div class="my-6 text-end">
-                    <a href="/dashboard">
+                    <a href="{{ route('dashboard') }}">
                         <x-secondary-button id="backButton" type="button">
-                            Anterior
+                            {{ Lg::t('Anterior') }}
                         </x-secondary-button>
                     </a>
                 </div>
             </div>
         </div>
 
-       <table hidden id="tblpdtsh">
-    <tr>
-        <th style="width: 15%;">Grupo de propriedades</th>
-        <th>Propriedade</th>
-        <th style="width: 7%;">Unidade</th>
-        <th style="width: 40%;">Descrição</th>
-        <th style="width: 16%;">Documento de referência</th>
-        <th>Origem</th>
-    </tr>
-    @foreach($sorted_combined_groups as $group)
-    @foreach($group as $propertyGroup)
-    @foreach($joined_properties as $property)
-    @if($property->gopID == $propertyGroup->Id)
-
-        @php
-            $propertyUrl = null;
-            $domainUrl = null;
-
-            if (!is_null($property->relationToOtherDataDictionaries)) {
-                $relations = explode('),(', trim($property->relationToOtherDataDictionaries, '()'));
-                foreach ($relations as $relation) {
-                    $parts = explode(', ', $relation);
-                    if (isset($parts[1]) && trim($parts[1]) === 'bsdd.buildingsmart.org') {
-                        $propertyUrl = trim($parts[0]);
-                        $domainUrl = trim($parts[1]);
-                        break;
-                    }
-                }
-            }
-        @endphp
-
-        <tr>
-            <td>{{ $propertyGroup->gopNamePt }}</td>
-            <td>
-                @if($domainUrl === 'bsdd.buildingsmart.org')
-                    {{ $property->nameEn }} - {{ $property->namePt }}
-                @else
-                    {{ $property->namePt }}
-                @endif
-            </td>
-            <td>{{ $property->units }}</td>
-            <td>{{ $property->namePtSc }}: {{ $property->descriptionPt }}</td>
-            <td>
-                @if($referenceDocument->where('GUID', $property->referenceDocumentGUID)->first())
-                    {{ $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first()->rdName }}
-                @else
-                    n/a
-                @endif
-            </td>
-            <td>{{ $property->is_inherited ? ('Herdado de: ' . $property->inherited_from) : 'Próprio' }}</td>
-        </tr>
-
-    @endif
-    @endforeach
-    @endforeach
-    @endforeach
-</table>
-
+        {{-- Flat table behind the CSV/XLS download — same language as the page. --}}
+        <table hidden id="tblpdtsh">
+            <tr>
+                <th style="width: 15%;">{{ Lg::t('Grupo de propriedades') }}</th>
+                <th>{{ Lg::t('Propriedade') }}</th>
+                <th style="width: 7%;">{{ Lg::t('Unidade') }}</th>
+                <th style="width: 40%;">{{ Lg::t('Descrição') }}</th>
+                <th style="width: 16%;">{{ Lg::t('Documento de referência') }}</th>
+                <th>{{ Lg::t('Origem') }}</th>
+                <th>URI</th>
+            </tr>
+            @foreach($sorted_combined_groups as $group)
+            @foreach($group as $propertyGroup)
+            @foreach($joined_properties as $property)
+            @if($property->gopID == $propertyGroup->Id)
+                @php $referenceDoc = $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first(); @endphp
+                <tr>
+                    <td>{{ Lg::f($propertyGroup, 'gopName') }}</td>
+                    <td>{{ Lg::f($property, 'name') }}</td>
+                    <td>{{ $property->units }}</td>
+                    <td>{{ Lg::fSc($property, 'name') }}: {{ Lg::f($property, 'description') }}</td>
+                    <td>{{ $referenceDoc ? $referenceDoc->rdName : 'n/a' }}</td>
+                    <td>{{ $property->is_inherited ? Lg::t('Herdado de: :source', ['source' => $inheritedFromLabels[$property->inherited_from] ?? $property->inherited_from]) : Lg::t('Próprio') }}</td>
+                    <td>{{ Uri::build('classprop', $property) }}</td>
+                </tr>
+            @endif
+            @endforeach
+            @endforeach
+            @endforeach
+        </table>
 
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.6/jspdf.plugin.autotable.min.js"></script>
         <script src="https://rawcdn.githack.com/FuriosoJack/TableHTMLExport/v2.0.0/src/tableHTMLExport.js"></script>
-
 
         <script>
             $(document).ready(function() {
@@ -237,67 +178,37 @@
                 });
             });
 
-            //export json - server-side EN ISO 23387 format
+            // Server-side EN ISO 23387 export. Both languages are always in the file;
+            // only the file name follows the page language.
+            function downloadExport(url, extension, errorPrefix) {
+                const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+                fetch(url, { method: 'POST', headers: { 'X-CSRF-TOKEN': token } })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Download failed');
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = @json($fileStem) + '.' + extension;
+                        link.click();
+                    })
+                    .catch(error => alert(errorPrefix + error.message));
+            }
+
             $("#json").on("click", function() {
-                const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-                const url = "{{ route('pdt.export.json', $pdt->Id) }}";
-                
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': token,
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) throw new Error('Download failed');
-                    return response.blob();
-                })
-                .then(blob => {
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = "{{ $pdt->pdtNamePt }}_V{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.json";
-                    link.click();
-                })
-                .catch(error => {
-                    alert('Erro ao descarregar JSON: ' + error.message);
-                });
+                downloadExport(@json(route('pdt.export.json', $pdt->Id)), 'json', @json(Lg::t('Erro ao descarregar JSON: ')));
             });
 
-            //export xml - server-side EN ISO 23387 format with XSD validation
             $("#xml").on("click", function() {
-                const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-                const url = "{{ route('pdt.export.xml', $pdt->Id) }}";
-                
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': token,
-                    }
-                })
-                .then(response => {
-                    if (!response.ok) throw new Error('Download failed');
-                    return response.blob();
-                })
-                .then(blob => {
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = "{{ $pdt->pdtNamePt }}_V{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.xml";
-                    link.click();
-                })
-                .catch(error => {
-                    alert('Erro ao descarregar XML: ' + error.message);
-                });
+                downloadExport(@json(route('pdt.export.xml', $pdt->Id)), 'xml', @json(Lg::t('Erro ao descarregar XML: ')));
             });
 
-            //export csv
             $("#csv").on("click", function() {
                 $("#tblpdtsh").tableHTMLExport({
                     type: "csv",
-                    filename: "{{ $pdt->pdtNamePt }} data template V{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}.csv"
+                    filename: @json($pdtName . ' data template V' . $pdt->versionNumber . '.' . $pdt->revisionNumber . '.csv')
                 });
             });
-     
         </script>
-
-
 </x-app-layout>

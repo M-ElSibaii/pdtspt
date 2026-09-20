@@ -26,22 +26,23 @@ class UnitsReference
         return str_replace('%2F', '/', rawurlencode($value));
     }
 
-    /** Canonical, resolvable pdts.pt identity URI for a unit code. */
+    /** Canonical identifier for a unit code: https://pdts.pt/uri/{v}/unit/{code}. */
     public static function unitUri(string $code): string
     {
-        return self::BASE . '/unit/' . self::seg($code);
+        return UriService::uri(UriService::UNIT, $code);
     }
 
-    /** Canonical, resolvable pdts.pt identity URI for a physical quantity (quantity kind). */
+    /** Canonical identifier for a quantity kind: https://pdts.pt/uri/{v}/pq/{name}. */
     public static function quantityKindUri(string $name): string
     {
-        return self::BASE . '/quantitykind/' . self::seg($name);
+        return UriService::uri(UriService::QUANTITY_KIND, $name);
     }
 
     /** Canonical, resolvable pdts.pt identity URI for a dimension (by canonical string). */
     public static function dimensionUri(string $canonical): string
     {
-        return self::BASE . '/dimension/' . self::seg($canonical);
+        // Dimensions have no segment in the identifier scheme; they keep their own page.
+        return UriService::base() . '/dimension/' . self::seg($canonical);
     }
 
     /**

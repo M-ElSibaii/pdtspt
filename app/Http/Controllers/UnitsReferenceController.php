@@ -125,7 +125,9 @@ class UnitsReferenceController extends Controller
     public function unit(Request $request, string $code)
     {
         $code = $this->stripJson($code);
-        $unit = Unit::where('code', $code)->first();
+        // Case-sensitive: "MW" (megawatt) and "mW" (milliwatt) are different units,
+        // and MySQL's default collation would confuse them.
+        $unit = Unit::whereRaw('BINARY `code` = ?', [$code])->first();
         abort_if(!$unit, 404, "Unknown unit: {$code}");
 
         $quantity = $unit->physicalQuantity;
@@ -163,7 +165,7 @@ class UnitsReferenceController extends Controller
     public function quantityKind(Request $request, string $name)
     {
         $name = $this->stripJson($name);
-        $quantity = PhysicalQuantity::where('name', $name)->first();
+        $quantity = PhysicalQuantity::whereRaw('BINARY `name` = ?', [$name])->first();
         abort_if(!$quantity, 404, "Unknown physical quantity: {$name}");
 
         $dimension = $quantity->dimension;
@@ -196,7 +198,7 @@ class UnitsReferenceController extends Controller
     public function dimension(Request $request, string $canonical)
     {
         $canonical = $this->stripJson($canonical);
-        $dimension = Dimension::where('canonical', $canonical)->first();
+        $dimension = Dimension::whereRaw('BINARY `canonical` = ?', [$canonical])->first();
         abort_if(!$dimension, 404, "Unknown dimension: {$canonical}");
 
         $quantities = $dimension->physicalQuantities()->orderBy('name')->get();

@@ -74,16 +74,22 @@
                 @auth
                 <a href="{{ url('/dashboard') }}" class="text-sm text-gray-700 underline">PDTs</a>
                 @else
-                <a href="{{ route('login') }}" class="text-sm text-gray-700 underline">Log in</a>
+                <a href="{{ route('login') }}" class="text-sm text-gray-700 underline">{{ Lg::t('Login') }}</a>
 
                 @if (Route::has('register'))
-                <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 underline">Register</a>
+                <a href="{{ route('register') }}" class="ml-4 text-sm text-gray-700 underline">{{ Lg::t('Registo') }}</a>
                 @endif
                 @endauth
-                <a href="{{ route('home') }}" class="ml-4 text-sm text-gray-700 underline">Home</a>
-                <a href="{{ route('contact.store') }}" class="ml-4 text-sm text-gray-700 underline">Contact-nos</a>
+                <a href="{{ route('home') }}" class="ml-4 text-sm text-gray-700 underline">{{ Lg::t('Home') }}</a>
+                <a href="{{ route('contact.store') }}" class="ml-4 text-sm text-gray-700 underline">{{ Lg::t('Contactos') }}</a>
 
                 @endif
+
+                {{-- Language toggle, so signing in does not drop the chosen language. --}}
+                @foreach (Lg::supported() as $code)
+                    <a href="{{ Lg::toggleUrl($code) }}" hreflang="{{ $code }}"
+                       class="ml-2 text-sm underline {{ Lg::current() === $code ? 'text-slate-900 font-semibold' : 'text-gray-500' }}">{{ strtoupper($code) }}</a>
+                @endforeach
             </div>
         </div>
         <!-- Page Content -->

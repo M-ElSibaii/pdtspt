@@ -126,29 +126,22 @@ class Iso23387Exporter
         return $map[$t] ?? 'STRING';
     }
 
-    /** Resolve a target lineage GUID to its public pdts.pt URI (latest active row). */
+    /**
+     * Resolve a relation's target lineage GUID to its canonical identifier (latest
+     * active row of that lineage). Every referenceURI in this export is a real,
+     * dereferenceable PDTs.pt identifier built by UriService.
+     */
     private function subjectUri(string $entityType, string $guid): ?string
     {
-        switch ($entityType) {
-            case 'pdt':
-                $r = DB::table('productdatatemplates')->where('GUID', $guid)
-                    ->orderByRaw("FIELD(status,'Active') DESC")->orderByRaw('versionNumber DESC, revisionNumber DESC')->first();
-                return $r ? 'https://pdts.pt/pdtview/' . $r->Id . '-' . $this->convertToPascalCase($r->pdtNamePt) : null;
-            case 'gop':
-                $r = DB::table('groupofproperties')->where('GUID', $guid)
-                    ->orderByRaw("FIELD(status,'Active') DESC")->orderByRaw('versionNumber DESC, revisionNumber DESC')->first();
-                return $r ? 'https://pdts.pt/datadictionaryviewGOP/' . $r->Id . '-' . $this->convertToPascalCase($r->gopNamePt) : null;
-            case 'property':
-                $r = DB::table('propertiesdatadictionaries')->where('GUID', $guid)
-                    ->orderByRaw("FIELD(status,'Active') DESC")->orderByRaw('versionNumber DESC, revisionNumber DESC')->first();
-                return $r ? 'https://pdts.pt/datadictionaryview/' . $r->Id . '-' . $this->sanitizePascalCase($r->namePt) : null;
-            case 'objecttype':
-                $r = DB::table('constructionobjects')->where('GUID', $guid)->first();
-                return $r ? 'https://pdts.pt/objecttype/' . $guid : null;
-        }
-        return null;
-    }
+        $entity = [
+            'pdt'        => \App\Services\UriService::DATA_TEMPLATE,
+            'gop'        => \App\Services\UriService::GROUP,
+            'property'   => \App\Services\UriService::PROPERTY,
+            'objecttype' => \App\Services\UriService::CONSTRUCTION,
+        ][$entityType] ?? null;
 
+        return $entity ? \App\Services\UriService::forLineage($entity, $guid) : null;
+    }
 
     private function  sanitizePascalCase($string): string
     {
@@ -354,9 +347,18 @@ class Iso23387Exporter
             if ($dict) {
                 $pivot = $pivotProps[$dict->Id] ?? null;
 
+                $pivotData = $pivot ? (array) $pivot : null;
+                if ($pivotData) {
+                    // The class-property identifier for this property's use in this PDT.
+                    $pivotData['uri'] = \App\Services\UriService::build(
+                        \App\Services\UriService::CLASS_PROPERTY,
+                        ['Id' => $pivot->Id, 'namePt' => $dict->namePt]
+                    );
+                }
+
                 $prop['_raw'] = [
                     'dictionary' => $dict->toArray(),
-                    'pivot' => $pivot ? (array)$pivot : null,
+                    'pivot' => $pivotData,
                     'source' => $pivot ? 'PDT' : 'MASTER'
                 ];
             }
@@ -560,7 +562,9 @@ class Iso23387Exporter
         // Attributes
         $template['dt:GUID'] = $pdt->GUID;
         $template['dateOfCreation'] = $this->formatDate($pdt->dateOfVersion ?? $pdt->dateOfRevision);
-        // No URI attribute on the subject (XSD allows only GUID + dateOfCreation).
+        // Canonical identifier (JSON/API only). The ed-2 XSD allows no URI attribute on a
+        // subject, so this key is annotation-style and the XML builders ignore it.
+        $template['_uri'] = \App\Services\UriService::build(\App\Services\UriService::DATA_TEMPLATE, $pdt);
 
         return $template;
     }
@@ -632,6 +636,9 @@ class Iso23387Exporter
         // Attributes (XSD: only GUID + dateOfCreation on a subject — no URI).
         $element['dt:GUID'] = $gop->GUID;
         $element['dateOfCreation'] = $this->formatDate($gop->dateOfVersion);
+        // Canonical identifier (JSON/API only). The ed-2 XSD allows no URI attribute on a
+        // subject, so this key is annotation-style and the XML builders ignore it.
+        $element['_uri'] = \App\Services\UriService::build(\App\Services\UriService::GROUP, $gop);
 
         return $element;
     }
@@ -732,6 +739,9 @@ class Iso23387Exporter
         // Attributes (XSD ConceptType: only GUID + dateOfCreation + optional about — no referenceURI).
         $element['dt:GUID'] = $prop->GUID;
         $element['dateOfCreation'] = $this->formatDate($prop->dateOfVersion);
+        // Canonical identifier (JSON/API only). The ed-2 XSD allows no URI attribute on a
+        // subject, so this key is annotation-style and the XML builders ignore it.
+        $element['_uri'] = \App\Services\UriService::build(\App\Services\UriService::PROPERTY, $prop);
 
         return $element;
     }
@@ -835,7 +845,7 @@ class Iso23387Exporter
             $element['Status'] = $refDoc->status;
         }
         // OPTIONAL: URI
-        $element['URI'] = 'https://pdts.pt/referencedocumentview/' . $refDoc->GUID;
+        $element['URI'] = \App\Services\UriService::build(\App\Services\UriService::DOCUMENT, $refDoc);
 
         // REQUIRED: Language (1..*) - XSD mandates at least one language
         $element['Language'] = 'en';
@@ -843,6 +853,7 @@ class Iso23387Exporter
         // Attributes
         $element['dt:GUID'] = $refDoc->GUID;
         $element['dateOfCreation'] = $this->formatDate($refDoc->created_at);
+        $element['_uri'] = \App\Services\UriService::build(\App\Services\UriService::DOCUMENT, $refDoc);
 
         return $element;
     }
@@ -1003,7 +1014,7 @@ class Iso23387Exporter
         return $properties->map(function ($prop) {
             return [
                 'dt:GUID' => $prop->GUID,
-                'referenceURI' => 'https://pdts.pt/datadictionaryview/' . $prop->Id . '-' . $this->sanitizePascalCase($prop->namePt)
+                'referenceURI' => \App\Services\UriService::build(\App\Services\UriService::PROPERTY, $prop)
             ];
         })->toArray();
     }
@@ -1024,7 +1035,7 @@ class Iso23387Exporter
         return $properties->unique('GUID')->map(function ($prop) {
             return [
                 'dt:GUID' => $prop->GUID,
-                'referenceURI' => 'https://pdts.pt/datadictionaryview/' . $prop->Id . '-' . $this->sanitizePascalCase($prop->namePt)
+                'referenceURI' => \App\Services\UriService::build(\App\Services\UriService::PROPERTY, $prop)
             ];
         })->values()->toArray();
     }
@@ -1043,7 +1054,7 @@ class Iso23387Exporter
         return $gops->map(function ($gop) {
             return [
                 'dt:GUID' => $gop->GUID,
-                'referenceURI' => 'https://pdts.pt/datadictionaryviewGOP/' . $gop->Id . '-' . $this->convertToPascalCase($gop->gopNamePt)
+                'referenceURI' => \App\Services\UriService::build(\App\Services\UriService::GROUP, $gop)
             ];
         })->toArray();
     }
@@ -1061,7 +1072,7 @@ class Iso23387Exporter
         return $properties->map(function ($prop) {
             return [
                 'dt:GUID' => $prop->GUID,
-                'referenceURI' => 'https://pdts.pt/datadictionaryview/' . $prop->Id . '-' . $this->sanitizePascalCase($prop->namePt)
+                'referenceURI' => \App\Services\UriService::build(\App\Services\UriService::PROPERTY, $prop)
             ];
         })->unique('dt:GUID')->values()->toArray();
     }
@@ -1079,7 +1090,7 @@ class Iso23387Exporter
         return $groupsOfProperties->map(function ($gop) {
             return [
                 'dt:GUID' => $gop->GUID,
-                'referenceURI' => 'https://pdts.pt/datadictionaryviewGOP/' . $gop->Id . '-' . $this->convertToPascalCase($gop->gopNamePt)
+                'referenceURI' => \App\Services\UriService::build(\App\Services\UriService::GROUP, $gop)
             ];
         })->unique('dt:GUID')->values()->toArray();
     }
@@ -1200,6 +1211,9 @@ class Iso23387Exporter
         // Attributes
         $element['dt:GUID'] = $objectType->GUID;
         $element['dateOfCreation'] = $this->formatDate($objectType->dateOfVersion ?? $objectType->dateOfRevision ?? $objectType->created_at ?? null);
+        // Canonical identifier (JSON/API only). The ed-2 XSD allows no URI attribute on a
+        // subject, so this key is annotation-style and the XML builders ignore it.
+        $element['_uri'] = \App\Services\UriService::build(\App\Services\UriService::CONSTRUCTION, $objectType);
 
         return $element;
     }

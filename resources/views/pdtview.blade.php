@@ -3,7 +3,7 @@
         <div class="container sm:max-w-full py-9">
             <div class=''>
                 <div class="flex-none inline">
-                    <h1 class="flex-none inline">{{ $pdt->pdtNamePt }}</h1>
+                    <h1 class="flex-none inline">{{ Lg::f($pdt, 'pdtName') }}</h1>
                     <p class="flex-none inline"> - <x-version-badge :version="$pdt->versionNumber" :revision="$pdt->revisionNumber" /></p>
                     <x-status-badge :status="$pdt->status" />
                     @if (Auth::check() && Auth::user()->isAdmin == 1 && $pdt->status == 'Active')
@@ -16,92 +16,76 @@
                 </div>
             </div>
             <div class='py-2'>
-                <h3 class='py-2'>Atributos do Modelo de Dados de Produto baseado em EN ISO 23387</h3>
-                
+                <h3 class='py-2'>{{ Lg::t('Atributos do Modelo de Dados de Produto baseado em EN ISO 23387') }}</h3>
+
                 <table id='tblprop' cellpadding='0' cellspacing='0'>
                     <tbody>
                             <tr>
                                 <th class="lg:w-1/4 md:w-1/4 sm:w-1/2">GUID</th>
                                 <td class="lg:w-3/4 md:w-3/4 sm:w-1/2">{{$pdt->GUID}}</td>
                             </tr>
+                            <x-uri-row entity="dt" :record="$pdt" />
                             <tr>
-                                <th>URI</th>
-                                <td>
-                                    <a href="https://pdts.pt/pdtview/{{$pdt->Id}}-{{\App\Http\Controllers\ProductdatatemplatesController::convertToPascalCase($pdt->pdtNamePt)}}" target="_blank">
-                                        https://pdts.pt/pdtview/{{$pdt->Id}}-{{\App\Http\Controllers\ProductdatatemplatesController::convertToPascalCase($pdt->pdtNamePt)}}
-                                    </a>
-                                </td>
+                                <th>{{ Lg::t('Nome') }}</th>
+                                <td>{{ Lg::f($pdt, 'pdtName') }}</td>
                             </tr>
                             <tr>
-                                <th>Nome En</th>
-                                <td>{{$pdt->pdtNameEn}}</td>
+                                <th>{{ Lg::t('Descrição') }}</th>
+                                <td>{{ Lg::f($pdt, 'description') }}</td>
                             </tr>
                             <tr>
-                                <th>Nome Pt</th>
-                                <td>{{$pdt->pdtNamePt}}</td>
-                            </tr>
-                            <tr>
-                                <th>Descrição En</th>
-                                <td>{{$pdt->descriptionEn}}</td>
-                            </tr>
-                            <tr>
-                                <th>Descrição Pt</th>
-                                <td>{{$pdt->descriptionPt}}</td>
-                            </tr>
-                            <tr>
-                                <th>Estado</th>
+                                <th>{{ Lg::t('Estado') }}</th>
                                 <td>{{$pdt->status}}</td>
                             </tr>
                             <tr>
-                                <th>Versão</th>
+                                <th>{{ Lg::t('Versão') }}</th>
                                 <td>{{$pdt->versionNumber}}</td>
                             </tr>
                             <tr>
-                                <th>Revisão</th>
+                                <th>{{ Lg::t('Revisão (número)') }}</th>
                                 <td>{{$pdt->revisionNumber}}</td>
                             </tr>
                             <tr>
-                                <th>Data da versão</th>
+                                <th>{{ Lg::t('Data da versão') }}</th>
                                 <td>{{$pdt->dateOfVersion}}</td>
                             </tr>
                             <tr>
-                                <th>Data de revisão</th>
+                                <th>{{ Lg::t('Data de revisão') }}</th>
                                 <td>{{$pdt->dateOfRevision}}</td>
                             </tr>
                             @if($objectType)
                             <tr>
-                                <th>ObjectType (Tipo de Objeto)</th>
+                                <th>{{ Lg::t('ObjectType (Tipo de Objeto)') }}</th>
                                 <td>
-                                    <strong>{{$objectType->constructionObjectNamePt}}</strong>
-                                    (EN: {{$objectType->constructionObjectNameEn}})<br/>
+                                    <a href="{{ Uri::buildLink('class', $objectType) }}"><strong>{{ Lg::f($objectType, 'constructionObjectName') }}</strong></a><br/>
                                     GUID: {{$objectType->GUID}}<br/>
-                                    Descrição: {{$objectType->descriptionPt}}
+                                    {{ Lg::t('Descrição') }}: {{ Lg::f($objectType, 'description') }}
                                 </td>
                             </tr>
                             @endif
                             @if(!empty($subtypeParents))
                             <tr>
-                                <th>Subtipo de (Object Type)</th>
+                                <th>{{ Lg::t('Subtipo de (Object Type)') }}</th>
                                 <td>
                                     @foreach($subtypeParents as $parent)
-                                        <a href="{{ url('pdtview/' . $parent['pdtId'] . '-' . \App\Http\Controllers\ProductdatatemplatesController::convertToPascalCase($parent['name'])) }}">
-                                            {{ $parent['name'] }}
+                                        <a href="{{ Uri::buildLink('dt', $parent['record']) }}">
+                                            {{ Lg::f($parent['record'], 'pdtName') }}
                                         </a>@if(!$loop->last), @endif
                                     @endforeach
                                 </td>
                             </tr>
                             @endif
                             <tr>
-                                <th>Grupos de Propriedades</th>
+                                <th>{{ Lg::t('Grupos de Propriedades') }}</th>
                                 <td>
-                                    {{ count($groupsOfProperties) }} grupos
+                                    {{ Lg::t(':count grupos', ['count' => count($groupsOfProperties)]) }}
                                     @if($inheritedGroupCount > 0)
-                                    <br/><small style="color: #666;">(inclui {{ $inheritedGroupCount }} herdado(s) de supertipos — IsSubtypeOf)</small>
+                                    <br/><small style="color: #666;">{{ Lg::t('(inclui :count herdado(s) de supertipos — IsSubtypeOf)', ['count' => $inheritedGroupCount]) }}</small>
                                     @endif
                                 </td>
                             </tr>
                           <tr>
-                             <th>Lista de versões anteriores</th>
+                             <th>{{ Lg::t('Lista de versões anteriores') }}</th>
                                 <td style="display: flex; border: none; flex-wrap: wrap;">
                                 @php
                                     $olderVersions = $pdtVersions
@@ -110,17 +94,16 @@
                                         ->sortByDesc('revisionNumber');
                                 @endphp
                                     @forelse($olderVersions as $version)
-                                    <form class="mb-3" action="{{ url('pdtview/' . $version->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::convertToPascalCase($version->pdtNamePt)) }}">
-                                        <button class="btn-link" type="submit" style="margin-right: 5px;">
-                                            V{{ $version->versionNumber }}.{{ $version->revisionNumber }}
-                                        </button>
-                                    </form>
+                                    {{-- Earlier versions are reached through the pinned identifier. --}}
+                                    <a class="btn-link" style="margin-right: 5px;" href="{{ Uri::buildLink('dt', $version, (int) $version->versionNumber) }}">
+                                        V{{ $version->versionNumber }}.{{ $version->revisionNumber }}
+                                    </a>
                                     @empty
-                                    <span>Nenhuma versão anterior</span>
+                                    <span>{{ Lg::t('Nenhuma versão anterior') }}</span>
                                     @endforelse
                                 </td>
                           </tr>
-                     
+
                     </tbody>
                 </table>
 
@@ -129,7 +112,7 @@
 
                 <br>
                      <form class="mb-3" action="{{ route('pdtsdownload', ['pdtID' => $pdt->Id]) }}">
-                                    <x-button-primary-pdts type="submit" title="Ver PDT" />
+                                    <x-button-primary-pdts type="submit" title="{{ Lg::t('Ver PDT') }}" />
                                 </form>
             </div>
         </div>

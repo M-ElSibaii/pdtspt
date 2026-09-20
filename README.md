@@ -122,13 +122,65 @@ The API is served under the `/api` prefix and returns JSON. Interactive document
 | `GET /api/quantityKinds` | All physical quantities (quantity kinds).                                           |
 | `GET /api/dimensions`    | All dimensions with their 7 SI exponents (ISO 80000 order).                         |
 
-Each reference entity also resolves as a **dereferenceable page** on the platform, as HTML or (via `Accept: application/json`, `?format=json`, or a `.json` suffix) JSON:
+Units and quantity kinds are dictionary entities, so they resolve through the identifier
+scheme below. Dimensions have no segment in that scheme and keep their own page:
 
 ```
-GET /unit/{code}            e.g. /unit/mm
-GET /quantitykind/{name}    e.g. /quantitykind/length
+GET /uri/0.1/unit/{code}    e.g. /uri/0.1/unit/mm
+GET /uri/0.1/pq/{name}      e.g. /uri/0.1/pq/length
 GET /dimension/{canonical}  e.g. /dimension/L
 ```
+
+## Identifiers
+
+Every record in the dictionary has exactly one resolvable identifier. This is the form
+that goes into exports and declarations, and every record the API returns carries it in a
+`uri` field.
+
+```
+https://pdts.pt/uri/{dictVersion}/{entity}/{code}
+https://pdts.pt/uri/{dictVersion}/{entity}/{code}/v{versionNumber}   (optional, pinned)
+```
+
+`dictVersion` is the dictionary release (`config/pdts.php`, currently `0.1`); `latest` is
+accepted on input and redirects to the current release. The unversioned form is canonical
+and resolves to the record's current state; `/v{n}` pins a known version. The language a
+page is read in never changes a record's identifier.
+
+| Entity                | Segment     | Code                     |
+| --------------------- | ----------- | ------------------------ |
+| Property              | `prop`      | `Name`                   |
+| Product data template | `dt`        | `Name`                   |
+| Construction object   | `class`     | `Name`                   |
+| Group of properties   | `gop`       | `{id}-Name`              |
+| Class property        | `classprop` | `{classPropertyId}-Name` |
+| Reference document    | `doc`       | `Name`                   |
+| Unit                  | `unit`      | `Name`                   |
+| Quantity kind         | `pq`        | `Name`                   |
+| Enumerated value      | `enum`      | `{id}-Name`              |
+
+Name-only codes rely on those names being unique across what the dictionary publishes.
+Where they are not, that is a data defect: it is reported, never resolved by renaming one
+of the records.
+
+```
+php artisan uri:check              # report collisions in what is published
+php artisan uri:check --scope=all  # audit every stored row
+php artisan uri:check --sync       # also rebuild the uri_codes registry
+```
+
+`App\Services\UriService` is the only place that builds, parses or resolves an
+identifier — nothing else concatenates one. `uri_codes` holds a `UNIQUE (entity, code)`
+registry of the published identifiers; it is additive and derived, never a source of truth.
+
+## Language
+
+The site renders in Portuguese or English, chosen with the header toggle (remembered for
+the session, PT by default) or with `?lang=pt` / `?lang=en` on any page. Record text comes
+from the language columns the data already holds (`nameEn`/`namePt`,
+`definitionEn`/`definitionPt`, `nameEnSc`/`namePtSc`); nothing is machine-translated, and
+a record with no text in the chosen language falls back to the other. Interface wording
+lives in `resources/lang/ui.php`, keyed by the Portuguese string.
 
 # Rebuild the reference layer (units from bsDD, dimensions, quantity kinds)
 

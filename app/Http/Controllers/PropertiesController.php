@@ -13,19 +13,17 @@ use Illuminate\Http\Request;
  * PropertiesAdded, addPropertyManual, addFromDictionary, PropertiesAddedDictionaryPage,
  * uploadExcel, showProperty, updateProperty) were removed — superseded by the unified
  * editor (PreviewService / PdtVersioning / ActivePdtEdit) and PropertyPickerController.
- * Only the shared class-property view used by the public /classpropertyview route remains.
+ * Only the shared class-property view remains, reached through /uri/{v}/classprop/{id}-{Name}.
  */
 class PropertiesController extends Controller
 {
     /**
      * GET Class Property View (ISO 23387 ClassProperty) — shows a specific class property
-     * usage within a class/group context. Used by the public classpropertyview route.
+     * usage within a class/group context. Reached through the classprop identifier,
+     * which UriController has already resolved to a properties.Id.
      */
-    public function getClassPropertyView($idSlug)
+    public function getClassPropertyView($id)
     {
-        // Parse ID from {id}-{slug}
-        $id = explode('-', $idSlug)[0];
-
         $property = properties::where('Id', $id)->first();
         if (!$property) {
             abort(404, 'Class Property not found');

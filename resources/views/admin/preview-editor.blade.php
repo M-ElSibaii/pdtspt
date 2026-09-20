@@ -4,7 +4,9 @@
 
             {{-- Header --}}
             <div class="flex flex-wrap items-center gap-2 border-b pb-3">
-                <h1 class="flex-none inline">{{ $pdt->pdtNamePt }}</h1>
+                {{-- The name links to the record's canonical identifier, the same URI
+                     the exports carry. --}}
+                <h1 class="flex-none inline"><a href="{{ Uri::buildLink('dt', $pdt) }}">{{ $pdt->pdtNamePt }}</a></h1>
                 <span> - <x-version-badge :version="$pdt->versionNumber" :revision="$pdt->revisionNumber" /></span>
                 <x-status-badge :status="$pdt->status" />
                 <span class="ml-auto flex gap-2">

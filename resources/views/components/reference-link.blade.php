@@ -20,12 +20,12 @@
         switch ($type) {
             case 'unit':
                 if (\App\Services\UnitsReference::isKnownUnit($raw)) {
-                    $url = route('reference.unit', ['code' => $raw]);
+                    $url = \App\Services\UriService::link('unit', $raw);
                 }
                 break;
             case 'quantitykind':
                 if (\App\Models\PhysicalQuantity::where('name', $raw)->exists()) {
-                    $url = route('reference.quantitykind', ['name' => $raw]);
+                    $url = \App\Services\UriService::link('pq', $raw);
                 }
                 break;
             case 'dimension':
@@ -36,10 +36,10 @@
         }
     }
 
-    $display = $isBlank ? ($placeholder ?? $value) : $value;
+    $display = $isBlank ? ($placeholder !== null ? Lg::t($placeholder) : $value) : $value;
 @endphp
 @if($url)
-    <a href="{{ $url }}" target="_blank" rel="noopener" title="Ver definição de referência (ISO 23387)">{{ $display }}</a>
+    <a href="{{ $url }}" target="_blank" rel="noopener" title="{{ Lg::pick('Ver definição de referência (ISO 23387)', 'View the reference definition (ISO 23387)') }}">{{ $display }}</a>
 @else
     {{ $display }}
 @endif

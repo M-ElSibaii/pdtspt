@@ -1,7 +1,7 @@
 <x-app-layout>
     <div style="background-color: white;">
         <div class="container sm:max-w-full py-9" x-data="{ search: '', selectedCategories: [], showCategories: false }">
-            <h1>Os Modelos de Dados dos Produtos</h1>
+            <h1>{{ Lg::t('Os Modelos de Dados dos Produtos') }}</h1>
 
             @if (Auth::check() && Auth::user()->isAdmin == 1)
                 <div class="my-3 flex flex-wrap gap-2">
@@ -14,7 +14,7 @@
             <div class="my-4">
                 <input
                     type="text"
-                    placeholder="Search PDTs..."
+                    placeholder="{{ Lg::t('Pesquisar PDTs...') }}"
                     x-model="search"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg" />
             </div>
@@ -32,10 +32,10 @@
                     </colgroup>
                     <thead class="sticky top-0 z-50 border-b bg-white font-medium">
                         <tr>
-                            <th scope="col" class="px-6 py-4">Imagem</th>
-                            <th scope="col" class="px-6 py-4">Nome</th>
-                            <th scope="col" class="px-6 py-4">Versões</th>
-                            <th scope="col" class="px-6 py-4">Categories
+                            <th scope="col" class="px-6 py-4">{{ Lg::t('Imagem') }}</th>
+                            <th scope="col" class="px-6 py-4">{{ Lg::t('Nome') }}</th>
+                            <th scope="col" class="px-6 py-4">{{ Lg::t('Versões') }}</th>
+                            <th scope="col" class="px-6 py-4">{{ Lg::t('Categorias') }}
                                 <button @click="showCategories = !showCategories" class="text-blue-500 relative">
                                     <span x-text="showCategories ? '▲' : '▼'"></span>
                                 </button>
@@ -61,12 +61,12 @@
                         @foreach($latestPDT as $pdt)
                         <tr
                             class="border-b"
-                            x-show="(search === '' || '{{ strtolower($pdt->pdtNamePt) }}'.includes(search.toLowerCase())) && (selectedCategories.length === 0 || selectedCategories.includes('{{ $pdt->category }}'))">
+                            x-show="(search === '' || @js(mb_strtolower(Lg::f($pdt, 'pdtName') ?? '')).includes(search.toLowerCase())) && (selectedCategories.length === 0 || selectedCategories.includes('{{ $pdt->category }}'))">
                             <td class="whitespace-nowrap px-6 py-4 font-medium">
                                 <img class="w-auto max-w-[100px] max-h-14" src="{{ asset('/img/' . $pdt->pdtNameEn . '.png') }}" alt="" />
                             </td>
                             <td class="whitespace-normal px-6 py-4 font-medium" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: normal;">
-                            <a href="/pdtview/{{ $pdt->Id }}-{{ \App\Http\Controllers\ProductdatatemplatesController::convertToPascalCase($pdt->pdtNamePt) }}" class="text-blue-500 hover:text-blue-700">{{ $pdt->pdtNamePt }}
+                            <a href="{{ Uri::buildLink('dt', $pdt) }}" class="text-blue-500 hover:text-blue-700">{{ Lg::f($pdt, 'pdtName') }}
                                 </a>
                             </td>
                             <td class="whitespace-nowrap px-6 py-4 font-medium">
@@ -106,7 +106,7 @@
                             <td class="whitespace-nowrap px-6 py-4 font-medium">{{ $pdt->category }}</td>
                             <td class="whitespace-nowrap px-6 py-4 font-medium my-auto ">
                                 <form class="mb-3" action="{{ route('pdtsdownload', ['pdtID' => $pdt->Id]) }}">
-                                    <x-button-primary-pdts type="submit" title="Ver" />
+                                    <x-button-primary-pdts type="submit" title="{{ Lg::t('Ver') }}" />
                                 </form>
                                 @if (Auth::check() && Auth::user()->isAdmin == 1)
                                     <div class="flex flex-col gap-1 text-xs">
@@ -122,7 +122,7 @@
                             <td class="whitespace-nowrap px-6 py-4 font-medium my-auto">
                                 <form class="mb-3" action="{{ route('pdtssurvey', ['pdtID' => $pdt->Id]) }}">
                                     <x-secondary-button type="submit">
-                                        {{ __('Revisão') }}
+                                        {{ Lg::t('Revisão') }}
                                     </x-secondary-button>
                                 </form>
                             </td>

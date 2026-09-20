@@ -19,7 +19,7 @@ class PropertiesdatadictionariesController extends Controller
         $propinpdts = properties::where('propertyId', $propID)->get();
         $pdts = productdatatemplates::get();
 
-        $propversions = propertiesdatadictionaries::where('GUID', $propinpdts->first()->GUID)->get();
+        $propversions = propertiesdatadictionaries::where('GUID', $propdd->GUID)->get();
 
         // Retrieve the latest referenceDocumentGUID
         $referenceDocumentData = properties::where('propertyId', $propID)->latest()->first('referenceDocumentGUID');

@@ -5,8 +5,6 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductdatatemplatesController;
 use App\Http\Controllers\GroupofpropertiesController;
-use App\Http\Controllers\PropertiesdatadictionariesController;
-use App\Http\Controllers\PropertiesController;
 use App\Http\Controllers\ReferencedocumentsController;
 use App\Http\Controllers\DictionaryDedupeController;
 use App\Http\Controllers\PreviewWorkflowController;
@@ -17,6 +15,9 @@ use App\Http\Controllers\PropertyPickerController;
 use App\Http\Controllers\AdminLookupController;
 use App\Http\Controllers\RelationshipController;
 use App\Http\Controllers\PropertyDependencyController;
+use App\Http\Controllers\UriController;
+use App\Support\Lang;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -70,10 +71,40 @@ Route::get('/dashboard', [ProductdatatemplatesController::class, 'getLatestPDTs'
 Route::get('/pdtsdownload/{pdtID}', [GroupofpropertiesController::class, 'getGroupOfProperties'])
     ->name('pdtsdownload');
 
-// PDT View Page
-Route::get('/pdtview/{idSlug}', [ProductdatatemplatesController::class, 'viewPdt'])
-    ->name('pdtview')
-    ->where('idSlug', '[0-9]+-.*');
+// ---------------------------------------------------------------------------
+// Identifiers. Every dictionary record is reached through exactly one scheme:
+//     /uri/{dictVersion}/{entity}/{code}
+//     /uri/{dictVersion}/{entity}/{code}/v{versionNumber}
+// entity is one of prop, dt, class, gop, classprop, doc, unit, pq, enum.
+// {code} captures the remainder so unit symbols containing "/" (e.g. kg/m³) and the
+// optional /v{n} suffix are split by UriService, not by the router. "latest" is
+// accepted as dictVersion and redirects to the current release.
+// These replace the old /pdtview, /datadictionaryview, /datadictionaryviewGOP,
+// /classpropertyview, /referencedocumentview, /unit and /quantitykind paths.
+// ---------------------------------------------------------------------------
+Route::get('/uri/{dictVersion}/{entity}/{code}', [UriController::class, 'resolve'])
+    ->name('uri.resolve')
+    ->where('dictVersion', '[0-9A-Za-z.]+')
+    ->where('entity', '[a-z]+')
+    ->where('code', '.+');
+
+// Language toggle (PT/EN), remembered for the session. ?lang=pt|en on any page also works.
+Route::get('/language/{locale}', function (Request $request, string $locale) {
+    Lang::set($locale);
+
+    // Only return into this site, and drop any ?lang= so it cannot override the choice.
+    $to = (string) $request->query('redirect', '');
+    if ($to === '' || !str_starts_with($to, url('/'))) {
+        return redirect(url()->previous(url('/')));
+    }
+    $parts = parse_url($to);
+    parse_str($parts['query'] ?? '', $query);
+    unset($query['lang']);
+
+    return redirect(strtok($to, '?')
+        . ($query ? '?' . http_build_query($query) : '')
+        . (isset($parts['fragment']) ? '#' . $parts['fragment'] : ''));
+})->name('language.switch')->where('locale', 'pt|en');
 
 // Single PDT export endpoints (EN ISO 23387 format)
 Route::post('/pdt-export/json/{pdtId}', [ProductdatatemplatesController::class, 'downloadPdtJson'])
@@ -97,6 +128,7 @@ Route::post('/updateSubscription', [ProfileController::class, 'updateSubscriptio
 require __DIR__ . '/auth.php';
 
 Route::get('/pdtssurvey/{pdtID}', [GroupofpropertiesController::class, 'getGroupOfProperties2'])
+    ->whereNumber('pdtID')   // otherwise a GET to the POST-only /pdtssurvey/saveAnswers matched here
     ->middleware(['auth', 'verified'])->name('pdtssurvey');
 Route::post('/pdtssurvey/saveAnswers', [GroupofpropertiesController::class, 'saveAnswers'])
     ->middleware(['auth', 'verified'])->name('saveAnswers');
@@ -106,36 +138,9 @@ Route::post('/pdtssurvey/store', [GroupofpropertiesController::class, 'store'])
     ->middleware(['auth', 'verified'])->name('pdtssurveystore');
 
 
-Route::get(
-    '/classpropertyview/{idSlug}',
-    [PropertiesController::class, 'getClassPropertyView']
-)->name('classpropertyview')
-    ->where('idSlug', '[0-9]+-.*');
-
-Route::get(
-    '/datadictionaryview/{idSlug}',
-    [PropertiesdatadictionariesController::class, 'getPropertyDataDictionary']
-)->name('datadictionaryview')
-    ->where('idSlug', '[0-9]+-.*');
-
-Route::get(
-    '/datadictionaryviewGOP/{idSlug}',
-    [GroupofpropertiesController::class, 'getGOPDataDictionary']
-)->name('datadictionaryviewGOP')
-    ->where('idSlug', '[0-9]+-.*');
-
-Route::get(
-    '/referencedocumentview/{rdGUID}',
-    [ReferencedocumentsController::class, 'getReferenceDocument']
-)->name('referencedocumentview');
-
-// ISO 23387 reference-layer dereferenceable pages (R-LD-2/3/4). Catch-all constraints so
-// codes/names with "/" (e.g. "kg/m³") resolve as a single path value. JSON via content
-// negotiation (Accept: application/json, ?format=json, or a .json suffix).
-Route::get('/unit/{code}', [\App\Http\Controllers\UnitsReferenceController::class, 'unit'])
-    ->name('reference.unit')->where('code', '.*');
-Route::get('/quantitykind/{name}', [\App\Http\Controllers\UnitsReferenceController::class, 'quantityKind'])
-    ->name('reference.quantitykind')->where('name', '.*');
+// ISO 23387 reference layer. Units and quantity kinds are identifiers now (/uri/.../unit,
+// /uri/.../pq). Dimensions have no segment in the identifier scheme, so they keep their
+// own dereferenceable page. JSON via Accept, ?format=json, or a .json suffix.
 Route::get('/dimension/{canonical}', [\App\Http\Controllers\UnitsReferenceController::class, 'dimension'])
     ->name('reference.dimension')->where('canonical', '.*');
 
@@ -153,7 +158,11 @@ Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
 
     // Route for exporting JSON
     Route::get('/exportdomainbsdd', function () {
-        return view('exportdomainbsdd');
+        // Show the identifier collisions up front: the export refuses to run while any
+        // code is claimed by two records, so the admin sees why before clicking.
+        return view('exportdomainbsdd', [
+            'collisions' => \App\Services\UriService::collisions('export'),
+        ]);
     })->name('exportdomainbsdd');
 
     Route::post('/exportdomainbsdd-psets', [ProductDataTemplatesController::class, 'exportDataToJsonPSETS'])
@@ -183,7 +192,9 @@ Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
     // Interactive API tester (admin). Calls the site's own origin by default so it
     // behaves identically on localhost and once live on pdts.pt.
     Route::get('/admin/api-tester', function () {
-        return view('admin.api-tester');
+        // Seed the identifier fields with codes that actually exist, so "Run all" works
+        // out of the box instead of 404-ing on invented examples.
+        return view('admin.api-tester', ['sample' => \App\Services\UriService::sampleCodes()]);
     })->name('admin.api-tester');
 
     // Preview workflow: free-edit drafts (status = Preview), hard-delete, publish.

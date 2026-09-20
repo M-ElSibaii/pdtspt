@@ -32,6 +32,12 @@
                     <div><label>Unit code</label><input id="p_unit" value="mm" /></div>
                     <div><label>Quantity kind name</label><input id="p_qk" value="millimetre" /></div>
                     <div><label>Dimension canonical</label><input id="p_dim" value="1" /></div>
+                    <div><label>dt code</label><input id="p_dtCode" value="{{ $sample['dt'] }}" /></div>
+                    <div><label>prop code</label><input id="p_propCode" value="{{ $sample['prop'] }}" /></div>
+                    <div><label>gop code</label><input id="p_gopCode" value="{{ $sample['gop'] }}" /></div>
+                    <div><label>classprop code</label><input id="p_classPropCode" value="{{ $sample['classprop'] }}" /></div>
+                    <div><label>class code</label><input id="p_classCode" value="{{ $sample['class'] }}" /></div>
+                    <div><label>doc code</label><input id="p_docCode" value="{{ $sample['doc'] }}" /></div>
                 </div>
             </div>
 
@@ -104,7 +110,16 @@
                 unit:   () => ($("p_unit").value || "").trim(),
                 qk:     () => ($("p_qk").value || "").trim(),
                 dim:    () => ($("p_dim").value || "").trim(),
+                dtCode:        () => ($("p_dtCode").value || "").trim(),
+                propCode:      () => ($("p_propCode").value || "").trim(),
+                gopCode:       () => ($("p_gopCode").value || "").trim(),
+                classPropCode: () => ($("p_classPropCode").value || "").trim(),
+                classCode:     () => ($("p_classCode").value || "").trim(),
+                docCode:       () => ($("p_docCode").value || "").trim(),
             };
+
+            // The identifier namespace of this dictionary release.
+            const URI = "/uri/{{ \App\Services\UriService::dictionaryVersion() }}";
 
             const CATALOG = [
                 ["Collections", [
@@ -125,10 +140,16 @@
                     ["GET", "Reference document",    () => `/api/referenceDocuments/${enc(P.refGuid())}`],
                     ["GET", "Group of properties",   () => `/api/groupsOfProperties/${enc(P.gopId())}`],
                 ]],
-                ["Reference layer (dereferenceable, JSON) — same-origin only", [
-                    ["GET", "Unit",          () => `/unit/${enc(P.unit())}?format=json`],
-                    ["GET", "Quantity kind", () => `/quantitykind/${enc(P.qk())}?format=json`],
-                    ["GET", "Dimension",     () => `/dimension/${enc(P.dim())}?format=json`],
+                ["Identifiers (dereferenceable, JSON) — same-origin only", [
+                    ["GET", "Data template",     () => `${URI}/dt/${enc(P.dtCode())}?format=json`],
+                    ["GET", "Property",          () => `${URI}/prop/${enc(P.propCode())}?format=json`],
+                    ["GET", "Group of props",    () => `${URI}/gop/${enc(P.gopCode())}?format=json`],
+                    ["GET", "Class property",    () => `${URI}/classprop/${enc(P.classPropCode())}?format=json`],
+                    ["GET", "Construction obj",  () => `${URI}/class/${enc(P.classCode())}?format=json`],
+                    ["GET", "Reference document",() => `${URI}/doc/${enc(P.docCode())}?format=json`],
+                    ["GET", "Unit",              () => `${URI}/unit/${enc(P.unit())}?format=json`],
+                    ["GET", "Quantity kind",     () => `${URI}/pq/${enc(P.qk())}?format=json`],
+                    ["GET", "Dimension",         () => `/dimension/${enc(P.dim())}?format=json`],
                 ]],
                 ["Exports (POST · download) — same-origin only", [
                     ["POST", "Download PDT JSON", () => `/pdt-export/json/${enc(P.pdtId())}`],

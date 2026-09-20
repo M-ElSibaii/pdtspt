@@ -1,29 +1,21 @@
 <x-app-layout>
     <div style="background-color: white;">
         <div class="container sm:max-w-full py-4">
-            <h3>{{ __('Análises e comentários do Modelo de Dados do Produto') }}</h3>
+            <h3>{{ Lg::t('Análises e comentários do Modelo de Dados do Produto') }}</h3>
             <section class="">
                 @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>Success!</strong> {{ session('success') }}
+                    <strong>{{ Lg::pick('Sucesso!', 'Success!') }}</strong> {{ session('success') }}
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 @endif
-                <p>O objetivo deste questionário é apoiar o consenso da indústria rumo a PDTs uniformizados a nível nacional</p>
+                <p>{{ Lg::t('O objetivo deste questionário é apoiar o consenso da indústria rumo a PDTs uniformizados a nível nacional') }}</p>
                 <div class="mb-6">
-                    <h1 class="flex-none inline">{{ $pdt->pdtNamePt }}</h1>
+                    <h1 class="flex-none inline">{{ Lg::f($pdt, 'pdtName') }}</h1>
                     <p class="flex-none inline"> - V{{ $pdt->versionNumber }}.{{ $pdt->revisionNumber }}</p>
-                    @if ($pdt->status == 'Active')
-                    <span class="status-tag status-tag-active">Ativa</span>
-                    @endif
-                    @if ($pdt->status == 'Preview')
-                    <span class="status-tag status-tag-inactive">Inativa</span>
-                    @endif
-                    @if ($pdt->status == 'InActive')
-                    <span class="status-tag status-tag-inactive">Inativa</span>
-                    @endif
+                    <x-status-badge :status="$pdt->status" />
 
                 </div>
                 <div>
@@ -36,12 +28,12 @@
                             <table class="table-auto" id="tblpdts" cellpadding="0" cellspacing="0">
                                 <thead class="sticky top-0 z-50">
                                     <tr>
-                                        <th>Propriedade</th>
-                                        <th>Unidade</th>
-                                        <th>Descrição</th>
-                                        <th>Documento de referência</th>
-                                        <th>Questão</th>
-                                        <th>Comentários</th>
+                                        <th>{{ Lg::t('Propriedade') }}</th>
+                                        <th>{{ Lg::t('Unidade') }}</th>
+                                        <th>{{ Lg::t('Descrição') }}</th>
+                                        <th>{{ Lg::t('Documento de referência') }}</th>
+                                        <th>{{ Lg::t('Questão') }}</th>
+                                        <th>{{ Lg::t('Comentários') }}</th>
                                     </tr>
                                 </thead>
 
@@ -51,9 +43,9 @@
                                     <tr>
                                         <td class="text-left content-start bg-slate-300 p-3" colspan="6">
                                             <input class="text-left expand" type="checkbox" name="{{ $group[0]->gopNamePt }}" id="{{ $group[0]->gopNamePt }}" data-toggle="toggle">
-                                            <label class="my-auto text-left cursor-pointer" for="{{ $group[0]->gopNamePt }}">Grupo de propriedades -
-                                                <a href="{{ url('datadictionaryviewGOP/' . $group[0]->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::convertToPascalCase($group[0]->gopNamePt)) }}">
-                                                    {{ $group[0]->gopNamePt }}
+                                            <label class="my-auto text-left cursor-pointer" for="{{ $group[0]->gopNamePt }}">{{ Lg::t('Grupo de propriedades') }} -
+                                                <a href="{{ Uri::buildLink('gop', $group[0]) }}">
+                                                    {{ Lg::f($group[0], 'gopName') }}
                                                 </a>
                                             </label>
                                         </td>
@@ -68,7 +60,7 @@
                                     <!-- Row colour-coded by inheritance source (IsSubtypeOf chain); see legend under the table -->
                                     <tr @if($property->is_inherited && isset($sourceColors[$property->inherited_from])) style="background-color: {{ $sourceColors[$property->inherited_from] }};" @endif>
                                         <td class="p-1.5 property-td">
-                                            <a href="{{ url('classpropertyview/' . $property->propertyId . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($property->namePt)) }}">{{ $property->namePt }}
+                                            <a href="{{ Uri::buildLink('classprop', $property) }}">{{ Lg::f($property, 'name') }}
                                                 {{-- Check if the relationToOtherDataDictionaries attribute exists and is not null --}}
                                                 @if(!is_null($property->relationToOtherDataDictionaries))
                                                 @php
@@ -108,7 +100,7 @@
                                         </td>
                                         <td class="p-1.5">
                                             <div class="flex flex-col">
-                                                <p>{{$property->descriptionPt}}</p>
+                                                <p>{{ Lg::f($property, 'description') }}</p>
                                                 @if($property->visualRepresentation == True)
                                                 <div class="col-sm">
                                                     <img src="{{ asset ('img/'.$property->nameEn.'.png')}}" alt='{{$property->nameEn}}' class="property-image">
@@ -126,7 +118,7 @@
                                         </td>
                                         @else
                                         <td class="p-1.5">
-                                            <a href="{{ route('referencedocumentview', ['rdGUID' => $property->referenceDocumentGUID]) }}">
+                                            <a href="{{ $referenceDoc ? Uri::buildLink('doc', $referenceDoc) : '#' }}">
                                                 <p title="{{ $referenceDoc->title }}">{{ $referenceDoc->rdName }}</p>
                                             </a>
                                         </td>
@@ -142,20 +134,20 @@
                                                 @endphp
                                                 <div class="form-check form-check-inline">
                                                     <input class="h-4 w-4 border-gray-300 text-slate-600 focus:ring-slate-600" type="radio" name="{{$property->Id}}" id="answerYes-{{$property->Id}}" value="yes" {{$yesChecked}}>
-                                                    <label class="ml-2 my-auto block text-sm font-medium leading-6 text-gray-900" for="answerYes-{{$property->Id}}">Sim</label>
+                                                    <label class="ml-2 my-auto block text-sm font-medium leading-6 text-gray-900" for="answerYes-{{$property->Id}}">{{ Lg::t('Sim') }}</label>
                                                 </div>
                                                 <div class="form-check form-check-inline">
                                                     <input class="h-4 w-4 border-gray-300 text-slate-600 focus:ring-slate-600" type="radio" name="{{$property->Id}}" id="answerNo-{{$property->Id}}" value="no" {{$noChecked}}>
-                                                    <label class="ml-2 my-auto block text-sm font-medium leading-6 text-gray-900" for="answerNo-{{$property->Id}}">Não</label>
+                                                    <label class="ml-2 my-auto block text-sm font-medium leading-6 text-gray-900" for="answerNo-{{$property->Id}}">{{ Lg::t('Não') }}</label>
                                                 </div>
                                                 <div class="form-check form-check-inline">
                                                     <input class="h-4 w-4 border-gray-300 text-slate-600 focus:ring-slate-600" type="radio" name="{{$property->Id}}" id="answerNoOpinion-{{$property->Id}}" value="no_opinion" {{$noOpinionChecked}}>
-                                                    <label class="ml-2 my-auto block text-sm font-medium leading-6 text-gray-900" for="answerNoOpinion-{{$property->Id}}">Sem opinião</label>
+                                                    <label class="ml-2 my-auto block text-sm font-medium leading-6 text-gray-900" for="answerNoOpinion-{{$property->Id}}">{{ Lg::t('Sem opinião') }}</label>
                                                 </div>
                                             </div>
                                         </td>
                                         <td class="p-1.5">
-                                            <x-nav-link type="button" id="loadComments-{{$property->Id}}" onclick="loadComments(this, '{{$property->Id}}')">Comentários ({{ \App\Models\comments::where('properties_Id', $property->Id)->count() }})</x-nav-link>
+                                            <x-nav-link type="button" id="loadComments-{{$property->Id}}" onclick="loadComments(this, '{{$property->Id}}')">{{ Lg::t('Comentários') }} ({{ \App\Models\comments::where('properties_Id', $property->Id)->count() }})</x-nav-link>
                                         </td>
                                     </tr>
                                     @endif
@@ -167,25 +159,25 @@
                         </div>
                         @if(!empty($inheritedFrom))
                         <div style="padding-top: 8px; font-size: 0.85rem;">
-                            <strong>Código de cores — origem das propriedades (relação IsSubtypeOf):</strong>
+                            <strong>{{ Lg::t('Código de cores — origem das propriedades (relação IsSubtypeOf):') }}</strong>
                             <div style="display:flex; flex-wrap:wrap; gap:14px; margin-top:6px; align-items:center;">
-                                <span><span style="display:inline-block; width:16px; height:16px; border:1px solid #cbd5e1; background:#ffffff; vertical-align:middle; margin-right:4px;"></span>Próprio (deste modelo)</span>
+                                <span><span style="display:inline-block; width:16px; height:16px; border:1px solid #cbd5e1; background:#ffffff; vertical-align:middle; margin-right:4px;"></span>{{ Lg::t('Próprio (deste modelo)') }}</span>
                                 @foreach($inheritedFrom as $src)
-                                <span><span style="display:inline-block; width:16px; height:16px; border:1px solid #cbd5e1; background:{{ $sourceColors[$src] }}; vertical-align:middle; margin-right:4px;"></span>Herdado de: {{ $src }}</span>
+                                <span><span style="display:inline-block; width:16px; height:16px; border:1px solid #cbd5e1; background:{{ $sourceColors[$src] }}; vertical-align:middle; margin-right:4px;"></span>{{ Lg::t('Herdado de: :source', ['source' => $inheritedFromLabels[$src] ?? $src]) }}</span>
                                 @endforeach
                             </div>
                         </div>
                         @else
-                        <h6 style="padding-top: 5px"> Nota: Este modelo de dados não herda propriedades de supertipos. </h6>
+                        <h6 style="padding-top: 5px">{{ Lg::t('Nota: Este modelo de dados não herda propriedades de supertipos.') }}</h6>
                         @endif
                         <div class="my-6 text-end">
-                            <a href="/dashboard">
+                            <a href="{{ route('dashboard') }}">
                                 <x-secondary-button id="backButton" type="button">
-                                    Anterior
+                                    {{ Lg::t('Anterior') }}
                                 </x-secondary-button>
                             </a>
                             <x-primary-button id="saveButton" type="submit">
-                                Guardar Respostas
+                                {{ Lg::t('Guardar Respostas') }}
                             </x-primary-button>
                         </div>
 

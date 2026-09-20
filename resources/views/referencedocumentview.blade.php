@@ -3,59 +3,51 @@
         <div class="container sm:max-w-full py-9">
             <h1>{{$rd->rdName}}</h1>
             <div class='flex flex-col'>
-                <h3 class="py-2">Atributos do documento de referência:</h3>
+                <h3 class="py-2">{{ Lg::t('Atributos do documento de referência:') }}</h3>
 
                 <table class="" id='tblprop' cellpadding='0' cellspacing='0'>
                     <tr>
                         <th class="lg:w-1/4 md:w-1/4 sm:w-1/2">GUID</th>
                         <td class="lg:w-3/4 md:w-3/4 sm:w-1/2">{{$rd->GUID}}</td>
                     </tr>
+                    <x-uri-row entity="doc" :record="$rd" />
                     <tr>
-                        <th>Nome</th>
+                        <th>{{ Lg::t('Nome') }}</th>
                         <td>{{$rd->rdName}}</td>
                     </tr>
                     <tr>
-                        <th>Título</th>
+                        <th>{{ Lg::t('Título') }}</th>
                         <td>{{$rd->title}}</td>
                     </tr>
                     <tr>
-                        <th>Descrição</th>
+                        <th>{{ Lg::t('Descrição') }}</th>
                         <td>{{$rd->description}}</td>
                     </tr>
-                     <tr>
-                        <th>URI</th>
-                        <td>https://pdts.pt/referencedocumentview/{{$rd->GUID}}</td>
-                    </tr>
                     <tr>
-                        <th>Estado</th>
+                        <th>{{ Lg::t('Estado') }}</th>
                         <td>{{$rd->status}}</td>
                     </tr>
                 </table>
-                <h3 class="py-2">Propriedades que utilizam este documento de referência:</h3>
+                <h3 class="py-2">{{ Lg::t('Propriedades que utilizam este documento de referência:') }}</h3>
                 <table id='tblprop' cellpadding='0' cellspacing='0'>
                     <tr>
-                        <th style="text-align: left!important;">Modelo de dados</th>
-                        {{-- <th style="text-align: left!important;">Versão</th> --}}
-                        <th style="text-align: left!important;">Propriedade</th>
-
+                        <th style="text-align: left!important;">{{ Lg::t('Modelo de dados') }}</th>
+                        <th style="text-align: left!important;">{{ Lg::t('Propriedade') }}</th>
                     </tr>
 
                     @foreach ($rdinprop as $proprd)
-
                     <tr>
                         <td>
-                            <a href="{{ route('pdtsdownload', ['pdtID' => $proprd->Id]) }}">{{$proprd->pdtNamePt}} V{{$proprd->versionNumber}}.{{$proprd->revisionNumber}}</a>
-
-                            {{-- {{$proprd->pdtNamePt}} --}}
+                            @if ($proprd->pdtId)
+                            <a href="{{ route('pdtsdownload', ['pdtID' => $proprd->pdtId]) }}">{{ Lg::f($proprd, 'pdtName') }} V{{ $proprd->versionNumber }}.{{ $proprd->revisionNumber }}</a>
+                            @endif
                         </td>
-                        {{-- <td>{{$proprd->versionNumber}}.{{$proprd->revisionNumber}}</td> --}}
                         <td>
-                            <a href="{{ url('datadictionaryview/' . $proprd->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::convertToPascalCase($proprd->namePt)) }}">{{ $proprd->namePt }}</a>
-                            {{-- {{$proprd->namePt}} --}}
+                            @if ($proprd->propertyId)
+                            <a href="{{ Uri::buildLink('classprop', ['Id' => $proprd->classPropertyId, 'namePt' => $proprd->namePt]) }}">{{ Lg::f($proprd, 'name') }}</a>
+                            @endif
                         </td>
-
                     </tr>
-
                     @endforeach
                 </table>
             </div>

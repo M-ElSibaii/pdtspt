@@ -53,12 +53,18 @@ class ReferencedocumentsController extends Controller
             $join->on('productdatatemplates.Id', '=', 'properties.pdtID');
         })
             ->where('properties.referenceDocumentGUID', $rdGUID)
+            // Aliased: both tables have Id / versionNumber, and an unaliased select let the
+            // PDT's Id overwrite the property's, so property links pointed at the wrong row.
             ->select(
-                'propertiesdatadictionaries.Id',
+                'properties.Id as classPropertyId',
+                'propertiesdatadictionaries.Id as propertyId',
                 'propertiesdatadictionaries.GUID',
                 'propertiesdatadictionaries.namePt',
+                'propertiesdatadictionaries.nameEn',
+                'propertiesdatadictionaries.versionNumber as propertyVersionNumber',
                 'productdatatemplates.pdtNamePt',
-                'productdatatemplates.Id',
+                'productdatatemplates.pdtNameEn',
+                'productdatatemplates.Id as pdtId',
                 'productdatatemplates.versionNumber',
                 'productdatatemplates.revisionNumber'
             )

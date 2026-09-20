@@ -10,4 +10,4 @@
     ];
     $s = $map[$status] ?? ['cls' => 'status-tag-inactive', 'label' => $status];
 @endphp
-<span {{ $attributes->merge(['class' => 'status-tag ' . $s['cls']]) }}>{{ $s['label'] }}</span>
+<span {{ $attributes->merge(['class' => 'status-tag ' . $s['cls']]) }}>{{ Lg::t($s['label']) }}</span>

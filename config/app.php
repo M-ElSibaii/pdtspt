@@ -212,6 +212,10 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
         'Captcha' => Mews\Captcha\Facades\Captcha::class,
+
+        // PT/EN switch and the identifier builder, for use in Blade.
+        'Lg'  => App\Support\Lang::class,
+        'Uri' => App\Services\UriService::class,
     ])->toArray(),
 
 ];

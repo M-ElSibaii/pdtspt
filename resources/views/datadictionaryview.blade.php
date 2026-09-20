@@ -1,16 +1,36 @@
 <x-app-layout>
+    @php
+        $isEarlier = fn($v) => $v->versionNumber < $propdd->versionNumber
+            || ($v->versionNumber == $propdd->versionNumber && $v->revisionNumber < $propdd->revisionNumber);
+        $isLater = fn($v) => $v->versionNumber > $propdd->versionNumber
+            || ($v->versionNumber == $propdd->versionNumber && $v->revisionNumber > $propdd->revisionNumber);
+        $hasDoc = is_object($referencedocument) && $referencedocument->rdName !== 'n/a';
+
+        // bSDD link, if relationToOtherDataDictionaries names one.
+        $bsddUrl = null;
+        if (!is_null($propdd->relationToOtherDataDictionaries)) {
+            foreach (explode('),(', trim($propdd->relationToOtherDataDictionaries, '()')) as $relation) {
+                $parts = explode(', ', $relation);
+                if (isset($parts[1]) && trim($parts[1]) === 'bsdd.buildingsmart.org') {
+                    $bsddUrl = trim($parts[0]);
+                    break;
+                }
+            }
+        }
+        $enumGroups = \App\Services\UriService::enumValueGroups($propdd);
+        $enumValues = \App\Services\UriService::enumValuesOf($propdd);
+    @endphp
     <div style="background-color: white;">
         <div class="container sm:max-w-full py-9">
             <div class=''>
-                {{-- <h1>{{$propdd->namePt}} </h1> --}}
                 <div class="flex-none inline">
-                    <h1 class="flex-none inline">{{ $propdd->namePt }}</h1>
+                    <h1 class="flex-none inline">{{ Lg::f($propdd, 'name') }}</h1>
                     <p class="flex-none inline"> - <x-version-badge :version="$propdd->versionNumber" :revision="$propdd->revisionNumber" /></p>
                     <x-status-badge :status="$propdd->status" />
                 </div>
             </div>
             <div class='py-2'>
-                <h3 class='py-2'>Atributos de propriedade no dicionário de dados baseado em EN ISO 23386</h3>
+                <h3 class='py-2'>{{ Lg::t('Atributos de propriedade no dicionário de dados baseado em EN ISO 23386') }}</h3>
 
                 <table id='tblprop' cellpadding='0' cellspacing='0'>
                     <tbody>
@@ -18,252 +38,211 @@
                             <th class="lg:w-1/4 md:w-1/4 sm:w-1/2">GUID</th>
                             <td class="lg:w-3/4 md:w-3/4 sm:w-1/2">{{$propdd->GUID}}</td>
                         </tr>
+                        <x-uri-row entity="prop" :record="$propdd" />
                         <tr>
-                            <th>URI</th>
-                            <td>
-                                <a href="https://pdts.pt/datadictionaryview/{{$propdd->Id}}-{{\App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($propdd->namePt)}}" target="_blank">
-                                    https://pdts.pt/datadictionaryview/{{$propdd->Id}}-{{\App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($propdd->namePt)}}
-                                </a>
-                            </td>
+                            <th>{{ Lg::t('Nome') }}</th>
+                            <td>{{ Lg::fSc($propdd, 'name') }}</td>
                         </tr>
                         <tr>
-                            <th>Nome En</th>
-                            <td>{{$propdd->nameEnSc}}</td>
+                            <th>{{ Lg::pick('Nome (código)', 'Name (code form)') }}</th>
+                            <td>{{ Lg::f($propdd, 'name') }}</td>
                         </tr>
                         <tr>
-                            <th>Nome En Código</th>
-                            <td>{{$propdd->nameEn}}</td>
+                            <th>{{ Lg::t('Definição') }}</th>
+                            <td>{{ Lg::f($propdd, 'definition') }}</td>
                         </tr>
                         <tr>
-                            <th>Nome Pt</th>
-                            <td>{{$propdd->namePtSc}}</td>
-                        </tr>
-                        <tr>
-                            <th>Nome Pt Código</th>
-                            <td>{{$propdd->namePt}}</td>
-                        </tr>
-                        <tr>
-                            <th>Descrição En</th>
-                            <td>{{$propdd->definitionEn}}</td>
-                        </tr>
-                        <tr>
-                            <th>Descrição Pt</th>
-                            <td>{{$propdd->definitionPt}}</td>
-                        </tr>
-                        <tr>
-                            <th>Unidades</th>
+                            <th>{{ Lg::t('Unidades') }}</th>
                             <td><x-reference-link type="unit" :value="$propdd->units" /></td>
                         </tr>
-                              <tr>
-                            <th>Representação Visual</th>
-                            <td>        @if($propdd->visualRepresentation == "TRUE")
-                                        <div class="col-sm">
-                                            <img src="{{ asset ('img/'.$propdd->nameEn.'.png')}}" alt='{{$propdd->nameEn}}' class="property-image">
-                                        </div>
-                                        @endif</td>
-                        </tr>
-                 
                         <tr>
-                            <th>Estado</th>
-                            <td>{{$propdd->status}}</td>
-                        </tr>
-                        <tr>
-                            <th>Documento de referência</th>
-                            <td class="p-1.5">
-                                @if ($referencedocument->rdName === 'n/a')
-                                <span>n/a</span>
-                                @else
-                                <a href="{{ route('referencedocumentview', ['rdGUID' => $referencedocument->GUID]) }}">
-                                    <p title="{{ $referencedocument->title }}">{{ $referencedocument->rdName }}</p>
-                                </a>
-                                @endif
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Data de criação</th>
-                            <td>{{$propdd->dateOfCreation}}</td>
-                        </tr>
-                        <tr>
-                            <th>Data de ativação</th>
-                            <td>{{$propdd->dateofActivation}}</td>
-                        </tr>
-                        <tr>
-                            <th>Data da última alteração</th>
-                            <td>{{$propdd->dateOfLastChange}}</td>
-                        </tr>
-                        <tr>
-                            <th>Data de revisão</th>
-                            <td>{{$propdd->dateOfRevision}}</td>
-                        </tr>
-                        <tr>
-                            <th>Data da versão</th>
-                            <td>{{$propdd->dateOfVersion}}</td>
-                        </tr>
-                        <tr>
-                            <th>Versão</th>
-                            <td>{{$propdd->versionNumber}}</td>
-                        </tr>
-                        <tr>
-                            <th>Revisão</th>
-                            <td>{{$propdd->revisionNumber}}</td>
-                        </tr>
-                        <tr>
-                            <th>Lista de propriedades substituídas</th>
-                            <td style="display: flex; border: none;">
-                                @foreach ($propversions as $version)
-                                @if ($version->versionNumber < $propdd->versionNumber || ($version->versionNumber == $propdd->versionNumber && $version->revisionNumber < $propdd->revisionNumber)) <form class="mb-3" action="{{ url('datadictionaryview/' . $version->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($version->namePt)) }}">
-                                            <button class="btn-link" type="submit" style="margin-right: 5px;">{{ $version->versionNumber}}.{{$version->revisionNumber}}, </button>
-                                        </form>
-                                        @endif
-                                        @endforeach
-
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Lista de propriedades de substituição</th>
+                            <th>{{ Lg::t('Representação Visual') }}</th>
                             <td>
-                                @foreach ($propversions as $version)
-                                @if ($version->versionNumber > $propdd->versionNumber || ($version->versionNumber == $propdd->versionNumber && $version->revisionNumber > $propdd->revisionNumber))
-                                <form class="mb-3" action="{{ url('datadictionaryview/' . $version->Id . '-' . \App\Http\Controllers\ProductdatatemplatesController::sanitizePascalCase($version->namePt)) }}">
-                                    <button class="btn-link" type="submit" style="margin-right: 5px;">{{ $version->versionNumber}}.{{$version->revisionNumber}}, </button>
-                                </form>
-                                @endif
-                                @endforeach
-
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Relação com outros dicionários de dados</th>
-                            <td>{{$propdd->relationToOtherDataDictionaries}}
-                                {{-- Check if the relationToOtherDataDictionaries attribute exists and is not null --}}
-                                @if(!is_null($propdd->relationToOtherDataDictionaries))
-                                @php
-                                // Remove parentheses and split by ',' to get individual elements
-                                $relations = explode('),(', trim($propdd->relationToOtherDataDictionaries, '()'));
-
-                                // Initialize variables for storing URLs
-                                $propertyUrl = null;
-                                $domainUrl = null;
-
-                                // Iterate through each relation to check for bsdd.buildingsmart.org
-                                foreach ($relations as $relation) {
-                                // Split each relation into property URL and domain URL
-                                $parts = explode(', ', $relation);
-
-                                // If the second part (domain URL) matches bsdd.buildingsmart.org, store the property URL
-                                if (isset($parts[1]) && trim($parts[1]) === 'bsdd.buildingsmart.org') {
-                                $propertyUrl = trim($parts[0]); // Store the property URL
-                                $domainUrl = trim($parts[1]); // Store the domain URL
-                                break; // Stop the loop once we find the correct domain
-                                }
-                                }
-                                @endphp
-
-                                {{-- Only show the logo if the domain matches --}}
-                                @if($domainUrl === 'bsdd.buildingsmart.org')
-                                <a href="{{ $propertyUrl }}" target="_blank">
-                                    <img src="{{ asset('img/IFCBSDD.png') }}" alt="IFC Logo" style="width:40px; height:auto; margin-left:10px;">
-                                </a>
-                                @endif
-                                @endif
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Língua dos criadores</th>
-                            <td>{{$propdd->creatorsLanguage}}</td>
-                        </tr>
-                        <tr>
-                            <th>Representação visual</th>
-                            <td>
-                                @if ($propdd->visualRepresentation == 'True')
-                                <div class='col-sm'>
-                                    <img src="{{ asset ('img/'.$propdd->nameEn.'.png')}}" alt='{{$propdd->nameEn}}' height='200'>
+                                @if($propdd->visualRepresentation == "TRUE" || $propdd->visualRepresentation == 'True')
+                                <div class="col-sm">
+                                    <img src="{{ asset ('img/'.$propdd->nameEn.'.png')}}" alt='{{$propdd->nameEn}}' class="property-image">
                                 </div>
                                 @endif
                             </td>
                         </tr>
                         <tr>
-                            <th>País de utilização</th>
+                            <th>{{ Lg::t('Estado') }}</th>
+                            <td>{{$propdd->status}}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ Lg::t('Documento de referência') }}</th>
+                            <td class="p-1.5">
+                                @if ($hasDoc)
+                                <a href="{{ Uri::buildLink('doc', $referencedocument) }}">
+                                    <p title="{{ $referencedocument->title }}">{{ $referencedocument->rdName }}</p>
+                                </a>
+                                @else
+                                <span>n/a</span>
+                                @endif
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>{{ Lg::t('Data de criação') }}</th>
+                            <td>{{$propdd->dateOfCreation}}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ Lg::t('Data de ativação') }}</th>
+                            <td>{{$propdd->dateofActivation}}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ Lg::t('Data da última alteração') }}</th>
+                            <td>{{$propdd->dateOfLastChange}}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ Lg::t('Data de revisão') }}</th>
+                            <td>{{$propdd->dateOfRevision}}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ Lg::t('Data da versão') }}</th>
+                            <td>{{$propdd->dateOfVersion}}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ Lg::t('Versão') }}</th>
+                            <td>{{$propdd->versionNumber}}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ Lg::t('Revisão (número)') }}</th>
+                            <td>{{$propdd->revisionNumber}}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ Lg::t('Lista de propriedades substituídas') }}</th>
+                            <td>
+                                @foreach ($propversions->filter($isEarlier) as $version)
+                                    <a class="btn-link" style="margin-right: 5px;" href="{{ Uri::buildLink('prop', $version, (int) $version->versionNumber) }}">{{ $version->versionNumber }}.{{ $version->revisionNumber }}</a>
+                                @endforeach
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>{{ Lg::t('Lista de propriedades de substituição') }}</th>
+                            <td>
+                                @foreach ($propversions->filter($isLater) as $version)
+                                    <a class="btn-link" style="margin-right: 5px;" href="{{ Uri::buildLink('prop', $version, (int) $version->versionNumber) }}">{{ $version->versionNumber }}.{{ $version->revisionNumber }}</a>
+                                @endforeach
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>{{ Lg::t('Relação com outros dicionários de dados') }}</th>
+                            <td>{{$propdd->relationToOtherDataDictionaries}}
+                                @if($bsddUrl)
+                                <a href="{{ $bsddUrl }}" target="_blank">
+                                    <img src="{{ asset('img/IFCBSDD.png') }}" alt="IFC Logo" style="width:40px; height:auto; margin-left:10px;">
+                                </a>
+                                @endif
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>{{ Lg::t('Língua dos criadores') }}</th>
+                            <td>{{$propdd->creatorsLanguage}}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ Lg::t('País de utilização') }}</th>
                             <td>{{$propdd->countryOfUse}}</td>
                         </tr>
                         <tr>
-                            <th>País de origem</th>
+                            <th>{{ Lg::t('País de origem') }}</th>
                             <td>{{$propdd->countryOfOrigin}}</td>
                         </tr>
                         <tr>
-                            <th>Quantidade física</th>
+                            <th>{{ Lg::t('Quantidade física') }}</th>
                             <td><x-reference-link type="quantitykind" :value="$propdd->physicalQuantity" /></td>
                         </tr>
                         <tr>
-                            <th>Dimensão</th>
+                            <th>{{ Lg::t('Dimensão') }}</th>
                             <td><x-reference-link type="dimension" :value="$propdd->dimension" /></td>
                         </tr>
                         <tr>
-                            <th>Tipo de dados</th>
+                            <th>{{ Lg::t('Tipo de dados') }}</th>
                             <td>{{$propdd->dataType}}</td>
                         </tr>
                         <tr>
-                            <th>Propriedade dinâmica</th>
+                            <th>{{ Lg::t('Propriedade dinâmica') }}</th>
                             <td>{{$propdd->dynamicProperty}}</td>
                         </tr>
                         <tr>
-                            <th>Parametros da propriedade dinâmica</th>
+                            <th>{{ Lg::t('Parametros da propriedade dinâmica') }}</th>
                             <td>{{$propdd->parametersOfTheDynamicProperty}}</td>
                         </tr>
                         <tr>
-                            <th>Nomes dos valores de definição</th>
+                            <th>{{ Lg::t('Nomes dos valores de definição') }}</th>
                             <td>{{$propdd->namesOfDefiningValues}}</td>
                         </tr>
                         <tr>
-                            <th>Valores de definição</th>
+                            <th>{{ Lg::t('Valores de definição') }}</th>
                             <td>{{$propdd->definingValues}}</td>
                         </tr>
                         <tr>
-                            <th>Tolerância</th>
+                            <th>{{ Lg::t('Tolerância') }}</th>
                             <td>{{$propdd->tolerance}}</td>
                         </tr>
                         <tr>
-                            <th>Formato digital</th>
+                            <th>{{ Lg::t('Formato digital') }}</th>
                             <td>{{$propdd->digitalFormat}}</td>
                         </tr>
                         <tr>
-                            <th>Formato de texto</th>
+                            <th>{{ Lg::t('Formato de texto') }}</th>
                             <td>{{$propdd->textFormat}}</td>
                         </tr>
-                        <tr>
-                            <th>Lista de valores possíveis na língua n</th>
-                            <td>{{$propdd->listOfPossibleValuesInLanguageN}}</td>
+                        <tr id="possible-values">
+                            <th>{{ Lg::t('Lista de valores possíveis na língua n') }}</th>
+                            <td>
+                                @if ($enumGroups)
+                                    {{-- Values are shown in the reader's language where the data has
+                                         them; the identifier below each set is language-independent. --}}
+                                    @php $shown = $enumGroups[Lg::current()] ?? $enumGroups['en'] ?? reset($enumGroups); @endphp
+                                    {{ implode(', ', $shown) }}
+                                    @if ($enumValues)
+                                        <br>
+                                        <small style="color:#6b7280;">
+                                            @foreach ($enumValues as $value)
+                                                <a href="{{ Uri::link('enum', \App\Services\UriService::enumCode($propdd, $value)) }}">{{ $value }}</a>@if(!$loop->last) · @endif
+                                            @endforeach
+                                        </small>
+                                    @endif
+                                @else
+                                    {{$propdd->listOfPossibleValuesInLanguageN}}
+                                @endif
+                            </td>
                         </tr>
                         <tr>
-                            <th>Valores-limite</th>
+                            <th>{{ Lg::t('Valores-limite') }}</th>
                             <td>{{$propdd->boundaryValues}}</td>
                         </tr>
                         <tr>
-                            <th>Explicação da depreciação</th>
+                            <th>{{ Lg::t('Explicação da depreciação') }}</th>
                             <td>{{$propdd->depreciationExplanation}}</td>
                         </tr>
                         <tr>
-                            <th>Data de depreciação</th>
+                            <th>{{ Lg::t('Data de depreciação') }}</th>
                             <td>{{$propdd->depreciationDate}}</td>
                         </tr>
                     </tbody>
                 </table>
                 <div class='flex py-2'>
-                    <h4><strong>Propriedade presente em:</strong></h4>
+                    <h4><strong>{{ Lg::t('Propriedade presente em:') }}</strong></h4>
                 </div>
                 <table id='tblprop' cellpadding='0' cellspacing='0'>
                     <tr>
-                        <th style="text-align: left!important; width:25%">Modelo de dados</th>
-                        <th style="text-align: left!important;">Descrição da propriedade</th>
+                        <th style="text-align: left!important; width:25%">{{ Lg::t('Modelo de dados') }}</th>
+                        <th style="text-align: left!important;">{{ Lg::t('Descrição da propriedade') }}</th>
                     </tr>
 
                     @foreach ($propinpdts as $proppdts)
+                    @php $inPdt = $pdts->where('Id', $proppdts->pdtID)->first(); @endphp
+                    @if ($inPdt)
                     <tr>
                         <td>
-                            <a href="{{ route('pdtsdownload', ['pdtID' => $proppdts->pdtID]) }}">{{$pdts->where('Id', $proppdts->pdtID)->first()->pdtNamePt}} V{{$pdts->where('Id', $proppdts->pdtID)->first()->versionNumber}}.{{$pdts->where('Id', $proppdts->pdtID)->first()->revisionNumber}}</a>
+                            <a href="{{ route('pdtsdownload', ['pdtID' => $inPdt->Id]) }}">{{ Lg::f($inPdt, 'pdtName') }} V{{ $inPdt->versionNumber }}.{{ $inPdt->revisionNumber }}</a>
                         </td>
-                        <td>{{$proppdts->descriptionPt}}</td>
+                        <td>
+                            <a href="{{ Uri::buildLink('classprop', $proppdts) }}">{{ Lg::f($proppdts, 'description') }}</a>
+                        </td>
                     </tr>
+                    @endif
                     @endforeach
                 </table>
             </div>
