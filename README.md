@@ -122,13 +122,13 @@ The API is served under the `/api` prefix and returns JSON. Interactive document
 | `GET /api/quantityKinds` | All physical quantities (quantity kinds).                                           |
 | `GET /api/dimensions`    | All dimensions with their 7 SI exponents (ISO 80000 order).                         |
 
-Units and quantity kinds are dictionary entities, so they resolve through the identifier
-scheme below. Dimensions have no segment in that scheme and keep their own page:
+Units, quantity kinds and dimensions are dictionary entities, so they all resolve through
+the identifier scheme below:
 
 ```
-GET /uri/0.1/unit/{code}    e.g. /uri/0.1/unit/mm
-GET /uri/0.1/pq/{name}      e.g. /uri/0.1/pq/length
-GET /dimension/{canonical}  e.g. /dimension/L
+GET /uri/0.1/unit/{code}       e.g. /uri/0.1/unit/mm
+GET /uri/0.1/pq/{name}         e.g. /uri/0.1/pq/length
+GET /uri/0.1/dim/{canonical}   e.g. /uri/0.1/dim/L
 ```
 
 ## Identifiers
@@ -157,7 +157,20 @@ page is read in never changes a record's identifier.
 | Reference document    | `doc`       | `Name`                   |
 | Unit                  | `unit`      | `Name`                   |
 | Quantity kind         | `pq`        | `Name`                   |
+| Dimension             | `dim`       | `Name`                   |
 | Enumerated value      | `enum`      | `{id}-Name`              |
+
+Codes are the **Portuguese** name. This is a Portuguese dictionary: `namePt` in CamelCase
+is the identifier that appears in exports, in DoPCs and in the canonical URI.
+
+A record's **English name also resolves**, as an alias: a request using `nameEn` finds the
+same record and is redirected (301) to the canonical Portuguese URI. It is a second way to
+arrive at the one canonical URI, never a second identity — nothing the platform emits ever
+uses the English form. An English name is not offered as an alias when it is also some
+record's Portuguese name (the Portuguese name always wins) or when two records share it;
+`uri:check` reports both cases. Codes carrying a record id (`gop`, `classprop`) are
+canonicalised the same way, so an English or outdated name part also 301s to the canonical
+spelling.
 
 Name-only codes rely on those names being unique across what the dictionary publishes.
 Where they are not, that is a data defect: it is reported, never resolved by renaming one
@@ -171,7 +184,9 @@ php artisan uri:check --sync       # also rebuild the uri_codes registry
 
 `App\Services\UriService` is the only place that builds, parses or resolves an
 identifier — nothing else concatenates one. `uri_codes` holds a `UNIQUE (entity, code)`
-registry of the published identifiers; it is additive and derived, never a source of truth.
+registry keyed on both names — each row marked `canonical` or `alias` — which is what
+guarantees a code means exactly one record. It is additive and derived, never a source of
+truth.
 
 ## Language
 

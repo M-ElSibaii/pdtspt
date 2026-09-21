@@ -8,9 +8,12 @@
                 </a>
             </div>
             <p class="text-sm text-gray-600 mt-1">
-                Groups of <code>propertiesdatadictionaries</code> rows that share the exact same
-                <strong>nameEn</strong>. Resolve one group at a time. Version variants (same GUID,
-                different version/revision) are shown read-only and are never changed.
+                Groups of <code>propertiesdatadictionaries</code> rows that share a name in
+                <strong>either language</strong> — <code>nameEn</code> or <code>namePt</code> —
+                followed transitively, so a property duplicated only in Portuguese is caught too.
+                Names are compared trimmed and case-insensitively. Resolve one group at a time.
+                Version variants (same GUID, different version/revision) are shown read-only and
+                are never changed.
             </p>
 
             @if ($schemaError)
@@ -19,7 +22,7 @@
                 </div>
             @elseif (empty($groups))
                 <div class="mt-6 p-4 rounded bg-green-100 text-green-800">
-                    No duplicate <code>nameEn</code> values found. Nothing to review.
+                    No duplicate names found in either language. Nothing to review.
                 </div>
             @else
                 <p class="mt-4 mb-2 text-sm text-gray-700">
@@ -42,12 +45,17 @@
                          data-has-mismatch="{{ $hasMismatch ? '1' : '0' }}">
 
                         {{-- UTF-8 safe transport for JS (group name + per-survivor definitions) --}}
-                        <input type="hidden" class="dd-name" value="{{ $group['name'] }}">
+                        <input type="hidden" class="dd-key" value="{{ $group['key'] }}">
                         <script type="application/json" class="dd-defs">@json($defsMap)</script>
 
                         {{-- Header --}}
                         <div class="px-4 py-3 border-b bg-slate-50 flex flex-wrap items-center gap-2">
                             <span class="font-semibold text-base">{{ $group['name'] }}</span>
+                            @foreach ($group['matchedOn'] as $lang)
+                                <span class="status-tag status-tag-active" title="These rows share this language's name">
+                                    same {{ $lang === 'pt' ? 'namePt' : 'nameEn' }}
+                                </span>
+                            @endforeach
                             @if (!$group['isActionable'])
                                 <span class="status-tag status-tag-preview">only version variants — nothing to merge</span>
                             @endif
@@ -251,7 +259,10 @@
                                     <div class="dd-panel dd-panel-keep_separate" style="display:none;">
                                         <p class="text-sm text-gray-600 mb-2">
                                             These are genuinely different properties. Edit the name fields so they are no
-                                            longer duplicates — <strong>nameEn</strong> must stay unique and non-empty.
+                                            longer duplicates. They are one group while they share a name in
+                                            <em>either</em> language, so the rows must end up differing in
+                                            <strong>both</strong> <code>nameEn</code> and <code>namePt</code>;
+                                            <code>nameEn</code> must also stay non-empty.
                                             Only the fields you change are written.
                                         </p>
                                         @foreach ($actionable as $row)
@@ -405,10 +416,10 @@
                     status.className = 'dedupe-status text-sm';
 
                     const action = (card.querySelector('.dd-action:checked') || {}).value;
-                    const name = card.querySelector('.dd-name').value;
+                    const key = card.querySelector('.dd-key').value;
                     const expectedActionableIds = JSON.parse(card.dataset.actionableIds);
 
-                    const decision = { action, name, expectedActionableIds };
+                    const decision = { action, key, expectedActionableIds };
 
                     if (action === 'merge') {
                         decision.survivorId = parseInt((card.querySelector('.dd-survivor:checked') || {}).value, 10);

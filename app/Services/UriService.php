@@ -40,6 +40,7 @@ class UriService
     public const DOCUMENT       = 'doc';
     public const UNIT           = 'unit';
     public const QUANTITY_KIND  = 'pq';
+    public const DIMENSION      = 'dim';
     public const ENUM_VALUE     = 'enum';
 
     /**
@@ -47,7 +48,11 @@ class UriService
      *
      *  table      the backing table
      *  key        primary key column
-     *  name       column the code's name part comes from
+     *  name       column the code's name part comes from (Portuguese: this is a
+     *             Portuguese dictionary, so the Portuguese name IS the identifier)
+     *  nameAlias  English name column, when the record has one. It mints no second
+     *             identity — it is only a second way to arrive at the one canonical
+     *             URI, which the resolver reaches by a 301 redirect.
      *  slug       'pascal'   fold prose into PascalCase
      *             'sanitize' strip URI-hostile characters, keep the name's own casing
      *             'raw'      already a code (a unit symbol, a quantity name)
@@ -59,16 +64,19 @@ class UriService
     private const MAP = [
         self::PROPERTY => [
             'table' => 'propertiesdatadictionaries', 'key' => 'Id', 'name' => 'namePt',
+            'nameAlias' => 'nameEn',
             'slug' => 'sanitize', 'prefixId' => false, 'versioned' => true, 'lineage' => 'GUID',
             'label' => 'Property',
         ],
         self::DATA_TEMPLATE => [
             'table' => 'productdatatemplates', 'key' => 'Id', 'name' => 'pdtNamePt',
+            'nameAlias' => 'pdtNameEn',
             'slug' => 'pascal', 'prefixId' => false, 'versioned' => true, 'lineage' => 'GUID',
             'label' => 'Product data template',
         ],
         self::CONSTRUCTION => [
             'table' => 'constructionobjects', 'key' => 'GUID', 'name' => 'constructionObjectNamePt',
+            'nameAlias' => 'constructionObjectNameEn',
             'slug' => 'pascal', 'prefixId' => false, 'versioned' => true, 'lineage' => 'GUID',
             'label' => 'Construction object',
         ],
@@ -96,6 +104,11 @@ class UriService
             'table' => 'physical_quantities', 'key' => 'guid', 'name' => 'name',
             'slug' => 'raw', 'prefixId' => false, 'versioned' => false, 'lineage' => null,
             'label' => 'Quantity kind',
+        ],
+        self::DIMENSION => [
+            'table' => 'dimensions', 'key' => 'guid', 'name' => 'canonical',
+            'slug' => 'raw', 'prefixId' => false, 'versioned' => false, 'lineage' => null,
+            'label' => 'Dimension',
         ],
         self::ENUM_VALUE => [
             // Enumerated values are carried inline on the dictionary property
@@ -239,6 +252,7 @@ class UriService
             \App\Models\referencedocuments::class         => self::DOCUMENT,
             \App\Models\Unit::class                       => self::UNIT,
             \App\Models\PhysicalQuantity::class           => self::QUANTITY_KIND,
+            \App\Models\Dimension::class                  => self::DIMENSION,
         ];
         $class = is_object($model) ? get_class($model) : null;
         if ($class !== null && isset($map[$class])) return $map[$class];
@@ -498,7 +512,19 @@ class UriService
      */
     private static function rowsForCode(string $entity, string $code)
     {
+        return self::rowsMatching($entity, $code, self::MAP[$entity]['name'], false);
+    }
+
+    /**
+     * Rows whose $column, run through this entity's slug rule, equals $code.
+     *
+     * @param bool $asAlias compare against the English name instead of the canonical one
+     */
+    private static function rowsMatching(string $entity, string $code, ?string $column, bool $asAlias)
+    {
         $def = self::MAP[$entity];
+        if ($column === null) return collect();
+
         $query = DB::table($def['table']);
 
         if ($def['slug'] === 'raw') {
@@ -506,7 +532,7 @@ class UriService
             // "MW" (megawatt) and "mW" (milliwatt) are different units. MySQL's default
             // collation is case-insensitive, so the comparison is forced to binary —
             // otherwise a URI would resolve to the wrong unit.
-            return $query->whereRaw('BINARY `' . $def['name'] . '` = ?', [$code])->get();
+            return $query->whereRaw('BINARY `' . $column . '` = ?', [$code])->get();
         }
 
         // Every derivation preserves the letters and digits of the name, in order —
@@ -515,10 +541,11 @@ class UriService
         $chars = str_split($skeleton === '' ? $code : $skeleton);
         $like = '%' . implode('%', array_map(fn($c) => addcslashes($c, '%_\\'), $chars)) . '%';
 
-        return $query->where($def['name'], 'like', $like)->get()
-            ->filter(function ($row) use ($entity, $code) {
+        return $query->where($column, 'like', $like)->get()
+            ->filter(function ($row) use ($entity, $code, $asAlias) {
                 try {
-                    return self::codeFor($entity, $row) === $code;
+                    $derived = $asAlias ? self::aliasCodeFor($entity, $row) : self::codeFor($entity, $row);
+                    return $derived === $code;
                 } catch (\Throwable $e) {
                     return false;
                 }
@@ -684,6 +711,182 @@ class UriService
                     break;
                 } catch (\Throwable $e) {
                     continue;
+                }
+            }
+        }
+
+        return $out;
+    }
+
+
+    // --------------------------------------------------------------- aliases
+
+    /**
+     * The English-name code for a record, or null when it has none.
+     *
+     * This is NOT a second identifier. Codes are the Portuguese name — this is a
+     * Portuguese dictionary, and namePt is what appears in exports, in DoPCs and in the
+     * canonical URI. The English code exists only so that a reader who knows the record
+     * by its English name can type it and be redirected (301) to the one canonical URI.
+     *
+     * Returns null when the English name is missing, or when it derives to the same code
+     * as the Portuguese one (in which case there is nothing to alias).
+     */
+    public static function aliasCodeFor(string $entity, $record): ?string
+    {
+        self::assertEntity($entity);
+        $def = self::MAP[$entity];
+
+        $column = $def['nameAlias'] ?? null;
+        if ($column === null) return null;
+
+        $slug = self::slugify(self::get($record, $column), $def['slug']);
+        if ($slug === '') return null;
+
+        $code = $def['prefixId'] ? self::joinCode(self::get($record, $def['key']), $slug) : $slug;
+
+        try {
+            if ($code === self::codeFor($entity, $record)) return null;
+        } catch (\Throwable $e) {
+            // No canonical code (no Portuguese name) — the alias is still a way in.
+        }
+
+        return $code;
+    }
+
+    /** True when this entity has an English name that can be aliased. */
+    public static function hasAlias(string $entity): bool
+    {
+        return (self::MAP[$entity]['nameAlias'] ?? null) !== null;
+    }
+
+    /**
+     * Resolve a code as an ENGLISH name, for records whose canonical (Portuguese) code
+     * it is not. Used only after the canonical lookup has come up empty, so a Portuguese
+     * code always wins over an English one that happens to spell the same.
+     *
+     * Returns null when nothing matches. Throws CodeCollisionException when two different
+     * records answer to the same English name — an ambiguous alias is no more usable than
+     * an ambiguous identifier.
+     */
+    public static function resolveAlias(string $entity, string $code, ?int $version = null)
+    {
+        self::assertEntity($entity);
+        $def = self::MAP[$entity];
+
+        if (!self::hasAlias($entity)) return null;
+        if ($version !== null && !$def['versioned']) return null;
+
+        $candidates = self::rowsMatching($entity, $code, $def['nameAlias'], true);
+        if ($candidates->isEmpty()) return null;
+
+        $lineages = $def['lineage']
+            ? $candidates->pluck($def['lineage'])->filter()->unique()->values()
+            : collect();
+
+        if ($lineages->count() > 1) {
+            throw new CodeCollisionException($entity, $code, self::describeAll($entity, $candidates));
+        }
+
+        if (!$def['versioned']) {
+            if ($candidates->count() > 1) {
+                throw new CodeCollisionException($entity, $code, self::describeAll($entity, $candidates));
+            }
+
+            return $candidates->first();
+        }
+
+        return self::pickVersion($candidates, $version);
+    }
+
+    /**
+     * Every alias the dictionary answers to, as code => canonical code, for one entity.
+     * Aliases that would shadow a canonical code are EXCLUDED: the canonical name always
+     * wins, and the clash is reported by aliasConflicts().
+     *
+     * @return array<string,string>
+     */
+    public static function aliases(string $entity, string $scope = 'export'): array
+    {
+        if (!self::hasAlias($entity)) return [];
+
+        $canonical = [];
+        $aliases = [];
+
+        foreach (self::rowsForCollisionScan($entity, $scope) as $row) {
+            try {
+                $canonical[self::codeFor($entity, $row)] = true;
+            } catch (\Throwable $e) {
+                // unnameable row; reported elsewhere
+            }
+            $alias = self::aliasCodeFor($entity, $row);
+            if ($alias === null) continue;
+            try {
+                $aliases[$alias][] = self::codeFor($entity, $row);
+            } catch (\Throwable $e) {
+                continue;
+            }
+        }
+
+        $out = [];
+        foreach ($aliases as $alias => $targets) {
+            if (isset($canonical[$alias])) continue;              // canonical wins
+            $targets = array_values(array_unique($targets));
+            if (count($targets) > 1) continue;                    // ambiguous, see aliasConflicts()
+            $out[$alias] = $targets[0];
+        }
+
+        return $out;
+    }
+
+    /**
+     * Aliases that cannot be honoured, with the reason: either the English name is also
+     * some record's Portuguese name, or two records share one English name.
+     *
+     * @return array<int,array{entity:string,code:string,reason:string,records:array<int,string>}>
+     */
+    public static function aliasConflicts(string $scope = 'export'): array
+    {
+        $out = [];
+
+        foreach (self::entities() as $entity) {
+            if (!self::hasAlias($entity)) continue;
+
+            $canonicalOwner = [];
+            $aliasRows = [];
+
+            foreach (self::rowsForCollisionScan($entity, $scope) as $row) {
+                try {
+                    $canonicalOwner[self::codeFor($entity, $row)][] = $row;
+                } catch (\Throwable $e) {
+                    // unnameable row; reported by uri:check
+                }
+                $alias = self::aliasCodeFor($entity, $row);
+                if ($alias !== null) $aliasRows[$alias][] = $row;
+            }
+
+            foreach ($aliasRows as $alias => $rows) {
+                if (isset($canonicalOwner[$alias])) {
+                    $out[] = [
+                        'entity' => $entity,
+                        'code' => $alias,
+                        'reason' => 'shadowed by a Portuguese name',
+                        'records' => array_merge(
+                            self::describeAll($entity, $canonicalOwner[$alias]),
+                            self::describeAll($entity, $rows)
+                        ),
+                    ];
+                    continue;
+                }
+
+                $lineages = collect($rows)->pluck(self::MAP[$entity]['lineage'] ?? 'x')->filter()->unique();
+                if ($lineages->count() > 1) {
+                    $out[] = [
+                        'entity' => $entity,
+                        'code' => $alias,
+                        'reason' => 'two records share this English name',
+                        'records' => self::describeAll($entity, $rows),
+                    ];
                 }
             }
         }

@@ -149,7 +149,7 @@
                     ["GET", "Reference document",() => `${URI}/doc/${enc(P.docCode())}?format=json`],
                     ["GET", "Unit",              () => `${URI}/unit/${enc(P.unit())}?format=json`],
                     ["GET", "Quantity kind",     () => `${URI}/pq/${enc(P.qk())}?format=json`],
-                    ["GET", "Dimension",         () => `/dimension/${enc(P.dim())}?format=json`],
+                    ["GET", "Dimension",         () => `${URI}/dim/${enc(P.dim())}?format=json`],
                 ]],
                 ["Exports (POST · download) — same-origin only", [
                     ["POST", "Download PDT JSON", () => `/pdt-export/json/${enc(P.pdtId())}`],

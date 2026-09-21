@@ -8,7 +8,7 @@
                 <tbody>
                     <tr><th class="lg:w-1/4 md:w-1/4 sm:w-1/2">GUID</th><td class="lg:w-3/4 md:w-3/4 sm:w-1/2">{{ $dimension->guid }}</td></tr>
                     <tr><th>URI</th><td>
-                        <a href="{{ route('reference.dimension', ['canonical' => $dimension->canonical]) }}" target="_blank">{{ \App\Services\UnitsReference::dimensionUri($dimension->canonical) }}</a>
+                        <a href="{{ Uri::link('dim', $dimension->canonical) }}" target="_blank">{{ \App\Services\UnitsReference::dimensionUri($dimension->canonical) }}</a>
                     </td></tr>
                     <tr><th>Canonical</th><td>{{ $dimension->canonical }}</td></tr>
                     @foreach ($exponents as $label => $value)

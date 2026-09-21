@@ -41,8 +41,7 @@ class UnitsReference
     /** Canonical, resolvable pdts.pt identity URI for a dimension (by canonical string). */
     public static function dimensionUri(string $canonical): string
     {
-        // Dimensions have no segment in the identifier scheme; they keep their own page.
-        return UriService::base() . '/dimension/' . self::seg($canonical);
+        return UriService::uri(UriService::DIMENSION, $canonical);
     }
 
     /**

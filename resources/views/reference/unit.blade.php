@@ -25,7 +25,7 @@
                     </td></tr>
                     <tr><th>{{ Lg::pick('Dimensão', 'Dimension') }}</th><td>
                         @if ($dimension && $dimension->canonical)
-                            <a href="{{ route('reference.dimension', ['canonical' => $dimension->canonical]) }}">{{ $dimension->canonical }}</a>
+                            <a href="{{ Uri::link('dim', $dimension->canonical) }}">{{ $dimension->canonical }}</a>
                         @else
                             <span class="text-gray-500">— ({{ Lg::pick('física adiada', 'physics deferred') }})</span>
                         @endif

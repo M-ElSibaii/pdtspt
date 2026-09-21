@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Schema;
  * Core deduplication logic for `propertiesdatadictionaries`, shared by both the
  * `pdts:dedupe-dictionary` Artisan command and the admin review UI.
  *
- * This is the single source of truth for: grouping by nameEn, version-variant
+ * This is the single source of truth for: grouping by shared name in EITHER language,
+ * version-variant
  * detection, description-conflict detection, locating the `properties` rows that
  * reference a dictionary row, the propertyId/GUID disagreement flag, the JSON
  * backup format, and the repoint-then-delete mutation.
@@ -33,11 +34,38 @@ class DictionaryDedupeService
     public const PROP_GUID   = 'GUID';              // properties -> dict GUID
 
     /**
+     * The name columns a duplicate can hide in. A property duplicated only in
+     * Portuguese ("Planeza" twice, under two different English names) is just as much
+     * a duplicate as one duplicated in English, so both columns are grouping keys.
+     */
+    public const NAME_COLS = ['nameEn', 'namePt'];
+
+    /** Normalise a name for comparison: trimmed and case-folded, as MySQL's collation already compares. */
+    public static function normaliseName(?string $name): string
+    {
+        return mb_strtolower(trim((string) $name));
+    }
+
+    /** "en:flatness" / "pt:planeza" — a group's stable address. */
+    private static function nameKey(string $col, string $normalised): string
+    {
+        return ($col === 'namePt' ? 'pt' : 'en') . ':' . $normalised;
+    }
+
+    /** @return array{0:string,1:string}|null [column, normalised name] */
+    private static function parseKey(string $key): ?array
+    {
+        if (!preg_match('/^(en|pt):(.*)$/s', $key, $m)) return null;
+
+        return [$m[1] === 'pt' ? 'namePt' : 'nameEn', self::normaliseName($m[2])];
+    }
+
+    /**
      * Verify the required columns exist. Returns an error message, or null if OK.
      */
     public function schemaError(): ?string
     {
-        $dictCols = array_merge([self::NAME_COL, self::DICT_ID, self::DICT_GUID], self::DESC_COLS);
+        $dictCols = array_merge(self::NAME_COLS, [self::DICT_ID, self::DICT_GUID], self::DESC_COLS);
         foreach ($dictCols as $col) {
             if (!Schema::hasColumn(self::DICT_TABLE, $col)) {
                 return "Column '{$col}' not found on " . self::DICT_TABLE . ".";
@@ -52,57 +80,177 @@ class DictionaryDedupeService
     }
 
     /**
-     * All nameEn values that occur more than once, mapped name => count.
+     * Every duplicated name, in either language, mapped "lang:name" => count.
+     * Kept for the Artisan command and for a quick overview.
      */
     public function duplicateNames(): Collection
     {
-        return DB::table(self::DICT_TABLE)
-            ->select(self::NAME_COL, DB::raw('COUNT(*) as cnt'))
-            ->whereNotNull(self::NAME_COL)
-            ->where(self::NAME_COL, '!=', '')
-            ->groupBy(self::NAME_COL)
-            ->having('cnt', '>', 1)
-            ->pluck('cnt', self::NAME_COL);
+        $out = collect();
+
+        foreach ($this->components() as $component) {
+            foreach ($component['duplicatedNames'] as $key => $names) {
+                $out->put($key, count($component['ids']));
+            }
+        }
+
+        return $out;
     }
 
     /**
-     * Analyze every duplicate nameEn group.
+     * Group the dictionary into duplicate sets.
+     *
+     * Rows belong to one set when they share a name in EITHER language, followed
+     * transitively: A and B share an English name, B and C share a Portuguese one, so
+     * all three are one set. That is what makes a Portuguese-only duplicate visible —
+     * grouping on nameEn alone hid it.
+     *
+     * The whole table is read once and the sets are built in memory, so this costs one
+     * query rather than one per name.
+     *
+     * @return array<int,array{key:string,ids:array<int,int>,rows:Collection,matchedOn:array,duplicatedNames:array}>
+     */
+    public function components(): array
+    {
+        $rows = DB::table(self::DICT_TABLE)->orderBy(self::DICT_ID)->get();
+
+        // Union-find over the rows, joined by each shared normalised name.
+        $parent = [];
+        $find = function ($x) use (&$parent, &$find) {
+            while (($parent[$x] ?? $x) !== $x) {
+                $parent[$x] = $parent[$parent[$x]] ?? $parent[$x];
+                $x = $parent[$x];
+            }
+            return $x;
+        };
+        $union = function ($a, $b) use (&$parent, $find) {
+            $ra = $find($a);
+            $rb = $find($b);
+            if ($ra !== $rb) $parent[$rb] = $ra;
+        };
+
+        foreach ($rows as $row) {
+            $parent[(int) $row->{self::DICT_ID}] ??= (int) $row->{self::DICT_ID};
+        }
+
+        // name (per column) -> the first row id that used it
+        $firstWith = [];
+        foreach ($rows as $row) {
+            $id = (int) $row->{self::DICT_ID};
+            foreach (self::NAME_COLS as $col) {
+                $name = self::normaliseName($row->{$col} ?? null);
+                if ($name === '') continue;
+                $slot = $col . '|' . $name;
+                if (isset($firstWith[$slot])) {
+                    $union($firstWith[$slot], $id);
+                } else {
+                    $firstWith[$slot] = $id;
+                }
+            }
+        }
+
+        $byId = $rows->keyBy(fn($r) => (int) $r->{self::DICT_ID});
+
+        $sets = [];
+        foreach ($rows as $row) {
+            $id = (int) $row->{self::DICT_ID};
+            $sets[$find($id)][] = $id;
+        }
+
+        $out = [];
+        foreach ($sets as $ids) {
+            if (count($ids) < 2) continue;
+
+            sort($ids);
+            $members = collect($ids)->map(fn($i) => $byId[$i]);
+
+            // Which names are actually shared, and in which language.
+            $duplicated = [];
+            foreach (self::NAME_COLS as $col) {
+                $counts = [];
+                foreach ($members as $row) {
+                    $name = self::normaliseName($row->{$col} ?? null);
+                    if ($name !== '') $counts[$name] = ($counts[$name] ?? 0) + 1;
+                }
+                foreach ($counts as $name => $n) {
+                    if ($n > 1) $duplicated[self::nameKey($col, $name)] = $name;
+                }
+            }
+            if (!$duplicated) continue;   // joined only through unique names — not a duplicate set
+
+            // The set's address: its smallest duplicated name key, so it stays the same
+            // as long as any of those rows survives.
+            $keys = array_keys($duplicated);
+            sort($keys);
+
+            $out[] = [
+                'key'             => $keys[0],
+                'ids'             => $ids,
+                'rows'            => $members,
+                'matchedOn'       => array_values(array_unique(array_map(
+                    fn($k) => explode(':', $k, 2)[0],
+                    $keys
+                ))),
+                'duplicatedNames' => $duplicated,
+            ];
+        }
+
+        return $out;
+    }
+
+    /**
+     * Analyze every duplicate set.
      *
      * @return array<int,array> list of group structures (see analyzeGroup()).
      */
     public function analyzeGroups(): array
     {
-        return $this->duplicateNames()
-            ->keys()
-            ->map(fn($name) => $this->analyzeGroup((string) $name))
+        return collect($this->components())
+            ->map(fn($c) => $this->buildGroup($c))
             ->filter()
             ->values()
             ->all();
     }
 
     /**
-     * Analyze a single nameEn group. Returns null if it is no longer a duplicate
-     * group (fewer than two rows share the name).
+     * Analyze a single set, addressed by its key ("en:<name>" / "pt:<name>").
+     * Returns null once the set is no longer a duplicate set.
+     *
+     * A bare name with no "en:"/"pt:" prefix is read as an English name, so an old
+     * link or bookmark still works.
      *
      * Group structure:
-     *   name, survivor (enriched row), duplicates[] (enriched rows, true duplicates),
-     *   versionVariants[] (enriched, read-only), hasDescriptionConflict (bool),
-     *   isActionable (bool), affectedCount (int), actionableIds[] (sorted int Ids),
-     *   _survivorRow / _duplicateRows (raw DB objects, used by the command).
+     *   key, name (display), matchedOn, survivor (enriched row), duplicates[],
+     *   versionVariants[] (read-only), hasDescriptionConflict, isActionable,
+     *   affectedCount, actionableIds[], _survivorRow / _duplicateRows.
      */
-    public function analyzeGroup(string $name): ?array
+    public function analyzeGroup(string $key): ?array
     {
-        $rows = DB::table(self::DICT_TABLE)
-            ->where(self::NAME_COL, $name)
-            ->orderBy(self::DICT_ID, 'asc')
-            ->get();
+        if ($key === '') return null;
+        if (!preg_match('/^(en|pt):/', $key)) $key = 'en:' . $key;
 
-        if ($rows->count() < 2) {
-            return null;
+        $parsed = self::parseKey($key);
+        if (!$parsed) return null;
+        [$col, $name] = $parsed;
+
+        foreach ($this->components() as $component) {
+            // Match on the set's own key first, then on any name it still carries, so
+            // the card can be refreshed after a merge changed which key is smallest.
+            if ($component['key'] === $key || isset($component['duplicatedNames'][self::nameKey($col, $name)])) {
+                return $this->buildGroup($component);
+            }
         }
 
+        return null;
+    }
+
+    /** Turn a duplicate set into the structure the UI and the command consume. */
+    private function buildGroup(array $component): ?array
+    {
+        $rows = $component['rows'];
+        if ($rows->count() < 2) return null;
+
         $survivor   = $rows->first();
-        $duplicates = collect();   // true name duplicates (mergeable)
+        $duplicates = collect();   // true duplicates (mergeable)
         $versions   = collect();   // version variants (left untouched)
 
         foreach ($rows->slice(1) as $row) {
@@ -125,7 +273,10 @@ class DictionaryDedupeService
             ->all();
 
         return [
-            'name'                   => $name,
+            'key'                    => $component['key'],
+            'name'                   => $this->groupLabel($component),
+            'matchedOn'              => $component['matchedOn'],
+            'duplicatedNames'        => $component['duplicatedNames'],
             'survivor'               => $this->enrichRow($survivor),
             'duplicates'             => $duplicates->map(fn($d) => $this->enrichRow($d))->all(),
             'versionVariants'        => $versions->map(fn($v) => $this->enrichRow($v))->all(),
@@ -136,6 +287,29 @@ class DictionaryDedupeService
             '_survivorRow'           => $survivor,
             '_duplicateRows'         => $duplicates,
         ];
+    }
+
+    /**
+     * Human label for a set: the shared names as stored, tagged by language, e.g.
+     * "EN FireRating" or "PT Planeza" or "EN Flatness · PT Planeza".
+     */
+    private function groupLabel(array $component): string
+    {
+        $parts = [];
+        foreach (['en' => 'nameEn', 'pt' => 'namePt'] as $tag => $col) {
+            foreach ($component['duplicatedNames'] as $key => $normalised) {
+                if (!str_starts_with($key, $tag . ':')) continue;
+                // Show the name as it is actually stored, not the folded form.
+                foreach ($component['rows'] as $row) {
+                    if (self::normaliseName($row->{$col} ?? null) === $normalised) {
+                        $parts[] = strtoupper($tag) . ' ' . $row->{$col};
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $parts ? implode(' · ', array_unique($parts)) : '(unnamed)';
     }
 
     /**
@@ -152,16 +326,18 @@ class DictionaryDedupeService
      */
     public function applyDecision(array $decision): array
     {
-        $name   = isset($decision['name']) ? (string) $decision['name'] : '';
+        // 'key' addresses the set ("en:<name>" / "pt:<name>"); 'name' is accepted as
+        // the older spelling and read as an English name.
+        $key    = (string) ($decision['key'] ?? $decision['name'] ?? '');
         $action = $decision['action'] ?? null;
 
-        if ($name === '') {
-            throw new \InvalidArgumentException('Missing group name.');
+        if ($key === '') {
+            throw new \InvalidArgumentException('Missing group key.');
         }
 
-        $group = $this->analyzeGroup($name);
+        $group = $this->analyzeGroup($key);
         if (!$group) {
-            throw new \RuntimeException("Group '{$name}' is no longer a duplicate group. The data changed — please reload.");
+            throw new \RuntimeException("Group '{$key}' is no longer a duplicate group. The data changed — please reload.");
         }
 
         // Re-validate: the actionable Id set must be exactly what the page saw.
@@ -173,7 +349,7 @@ class DictionaryDedupeService
 
         switch ($action) {
             case 'skip':
-                return ['action' => 'skip', 'name' => $name, 'message' => 'Skipped — no changes made.'];
+                return ['action' => 'skip', 'key' => $key, 'name' => $group['name'], 'message' => 'Skipped — no changes made.'];
             case 'keep_separate':
                 return $this->applyKeepSeparate($decision, $group);
             case 'merge':
@@ -239,6 +415,7 @@ class DictionaryDedupeService
 
         return [
             'action'     => 'merge',
+            'key'         => $group['key'],
             'name'        => $group['name'],
             'survivorId'  => $survivorId,
             'deleted'     => $duplicates->count(),
@@ -251,8 +428,13 @@ class DictionaryDedupeService
     /**
      * KEEP SEPARATE: edit the name fields (nameEn, namePt, nameEnSc, namePtSc) on one
      * or more rows so they are no longer duplicates. Only the fields actually supplied
-     * per row are written. nameEn (the grouping key) must stay non-empty, unique in the
-     * table, and unique amongst the submitted renames.
+     * per row are written.
+     *
+     * Because a set is held together by a shared name in EITHER language, the renames
+     * are checked against the state they would produce: the edit is rejected unless no
+     * two rows in the set would still share a name, in either language. Renaming only
+     * nameEn on a set that was grouped by namePt would otherwise look like it worked
+     * and leave the duplicate in place.
      *
      * decision.renames shape:
      *   { "<dictId>": { nameEn?, namePt?, nameEnSc?, namePtSc? }, ... }
@@ -281,29 +463,19 @@ class DictionaryDedupeService
         }
 
         if (empty($renames)) {
-            return ['action' => 'keep_separate', 'name' => $group['name'], 'message' => 'Kept separate — no changes applied.'];
+            return ['action' => 'keep_separate', 'key' => $group['key'], 'name' => $group['name'], 'message' => 'Kept separate — no changes applied.'];
         }
 
-        // Validate ownership + nameEn rules (nameEn is the grouping key).
-        $newNameEns = [];
         foreach ($renames as $id => $fields) {
             if (!in_array($id, $group['actionableIds'], true)) {
                 throw new \RuntimeException("Cannot edit Id {$id}: it is not part of this group.");
             }
-            if (array_key_exists('nameEn', $fields)) {
-                $newName = $fields['nameEn'];
-                if ($newName === '') {
-                    throw new \RuntimeException("nameEn cannot be empty (Id {$id}).");
-                }
-                if ($this->nameExists($newName, $id)) {
-                    throw new \RuntimeException("The name '{$newName}' is already taken by another property.");
-                }
-                $newNameEns[] = $newName;
+            if (array_key_exists('nameEn', $fields) && $fields['nameEn'] === '') {
+                throw new \RuntimeException("nameEn cannot be empty (Id {$id}).");
             }
         }
-        if (collect($newNameEns)->duplicates()->isNotEmpty()) {
-            throw new \RuntimeException('Two rows were given the same new nameEn.');
-        }
+
+        $this->assertRenamesSplitGroup($group, $renames);
 
         $before = DB::table(self::DICT_TABLE)
             ->whereIn(self::DICT_ID, array_keys($renames))
@@ -327,11 +499,65 @@ class DictionaryDedupeService
 
         return [
             'action'   => 'keep_separate',
+            'key'       => $group['key'],
             'name'      => $group['name'],
             'renamed'   => count($renames),
             'backup'    => basename($backupPath),
             'message'   => 'Kept separate — updated ' . count($renames) . ' row(s).',
         ];
+    }
+
+
+    /**
+     * Refuse a "keep separate" edit that would not actually separate anything.
+     *
+     * Applies the proposed renames to a copy of the set's rows and checks the result:
+     * no two of them may still share a name in either language, and no name may
+     * collide with a row outside the set.
+     */
+    private function assertRenamesSplitGroup(array $group, array $renames): void
+    {
+        $rows = [];
+        foreach (array_merge([$group['survivor']], $group['duplicates']) as $row) {
+            $rows[$row['id']] = ['nameEn' => (string) $row['nameEn'], 'namePt' => (string) $row['namePt']];
+        }
+        foreach ($renames as $id => $fields) {
+            foreach (self::NAME_COLS as $col) {
+                if (array_key_exists($col, $fields)) $rows[$id][$col] = $fields[$col];
+            }
+        }
+
+        foreach (self::NAME_COLS as $col) {
+            $seen = [];
+            foreach ($rows as $id => $names) {
+                $name = self::normaliseName($names[$col] ?? null);
+                if ($name === '') continue;
+                if (isset($seen[$name])) {
+                    throw new \RuntimeException(
+                        "Ids {$seen[$name]} and {$id} would still share the same {$col} "
+                        . "('{$names[$col]}'), so they would remain one duplicate group. "
+                        . 'Give them different names in both languages, or merge them.'
+                    );
+                }
+                $seen[$name] = $id;
+            }
+        }
+
+        // A new name must not collide with a property outside this set either.
+        foreach ($renames as $id => $fields) {
+            foreach (self::NAME_COLS as $col) {
+                if (!array_key_exists($col, $fields) || $fields[$col] === '') continue;
+                $clash = DB::table(self::DICT_TABLE)
+                    ->where($col, $fields[$col])
+                    ->whereNotIn(self::DICT_ID, $group['actionableIds'])
+                    ->value(self::DICT_ID);
+                if ($clash) {
+                    throw new \RuntimeException(
+                        "The {$col} '{$fields[$col]}' is already used by property Id {$clash}."
+                    );
+                }
+            }
+        }
     }
 
     /**

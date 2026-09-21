@@ -28,8 +28,9 @@ class DictionaryDedupeController extends Controller
      */
     public function group(Request $request, DictionaryDedupeService $service)
     {
-        $name = (string) $request->query('name', '');
-        return response()->json(['group' => $name === '' ? null : $service->analyzeGroup($name)]);
+        // A set is addressed by its key ("en:<name>" / "pt:<name>"); 'name' still works.
+        $key = (string) $request->query('key', $request->query('name', ''));
+        return response()->json(['group' => $key === '' ? null : $service->analyzeGroup($key)]);
     }
 
     /**
@@ -125,7 +126,7 @@ class DictionaryDedupeController extends Controller
 
         try {
             $result = $service->applyDecision($decision);
-            $group  = $service->analyzeGroup((string) ($decision['name'] ?? ''));
+            $group  = $service->analyzeGroup((string) ($decision['key'] ?? $decision['name'] ?? ''));
 
             return response()->json([
                 'ok'     => true,

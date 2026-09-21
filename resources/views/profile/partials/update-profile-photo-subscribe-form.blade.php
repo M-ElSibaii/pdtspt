@@ -1,11 +1,11 @@
 <section>
     <header>
         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-            {{ __('Foto') }}
+            {{ Lg::t('Foto') }}
         </h2>
 
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {{ __("Actualize a fotografia da sua conta.") }}
+            {{ Lg::t("Actualize a fotografia da sua conta.") }}
         </p>
     </header>
 
@@ -18,7 +18,7 @@
         @endif
         <div class="flex flex-col gap-4">
             <div class="">
-                <x-input-label for="photo" :value="__('Photo')" />
+                <x-input-label for="photo" :value="Lg::t('Foto')" />
                 <input type="file" name="photo" id="photo" class="block w-full text-sm text-slate-500 file:text-xs 
                 file:mr-4 file:py-2 file:px-4
                 file:rounded-md file:uppercase
@@ -35,7 +35,7 @@
         </div>
 
         @if (session('status') === 'photo-updated')
-        <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)" class="text-sm text-gray-600 dark:text-gray-400">{{ __('Actualizada.') }}</p>
+        <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)" class="text-sm text-gray-600 dark:text-gray-400">{{ Lg::t('Actualizada.') }}</p>
         @endif
     </form>
     <form method="post" action="{{ route('profile.deletePhoto') }}">

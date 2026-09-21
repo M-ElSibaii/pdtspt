@@ -1,7 +1,7 @@
 <x-app-layout>
     <div style="background-color: white;">
         <div class="container sm:max-w-full py-9">
-            <h1>{{ __('Perfil') }}</h1>
+            <h1>{{ Lg::t('Perfil') }}</h1>
             @if (session('subscribestatus'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('subscribestatus') }}

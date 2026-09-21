@@ -73,11 +73,17 @@
                             <!-- Row colour-coded by inheritance source (IsSubtypeOf chain); see legend under the table -->
                             <tr @if($property->is_inherited && isset($sourceColors[$property->inherited_from])) style="background-color: {{ $sourceColors[$property->inherited_from] }};" @endif>
                                 <td class="p-1.5 property-td">
-                                    <a href="{{ Uri::buildLink('classprop', $property) }}">{{ Lg::f($property, 'name') }}</a>
                                     @if($bsdd)
-                                        <a href="{{ $bsdd }}" target="_blank">
+                                        {{-- A property mapped into bSDD is shown under BOTH names, since bSDD
+                                             and IFC know it by its English one. Order is the same in either
+                                             language: English name, the bSDD link, then the Portuguese name. --}}
+                                        <a href="{{ Uri::buildLink('classprop', $property) }}">{{ $property->nameEn }}</a>
+                                        <a href="{{ $bsdd }}" target="_blank" title="buildingSMART Data Dictionary">
                                             <img src="{{ asset('img/IFCBSDD.png') }}" alt="IFC Logo" style="width:40px; height:auto; margin-left:10px;">
                                         </a>
+                                        <a href="{{ Uri::buildLink('classprop', $property) }}">{{ $property->namePt }}</a>
+                                    @else
+                                        <a href="{{ Uri::buildLink('classprop', $property) }}">{{ Lg::f($property, 'name') }}</a>
                                     @endif
                                     @if($property->status == 'InActive')
                                         <span class="status-tag status-tag-inactive">{{ Lg::t('Inativa') }}</span>
@@ -153,7 +159,7 @@
                 @php $referenceDoc = $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first(); @endphp
                 <tr>
                     <td>{{ Lg::f($propertyGroup, 'gopName') }}</td>
-                    <td>{{ Lg::f($property, 'name') }}</td>
+                    <td>@if($bsddLink($property)){{ $property->nameEn }} - {{ $property->namePt }}@else{{ Lg::f($property, 'name') }}@endif</td>
                     <td>{{ $property->units }}</td>
                     <td>{{ Lg::fSc($property, 'name') }}: {{ Lg::f($property, 'description') }}</td>
                     <td>{{ $referenceDoc ? $referenceDoc->rdName : 'n/a' }}</td>

@@ -1,15 +1,15 @@
 <x-app-layout>
     <div class="h-screen" style="background-color: white;">
         <div class="container py-9">
-            <h1>Verifique o seu e-mail</h1>
+            <h1>{{ Lg::t('Verifique o seu e-mail') }}</h1>
 
             <div class="mb-4 text-sm text-gray-600">
-                {{ __('Obrigado por se inscrever! Antes de começar, poderia verificar o seu endereço electrónico clicando no link que lhe acabámos de enviar por correio electrónico? Se não recebeu o e-mail, enviar-lhe-emos de bom grado outro.') }}
+                {{ Lg::t('Obrigado por se inscrever! Antes de começar, poderia verificar o seu endereço electrónico clicando no link que lhe acabámos de enviar por correio electrónico? Se não recebeu o e-mail, enviar-lhe-emos de bom grado outro.') }}
             </div>
 
             @if (session('status') == 'verification-link-sent')
             <div class="mb-4 font-medium text-sm text-green-600">
-                {{ __('Uma nova ligação de verificação foi enviada para o endereço de correio electrónico que nos forneceu durante o registo.') }}
+                {{ Lg::t('Uma nova ligação de verificação foi enviada para o endereço de correio electrónico que nos forneceu durante o registo.') }}
             </div>
             @endif
 
@@ -19,7 +19,7 @@
 
                     <div>
                         <x-primary-button>
-                            {{ __('Reenviar e-mail de verificação') }}
+                            {{ Lg::t('Reenviar e-mail de verificação') }}
                         </x-primary-button>
                     </div>
                 </form>
@@ -28,7 +28,7 @@
                     @csrf
 
                     <button type="submit" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        {{ __('Log Out') }}
+                        {{ Lg::t('Sair') }}
                     </button>
                 </form>
             </div>

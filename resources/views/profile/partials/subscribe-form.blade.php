@@ -1,11 +1,11 @@
 <section>
     <header>
         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-            {{ __('Subscrever') }}
+            {{ Lg::t('Subscrever') }}
         </h2>
 
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {{ __('Ao subscrever, só receberá notificações por e-mail quando houver um novo feedback sobre um Modelo de Dados de Produto ao qual tenha previamente adicionado feedback.') }}
+            {{ Lg::t('Ao subscrever, só receberá notificações por e-mail quando houver um novo feedback sobre um Modelo de Dados de Produto ao qual tenha previamente adicionado feedback.') }}
         </p>
     </header>
 
@@ -20,6 +20,6 @@
             Não
         </label>
         <br><br>
-        <x-primary-button>{{ __('Guardar') }}</x-primary-button>
+        <x-primary-button>{{ Lg::t('Guardar') }}</x-primary-button>
     </form>
 </section>

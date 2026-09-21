@@ -34,6 +34,7 @@ https://pdts.pt/uri/{{ \App\Services\UriService::dictionaryVersion() }}/{entity}
                         ['doc', Lg::pick('Documento de referência', 'Reference document'), 'Name'],
                         ['unit', Lg::pick('Unidade', 'Unit'), 'Name'],
                         ['pq', Lg::pick('Grandeza física', 'Quantity kind'), 'Name'],
+                        ['dim', Lg::pick('Dimensão', 'Dimension'), 'Name'],
                         ['enum', Lg::pick('Valor enumerado', 'Enumerated value'), '{id}-Name'],
                     ];
                 @endphp
@@ -57,25 +58,30 @@ https://pdts.pt/uri/{{ \App\Services\UriService::dictionaryVersion() }}/{entity}
                 'Where names legitimately repeat (groups of properties, class properties, enumerated values) the identifier carries the record id. Any identifier requested with Accept: application/json, ?format=json or a .json suffix returns the record as JSON.'
             ) }}</p>
 
-            <h2 class="my-4">Obter Modelo de Dados de Produto (Completo)</h2>
-            <p class="mb-4">Retorna o modelo de dados do produto com o ID especificado (estrutura ISO 23387). Inclui TODAS as informações: grupos de propriedades, propriedades com atributos completos do dicionário de dados (EN ISO 23386), documentos de referência, e objeto de construção.</p>
+            <p class="mb-4 text-sm text-gray-600">{{ Lg::pick(
+                'O código é o nome em português: este é um dicionário português, e é namePt que consta das exportações, das DoPC e do URI canónico. O nome em inglês também resolve, como alias: um pedido com nameEn encontra o mesmo registo e reencaminha (301) para o URI canónico em português. É uma segunda forma de chegar ao mesmo URI, nunca uma segunda identidade.',
+                'The code is the Portuguese name: this is a Portuguese dictionary, and namePt is what appears in exports, in DoPCs and in the canonical URI. A record\'s English name also resolves, as an alias: a request using nameEn finds the same record and redirects (301) to the canonical Portuguese URI. It is a second way to arrive at the same URI, never a second identity.'
+            ) }}</p>
+
+            <h2 class="my-4">{{ Lg::pick('Obter Modelo de Dados de Produto (Completo)', 'Get a product data template (complete)') }}</h2>
+            <p class="mb-4">{{ Lg::pick('Retorna o modelo de dados do produto com o ID especificado (estrutura ISO 23387). Inclui TODAS as informações: grupos de propriedades, propriedades com atributos completos do dicionário de dados (EN ISO 23386), documentos de referência, e objeto de construção.', 'Returns the product data template with the given id (ISO 23387 structure). It includes everything: groups of properties, properties with their full data-dictionary attributes (EN ISO 23386), reference documents, and the construction object.') }}</p>
             <div style="background-color: #F0F4F8;">
                 <pre><code>GET /api/{pdtID}</code></pre>
             </div>
             <p class="text-sm text-gray-600 my-2"><strong>Formato:</strong> JSON </p>
             <p class="text-sm text-gray-600 my-2"><strong>Inclui:</strong> Todas as colunas das tabelas productdatatemplates, groupofproperties, propertiesdatadictionaries, referencedocuments, constructionobjects</p>
-            <p class="text-sm text-gray-600 my-2"><strong>Exemplo:</strong> <code>GET /api/1</code></p>
+            <p class="text-sm text-gray-600 my-2"><strong>{{ Lg::pick('Exemplo:', 'Example:') }}</strong> <code>GET /api/1</code></p>
 
             <!-- JSON Export Endpoint -->
-            <h2 class="my-4 mt-8">Exportar Modelo de Dados de Produto como JSON (estrutura EN ISO 23387)</h2>
-            <p class="mb-4">Retorna o modelo de dados do produto em formato JSON completamente compatível com EN ISO 23387.</p>
+            <h2 class="my-4 mt-8">{{ Lg::pick('Exportar Modelo de Dados de Produto como JSON (estrutura EN ISO 23387)', 'Export a product data template as JSON (EN ISO 23387 structure)') }}</h2>
+            <p class="mb-4">{{ Lg::pick('Retorna o modelo de dados do produto em formato JSON completamente compatível com EN ISO 23387.', 'Returns the product data template as JSON, fully compliant with EN ISO 23387.') }}</p>
             <div style="background-color: #F0F4F8;">
                 <pre><code>GET /api/{pdtID}/json</code></pre>
             </div>
             <p class="text-sm text-gray-600 my-2"><strong>Formato:</strong> JSON (estrutura EN ISO 23387)</p>
             <p class="text-sm text-gray-600 my-2"><strong>Content-Type:</strong> application/json</p>
             <p class="text-sm text-gray-600 my-2"><strong>Estrutura:</strong></p>
-            <p class="text-sm text-gray-600 my-2">Os GUIDs são emitidos no formato UUID com hífens (8-4-4-4-12) para validarem contra o padrão do XSD ed-2. O elemento <code>Library</code> só admite o atributo <code>dt:GUID</code> e os elementos <code>Name</code> (sem <code>dateOfCreation</code>, <code>URI</code> ou <code>Definition</code> ao nível da Library).</p>
+            <p class="text-sm text-gray-600 my-2">{{ Lg::pick('Os GUIDs são emitidos no formato UUID com hífens (8-4-4-4-12) para validarem contra o padrão do XSD ed-2. O elemento <code>Library</code> só admite o atributo <code>dt:GUID</code> e os elementos <code>Name</code> (sem <code>dateOfCreation</code>, <code>URI</code> ou <code>Definition</code> ao nível da Library).', 'GUIDs are emitted as dashed UUIDs (8-4-4-4-12) so they validate against the ed-2 XSD pattern. The <code>Library</code> element admits only the <code>dt:GUID</code> attribute and <code>Name</code> elements (no <code>dateOfCreation</code>, <code>URI</code> or <code>Definition</code> at Library level).') }}</p>
             <div style="background-color: #F0F4F8; margin: 10px 0;">
                 <pre><code>{"Library": {
     "dt:GUID": "8d2f...-...-...-...-...",
@@ -147,16 +153,26 @@ https://pdts.pt/uri/{{ \App\Services\UriService::dictionaryVersion() }}/{entity}
     }]
 }}</code></pre>
             </div>
-           <p class="text-sm text-gray-600 my-2"><strong>Exemplo:</strong> <code>GET /api/1/json</code></p>
-           <p class="text-sm text-gray-600 my-2"><strong>Unidades / grandeza física / dimensão:</strong>
+           <p class="text-sm text-gray-600 my-2"><strong>{{ Lg::pick('Exemplo:', 'Example:') }}</strong> <code>GET /api/1/json</code></p>
+           <p class="text-sm text-gray-600 my-2">
+@if (Lg::isEn())
+              <strong>Unit / physical quantity / dimension:</strong>
+              the unit is referenced by <code>UnitRef</code> (stable GUID, plus the QUDT <code>referenceURI</code> where available);
+              the physical quantity by <code>QuantityKindRef</code> and the dimension by <code>DimensionRef</code>.
+              The <code>_physicalQuantity</code> field carries the ISO 23386 "physical quantity | language" pair
+              (e.g. <code>"millimetre | en.EN"</code>), or <code>"without"</code> for unit-less / text properties.
+@else
+              <strong>Unidades / grandeza física / dimensão:</strong>
               a unidade é referenciada por <code>UnitRef</code> (GUID estável, e <code>referenceURI</code> QUDT quando disponível);
               a grandeza física por <code>QuantityKindRef</code> e a dimensão por <code>DimensionRef</code>.
               O campo <code>_physicalQuantity</code> apresenta o par ISO 23386 "grandeza física | idioma"
-              (ex. <code>"millimetre | en.EN"</code>), ou <code>"without"</code> para propriedades sem unidade / de texto.</p>
+              (ex. <code>"millimetre | en.EN"</code>), ou <code>"without"</code> para propriedades sem unidade / de texto.
+@endif
+           </p>
 
             <!-- XML Export Endpoint -->
-            <h2 class="my-4 mt-8">Exportar Modelo de Dados de Produto como XML (estrutura EN ISO 23387)</h2>
-            <p class="mb-4">Retorna o modelo de dados do produto em formato XML completamente compatível com EN ISO 23387 XSD.</p>
+            <h2 class="my-4 mt-8">{{ Lg::pick('Exportar Modelo de Dados de Produto como XML (estrutura EN ISO 23387)', 'Export a product data template as XML (EN ISO 23387 structure)') }}</h2>
+            <p class="mb-4">{{ Lg::pick('Retorna o modelo de dados do produto em formato XML completamente compatível com EN ISO 23387 XSD.', 'Returns the product data template as XML, fully compliant with the EN ISO 23387 XSD.') }}</p>
             <div style="background-color: #F0F4F8;">
                 <pre><code>GET /api/{pdtID}/xml</code></pre>
             </div>
@@ -220,61 +236,65 @@ https://pdts.pt/uri/{{ \App\Services\UriService::dictionaryVersion() }}/{entity}
     &lt;/dt:ReferenceDocument&gt;
 &lt;/dt:Library&gt;</code></pre>
             </div>
-           <p class="text-sm text-gray-600 my-2"><strong>Exemplo:</strong> <code>GET /api/1/xml</code></p>
+           <p class="text-sm text-gray-600 my-2"><strong>{{ Lg::pick('Exemplo:', 'Example:') }}</strong> <code>GET /api/1/xml</code></p>
           
 
             <!-- Additional Endpoints -->
-            <h2 class="my-4 mt-8">Obter Todos os Modelos de Dados de Produtos</h2>
-            <p class="mb-4">Retorna todos os templates de dados de produtos.</p>
+            <h2 class="my-4 mt-8">{{ Lg::pick('Obter Todos os Modelos de Dados de Produtos', 'Get all product data templates') }}</h2>
+            <p class="mb-4">{{ Lg::pick('Retorna todos os templates de dados de produtos.', 'Returns every product data template.') }}</p>
             <div style="background-color: #F0F4F8;">
                 <pre><code>GET /api/productDataTemplates</code></pre>
             </div>
 
-            <h2 class="my-4">Obter todas as propriedades do Dicionário de Dados</h2>
-            <p class="mb-4">Retorna todas as propriedades do dicionário de dados dos modelos de dados do produto.</p>
+            <h2 class="my-4">{{ Lg::pick('Obter todas as propriedades do Dicionário de Dados', 'Get every data-dictionary property') }}</h2>
+            <p class="mb-4">{{ Lg::pick('Retorna todas as propriedades do dicionário de dados dos modelos de dados do produto.', 'Returns every property in the data dictionary behind the product data templates.') }}</p>
             <div style="background-color: #F0F4F8;">
                 <pre><code>GET /api/dataDictionary</code></pre>
             </div>
 
-            <h2 class="my-4">Obter uma propriedade do Dicionário de dados</h2>
-            <p class="mb-4">Retorna uma propriedade e seus atributos do dicionário de dados.</p>
+            <h2 class="my-4">{{ Lg::pick('Obter uma propriedade do Dicionário de dados', 'Get one data-dictionary property') }}</h2>
+            <p class="mb-4">{{ Lg::pick('Retorna uma propriedade e seus atributos do dicionário de dados.', 'Returns one property and its data-dictionary attributes.') }}</p>
             <div style="background-color: #F0F4F8;">
                 <pre><code>GET /api/dataDictionary/{Id}</code></pre>
             </div>
 
-            <h2 class="my-4">Obter Documentos de Referência</h2>
-            <p class="mb-4">Retorna os documentos de referência usados nos templates de dados de produtos.</p>
+            <h2 class="my-4">{{ Lg::pick('Obter Documentos de Referência', 'Get reference documents') }}</h2>
+            <p class="mb-4">{{ Lg::pick('Retorna os documentos de referência usados nos templates de dados de produtos.', 'Returns the reference documents cited by the product data templates.') }}</p>
             <div style="background-color: #F0F4F8;">
                 <pre><code>GET /api/referenceDocuments</code></pre>
             </div>
 
-            <h2 class="my-4">Obter um Documento de Referência</h2>
-            <p class="mb-4">Retorna um documento de referência usado nos templates de dados de produtos.</p>
+            <h2 class="my-4">{{ Lg::pick('Obter um Documento de Referência', 'Get one reference document') }}</h2>
+            <p class="mb-4">{{ Lg::pick('Retorna um documento de referência usado nos templates de dados de produtos.', 'Returns one reference document cited by the product data templates.') }}</p>
             <div style="background-color: #F0F4F8;">
                 <pre><code>GET /api/referenceDocuments/{GUID}</code></pre>
             </div>
 
-            <h2 class="my-4">Obter Grupos de Propriedades</h2>
-            <p class="mb-4">Retorna os grupos de propriedades para os templates de dados de produtos.</p>
+            <h2 class="my-4">{{ Lg::pick('Obter Grupos de Propriedades', 'Get groups of properties') }}</h2>
+            <p class="mb-4">{{ Lg::pick('Retorna os grupos de propriedades para os templates de dados de produtos.', 'Returns the groups of properties used by the product data templates.') }}</p>
             <div style="background-color: #F0F4F8;">
                 <pre><code>GET /api/groupsOfProperties</code></pre>
             </div>
 
-            <h2 class="my-4">Obter um Grupo de Propriedades</h2>
-            <p class="mb-4">Retorna um grupo de propriedades e seus atributos para um template de dados de produto.</p>
+            <h2 class="my-4">{{ Lg::pick('Obter um Grupo de Propriedades', 'Get one group of properties') }}</h2>
+            <p class="mb-4">{{ Lg::pick('Retorna um grupo de propriedades e seus atributos para um template de dados de produto.', 'Returns one group of properties and its attributes for a product data template.') }}</p>
             <div style="background-color: #F0F4F8;">
                 <pre><code>GET /api/groupsOfProperties/{Id}</code></pre>
             </div>
 
-            <h2 class="my-4">Obter Todos os objectos de construção</h2>
-            <p class="mb-4">Retorna todos os objectos de construção.</p>
+            <h2 class="my-4">{{ Lg::pick('Obter Todos os objectos de construção', 'Get all construction objects') }}</h2>
+            <p class="mb-4">{{ Lg::pick('Retorna todos os objectos de construção.', 'Returns every construction object.') }}</p>
             <div style="background-color: #F0F4F8;">
                 <pre><code>GET /api/constructionObjects</code></pre>
             </div>
 
             <!-- Units reference collections (ISO 23387) -->
-            <h2 class="my-4 mt-8">Obter Todas as Unidades</h2>
-            <p class="mb-4">Retorna todas as unidades (ISO 23387 UnitType), cada uma com o seu URI de identidade resolúvel (<code>@id</code>), grandeza física e dimensão associadas, e a ligação à autoridade externa QUDT (<code>sameAs</code>, quando disponível).</p>
+            <h2 class="my-4 mt-8">{{ Lg::pick('Obter Todas as Unidades', 'Get all units') }}</h2>
+            <p class="mb-4">@if (Lg::isEn())
+Returns every unit (ISO 23387 UnitType), each with its resolvable identity URI (<code>@id</code>), the physical quantity and dimension it belongs to, and the link to the external QUDT authority (<code>sameAs</code>, where available).
+@else
+Retorna todas as unidades (ISO 23387 UnitType), cada uma com o seu URI de identidade resolúvel (<code>@id</code>), grandeza física e dimensão associadas, e a ligação à autoridade externa QUDT (<code>sameAs</code>, quando disponível).
+@endif</p>
             <div style="background-color: #F0F4F8;">
                 <pre><code>GET /api/units</code></pre>
             </div>
@@ -287,14 +307,18 @@ https://pdts.pt/uri/{{ \App\Services\UriService::dictionaryVersion() }}/{entity}
     "code": "mm",
     "name": "millimetre",
     "physicalQuantity": { "name": "length", "languageIsoCode": "en.EN", "@id": "https://pdts.pt/uri/{{ \App\Services\UriService::dictionaryVersion() }}/pq/length" },
-    "dimension": { "canonical": "L", "@id": "https://pdts.pt/dimension/L" },
+    "dimension": { "canonical": "L", "@id": "https://pdts.pt/uri/{{ \App\Services\UriService::dictionaryVersion() }}/dim/L" },
     "sameAs": "http://qudt.org/vocab/unit/MilliM"
 }]</code></pre>
             </div>
             <p class="text-sm text-gray-600 my-2"><strong>Detalhe:</strong> siga o <code>@id</code> de cada unidade para <code>GET /api/unit/{code}</code> (representação completa, incl. escala/base/coeficiente).</p>
 
-            <h2 class="my-4 mt-8">Obter Todas as Grandezas Físicas</h2>
-            <p class="mb-4">Retorna todas as grandezas físicas (ISO 23387 QuantityKindType), cada uma com o seu URI de identidade (<code>@id</code>) e a dimensão associada.</p>
+            <h2 class="my-4 mt-8">{{ Lg::pick('Obter Todas as Grandezas Físicas', 'Get all quantity kinds') }}</h2>
+            <p class="mb-4">@if (Lg::isEn())
+Returns every physical quantity (ISO 23387 QuantityKindType), each with its identity URI (<code>@id</code>) and the dimension it belongs to.
+@else
+Retorna todas as grandezas físicas (ISO 23387 QuantityKindType), cada uma com o seu URI de identidade (<code>@id</code>) e a dimensão associada.
+@endif</p>
             <div style="background-color: #F0F4F8;">
                 <pre><code>GET /api/quantityKinds</code></pre>
             </div>
@@ -306,20 +330,24 @@ https://pdts.pt/uri/{{ \App\Services\UriService::dictionaryVersion() }}/{entity}
     "guid": "...",
     "name": "length",
     "languageIsoCode": "en.EN",
-    "dimension": { "canonical": "L", "@id": "https://pdts.pt/dimension/L" },
+    "dimension": { "canonical": "L", "@id": "https://pdts.pt/uri/{{ \App\Services\UriService::dictionaryVersion() }}/dim/L" },
     "sameAs": null
 }]</code></pre>
             </div>
 
-            <h2 class="my-4 mt-8">Obter Todas as Dimensões</h2>
-            <p class="mb-4">Retorna todas as dimensões (ISO 23387 DimensionType), cada uma com o seu URI de identidade (<code>@id</code>) e os 7 expoentes SI (ordem ISO 80000).</p>
+            <h2 class="my-4 mt-8">{{ Lg::pick('Obter Todas as Dimensões', 'Get all dimensions') }}</h2>
+            <p class="mb-4">@if (Lg::isEn())
+Returns every dimension (ISO 23387 DimensionType), each with its identity URI (<code>@id</code>) and the 7 SI exponents (ISO 80000 order).
+@else
+Retorna todas as dimensões (ISO 23387 DimensionType), cada uma com o seu URI de identidade (<code>@id</code>) e os 7 expoentes SI (ordem ISO 80000).
+@endif</p>
             <div style="background-color: #F0F4F8;">
                 <pre><code>GET /api/dimensions</code></pre>
             </div>
             <p class="text-sm text-gray-600 my-2"><strong>Formato:</strong> JSON</p>
             <div style="background-color: #F0F4F8; margin: 10px 0;">
                 <pre><code>[{
-    "@id": "https://pdts.pt/dimension/L",
+    "@id": "https://pdts.pt/uri/{{ \App\Services\UriService::dictionaryVersion() }}/dim/L",
     "type": "Dimension",
     "guid": "...",
     "canonical": "L",

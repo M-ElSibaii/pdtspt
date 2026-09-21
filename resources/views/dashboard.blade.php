@@ -47,7 +47,7 @@
                                             value="{{ $category->category }}"
                                             x-model="selectedCategories"
                                             class="mr-2" />
-                                        {{ $category->category }} ({{ $category->count }})
+                                        {{ Lg::t($category->category) }} ({{ $category->count }})
                                     </label>
                                     @endforeach
                                 </div>
@@ -103,7 +103,7 @@
                                     @endif
                                 </div>
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4 font-medium">{{ $pdt->category }}</td>
+                            <td class="whitespace-nowrap px-6 py-4 font-medium">{{ Lg::t($pdt->category) }}</td>
                             <td class="whitespace-nowrap px-6 py-4 font-medium my-auto ">
                                 <form class="mb-3" action="{{ route('pdtsdownload', ['pdtID' => $pdt->Id]) }}">
                                     <x-button-primary-pdts type="submit" title="{{ Lg::t('Ver') }}" />

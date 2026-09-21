@@ -1,9 +1,9 @@
 <x-app-layout>
     <div style="background-color: white;">
         <div class="container sm:max-w-full py-9">
-            <h1>Participantes</h1>
+            <h1>{{ Lg::pick('Participantes', 'Participants') }}</h1>
             <div class="py-10">
-                <h2 class="pb-1.5 border-b">Instituições</h2>
+                <h2 class="pb-1.5 border-b">{{ Lg::pick('Instituições', 'Institutions') }}</h2>
                 <div class="grid lg:grid-cols-6 md:grid-cols-4 sm:grid-cols-2 gap-6 py-6">
                     <div class="content-center">
                         <a class="content-center" href="https://www.uminho.pt/PT" target="_blank" rel="noopener noreferrer">
@@ -14,7 +14,7 @@
             </div>
             <div class="py-10">
 
-                <h2 class="pb-1.5 border-b">Associações e iniciativas</h2>
+                <h2 class="pb-1.5 border-b">{{ Lg::pick('Associações e iniciativas', 'Associations and initiatives') }}</h2>
                 <div class="grid lg:grid-cols-6 md:grid-cols-4 sm:grid-cols-2 gap-6 py-6">
                     <div class="content-center">
                         <a class="content-center" href="http://www.ct197.pt/" target="_blank" rel="noopener noreferrer">
@@ -30,7 +30,7 @@
             </div>
             <div class="py-10">
 
-                <h2 class="pb-1.5 border-b">Projetos I&D</h2>
+                <h2 class="pb-1.5 border-b">{{ Lg::pick('Projetos I&D', 'R&D projects') }}</h2>
                 <div class="grid lg:grid-cols-6 md:grid-cols-4 sm:grid-cols-2 gap-6 py-6">
                     <div class="content-center">
                         <a class="content-center" href="https://secclass.pt/" target="_blank" rel="noopener noreferrer">
@@ -55,7 +55,7 @@
                 </div>
             </div>
             <div class="py-10">
-                <h2 class="pb-1.5 border-b">Financiamento</h2>
+                <h2 class="pb-1.5 border-b">{{ Lg::pick('Financiamento', 'Funding') }}</h2>
                 <div class="grid lg:grid-cols-6 md:grid-cols-4 sm:grid-cols-2 gap-6 py-6">
                     <div class="content-center">
                         <a class="content-center" href="https://www.fct.pt/" target="_blank" rel="noopener noreferrer">

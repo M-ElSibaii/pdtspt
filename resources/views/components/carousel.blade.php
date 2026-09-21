@@ -9,14 +9,14 @@
             <div class="h-[500px] w-full opacity-50 block bg-cover bg-center bg-no-repeat" style="background-image: url({{asset('/img/standard.png')}});"></div>
             <div class="absolute inset-x-[15%] bottom-5 hidden py-5 text-center text-white md:block lg:block sm:block">
                 <h1 class="text-white">
-                    A normalização dos dados na indústria da contrução está a caminho
+                    {{ Lg::pick('A normalização dos dados na indústria da construção está a caminho', 'Data standardisation in the construction industry is on its way') }}
                 </h1>
                 <h3 class="my-3">
-                    Aqui tem acesso a modelos de dados de produtos normalizados abertos
+                    {{ Lg::pick('Aqui tem acesso a modelos de dados de produtos normalizados abertos', 'Here you have access to open, standardised product data templates') }}
                 </h3>
                 <a href="{{route('dashboard')}}">
                     <x-secondary-button>
-                        {{ __('Ver PDTs') }}
+                        {{ Lg::pick('Ver PDTs', 'View PDTs') }}
                     </x-secondary-button>
                 </a>
             </div>
@@ -25,14 +25,14 @@
             <div class="h-[500px] w-full opacity-50 block bg-cover bg-center bg-no-repeat" style="background-image: url({{asset('/img/apibackground.png')}});"></div>
             <div class="absolute inset-x-[15%] bottom-5 hidden py-5 text-center text-white md:block lg:block sm:block">
                 <h1 class="text-white">
-                    As API's são a chave para ligar a indústria
+                    {{ Lg::pick('As API\'s são a chave para ligar a indústria', 'APIs are the key to connecting the industry') }}
                 </h1>
                 <h3 class="my-3">
-                    Obtenha acesso a todos os Modelos de Dados de Produtos através do nosso API
+                    {{ Lg::pick('Obtenha acesso a todos os Modelos de Dados de Produtos através do nosso API', 'Reach every Product Data Template through our API') }}
                 </h3>
                 <a href="{{route('apidoc')}}">
                     <x-secondary-button>
-                        {{ __('Documentação') }}
+                        {{ Lg::pick('Documentação', 'Documentation') }}
                     </x-secondary-button>
                 </a>
             </div>
@@ -41,14 +41,14 @@
             <div class="h-[500px] w-full opacity-50 block bg-cover bg-center bg-no-repeat" style="background-image: url({{asset('/img/pdtreview.png')}});"></div>
             <div class="absolute inset-x-[15%] bottom-5 hidden py-5 text-center text-white md:block lg:block sm:block">
                 <h1 class="text-white">
-                    Faz parte da digitalização em construção em Portugal
+                    {{ Lg::pick('Faz parte da digitalização em construção em Portugal', 'Be part of the digitalisation of construction in Portugal') }}
                 </h1>
                 <h3 class="my-3">
-                    Ver, rever, adicionar feedback e descarregar modelos de dados do produto
+                    {{ Lg::pick('Ver, rever, adicionar feedback e descarregar modelos de dados do produto', 'View, review, give feedback on and download product data templates') }}
                 </h3>
                 <a href="{{route('dashboard')}}">
                     <x-secondary-button>
-                        {{ __('Participar') }}
+                        {{ Lg::pick('Participar', 'Take part') }}
                     </x-secondary-button>
                 </a>
             </div>
@@ -61,7 +61,7 @@
             </svg>
         </span>
         <span class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-            Previous
+            {{ Lg::pick('Anterior', 'Previous') }}
         </span>
     </button>
     <button class="absolute top-0 bottom-0 right-0 z-[1] flex w-[15%] items-center justify-center border-0 bg-none p-0 text-center text-white opacity-50 transition-opacity duration-150 ease-[cubic-bezier(0.25,0.1,0.25,1.0)] hover:text-white hover:no-underline hover:opacity-90 hover:outline-none focus:text-white focus:no-underline focus:opacity-90 focus:outline-none motion-reduce:transition-none" type="button" data-te-target="#carouselExampleCaptions" data-te-slide="next">
@@ -71,7 +71,7 @@
             </svg>
         </span>
         <span class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-            Next
+            {{ Lg::pick('Seguinte', 'Next') }}
         </span>
     </button>
 </div>

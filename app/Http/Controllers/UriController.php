@@ -18,6 +18,11 @@ use Illuminate\Http\Request;
  *
  * Identifiers are also dereferenceable as data: ask for JSON (Accept header, ?format=json
  * or a .json suffix) and the same URI returns the record plus its identity.
+ *
+ * Codes are the Portuguese name — this is a Portuguese dictionary, and that is the code
+ * carried by exports, DoPCs and the canonical URI. A record's ENGLISH name also resolves,
+ * as an alias: it finds the same record and 301-redirects to the canonical Portuguese
+ * URI. That is a second way in, never a second identity.
  */
 class UriController extends Controller
 {
@@ -51,6 +56,15 @@ class UriController extends Controller
 
         try {
             $record = UriService::resolve($entity, $code, $version);
+
+            // Not a canonical (Portuguese) code — try the English name. It is an alias,
+            // not a second identity, so a hit is sent on to the one canonical URI.
+            if (!$record) {
+                $byEnglishName = UriService::resolveAlias($entity, $code, $version);
+                if ($byEnglishName) {
+                    return $this->redirectToCanonical($request, $entity, $byEnglishName, $version);
+                }
+            }
         } catch (CodeCollisionException $e) {
             // Two records claim this identifier. Say so; do not pick one.
             return response()->view('errors.uri-collision', [
@@ -65,9 +79,33 @@ class UriController extends Controller
                 . UriService::dictionaryVersion() . '.');
         }
 
+        // An id-prefixed code (a group, a class property) resolves on its id alone, so an
+        // English — or simply outdated — name part still lands on the right record. Send
+        // it to the canonical spelling rather than serving the record under two URLs.
+        // An enumerated value is not a stored row and has no code of its own to compare.
+        if ($entity !== UriService::ENUM_VALUE && UriService::codeFor($entity, $record) !== $code) {
+            return $this->redirectToCanonical($request, $entity, $record, $version);
+        }
+
         return $json
             ? $this->asJson($entity, $code, $version, $record)
             : $this->asPage($request, $entity, $code, $version, $record);
+    }
+
+
+    /**
+     * Permanent redirect to a record's one canonical URI, preserving the pinned version
+     * and any query string (so ?format=json still returns JSON after the hop).
+     *
+     * 301, not 302: the canonical Portuguese URI is the record's identity and that does
+     * not change, so callers and crawlers should remember it.
+     */
+    private function redirectToCanonical(Request $request, string $entity, $record, ?int $version)
+    {
+        $target = UriService::buildLink($entity, $record, $version);
+        $query = $request->getQueryString();
+
+        return redirect($target . ($query ? '?' . $query : ''), 301);
     }
 
     // ------------------------------------------------------------------ pages
@@ -98,6 +136,9 @@ class UriController extends Controller
 
             case UriService::QUANTITY_KIND:
                 return (new UnitsReferenceController())->quantityKind($request, $record->name);
+
+            case UriService::DIMENSION:
+                return (new UnitsReferenceController())->dimension($request, $record->canonical);
 
             case UriService::ENUM_VALUE:
                 // An enumerated value has no page of its own: it is one entry in its

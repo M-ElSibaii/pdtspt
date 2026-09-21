@@ -87,8 +87,12 @@
 
                 {{-- Language toggle, so signing in does not drop the chosen language. --}}
                 @foreach (Lg::supported() as $code)
+                    @php $on = Lg::current() === $code; @endphp
                     <a href="{{ Lg::toggleUrl($code) }}" hreflang="{{ $code }}"
-                       class="ml-2 text-sm underline {{ Lg::current() === $code ? 'text-slate-900 font-semibold' : 'text-gray-500' }}">{{ strtoupper($code) }}</a>
+                       aria-current="{{ $on ? 'true' : 'false' }}"
+                       style="margin-left:8px; font-size:14px; text-decoration:underline;
+                              color:{{ $on ? '#0f172a' : '#64748b' }};
+                              font-weight:{{ $on ? '700' : '400' }};">{{ strtoupper($code) }}</a>
                 @endforeach
             </div>
         </div>

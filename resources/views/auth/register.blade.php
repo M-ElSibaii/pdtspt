@@ -11,41 +11,41 @@
                         alt="Sample image" />
                 </div>
                 <div class="mb-12 md:mb-0 md:w-8/12 lg:w-5/12 xl:w-5/12">
-                    <h1>Registo</h1>
+                    <h1>{{ Lg::t('Registo') }}</h1>
                     <form method="POST" action="{{ route('register') }}">
                         @csrf
 
                         <!-- Name -->
                         <div>
-                            <x-input-label for="name" :value="__('Nome')" />
+                            <x-input-label for="name" :value="Lg::t('Nome')" />
                             <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus />
                             <x-input-error :messages="$errors->get('name')" class="mt-2" />
                         </div>
                         <br>
                         <!-- Profession-->
                         <div>
-                            <x-input-label for="profession" :value="__('Profissão')" />
+                            <x-input-label for="profession" :value="Lg::t('Profissão')" />
                             <x-text-input id="profession" class="block mt-1 w-full" type="text" name="profession" :value="old('profession')" autofocus />
                             <x-input-error :messages="$errors->get('profession')" class="mt-2" />
                         </div>
                         <br>
                         <!-- Institute -->
                         <div>
-                            <x-input-label for="institute" :value="__('Instituto')" />
+                            <x-input-label for="institute" :value="Lg::t('Instituto')" />
                             <x-text-input id="institute" class="block mt-1 w-full" type="text" name="institute" :value="old('institute')" autofocus />
                             <x-input-error :messages="$errors->get('institute')" class="mt-2" />
                         </div>
 
                         <!-- Email Address -->
                         <div class="mt-4">
-                            <x-input-label for="email" :value="__('Email')" />
+                            <x-input-label for="email" :value="Lg::t('Email')" />
                             <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required />
                             <x-input-error :messages="$errors->get('email')" class="mt-2" />
                         </div>
 
                         <!-- Password -->
                         <div class="mt-4">
-                            <x-input-label for="password" :value="__('Palavra-passe')" />
+                            <x-input-label for="password" :value="Lg::t('Palavra-passe')" />
 
                             <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
 
@@ -54,7 +54,7 @@
 
                         <!-- Confirm Password -->
                         <div class="mt-4">
-                            <x-input-label for="password_confirmation" :value="__('Confirmar Palavra-passe')" />
+                            <x-input-label for="password_confirmation" :value="Lg::t('Confirmar Palavra-passe')" />
 
                             <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required />
 
@@ -62,16 +62,16 @@
                         </div>
                         <div class="flex items-center justify-end mt-4">
                             <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('privacypolicy') }}">
-                                {{ __('Ao registar-se nesta plataforma, está a concordar com a nossa política de privacidade.') }}
+                                {{ Lg::t('Ao registar-se nesta plataforma, está a concordar com a nossa política de privacidade.') }}
                             </a>
                         </div>
                         <div class="flex items-center justify-end mt-4">
                             <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                                {{ __('Já registado?') }}
+                                {{ Lg::t('Já registado?') }}
                             </a>
 
                             <x-primary-button class="ml-4">
-                                {{ __('Registar') }}
+                                {{ Lg::t('Registar') }}
                             </x-primary-button>
                         </div>
                     </form>

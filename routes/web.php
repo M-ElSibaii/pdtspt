@@ -75,12 +75,12 @@ Route::get('/pdtsdownload/{pdtID}', [GroupofpropertiesController::class, 'getGro
 // Identifiers. Every dictionary record is reached through exactly one scheme:
 //     /uri/{dictVersion}/{entity}/{code}
 //     /uri/{dictVersion}/{entity}/{code}/v{versionNumber}
-// entity is one of prop, dt, class, gop, classprop, doc, unit, pq, enum.
+// entity is one of prop, dt, class, gop, classprop, doc, unit, pq, dim, enum.
 // {code} captures the remainder so unit symbols containing "/" (e.g. kg/m³) and the
 // optional /v{n} suffix are split by UriService, not by the router. "latest" is
 // accepted as dictVersion and redirects to the current release.
 // These replace the old /pdtview, /datadictionaryview, /datadictionaryviewGOP,
-// /classpropertyview, /referencedocumentview, /unit and /quantitykind paths.
+// /classpropertyview, /referencedocumentview, /unit, /quantitykind and /dimension paths.
 // ---------------------------------------------------------------------------
 Route::get('/uri/{dictVersion}/{entity}/{code}', [UriController::class, 'resolve'])
     ->name('uri.resolve')
@@ -138,11 +138,9 @@ Route::post('/pdtssurvey/store', [GroupofpropertiesController::class, 'store'])
     ->middleware(['auth', 'verified'])->name('pdtssurveystore');
 
 
-// ISO 23387 reference layer. Units and quantity kinds are identifiers now (/uri/.../unit,
-// /uri/.../pq). Dimensions have no segment in the identifier scheme, so they keep their
-// own dereferenceable page. JSON via Accept, ?format=json, or a .json suffix.
-Route::get('/dimension/{canonical}', [\App\Http\Controllers\UnitsReferenceController::class, 'dimension'])
-    ->name('reference.dimension')->where('canonical', '.*');
+// The whole ISO 23387 reference layer — units, quantity kinds AND dimensions — is
+// addressed through the identifier scheme above (/uri/{v}/unit, /uri/{v}/pq,
+// /uri/{v}/dim). JSON via Accept, ?format=json, or a .json suffix.
 
 
 Route::post('/comments/{propID}', [GroupofpropertiesController::class, 'getCommentProperty']);

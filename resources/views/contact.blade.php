@@ -2,8 +2,8 @@
     <div style="background-color: white;">
         <div class="container sm:max-w-full py-9 flex ls:flex-row md:flex-row sm:flex-col gap-6">
             <div class="basis-1/2 text-current">
-                <h2>Contactos</h2>
-                <p>Para entrar em contacto com a equipa de investigação contact-nos no nosso email:</p>
+                <h2>{{ Lg::pick('Contactos', 'Contact') }}</h2>
+                <p>{{ Lg::pick('Para entrar em contacto com a equipa de investigação contacte-nos no nosso email:', 'To reach the research team, email us at:') }}</p>
                 <a href="mailto: pdts.portugal@gmail.com">pdts.portugal@gmail.com</a>
                 <img class="max-h-[500px] w-auto" src="{{asset('/img/contact.jpg')}}" alt="contact">
             </div>
@@ -19,7 +19,7 @@
                     </div>
                     <div class="alert-content ml-4">
                         <div class="alert-title font-semibold text-lg text-green-800">
-                            {{ __('success') }}
+                            {{ Lg::pick('Sucesso', 'Success') }}
                         </div>
                         <div class="alert-description text-sm text-green-600">
                             {{ session('success') }}

@@ -30,7 +30,7 @@
                 break;
             case 'dimension':
                 if (\App\Models\Dimension::where('canonical', $raw)->exists()) {
-                    $url = route('reference.dimension', ['canonical' => $raw]);
+                    $url = \App\Services\UriService::link('dim', $raw);
                 }
                 break;
         }

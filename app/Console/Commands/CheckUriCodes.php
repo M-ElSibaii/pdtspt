@@ -57,6 +57,8 @@ class CheckUriCodes extends Command
             $this->line('Reconcile these records (Admin > Dedupe dictionary). Nothing was renamed.');
         }
 
+        $this->reportAliases($scope);
+
         if ($this->option('sync')) {
             $this->newLine();
             $this->syncRegistry($scope, $collisions);
@@ -130,9 +132,44 @@ class CheckUriCodes extends Command
             UriService::DOCUMENT       => ['referencedocuments', 'GUID', null, false],
             UriService::UNIT           => ['units', 'guid', null, false],
             UriService::QUANTITY_KIND  => ['physical_quantities', 'guid', null, false],
+            UriService::DIMENSION      => ['dimensions', 'guid', null, false],
         ];
 
         return $shapes[$entity];
+    }
+
+
+    /**
+     * How many English names resolve as aliases, and which cannot be honoured.
+     *
+     * An alias is never an identity: it 301s to the canonical Portuguese URI. One is
+     * dropped when the English name is also some record's Portuguese name (the
+     * Portuguese name always wins) or when two records share it.
+     */
+    private function reportAliases(string $scope): void
+    {
+        $this->newLine();
+        $total = 0;
+        foreach (UriService::entities() as $entity) {
+            if (!UriService::hasAlias($entity)) continue;
+            $n = count(UriService::aliases($entity, $scope));
+            $total += $n;
+            $this->line(sprintf('  %-10s %5d English aliases', $entity, $n));
+        }
+        $this->line("  {$total} English names resolve and redirect to the canonical Portuguese URI.");
+
+        $conflicts = UriService::aliasConflicts($scope);
+        if (!$conflicts) return;
+
+        $this->newLine();
+        $this->warn(count($conflicts) . ' English name(s) cannot be used as an alias:');
+        foreach ($conflicts as $c) {
+            $this->line('  <fg=yellow>' . $c['entity'] . '/' . $c['code'] . '</> — ' . $c['reason']);
+            foreach ($c['records'] as $record) {
+                $this->line('      ' . $record);
+            }
+        }
+        $this->line('  These English names simply do not resolve; every canonical URI is unaffected.');
     }
 
     /**
@@ -150,6 +187,7 @@ class CheckUriCodes extends Command
         $now = now();
         $written = 0;
         $skipped = 0;
+        $aliasCount = 0;
 
         DB::table('uri_codes')->where('dictionaryVersion', $version)->delete();
 
@@ -172,6 +210,8 @@ class CheckUriCodes extends Command
                 $batch[] = [
                     'entity' => $entity,
                     'code' => $code,
+                    'kind' => 'canonical',
+                    'canonicalCode' => null,
                     'recordTable' => $table,
                     'recordKey' => (string) ($r['row']->{$key} ?? ''),
                     'lineageGuid' => $lineage ? ($r['row']->{$lineage} ?? null) : null,
@@ -181,13 +221,39 @@ class CheckUriCodes extends Command
                 ];
             }
 
+            // The English names, as aliases onto the canonical code. Only the ones that
+            // are unambiguous and do not shadow a Portuguese name; the rest are reported.
+            $byCode = [];
+            foreach ($rows as $r) $byCode[$r['code']] ??= $r['row'];
+
+            foreach (UriService::aliases($entity, $scope) as $alias => $canonical) {
+                if (isset($seen[$alias]) || strlen($alias) > 191) { $skipped++; continue; }
+                $seen[$alias] = true;
+                $row = $byCode[$canonical] ?? null;
+
+                $batch[] = [
+                    'entity' => $entity,
+                    'code' => $alias,
+                    'kind' => 'alias',
+                    'canonicalCode' => $canonical,
+                    'recordTable' => $table,
+                    'recordKey' => $row ? (string) ($row->{$key} ?? '') : '',
+                    'lineageGuid' => ($row && $lineage) ? ($row->{$lineage} ?? null) : null,
+                    'dictionaryVersion' => $version,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+                $aliasCount++;
+            }
+
             foreach (array_chunk($batch, 500) as $chunk) {
                 DB::table('uri_codes')->insert($chunk);
                 $written += count($chunk);
             }
         }
 
-        $this->info("Registry rebuilt: {$written} identifiers registered, {$skipped} not registered"
+        $this->info("Registry rebuilt: {$written} rows — " . ($written - $aliasCount)
+            . " canonical codes and {$aliasCount} English aliases; {$skipped} not registered"
             . ($collisions ? ' (collisions above).' : '.'));
     }
 }

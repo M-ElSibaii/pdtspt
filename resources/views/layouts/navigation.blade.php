@@ -62,15 +62,21 @@
             </div>
 
 
-            <!-- Language toggle (PT/EN). Remembered for the session; never changes a record's URI. -->
+            <!-- Language toggle (PT/EN). Remembered for the session; never changes a record's URI.
+                 Colours are inline: the layout's global `a:link { color: black }` outranks a
+                 utility class, which would otherwise leave one of the two unreadable. -->
             <div class="flex items-center ml-4">
-                <div class="inline-flex rounded-md border border-gray-300 overflow-hidden text-xs font-semibold" role="group" aria-label="{{ Lg::t('Idioma') }}">
+                <div style="display:inline-flex; border:1px solid #cbd5e1; border-radius:6px; overflow:hidden; font-size:12px; font-weight:700;"
+                     role="group" aria-label="{{ Lg::t('Idioma') }}">
                     @foreach (Lg::supported() as $code)
+                        @php $on = Lg::current() === $code; @endphp
                         <a href="{{ Lg::toggleUrl($code) }}"
                            hreflang="{{ $code }}"
-                           aria-current="{{ Lg::current() === $code ? 'true' : 'false' }}"
+                           aria-current="{{ $on ? 'true' : 'false' }}"
                            title="{{ $code === 'pt' ? Lg::t('Português') : Lg::t('Inglês') }}"
-                           class="px-3 py-1.5 {{ Lg::current() === $code ? 'bg-slate-700 text-white' : 'bg-white text-gray-600 hover:bg-gray-100' }}">
+                           style="padding:6px 12px; text-decoration:none; line-height:1.2;
+                                  background-color:{{ $on ? '#334155' : '#ffffff' }};
+                                  color:{{ $on ? '#ffffff' : '#334155' }};">
                             {{ strtoupper($code) }}
                         </a>
                     @endforeach
@@ -170,8 +176,13 @@
             </x-responsive-nav-link>
             <div class="flex gap-2 px-4 py-2">
                 @foreach (Lg::supported() as $code)
+                    @php $on = Lg::current() === $code; @endphp
                     <a href="{{ Lg::toggleUrl($code) }}" hreflang="{{ $code }}"
-                       class="px-3 py-1 text-xs font-semibold rounded border {{ Lg::current() === $code ? 'bg-slate-700 text-white border-slate-700' : 'bg-white text-gray-600 border-gray-300' }}">
+                       aria-current="{{ $on ? 'true' : 'false' }}"
+                       style="padding:4px 12px; font-size:12px; font-weight:700; border-radius:6px;
+                              text-decoration:none; border:1px solid {{ $on ? '#334155' : '#cbd5e1' }};
+                              background-color:{{ $on ? '#334155' : '#ffffff' }};
+                              color:{{ $on ? '#ffffff' : '#334155' }};">
                         {{ strtoupper($code) }}
                     </a>
                 @endforeach
