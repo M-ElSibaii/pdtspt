@@ -7,6 +7,7 @@ use App\Http\Controllers\ProductdatatemplatesController;
 use App\Http\Controllers\GroupofpropertiesController;
 use App\Http\Controllers\ReferencedocumentsController;
 use App\Http\Controllers\DictionaryDedupeController;
+use App\Http\Controllers\ReferenceDocumentDedupeController;
 use App\Http\Controllers\PreviewWorkflowController;
 use App\Http\Controllers\PdtVersioningController;
 use App\Http\Controllers\PdtCreateController;
@@ -186,6 +187,16 @@ Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
         ->name('admin.dedupe.dict');
     Route::post('/admin/dedupe-dictionary/review-state', [DictionaryDedupeController::class, 'reviewState'])
         ->name('admin.dedupe.reviewState');
+
+    // Reference-document deduplication: same tool, different table. Documents duplicated
+    // under one name hand out one identifier to two records; documents that merely share
+    // a title are usually amendments of a standard and are shown for review only.
+    Route::get('/admin/dedupe-reference-documents', [ReferenceDocumentDedupeController::class, 'index'])
+        ->name('admin.dedupeRefDocs');
+    Route::get('/admin/dedupe-reference-documents/group', [ReferenceDocumentDedupeController::class, 'group'])
+        ->name('admin.dedupeRefDocs.group');
+    Route::post('/admin/dedupe-reference-documents/apply', [ReferenceDocumentDedupeController::class, 'apply'])
+        ->name('admin.dedupeRefDocs.apply');
 
     // Interactive API tester (admin). Calls the site's own origin by default so it
     // behaves identically on localhost and once live on pdts.pt.

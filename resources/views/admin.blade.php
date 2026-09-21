@@ -68,6 +68,12 @@
             </a>
             <br>
             <br>
+            <!-- same tool for the reference documents table -->
+            <a href="{{ route('admin.dedupeRefDocs') }}" class="btn btn-secondary">
+                Review &amp; deduplicate reference documents
+            </a>
+            <br>
+            <br>
             <!-- create a new PDT from a construction object (unified CREATE editor) -->
             <a href="{{ route('admin.pdt.create') }}" class="btn btn-secondary">
                 Create a new PDT (from Object Type)

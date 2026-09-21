@@ -6,6 +6,9 @@
                 <a href="{{ route('admin.dedupe.deduped') }}" class="btn btn-secondary ml-auto">
                     View deduped &amp; shared properties →
                 </a>
+                <a href="{{ route('admin.dedupeRefDocs') }}" class="btn btn-secondary">
+                    Reference documents →
+                </a>
             </div>
             <p class="text-sm text-gray-600 mt-1">
                 Groups of <code>propertiesdatadictionaries</code> rows that share a name in

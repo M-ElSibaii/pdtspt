@@ -197,6 +197,9 @@ from the language columns the data already holds (`nameEn`/`namePt`,
 a record with no text in the chosen language falls back to the other. Interface wording
 lives in `resources/lang/ui.php`, keyed by the Portuguese string.
 
+## Maintenance commands
+
+```bash
 # Rebuild the reference layer (units from bsDD, dimensions, quantity kinds)
 
 php artisan units:seed-reference
@@ -207,6 +210,27 @@ php artisan properties:reconcile-units --apply
 # Re-run the dictionary dedup
 
 php artisan pdts:dedupe-dictionary
+```
+
+## Deduplication
+
+Two review tools, both under Admin, both writing a JSON backup to `storage/app` before any
+change and running the change in one transaction:
+
+- **Dictionary properties** (`/admin/dedupe-dictionary`) groups rows that share a name in
+  *either* language — `nameEn` or `namePt`, followed transitively — so a property
+  duplicated only in Portuguese is caught too. Version variants (same GUID, different
+  version) are shown read-only and never merged.
+- **Reference documents** (`/admin/dedupe-reference-documents`) separates two signals.
+  Rows sharing an `rdName` are true duplicates and are directly actionable. Rows sharing
+  only a `title` are shown for review and refuse to merge without an explicit
+  acknowledgement, because a standard's amendments and corrigenda keep the base standard's
+  title (`EN 474-1:2006+A6:2019` and `EN 474-1:2006+A4:2013/AC:2014` are different
+  documents). A merge repoints every citation — properties, groups, data templates and
+  construction objects — onto the survivor before deleting the rest.
+
+Both tools reject a "keep separate" edit that would not actually separate the group, and
+both re-validate the group server-side so a stale page cannot apply a decision.
 
 ## Contributing
 
