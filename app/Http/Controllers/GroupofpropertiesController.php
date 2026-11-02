@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\Lineage;
 use Illuminate\Support\Facades\Auth;
 use App\Models\productdatatemplates;
 use App\Models\groupofproperties;
@@ -26,19 +27,19 @@ class GroupofpropertiesController extends Controller
     //function for pdtdownload page
     public function getGroupOfProperties($pdtID)
     {
-        $pdt = productdatatemplates::where('Id', $pdtID)->first();
+        Lineage::abortIfHiddenDraft($pdtID);
+        $pdt = productdatatemplates::where('Id', $pdtID)->firstOrFail();
         $pdtGUID = $pdt->GUID;
-        $pdts = productdatatemplates::where('GUID', $pdtGUID)
+        // Published history only: a new-version draft shares the GUID but is not a version yet.
+        $pdts = Lineage::publicVersions(productdatatemplates::where('GUID', $pdtGUID)
             ->orderBy('versionNumber', 'asc')
             ->orderBy('revisionNumber', 'asc')
-
-            ->get();
+            ->get());
 
         $latestPdt = $pdts->last();
 
         $masterpdt = productdatatemplates::where('GUID', '230d9954097541b793f2a1fddb8bd0ad')
-            ->orderBy('versionNumber', 'desc')
-            ->orderBy('revisionNumber', 'desc')
+            ->orderByRaw(Lineage::PREFER_PUBLISHED)
             ->first();
         // Effective groups = own + inherited from every IsSubtypeOf ancestor (transitive,
         // collapsed by GUID) via the shared resolver — so the download/review page reflects
@@ -106,7 +107,7 @@ class GroupofpropertiesController extends Controller
             $property->is_inherited   = $src ? $src['inherited'] : false;
             $property->inherited_from = $src ? $src['name'] : null;
             // Kept for any legacy consumers.
-            $property->from_master = ($property->pdtID == $masterpdt->Id);
+            $property->from_master = ($masterpdt && $property->pdtID == $masterpdt->Id);
         });
 
         $combined_groups = $inherited_groups->groupBy('gopNamePt');
@@ -152,22 +153,21 @@ class GroupofpropertiesController extends Controller
     }
     public function getGroupOfProperties2($pdtID)
     {
+        Lineage::abortIfHiddenDraft($pdtID);
 
-        $pdt = productdatatemplates::where('Id', $pdtID)->first();
+        $pdt = productdatatemplates::where('Id', $pdtID)->firstOrFail();
         $pdtGUID = $pdt->GUID;
-        $pdts = productdatatemplates::where('GUID', $pdtGUID)
+        // Published history only: a new-version draft shares the GUID but is not a version yet.
+        $pdts = Lineage::publicVersions(productdatatemplates::where('GUID', $pdtGUID)
             ->orderBy('versionNumber', 'asc')
             ->orderBy('revisionNumber', 'asc')
+            ->get());
 
-            ->get();
-
-        $pdtCount = $pdts->count();
-        $latestPdt = $pdts[$pdtCount - 1];
+        $latestPdt = $pdts->last();
 
         // Fetch the groups for PDT properties and Master properties
         $masterpdt = productdatatemplates::where('GUID', '230d9954097541b793f2a1fddb8bd0ad')
-            ->orderBy('versionNumber', 'desc')
-            ->orderBy('revisionNumber', 'desc')
+            ->orderByRaw(Lineage::PREFER_PUBLISHED)
             ->first();
         // Effective groups = own + inherited from every IsSubtypeOf ancestor (transitive,
         // collapsed by GUID) via the shared resolver — same inheritance as the exports
@@ -233,7 +233,7 @@ class GroupofpropertiesController extends Controller
             $src = $gopSource[$property->gopID] ?? null;
             $property->is_inherited   = $src ? $src['inherited'] : false;
             $property->inherited_from = $src ? $src['name'] : null;
-            $property->from_master = ($property->pdtID == $masterpdt->Id); // legacy
+            $property->from_master = ($masterpdt && $property->pdtID == $masterpdt->Id); // legacy
         });
 
         // Combine groups with similar names by grouping by gopNamePt

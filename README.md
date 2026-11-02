@@ -4,7 +4,7 @@ Welcome to the **PDTs.pt** open-source repository. PDTs.pt is a Product Data Tem
 
 ## Key Features
 
-- **PDT authoring & lifecycle** – create PDTs from construction objects, edit as free "Preview" drafts, publish, and cut new versions of active PDTs (staged plan → diff → commit).
+- **PDT authoring & lifecycle** – create PDTs from construction objects, edit them as offline drafts, and make new versions of published PDTs through a draft that is reviewed (diff against the live version, version vs revision) before it is published.
 - **Query, view & download** – browse PDTs, groups of properties, and the shared data dictionary, then download a PDT as **XLSX, XML, or JSON**.
 - **ISO 23387 reference layer** – resolvable identity pages for **units**, **physical quantities (quantity kinds)**, and **dimensions**, each citing QUDT as the external authority, available as HTML or JSON via content negotiation.
 - **Relationships & dependencies** – model ISO 23387 entity relationships (IsSubtypeOf, HasPart, …) and property dependencies between properties.
@@ -25,7 +25,7 @@ Welcome to the **PDTs.pt** open-source repository. PDTs.pt is a Product Data Tem
 
 PDTs.pt follows Laravel's Model-View-Controller pattern.
 
-- **Controllers** (`app/Http/Controllers`) – request handling, e.g. `ProductdatatemplatesController` (view/query/export), `PreviewWorkflowController` (draft editor), `PdtCreateController`, `PdtVersioningController`, `UnitsReferenceController` (reference layer), `RelationshipController`.
+- **Controllers** (`app/Http/Controllers`) – request handling, e.g. `ProductdatatemplatesController` (view/query/export), `PreviewWorkflowController` (draft editor), `PdtCreateController`, `PdtVersioningController` (starts a new-version draft), `AdminHubController`, `StatusCheckController`, `UnitsReferenceController` (reference layer), `RelationshipController`.
 - **Models** (`app/Models`) – e.g. `productdatatemplates`, `properties`, `propertiesdatadictionaries`, `groupofproperties`, `constructionobjects`, `referencedocuments`, and the reference-layer models `Unit`, `PhysicalQuantity`, `Dimension`.
 - **Services** (`app/Services`) – domain logic, e.g. `Iso23387Exporter`, `UnitsReference`, `RelationshipService`, `VersioningService`, `PdtInheritanceService`, `PropertyPickerService`.
 - **Views** (`resources/views`) – Blade templates; the ISO 23387 reference pages live in `resources/views/reference/`.
@@ -196,6 +196,50 @@ from the language columns the data already holds (`nameEn`/`namePt`,
 `definitionEn`/`definitionPt`, `nameEnSc`/`namePtSc`); nothing is machine-translated, and
 a record with no text in the chosen language falls back to the other. Interface wording
 lives in `resources/lang/ui.php`, keyed by the Portuguese string.
+
+## Admin workflow
+
+Everything starts from **`/admin`**: drafts in progress, every template with its actions,
+the data-health summary, the tools and user management.
+
+**New version of a published template**
+
+1. *New version* on a template → a confirmation page → *Create draft*. The current version
+   is copied into an offline draft (same lineage GUID). The public site, exports and the
+   API keep serving the live version; a draft is 404 for anyone but admins.
+2. Edit the draft in the draft editor, over as many sessions as needed — every change is
+   saved as you go. Groups are collapsed; a property opens to edit how this template uses it
+   and its dictionary definition. Editing a definition shared with other templates makes a
+   draft copy, so the live definition is untouched. A group added to the draft opens
+   straight away with *Add properties* ready.
+3. *Review & publish* shows every change against the live version and the bump it needs:
+   a **version** when the template is renamed or groups are added/removed, otherwise a
+   **revision** (which the admin may still publish as a version). Edited shared definitions
+   are decided there (publish as a new version of the property, or keep the live one).
+4. *Publish* makes the draft the live version with the next numbers, keeps the old one as
+   InActive history, renumbers the changed groups, and re-derives the statuses of every
+   property and construction object involved. A JSON backup is written to `storage/app`.
+
+A draft can be discarded at any time without affecting the live version. Small corrections
+that need no new version stay available as *Quick fix* (in-place edit of an Active template).
+
+**Status health check** (`/admin/status-check`) compares every status with the rules
+(newest published version Active, older ones InActive; groups follow their template; a
+property or construction object is Active when an Active template uses it, Preview when only
+drafts do, otherwise InActive), explains each proposed fix, and applies only the ones
+ticked (with a backup). It also lists structural problems a status change cannot fix.
+`php artisan pdts:recompute-status [--apply]` runs the same rules from the command line.
+
+## Running the tests
+
+The feature tests rebuild their database, so they run against a dedicated `pdtspt_test`
+database (set in `phpunit.xml`) and refuse to run against any database whose name does not
+end in `_test`:
+
+```bash
+mysql -u root -e "CREATE DATABASE pdtspt_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci"
+php artisan test
+```
 
 ## Maintenance commands
 

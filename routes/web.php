@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\AdminHubController;
+use App\Http\Controllers\StatusCheckController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductdatatemplatesController;
@@ -149,11 +151,18 @@ Route::post('/comments/{propID}', [GroupofpropertiesController::class, 'getComme
 Route::delete('/deletefeedback', [GroupofpropertiesController::class, 'destroyfeedback']);
 
 
-// Routes accessible only to admins
-Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
+// Routes accessible only to admins. The middleware MUST be one array: written as
+// ['middleware' => 'auth', 'verified', 'admin'] the last two are positional entries
+// Laravel ignores, which left every admin route open to any logged-in user.
+Route::group(['middleware' => ['auth', 'verified', 'admin']], function () {
 
-    Route::get('/admin', [UserController::class, 'index'])
+    Route::get('/admin', [AdminHubController::class, 'index'])
         ->name('admin');
+
+    // Status health check: what the status rules would change, row by row, and structural
+    // problems; fixes are applied only for the rows the admin selects.
+    Route::get('/admin/status-check', [StatusCheckController::class, 'index'])->name('admin.statusCheck');
+    Route::post('/admin/status-check/apply', [StatusCheckController::class, 'apply'])->name('admin.statusCheck.apply');
 
     // Route for exporting JSON
     Route::get('/exportdomainbsdd', function () {
@@ -230,7 +239,8 @@ Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
     Route::get('/admin/previews/{pdt}/delete-plan', [PreviewWorkflowController::class, 'deletePlan'])->whereNumber('pdt')->name('admin.previews.deletePlan');
     Route::post('/admin/previews/{pdt}/delete', [PreviewWorkflowController::class, 'deleteApply'])->whereNumber('pdt')->name('admin.previews.deleteApply');
 
-    // Publish (plan -> per-element divergence decision -> apply)
+    // Publish (review page: diff vs live + version/revision choice + divergence decisions -> apply)
+    Route::get('/admin/previews/{pdt}/review', [PreviewWorkflowController::class, 'review'])->whereNumber('pdt')->name('admin.previews.review');
     Route::get('/admin/previews/{pdt}/publish-plan', [PreviewWorkflowController::class, 'publishPlan'])->whereNumber('pdt')->name('admin.previews.publishPlan');
     Route::post('/admin/previews/{pdt}/publish', [PreviewWorkflowController::class, 'publishApply'])->whereNumber('pdt')->name('admin.previews.publishApply');
 
@@ -267,10 +277,11 @@ Route::group(['middleware' => 'auth', 'verified', 'admin'], function () {
     Route::post('/admin/pdt/{pdt}/edit/context', [ActivePdtEditController::class, 'updateContext'])->whereNumber('pdt')->name('admin.pdt.active.context');
     Route::post('/admin/pdt/{pdt}/edit/mapping', [ActivePdtEditController::class, 'updateDictMapping'])->whereNumber('pdt')->name('admin.pdt.active.mapping');
 
-    // Staged "create new version" editor for Active PDTs (plan -> diff preview -> commit).
-    Route::get('/admin/pdt/{pdt}/new-version', [PdtVersioningController::class, 'editor'])->whereNumber('pdt')->name('admin.pdt.newVersion');
-    Route::post('/admin/pdt/{pdt}/new-version/preview', [PdtVersioningController::class, 'preview'])->whereNumber('pdt')->name('admin.pdt.newVersion.preview');
-    Route::post('/admin/pdt/{pdt}/new-version/commit', [PdtVersioningController::class, 'commit'])->whereNumber('pdt')->name('admin.pdt.newVersion.commit');
+    // "Create new version": copies the published version into an offline draft (same
+    // lineage), edited in the draft editor and published from its review page. The GET
+    // shows a confirmation (or jumps to the draft already in progress); only the POST writes.
+    Route::get('/admin/pdt/{pdt}/new-version', [PdtVersioningController::class, 'start'])->whereNumber('pdt')->name('admin.pdt.newVersion');
+    Route::post('/admin/pdt/{pdt}/new-version', [PdtVersioningController::class, 'create'])->whereNumber('pdt')->name('admin.pdt.newVersion.create');
 
     // [Legacy "Create / Edit PDTs" tool removed — superseded by the unified editor
     //  (CREATE / Active edit / Preview / New-version). Its routes, views, controller

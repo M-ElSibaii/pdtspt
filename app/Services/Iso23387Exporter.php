@@ -9,6 +9,7 @@ use App\Models\referencedocuments;
 use App\Models\constructionobjects;
 use App\Models\EntityRelationship;
 use Illuminate\Support\Facades\DB;
+use App\Support\Lineage;
 use Carbon\Carbon;
 use DOMDocument;
 use DOMElement;
@@ -400,7 +401,7 @@ class Iso23387Exporter
             // Likely a GUID
             return DB::table('productdatatemplates')
                 ->where('GUID', $pdtIdOrGuid)
-                ->orderByRaw('versionNumber DESC, revisionNumber DESC')
+                ->orderByRaw(Lineage::PREFER_PUBLISHED)
                 ->first();
         } else {
             // Likely an ID
@@ -969,8 +970,7 @@ class Iso23387Exporter
         // 4. MASTER PDT
         $masterPdt = DB::table('productdatatemplates')
             ->where('GUID', self::MASTER_PDT_GUID)
-            ->orderByDesc('versionNumber')
-            ->orderByDesc('revisionNumber')
+            ->orderByRaw(Lineage::PREFER_PUBLISHED)
             ->first();
 
         if ($masterPdt) {

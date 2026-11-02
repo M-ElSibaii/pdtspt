@@ -599,11 +599,24 @@ class VersioningService
 
     // ============================================================ STATUS recompute
 
+    /**
+     * Recompute every status from the structural rules:
+     *   PDT  : the newest non-Preview row of each lineage is Active, older ones InActive.
+     *   GOP  : follows its PDT.
+     *   dict : Active if any Active PDT uses it, else Preview if a draft uses it, else InActive.
+     *   CO   : same referrer rule via productdatatemplates.constructionObjectGUID.
+     * Preview rows (drafts) are left alone unless an Active PDT uses them — then they are
+     * published content and become Active.
+     *
+     * The dependent levels are computed against the PROJECTED PDT statuses, so a dry run
+     * reports exactly what --apply will write (it used to read the pre-change PDT statuses).
+     */
     public function recomputeStatuses(bool $apply = false): array
     {
         $changes = [];
 
         $pdts = DB::table(self::PDT)->get();
+        $pdtStatus = $pdts->pluck('status', 'Id')->all();
         foreach ($pdts->groupBy('GUID') as $rows) {
             $nonPreview = $rows->reject(fn($r) => $r->status === self::ST_PREVIEW)
                 ->sortBy([['versionNumber', 'desc'], ['revisionNumber', 'desc']])->values();
@@ -612,16 +625,14 @@ class VersioningService
                 if ($r->status === self::ST_PREVIEW) {
                     continue;
                 }
-                $this->diffStatus($changes, self::PDT, $r, $r->Id === $headId ? self::ST_ACTIVE : self::ST_INACTIVE);
+                $want = $r->Id === $headId ? self::ST_ACTIVE : self::ST_INACTIVE;
+                $this->diffStatus($changes, self::PDT, $r, $want);
+                $pdtStatus[$r->Id] = $want;
             }
         }
-        if ($apply) {
-            $this->writeStatusChanges(array_filter($changes, fn($c) => $c['table'] === self::PDT));
-        }
-        $pdtStatus = DB::table(self::PDT)->pluck('status', 'Id');
 
         foreach (DB::table(self::GOP)->get() as $g) {
-            if ($g->status === self::ST_PREVIEW) {
+            if ($g->status === self::ST_PREVIEW && ($pdtStatus[$g->pdtId] ?? null) !== self::ST_ACTIVE) {
                 continue;
             }
             $this->diffStatus($changes, self::GOP, $g, $pdtStatus[$g->pdtId] ?? self::ST_INACTIVE);
@@ -629,39 +640,78 @@ class VersioningService
 
         $ctxByProp = DB::table(self::PROP)->select('propertyId', 'pdtID')->get()->groupBy('propertyId');
         foreach (DB::table(self::DICT)->get() as $d) {
-            if ($d->status === self::ST_PREVIEW) {
+            $ctx = $ctxByProp->get($d->Id);
+            $want = $this->referrerStatus(collect($ctx ? $ctx->pluck('pdtID')->all() : [])
+                ->map(fn($id) => $pdtStatus[$id] ?? self::ST_INACTIVE));
+            if ($d->status === self::ST_PREVIEW && $want !== self::ST_ACTIVE) {
                 continue;
             }
-            $ctx = $ctxByProp->get($d->Id);
-            $statuses = collect($ctx ? $ctx->pluck('pdtID')->all() : [])->map(fn($id) => $pdtStatus[$id] ?? self::ST_INACTIVE);
-            $want = $statuses->contains(self::ST_ACTIVE) ? self::ST_ACTIVE
-                : ($statuses->contains(self::ST_PREVIEW) ? self::ST_PREVIEW : self::ST_INACTIVE);
             $this->diffStatus($changes, self::DICT, $d, $want);
         }
 
         // Construction objects: GUID is the PRIMARY KEY, so each CO is a single row (no
         // shared-GUID version lineage, unlike PDT/GOP/dict). Status is purely the referrer
-        // rule: Active if any Active PDT references the CO's GUID (via
-        // productdatatemplates.constructionObjectGUID), Preview if only Preview PDTs
-        // reference it, else InActive. Preview-status CO rows (drafts) are left as-is.
+        // rule via productdatatemplates.constructionObjectGUID.
         $pdtByCoGuid = DB::table(self::PDT)->select('Id', 'constructionObjectGUID')
             ->whereNotNull('constructionObjectGUID')->get()->groupBy('constructionObjectGUID');
         foreach (DB::table(self::CO)->get() as $co) {
-            if ($co->status === self::ST_PREVIEW) {
+            $want = $this->referrerStatus(($pdtByCoGuid->get($co->GUID) ?? collect())
+                ->map(fn($p) => $pdtStatus[$p->Id] ?? self::ST_INACTIVE));
+            if ($co->status === self::ST_PREVIEW && $want !== self::ST_ACTIVE) {
                 continue; // draft CO, leave as-is
             }
-            $refStatuses = ($pdtByCoGuid->get($co->GUID) ?? collect())
-                ->map(fn($p) => $pdtStatus[$p->Id] ?? self::ST_INACTIVE);
-            $want = $refStatuses->contains(self::ST_ACTIVE) ? self::ST_ACTIVE
-                : ($refStatuses->contains(self::ST_PREVIEW) ? self::ST_PREVIEW : self::ST_INACTIVE);
             $this->diffStatus($changes, self::CO, $co, $want, 'GUID');
         }
 
         if ($apply) {
-            $this->writeStatusChanges(array_filter($changes, fn($c) => $c['table'] !== self::PDT));
+            $this->writeStatusChanges($changes);
         }
 
         return $changes;
+    }
+
+    /**
+     * Apply the dict + construction-object status rules to just the given rows (used right
+     * after a publish, so only what that publish touched is changed). Same rules as
+     * {@see recomputeStatuses()}, except that rows in Preview are re-evaluated too: the
+     * caller knows they were part of the publish.
+     *
+     * @return array the changes written
+     */
+    public function syncStatusesFor(array $dictIds, array $coGuids): array
+    {
+        $changes = [];
+
+        $dictIds = array_values(array_unique(array_filter(array_map('intval', $dictIds))));
+        if ($dictIds) {
+            $refs = DB::table(self::PROP . ' as p')->join(self::PDT . ' as pdt', 'pdt.Id', '=', 'p.pdtID')
+                ->whereIn('p.propertyId', $dictIds)->get(['p.propertyId', 'pdt.status'])->groupBy('propertyId');
+            foreach (DB::table(self::DICT)->whereIn('Id', $dictIds)->get() as $d) {
+                $this->diffStatus($changes, self::DICT, $d, $this->referrerStatus(($refs->get($d->Id) ?? collect())->pluck('status')));
+            }
+        }
+
+        $coGuids = array_values(array_unique(array_filter($coGuids)));
+        if ($coGuids) {
+            $refs = DB::table(self::PDT)->whereIn('constructionObjectGUID', $coGuids)->get(['constructionObjectGUID', 'status'])
+                ->groupBy('constructionObjectGUID');
+            foreach (DB::table(self::CO)->whereIn('GUID', $coGuids)->get() as $co) {
+                $this->diffStatus($changes, self::CO, $co, $this->referrerStatus(($refs->get($co->GUID) ?? collect())->pluck('status')), 'GUID');
+            }
+        }
+
+        $this->writeStatusChanges($changes);
+
+        return $changes;
+    }
+
+    /** Active if any referrer is Active, else Preview if any is a draft, else InActive. */
+    private function referrerStatus($statuses): string
+    {
+        $statuses = collect($statuses);
+
+        return $statuses->contains(self::ST_ACTIVE) ? self::ST_ACTIVE
+            : ($statuses->contains(self::ST_PREVIEW) ? self::ST_PREVIEW : self::ST_INACTIVE);
     }
 
     private function diffStatus(array &$changes, string $table, $row, string $want, string $keyCol = 'Id'): void
@@ -669,6 +719,12 @@ class VersioningService
         if ($row->status !== $want) {
             $changes[] = ['table' => $table, 'id' => $row->{$keyCol}, 'from' => $row->status, 'to' => $want, 'keyCol' => $keyCol];
         }
+    }
+
+    /** Write a reviewed subset of {@see recomputeStatuses()} changes (one transaction). */
+    public function applyStatusChanges(array $changes): void
+    {
+        DB::transaction(fn() => $this->writeStatusChanges($changes));
     }
 
     private function writeStatusChanges(array $changes): void
@@ -770,12 +826,12 @@ class VersioningService
         }
     }
 
-    public function buildNewDictValues(array $vals, string $guid): array
+    public function buildNewDictValues(array $vals, string $guid, string $status = self::ST_ACTIVE): array
     {
         $this->assertDictEnums($vals);
         $today = Carbon::today()->toDateString();
         $row = [
-            'GUID' => $guid, 'versionNumber' => 1, 'revisionNumber' => 0, 'status' => self::ST_ACTIVE,
+            'GUID' => $guid, 'versionNumber' => 1, 'revisionNumber' => 0, 'status' => $status,
             'nameEn' => $vals['nameEn'] ?? 'New property', 'namePt' => $vals['namePt'] ?? 'Nova propriedade',
             'definitionEn' => $vals['definitionEn'] ?? '', 'definitionPt' => $vals['definitionPt'] ?? '',
             'dateOfRevision' => $today, 'dateOfVersion' => $today, 'dateOfCreation' => $today,

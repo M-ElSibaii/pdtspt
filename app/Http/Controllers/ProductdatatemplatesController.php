@@ -13,6 +13,7 @@ use App\Models\Answers;
 use App\Models\constructionobjects;
 use App\Models\propertiesdatadictionaries;
 use App\Models\referencedocuments;
+use App\Support\Lineage;
 use Carbon\Carbon;
 
 class ProductdatatemplatesController extends Controller
@@ -24,6 +25,7 @@ class ProductdatatemplatesController extends Controller
 
     public function productDataTemplate($pdtID)
     {
+        Lineage::abortIfHiddenDraft($pdtID);
         try {
             $exporter = new \App\Services\Iso23387Exporter();
 
@@ -105,6 +107,7 @@ class ProductdatatemplatesController extends Controller
      */
     public function viewPdt($id)
     {
+        Lineage::abortIfHiddenDraft($id);
         $pdt = productdatatemplates::where('Id', $id)->firstOrFail();
 
         // Effective groups = own + inherited from IsSubtypeOf ancestors (transitive,
@@ -112,7 +115,8 @@ class ProductdatatemplatesController extends Controller
         $ownGroupCount = groupofproperties::where('pdtId', $id)->count();
         $groupsOfProperties = (new \App\Services\PdtInheritanceService())->groups($pdt);
         $inheritedGroupCount = $groupsOfProperties->count() - $ownGroupCount;
-        $pdtVersions = productdatatemplates::where('GUID', $pdt->GUID)->get();
+        // Drafts stay off the public version list (a new-version draft shares the GUID).
+        $pdtVersions = Lineage::publicVersions(productdatatemplates::where('GUID', $pdt->GUID)->get());
 
         // Load ObjectType if exists
         $objectType = null;
@@ -127,7 +131,7 @@ class ProductdatatemplatesController extends Controller
         foreach ($relSvc->relationsFrom(\App\Models\EntityRelationship::TYPE_PDT, $pdt->GUID, \App\Models\EntityRelationship::REL_IS_SUBTYPE_OF) as $rel) {
             if ($rel->targetEntityType !== \App\Models\EntityRelationship::TYPE_PDT) continue;
             $target = productdatatemplates::where('GUID', $rel->targetGuid)
-                ->orderByRaw('versionNumber DESC, revisionNumber DESC')
+                ->orderByRaw(Lineage::PREFER_PUBLISHED)
                 ->first();
             if ($target) {
                 $subtypeParents[] = ['name' => $target->pdtNamePt ?: $target->pdtNameEn, 'pdtId' => $target->Id, 'guid' => $target->GUID, 'record' => $target];
@@ -141,45 +145,25 @@ class ProductdatatemplatesController extends Controller
     /** Get the latest version of a PDT */
     public function getLatestPDTs()
     {
-        $latestPDT = DB::table('productdatatemplates as pdt')
-            ->join(
-                DB::raw("(SELECT 
-                GUID,
-                MAX(versionNumber) as max_versionNumber,
-                MAX(revisionNumber) as max_revisionNumber
-             
-                FROM productdatatemplates 
-                GROUP BY GUID) as mx"),
-                function ($join) {
-                    $join->on('mx.GUID', '=', 'pdt.GUID');
-                    $join->on('mx.max_versionNumber', '=', 'pdt.versionNumber');
-                    $join->on('mx.max_revisionNumber', '=', 'pdt.revisionNumber');
-                }
-            )
-            ->get();
+        // One row per lineage (GUID). Picked in PHP rather than with MAX(versionNumber) /
+        // MAX(revisionNumber): those two maxima are independent, so after v1.3 -> v2.0 the
+        // join looked for a "v2.3" that does not exist and the PDT vanished from this list.
+        // Lineage::publicHead also keeps a new-version draft off the public list.
+        $lineages = DB::table('productdatatemplates')->get()->groupBy('GUID');
 
-        $categories = DB::table('productdatatemplates as pdt')
-            ->join(
-                DB::raw("(SELECT 
-                    GUID,
-                    MAX(versionNumber) as max_versionNumber,
-                    MAX(revisionNumber) as max_revisionNumber
-                  FROM productdatatemplates 
-                  GROUP BY GUID) as mx"),
-                function ($join) {
-                    $join->on('mx.GUID', '=', 'pdt.GUID');
-                    $join->on('mx.max_versionNumber', '=', 'pdt.versionNumber');
-                    $join->on('mx.max_revisionNumber', '=', 'pdt.revisionNumber');
-                }
-            )
-            ->select('pdt.category')
-            ->groupBy('pdt.category')
-            ->selectRaw('count(*) as count')
-            ->get();
+        $latestPDT = $lineages->map(fn($rows) => Lineage::publicHead($rows))->values();
 
-        $allpdts = productdatatemplates::all();
+        // Version drafts in progress, keyed by GUID — only surfaced to admins by the view.
+        $drafts = $lineages->map(fn($rows) => Lineage::versionDraft($rows))->filter();
 
-        return view('dashboard', compact('latestPDT', 'categories', 'allpdts'));
+        $categories = $latestPDT->groupBy('category')
+            ->map(fn($rows, $category) => (object) ['category' => $category, 'count' => $rows->count()])
+            ->values();
+
+        // The per-row "other versions" dropdown lists published history only.
+        $allpdts = $lineages->flatMap(fn($rows) => Lineage::publicVersions($rows))->values();
+
+        return view('dashboard', compact('latestPDT', 'categories', 'allpdts', 'drafts'));
     }
 
 
@@ -199,6 +183,7 @@ class ProductdatatemplatesController extends Controller
      */
     public function productDataTemplateout($pdtID)
     {
+        Lineage::abortIfHiddenDraft($pdtID);
         try {
             // Get latest version of PDT
             $pdt = DB::table('productdatatemplates')
@@ -206,7 +191,7 @@ class ProductdatatemplatesController extends Controller
                     $query->where('Id', $pdtID)
                         ->orWhere('GUID', $pdtID);
                 })
-                ->orderByRaw('versionNumber DESC, revisionNumber DESC')
+                ->orderByRaw(Lineage::PREFER_PUBLISHED)
                 ->first();
 
             if (!$pdt) {
@@ -307,7 +292,7 @@ class ProductdatatemplatesController extends Controller
             if ($pdt->GUID !== '230d9954097541b793f2a1fddb8bd0ad') {
                 $masterPdt = DB::table('productdatatemplates')
                     ->where('GUID', '230d9954097541b793f2a1fddb8bd0ad')
-                    ->orderByRaw('versionNumber DESC, revisionNumber DESC')
+                    ->orderByRaw(Lineage::PREFER_PUBLISHED)
                     ->first();
 
                 if ($masterPdt) {
@@ -469,6 +454,7 @@ class ProductdatatemplatesController extends Controller
      */
     public function productDataTemplateJson($pdtID)
     {
+        Lineage::abortIfHiddenDraft($pdtID);
         try {
             $exporter = new \App\Services\Iso23387Exporter();
             $jsonString = $exporter->exportToJson($pdtID);
@@ -485,6 +471,7 @@ class ProductdatatemplatesController extends Controller
      */
     public function productDataTemplateXml($pdtID)
     {
+        Lineage::abortIfHiddenDraft($pdtID);
         try {
             $exporter = new \App\Services\Iso23387Exporter();
             $xmlString = $exporter->exportToXml($pdtID);
@@ -1169,7 +1156,7 @@ class ProductdatatemplatesController extends Controller
         } else {
             $q->where('status', 'Active');
         }
-        $t = $q->orderByRaw('versionNumber DESC, revisionNumber DESC')->first();
+        $t = $q->orderByRaw(Lineage::PREFER_PUBLISHED)->first();
         if (!$t) return [null, null];
 
         return [
@@ -1522,6 +1509,7 @@ class ProductdatatemplatesController extends Controller
      */
     public function downloadPdtJson($pdtId)
     {
+        Lineage::abortIfHiddenDraft($pdtId);
         $exporter = new \App\Services\Iso23387Exporter();
         $json = $exporter->exportToJson($pdtId);
 
@@ -1542,6 +1530,7 @@ class ProductdatatemplatesController extends Controller
      */
     public function downloadPdtXml($pdtId)
     {
+        Lineage::abortIfHiddenDraft($pdtId);
         $exporter = new \App\Services\Iso23387Exporter();
         $xml = $exporter->exportToXml($pdtId);
 

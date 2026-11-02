@@ -6,7 +6,8 @@
             @if (Auth::check() && Auth::user()->isAdmin == 1)
                 <div class="my-3 flex flex-wrap gap-2">
                     <a href="{{ route('admin.pdt.create') }}" class="btn btn-secondary">+ Create PDT</a>
-                    <a href="{{ route('admin.previews') }}" class="btn btn-secondary">Preview drafts</a>
+                    <a href="{{ route('admin.previews') }}" class="btn btn-secondary">Drafts{{ $drafts->isNotEmpty() ? ' (' . $drafts->count() . ' new versions in progress)' : '' }}</a>
+                    <a href="{{ route('admin') }}" class="btn btn-secondary">Admin</a>
                 </div>
             @endif
 
@@ -110,11 +111,15 @@
                                 </form>
                                 @if (Auth::check() && Auth::user()->isAdmin == 1)
                                     <div class="flex flex-col gap-1 text-xs">
-                                        @if ($pdt->status == 'Active')
-                                            <a href="{{ route('admin.pdt.activeEdit', ['pdt' => $pdt->Id]) }}" class="text-blue-700 underline">Edit (limited)</a>
+                                        @if ($pdt->status == 'Preview')
+                                            <a href="{{ route('admin.previews.editor', ['pdt' => $pdt->Id]) }}" class="text-blue-700 underline">Edit draft</a>
+                                        @elseif ($drafts->has($pdt->GUID))
+                                            <a href="{{ route('admin.previews.editor', ['pdt' => $drafts[$pdt->GUID]->Id]) }}" class="text-blue-700 underline">Continue new-version draft</a>
+                                        @else
                                             <a href="{{ route('admin.pdt.newVersion', ['pdt' => $pdt->Id]) }}" class="text-blue-700 underline">Create new version</a>
-                                        @elseif ($pdt->status == 'Preview')
-                                            <a href="{{ route('admin.previews.editor', ['pdt' => $pdt->Id]) }}" class="text-blue-700 underline">Edit / Publish / Delete</a>
+                                        @endif
+                                        @if ($pdt->status == 'Active')
+                                            <a href="{{ route('admin.pdt.activeEdit', ['pdt' => $pdt->Id]) }}" class="text-blue-700 underline">Quick fix (no new version)</a>
                                         @endif
                                     </div>
                                 @endif

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\DraftVersionService;
 use App\Services\GuidGenerator;
 use App\Services\PreviewService;
 use App\Services\SchemaAttributeService;
@@ -29,7 +30,13 @@ class PreviewWorkflowController extends Controller
     public function drafts()
     {
         $drafts = DB::table(self::PDT)->where('status', 'Preview')
-            ->orderByDesc('Id')->get();
+            ->orderByDesc('updated_at')->orderByDesc('Id')->get();
+        $versioning = app(DraftVersionService::class);
+        foreach ($drafts as $d) {
+            $d->base = $versioning->baseOf($d);
+            $d->gopCount = DB::table(self::GOP)->where('pdtId', $d->Id)->count();
+            $d->propCount = DB::table(self::PROP)->where('pdtID', $d->Id)->count();
+        }
 
         return view('admin.previews-index', [
             'drafts' => $drafts,
@@ -86,7 +93,7 @@ class PreviewWorkflowController extends Controller
     }
 
     /** The Preview editor: PDT + its GOPs + context rows (joined to dictionary). */
-    public function editor(int $pdt, PreviewService $service, SchemaAttributeService $schema)
+    public function editor(int $pdt, PreviewService $service, SchemaAttributeService $schema, DraftVersionService $drafts)
     {
         try {
             $service->assertPreviewPdt($pdt);
@@ -112,6 +119,8 @@ class PreviewWorkflowController extends Controller
                 'p.visualRepresentation',
                 'd.nameEn as dictNameEn',
                 'd.namePt as dictNamePt',
+                'd.nameEnSc as dictNameEnSc',
+                'd.namePtSc as dictNamePtSc',
                 'd.definitionEn as dictDefEn',
                 'd.definitionPt as dictDefPt',
                 'd.dataType as dictDataType',
@@ -124,11 +133,10 @@ class PreviewWorkflowController extends Controller
             ->get();
 
         // Mark whether each context's dict row is shared with another PDT (=> editing forks).
+        $sharedIds = DB::table(self::PROP)->whereIn('propertyId', $context->pluck('propertyId')->filter()->unique())
+            ->where('pdtID', '<>', $pdt)->distinct()->pluck('propertyId')->flip();
         foreach ($context as $c) {
-            $c->shared = $c->propertyId
-                ? DB::table(self::PROP)->where('propertyId', $c->propertyId)
-                ->where('pdtID', '<>', $pdt)->exists()
-                : false;
+            $c->shared = $c->propertyId && $sharedIds->has($c->propertyId);
         }
         $contextByGop = $context->groupBy('gopID');
 
@@ -138,8 +146,14 @@ class PreviewWorkflowController extends Controller
         $dictRows = $dictIds->isEmpty() ? collect()
             : DB::table(self::DICT)->whereIn('Id', $dictIds)->get()->keyBy('Id');
 
+        $markers = $drafts->markers($pdt);
+
         return view('admin.preview-editor', [
             'pdt' => $pdtRow,
+            'base' => $markers['diff']['base'],
+            'diff' => $markers['diff'],
+            'gopMarkers' => $markers['gops'],
+            'ctxMarkers' => $markers['contexts'],
             'gops' => $gops,
             'contextByGop' => $contextByGop,
             'dictRows' => $dictRows,
@@ -250,7 +264,36 @@ class PreviewWorkflowController extends Controller
         $decisions = (array) $request->input('decisions', []);
         // Keys arrive as strings from JSON; PreviewService indexes by contextId int.
         $decisions = collect($decisions)->mapWithKeys(fn($v, $k) => [(int) $k => (string) $v])->all();
-        return $this->guarded(fn() => $service->applyPublish($pdt, $decisions));
+        $bump = $request->input('bump');
+        return $this->guarded(fn() => $service->applyPublish($pdt, $decisions, $bump ?: null)
+            + ['redirect' => route('pdtsdownload', ['pdtID' => $pdt])], false);
+    }
+
+    /**
+     * Review & publish: what changed against the live version, the version/revision it
+     * will be published as (with the choice where both are allowed), the forked property
+     * definitions that need a decision, and what happens to statuses.
+     */
+    public function review(int $pdt, PreviewService $service)
+    {
+        try {
+            $plan = $service->planPublish($pdt);
+        } catch (\Throwable $e) {
+            return redirect()->route('admin.previews')->with('error', $e->getMessage());
+        }
+
+        $schema = app(SchemaAttributeService::class);
+        $labels = [];
+        foreach ([self::PDT, self::GOP, self::PROP, self::DICT] as $table) {
+            $labels[$table] = collect($schema->describe($table))->pluck('label', 'name')->all();
+        }
+
+        return view('admin.preview-review', [
+            'pdt' => DB::table(self::PDT)->where('Id', $pdt)->first(),
+            'plan' => $plan,
+            'diff' => $plan['diff'],
+            'labels' => $labels,
+        ]);
     }
 
     // ============================================================ helper
@@ -259,10 +302,16 @@ class PreviewWorkflowController extends Controller
      * Run a mutation closure and normalise to the {ok:true,...} / {ok:false,error}
      * JSON shape the front-end expects, matching the dedupe tool.
      */
-    private function guarded(\Closure $fn)
+    private function guarded(\Closure $fn, bool $touch = true)
     {
         try {
             $payload = $fn();
+            // "Last edited" on the drafts list. Only for writes into a draft that still exists.
+            $pdtId = (int) request()->route('pdt');
+            if ($touch && $pdtId && request()->isMethod('post')) {
+                DB::table(self::PDT)->where('Id', $pdtId)->where('status', 'Preview')
+                    ->update(['updated_at' => Carbon::today()->toDateString()]);
+            }
             $body = ['ok' => true];
             if (is_array($payload)) {
                 $body += $payload;

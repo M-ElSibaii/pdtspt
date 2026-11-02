@@ -78,9 +78,14 @@
                 .then(r => r.json()).then(body => {
                     if (!body.ok) { msg.textContent = '✗ ' + (body.error || 'Failed'); msg.className = 'text-sm text-red-700'; return; }
                     const label = payload.name + ': ' + body.label; // "rdName: Title"
-                    // Append to every ref-doc datalist so all fields can pick it.
-                    document.querySelectorAll('input[data-field="referenceDocumentGUID"]').forEach(h => {
-                        const dl = document.getElementById('dl_' + h.id);
+                    // Append to the ref-doc list(s) the fields use, so every field can pick it.
+                    const lists = new Set();
+                    document.querySelectorAll('input.js-lookup-search').forEach(s => {
+                        const h = document.getElementById(s.dataset.for);
+                        if (h && h.dataset.field === 'referenceDocumentGUID') lists.add(s.getAttribute('list'));
+                    });
+                    lists.forEach(id => {
+                        const dl = document.getElementById(id);
                         if (dl) { const o = document.createElement('option'); o.value = label; o.dataset.guid = body.guid; dl.appendChild(o); }
                     });
                     if (activeHidden) activeHidden.value = body.guid;

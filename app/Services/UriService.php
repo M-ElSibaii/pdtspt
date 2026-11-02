@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Support\Lineage;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -572,22 +573,20 @@ class UriService
         $rows = collect($rows);
         if ($rows->isEmpty()) return null;
 
+        // Status ranks first (Active, then InActive history, then Preview) so a new-version
+        // draft — same GUID, same numbers as the version it was copied from — never wins.
         if ($version !== null) {
             $rows = $rows->filter(fn($r) => (int) ($r->versionNumber ?? -1) === $version)->values();
             if ($rows->isEmpty()) return null;
 
-            return $rows->sortByDesc(fn($r) => (int) ($r->revisionNumber ?? 0))->first();
+            return $rows->sort(fn($a, $b) => [Lineage::statusRank($a), -(int) ($a->revisionNumber ?? 0)]
+                <=> [Lineage::statusRank($b), -(int) ($b->revisionNumber ?? 0)])->first();
         }
 
         return $rows->sort(function ($a, $b) {
-            return [self::activeRank($b), (int) ($b->versionNumber ?? 0), (int) ($b->revisionNumber ?? 0)]
-                <=> [self::activeRank($a), (int) ($a->versionNumber ?? 0), (int) ($a->revisionNumber ?? 0)];
+            return [Lineage::statusRank($a), -(int) ($a->versionNumber ?? 0), -(int) ($a->revisionNumber ?? 0)]
+                <=> [Lineage::statusRank($b), -(int) ($b->versionNumber ?? 0), -(int) ($b->revisionNumber ?? 0)];
         })->first();
-    }
-
-    private static function activeRank($row): int
-    {
-        return (($row->status ?? null) === 'Active') ? 1 : 0;
     }
 
     /** "73-DadosGerais" -> "73"; also accepts a bare id. */

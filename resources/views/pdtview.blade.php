@@ -7,11 +7,11 @@
                     <p class="flex-none inline"> - <x-version-badge :version="$pdt->versionNumber" :revision="$pdt->revisionNumber" /></p>
                     <x-status-badge :status="$pdt->status" />
                     @if (Auth::check() && Auth::user()->isAdmin == 1 && $pdt->status == 'Active')
-                        <a href="{{ route('admin.pdt.activeEdit', ['pdt' => $pdt->Id]) }}" class="btn btn-secondary" style="margin-left:8px;">Edit (limited)</a>
+                        <a href="{{ route('admin.pdt.activeEdit', ['pdt' => $pdt->Id]) }}" class="btn btn-secondary" style="margin-left:8px;">Quick fix (no new version)</a>
                         <a href="{{ route('admin.pdt.newVersion', ['pdt' => $pdt->Id]) }}" class="btn btn-secondary" style="margin-left:8px;">Create new version</a>
                     @endif
                     @if (Auth::check() && Auth::user()->isAdmin == 1 && $pdt->status == 'Preview')
-                        <a href="{{ route('admin.previews.editor', ['pdt' => $pdt->Id]) }}" class="btn btn-secondary" style="margin-left:8px;">Edit / Publish / Delete (Preview)</a>
+                        <a href="{{ route('admin.previews.editor', ['pdt' => $pdt->Id]) }}" class="btn btn-secondary" style="margin-left:8px;">Edit draft</a>
                     @endif
                 </div>
             </div>

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Support\LegacyDates;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -201,7 +202,7 @@ class PreviewService
             $clone['depreciationExplanation'] = null;
             $clone = array_merge($clone, $this->only($dictValues, $this->editableOf(self::DICT)));
 
-            $forkId = DB::table(self::DICT)->insertGetId($clone, 'Id');
+            $forkId = DB::table(self::DICT)->insertGetId(LegacyDates::clean($clone), 'Id');
 
             // Re-point THIS PDT's context at the fork (GUID unchanged).
             DB::table(self::PROP)->where('Id', $contextId)
@@ -266,8 +267,9 @@ class PreviewService
     }
 
     /**
-     * Create a brand-new dictionary property from scratch (fresh GUID, v1.0, Active)
-     * and add its context row under a Preview GOP. Manual GUID override allowed.
+     * Create a brand-new dictionary property from scratch (fresh GUID, v1.0) and add its
+     * context row under a Preview GOP. Manual GUID override allowed. The property is a
+     * Preview draft like the PDT it belongs to; publishing the PDT makes it Active.
      *
      * @return array ['dictId'=>int, 'contextId'=>int, 'guid'=>string]
      */
@@ -282,7 +284,7 @@ class PreviewService
         $dictVals = app(VersioningService::class)->buildNewDictValues($this->only($values, $this->editableOf(self::DICT)) + [
             'nameEn' => $values['nameEn'] ?? null, 'namePt' => $values['namePt'] ?? null,
             'definitionEn' => $values['definitionEn'] ?? null, 'definitionPt' => $values['definitionPt'] ?? null,
-        ], $guid);
+        ], $guid, self::ST_PREVIEW);
 
         return DB::transaction(function () use ($dictVals, $gop, $gopId, $guid) {
             $dictId = DB::table(self::DICT)->insertGetId($dictVals, 'Id');
@@ -342,6 +344,11 @@ class PreviewService
                 $sharingPdts = DB::table(self::PROP)->where('propertyId', $dictId)->where('pdtID', '<>', $pdtId)
                     ->distinct()->pluck('pdtID')->all();
                 $dictKeptShared[] = ['id' => $dictId, 'nameEn' => $d->nameEn, 'sharedWithPdtIds' => $sharingPdts];
+            } elseif ($d->status === self::ST_PREVIEW) {
+                // A Preview row used only by this draft is draft content (a new property, or
+                // a fork of a live definition made while editing) — it goes with the draft.
+                // Its GUID may be shared with live rows; those are never touched.
+                $dictDelete[] = ['id' => $dictId, 'nameEn' => $d->nameEn, 'guid' => $d->GUID];
             } else {
                 // Solely owned here. Also require the whole GUID lineage to be unreferenced elsewhere.
                 $lineageOtherRefs = DB::table(self::PROP . ' as p')
@@ -406,8 +413,10 @@ class PreviewService
             DB::table(self::PROP)->whereIn('Id', $plan['deleteContextIds'] ?: [0])->delete();
             DB::table(self::GOP)->whereIn('Id', $plan['deleteGopIds'] ?: [0])->delete();
             DB::table(self::PDT)->where('Id', $pdtId)->delete();
-            if (!empty($plan['deleteDictIds'])) {
-                DB::table(self::DICT)->whereIn('Id', $plan['deleteDictIds'])->delete();
+            foreach ($plan['deleteDictIds'] as $dictId) {
+                // Fork rows share their GUID with live rows that keep satisfying the
+                // non-unique properties.GUID FK; deleteDictRowFkSafe covers that case.
+                $this->deleteDictRowFkSafe((int) $dictId);
             }
         });
 
@@ -425,10 +434,17 @@ class PreviewService
     // ============================================================ publish
 
     /**
-     * Plan publishing a Preview PDT -> Active. Detects DIVERGENCE: context rows that
-     * reference a Preview-forked dictionary property (same GUID as an Active row but a
-     * Preview-status edited copy). Each divergence is returned for a per-element
-     * decision; nothing is auto-versioned. Writes nothing.
+     * Plan publishing a Preview PDT -> Active. Writes nothing.
+     *
+     * Two kinds of draft are published here:
+     *   - a brand-new PDT: goes live as it is;
+     *   - a new-version draft ({@see DraftVersionService}): replaces the current version
+     *     with the next version/revision number; 'diff' says what changed and which bump
+     *     is required ('allowedBumps' lists what the admin may choose).
+     *
+     * Also detects DIVERGENCE: context rows that reference a Preview-forked dictionary
+     * property (same GUID as an Active row but a Preview-status edited copy). Each one is
+     * returned for a per-element decision; nothing is auto-versioned.
      */
     public function planPublish(int $pdtId): array
     {
@@ -457,7 +473,24 @@ class PreviewService
             }
         }
 
-        $summary = ["PUBLISH Preview PDT '{$pdt->pdtNameEn}' Id={$pdtId} -> Active"];
+        $diff = app(DraftVersionService::class)->diff($pdtId);
+
+        $summary = [];
+        if ($diff['isVersionDraft']) {
+            $base = $diff['base'];
+            $summary[] = "PUBLISH new version of '{$pdt->pdtNameEn}' — replaces live v{$base->versionNumber}.{$base->revisionNumber}";
+            if (!$diff['hasChanges']) {
+                $summary[] = 'No changes compared to the live version — nothing to publish.';
+            } else {
+                [$v, $r] = $diff['next'][$diff['bump']];
+                $summary[] = "Required: {$diff['bump']} → v{$v}.{$r}";
+                foreach ($diff['reasons'] as $reason) {
+                    $summary[] = "   · {$reason}";
+                }
+            }
+        } else {
+            $summary[] = "PUBLISH new template '{$pdt->pdtNameEn}' Id={$pdtId} -> Active";
+        }
         if ($divergences) {
             $summary[] = count($divergences) . " divergence(s) need a decision (version vs keep):";
             foreach ($divergences as $dv) {
@@ -467,28 +500,67 @@ class PreviewService
             $summary[] = "No divergences — straight publish.";
         }
 
-        return ['pdtId' => $pdtId, 'divergences' => $divergences, 'summary' => $summary];
+        return [
+            'pdtId'          => $pdtId,
+            'divergences'    => $divergences,
+            'isVersionDraft' => $diff['isVersionDraft'],
+            'canPublish'     => $diff['hasChanges'],
+            'bump'           => $diff['bump'],
+            'allowedBumps'   => $diff['allowedBumps'],
+            'next'           => $diff['next'],
+            'diff'           => $diff,
+            'summary'        => $summary,
+        ];
     }
 
     /**
-     * Apply publish. For each divergence, $decisions[contextId] is 'version' (spawn a
-     * new version of the live element via the engine, adopting the Preview values) or
-     * 'keep' (re-point the context to the existing Active element; discard the fork).
-     * Flips the PDT, its GOPs, and its Preview-owned (non-fork) dict rows to Active.
+     * Apply publish, in one transaction (JSON backup first).
+     *
+     * For each divergence, $decisions[contextId] is 'version' (spawn a new version of the
+     * live element, adopting the Preview values) or 'keep' (re-point the context to the
+     * existing Active element; discard the fork).
+     *
+     * A brand-new PDT is flipped to Active with its groups. A new-version draft takes the
+     * next numbers ($bump: 'version' | 'revision', defaulting to the required bump; a
+     * revision request is refused when a version is required), its changed groups are
+     * renumbered, and the version it replaces is retired (InActive, deprecation recorded)
+     * together with its groups — it stays as the read-only history snapshot.
+     *
+     * Afterwards the statuses of every dictionary property and construction object the
+     * publish touched are re-derived, so nothing is left Preview/Active by mistake.
      */
-    public function applyPublish(int $pdtId, array $decisions = []): array
+    public function applyPublish(int $pdtId, array $decisions = [], ?string $bump = null): array
     {
         $plan = $this->planPublish($pdtId);
-        $versioning = app(VersioningService::class);
+        $diff = $plan['diff'];
+
+        if (!$plan['canPublish']) {
+            throw new \RuntimeException('Nothing to publish: this draft is identical to the live version. Discard it instead.');
+        }
+        if ($plan['isVersionDraft']) {
+            $bump = $bump ?: $plan['bump'];
+            if (!in_array($bump, $plan['allowedBumps'], true)) {
+                throw new \RuntimeException("A {$bump} is not allowed here — this change requires a {$plan['bump']}.");
+            }
+        }
+        $base = $diff['base'];
 
         $backup = ['generated_at' => now()->toIso8601String(), 'summary' => $plan['summary'],
-            'pdt' => DB::table(self::PDT)->where('Id', $pdtId)->first()];
+            'pdt' => DB::table(self::PDT)->where('Id', $pdtId)->first(),
+            'replaces' => $base, 'replacedGops' => $base ? DB::table(self::GOP)->where('pdtId', $base->Id)->get() : []];
         $path = storage_path('app/publish_backup_' . now()->format('Ymd_His') . '.json');
         file_put_contents($path, json_encode($backup, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
         $applied = [];
-        DB::transaction(function () use ($plan, $pdtId, $decisions, $versioning, &$applied) {
-            $forkContextIds = array_column($plan['divergences'], 'contextId');
+        $statusChanges = [];
+        $published = null;
+        DB::transaction(function () use ($plan, $diff, $base, $bump, $pdtId, $decisions, &$applied, &$statusChanges, &$published) {
+            $versioning = app(VersioningService::class);
+            $drafts = app(DraftVersionService::class);
+            $today = Carbon::today()->toDateString();
+            // The draft being published and the version it replaces. The replaced version is
+            // about to retire, so it does not keep a forked property's old definition alive.
+            $involved = array_filter([$pdtId, $base->Id ?? null]);
 
             foreach ($plan['divergences'] as $dv) {
                 $decision = $decisions[$dv['contextId']] ?? 'keep';
@@ -496,28 +568,22 @@ class PreviewService
                     // PROMOTE the Preview fork into a real new version of the live element:
                     // it already has the edited values and the same GUID, and this PDT's
                     // context already points at it — so we just renumber it Active and
-                    // deprecate the old original per the use-gate. (No PDT clone: the PDT
-                    // is being published, not versioned.)
+                    // deprecate the old original per the use-gate.
                     $fork = DB::table(self::DICT)->where('Id', $dv['previewDictId'])->first();
                     $active = DB::table(self::DICT)->where('Id', $dv['activeDictId'])->first();
                     $forkVals = array_intersect_key((array) $fork, array_flip($this->editableOf(self::DICT)));
-                    $bump = $versioning->decidePropertyBump($active, $forkVals);
-                    $bump = $bump === 'version' ? 'version' : 'revision';
-                    $head = DB::table(self::DICT)->where('GUID', $dv['guid'])->where('status', self::ST_ACTIVE)
-                        ->orderByDesc('versionNumber')->orderByDesc('revisionNumber')->first();
-                    $nv = $bump === 'version' ? (int) $head->versionNumber + 1 : (int) $head->versionNumber;
-                    $nr = $bump === 'version' ? 0 : (int) $head->revisionNumber + 1;
-                    $today = Carbon::today()->toDateString();
+                    $propBump = $versioning->decidePropertyBump($active, $forkVals) === 'version' ? 'version' : 'revision';
+                    [$nv, $nr] = $drafts->nextNumbers(self::DICT, $dv['guid'], $propBump);
                     DB::table(self::DICT)->where('Id', $fork->Id)->update([
                         'versionNumber' => $nv, 'revisionNumber' => $nr, 'status' => self::ST_ACTIVE,
                         'listOfReplacedProperties' => "v{$active->versionNumber}.{$active->revisionNumber}",
-                        'dateOfVersion' => $today, 'dateOfRevision' => $today,
+                        'dateOfVersion' => $propBump === 'version' ? $today : LegacyDates::orToday($active->dateOfVersion), 'dateOfRevision' => $today,
                         'depreciationDate' => null, 'depreciationExplanation' => null,
                     ]);
                     // Use-gate: deprecate the old original only if no OTHER active PDT uses it.
                     $others = DB::table(self::PROP . ' as p')->join(self::PDT . ' as pdt', 'pdt.Id', '=', 'p.pdtID')
                         ->where('p.propertyId', $dv['activeDictId'])->where('pdt.status', self::ST_ACTIVE)
-                        ->where('p.pdtID', '<>', $pdtId)->count();
+                        ->whereNotIn('p.pdtID', $involved)->count();
                     if ($others === 0) {
                         DB::table(self::DICT)->where('Id', $dv['activeDictId'])->update([
                             'status' => self::ST_INACTIVE, 'depreciationDate' => $today,
@@ -537,21 +603,60 @@ class PreviewService
                 }
             }
 
-            // Flip the PDT + its GOPs to Active.
-            DB::table(self::PDT)->where('Id', $pdtId)->update(['status' => self::ST_ACTIVE]);
+            if ($base) {
+                [$pv, $pr] = $diff['next'][$bump];
+
+                // Changed groups get their next numbers; unchanged ones carry forward as they are.
+                foreach ($diff['gops'] as $g) {
+                    if ($g['draftGopId'] && $g['state'] === 'modified') {
+                        $upd = ['versionNumber' => $g['to'][0], 'revisionNumber' => $g['to'][1],
+                            'listOfReplacedProperties' => "v{$g['from'][0]}.{$g['from'][1]}",
+                            'dateOfRevision' => $today, 'dateOfLastChange' => $today, 'updated_at' => $today];
+                        if ($g['bump'] === 'version') {
+                            $upd['dateOfVersion'] = $today;
+                        }
+                        DB::table(self::GOP)->where('Id', $g['draftGopId'])->update($upd);
+                        $applied[] = "group '{$g['nameEn']}' -> v{$g['to'][0]}.{$g['to'][1]}";
+                    }
+                }
+
+                $upd = ['versionNumber' => $pv, 'revisionNumber' => $pr, 'status' => self::ST_ACTIVE,
+                    'dateOfRevision' => $today, 'updated_at' => $today,
+                    'depreciationDate' => null, 'depreciationExplanation' => null];
+                if ($bump === 'version') {
+                    $upd['dateOfVersion'] = $today;
+                }
+                DB::table(self::PDT)->where('Id', $pdtId)->update($upd);
+
+                // Retire every other Active row of the lineage (normally just the base).
+                $retired = DB::table(self::PDT)->where('GUID', $base->GUID)->where('Id', '<>', $pdtId)
+                    ->where('status', self::ST_ACTIVE)->pluck('Id')->all();
+                DB::table(self::PDT)->whereIn('Id', $retired ?: [0])->update([
+                    'status' => self::ST_INACTIVE, 'depreciationDate' => $today,
+                    'depreciationExplanation' => "Superseded by version {$pv}.{$pr}",
+                ]);
+                DB::table(self::GOP)->whereIn('pdtId', $retired ?: [0])->update(['status' => self::ST_INACTIVE]);
+                $applied[] = "published as v{$pv}.{$pr} ({$bump}); v{$base->versionNumber}.{$base->revisionNumber} kept as InActive history";
+                $published = [$pv, $pr];
+            } else {
+                DB::table(self::PDT)->where('Id', $pdtId)->update(['status' => self::ST_ACTIVE, 'updated_at' => $today]);
+                $draft = DB::table(self::PDT)->where('Id', $pdtId)->first();
+                $published = [(int) $draft->versionNumber, (int) $draft->revisionNumber];
+            }
             DB::table(self::GOP)->where('pdtId', $pdtId)->update(['status' => self::ST_ACTIVE]);
 
-            // Preview-owned, non-fork dict rows referenced by this PDT become Active.
-            $dictIds = DB::table(self::PROP)->where('pdtID', $pdtId)->pluck('propertyId')->unique()->filter();
-            foreach ($dictIds as $did) {
-                $d = DB::table(self::DICT)->where('Id', $did)->first();
-                if ($d && $d->status === self::ST_PREVIEW) {
-                    DB::table(self::DICT)->where('Id', $did)->update(['status' => self::ST_ACTIVE]);
-                }
-            }
+            // Re-derive statuses for everything this publish touched: properties of the new
+            // and the retired version (and forked originals), and both construction objects.
+            $dictIds = DB::table(self::PROP)->whereIn('pdtID', $involved)->pluck('propertyId')
+                ->merge(array_column($plan['divergences'], 'activeDictId'))->all();
+            $coGuids = DB::table(self::PDT)->whereIn('Id', $involved)->pluck('constructionObjectGUID')->all();
+            $statusChanges = $versioning->syncStatusesFor($dictIds, $coGuids);
         });
 
-        return ['published' => $pdtId, 'actions' => $applied, 'backup' => basename($path), 'summary' => $plan['summary']];
+        return [
+            'published' => $pdtId, 'version' => $published, 'actions' => $applied,
+            'statusChanges' => count($statusChanges), 'backup' => basename($path), 'summary' => $plan['summary'],
+        ];
     }
 
     /**

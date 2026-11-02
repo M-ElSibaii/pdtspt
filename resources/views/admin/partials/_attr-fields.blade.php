@@ -63,17 +63,14 @@
             if ($name === 'referenceDocumentGUID' || $name === 'constructionObjectGUID') {
                 $isRef = $name === 'referenceDocumentGUID';
                 $opts = $isRef ? \App\Services\RefDocs::all() : \App\Services\ConObjs::all();
-                $listId = 'dl_' . $id;
+                // One shared list per page (see AttrDatalists), not one per field.
+                $listId = $isRef ? \App\Support\AttrDatalists::REFDOCS : \App\Support\AttrDatalists::CONOBJS;
                 $curLabel = '';
                 foreach ($opts as $o) {
                     if ((string) $o->GUID === (string) $val) { $curLabel = $o->label; break; }
                 }
                 if ($curLabel === '' && $val !== '' && $val !== 'n/a') { $curLabel = $val; }
-                $dl = '<datalist id="' . e($listId) . '">';
-                foreach ($opts as $o) {
-                    $dl .= '<option data-guid="' . e($o->GUID) . '" value="' . e($o->label) . '"></option>';
-                }
-                $dl .= '</datalist>';
+                $dl = \App\Support\AttrDatalists::lookup($isRef);
                 $search = '<input type="text" class="js-lookup-search w-full border rounded p-2 text-sm" list="' . e($listId)
                     . '" data-for="' . e($id) . '" value="' . e($curLabel) . '" placeholder="type to search…" autocomplete="off" style="min-width:0">';
                 $hidden = '<input type="hidden" class="js-attr" id="' . e($id) . '" name="' . e($inputName)
@@ -86,13 +83,9 @@
             if (isset($enums[$name])) {
                 $opts = $enums[$name];
                 if (count($opts) > 20) {
-                    // Big list (units ~600): type-to-filter via native datalist.
-                    $listId = 'dl_' . $id;
-                    $dl = '<datalist id="' . e($listId) . '">';
-                    foreach ($opts as $o) {
-                        $dl .= '<option value="' . e($o) . '"></option>';
-                    }
-                    $dl .= '</datalist>';
+                    // Big list (units ~600): type-to-filter via a shared native datalist.
+                    $listId = \App\Support\AttrDatalists::enumId($name);
+                    $dl = \App\Support\AttrDatalists::enum($name, $opts);
                     return '<input type="text" list="' . e($listId) . '" ' . $common
                         . ' value="' . e($val) . '" placeholder="type to filter…">' . $dl;
                 }
