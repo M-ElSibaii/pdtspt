@@ -307,7 +307,7 @@ Retorna todas as unidades (ISO 23387 UnitType), cada uma com o seu URI de identi
     "code": "mm",
     "name": "millimetre",
     "physicalQuantity": { "name": "length", "languageIsoCode": "en.EN", "@id": "https://pdts.pt/uri/{{ \App\Services\UriService::dictionaryVersion() }}/pq/length" },
-    "dimension": { "canonical": "L", "@id": "https://pdts.pt/uri/{{ \App\Services\UriService::dictionaryVersion() }}/dim/L" },
+    "dimension": { "canonical": "L1", "@id": "https://pdts.pt/uri/{{ \App\Services\UriService::dictionaryVersion() }}/dim/L1" },
     "sameAs": "http://qudt.org/vocab/unit/MilliM"
 }]</code></pre>
             </div>
@@ -329,8 +329,9 @@ Retorna todas as grandezas físicas (ISO 23387 QuantityKindType), cada uma com o
     "type": "QuantityKind",
     "guid": "...",
     "name": "length",
+    "namePt": "comprimento",
     "languageIsoCode": "en.EN",
-    "dimension": { "canonical": "L", "@id": "https://pdts.pt/uri/{{ \App\Services\UriService::dictionaryVersion() }}/dim/L" },
+    "dimension": { "canonical": "L1", "@id": "https://pdts.pt/uri/{{ \App\Services\UriService::dictionaryVersion() }}/dim/L1" },
     "sameAs": null
 }]</code></pre>
             </div>
@@ -347,10 +348,10 @@ Retorna todas as dimensões (ISO 23387 DimensionType), cada uma com o seu URI de
             <p class="text-sm text-gray-600 my-2"><strong>Formato:</strong> JSON</p>
             <div style="background-color: #F0F4F8; margin: 10px 0;">
                 <pre><code>[{
-    "@id": "https://pdts.pt/uri/{{ \App\Services\UriService::dictionaryVersion() }}/dim/L",
+    "@id": "https://pdts.pt/uri/{{ \App\Services\UriService::dictionaryVersion() }}/dim/L1",
     "type": "Dimension",
     "guid": "...",
-    "canonical": "L",
+    "canonical": "L1",
     "exponents": {
       "Length": "1.000", "Mass": "0.000", "Time": "0.000", "ElectricCurrent": "0.000",
       "ThermodynamicTemperature": "0.000", "AmountOfSubstance": "0.000", "LuminousIntensity": "0.000"

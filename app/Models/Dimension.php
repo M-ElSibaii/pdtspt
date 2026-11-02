@@ -21,4 +21,9 @@ class Dimension extends Model
     {
         return $this->hasMany(PhysicalQuantity::class, 'dimension_guid', 'guid');
     }
+
+    public function units()
+    {
+        return $this->hasMany(Unit::class, 'dimension_guid', 'guid');
+    }
 }

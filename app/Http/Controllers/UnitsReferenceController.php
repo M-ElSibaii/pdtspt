@@ -40,11 +40,11 @@ class UnitsReferenceController extends Controller
      */
     public function units()
     {
-        $units = Unit::with('physicalQuantity.dimension')->orderBy('code')->get();
+        $units = Unit::with(['physicalQuantity.dimension', 'dimension'])->orderBy('code')->get();
 
         return response()->json($units->map(function ($unit) {
             $quantity = $unit->physicalQuantity;
-            $dimension = $quantity ? $quantity->dimension : null;
+            $dimension = $unit->effectiveDimension();
             $authority = UnitsReference::qudtAuthority($unit->reference_uri, $unit->code, 'unit');
 
             return [
@@ -84,6 +84,7 @@ class UnitsReferenceController extends Controller
                 'type' => 'QuantityKind',
                 'guid' => $quantity->guid,
                 'name' => $quantity->name,
+                'namePt' => $quantity->namePt,
                 'languageIsoCode' => $quantity->languageIsoCode,
                 'dimension' => $dimension ? [
                     'canonical' => $dimension->canonical,
@@ -122,6 +123,39 @@ class UnitsReferenceController extends Controller
         })->all(), 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
+    /**
+     * Browsable index of the reference layer: every physical quantity with its units, and
+     * every dimension. ?q= filters by unit symbol or name, or quantity name (EN/PT).
+     */
+    public function index(Request $request)
+    {
+        $q = trim((string) $request->query('q', ''));
+        // Alphabetical in the language the page is shown in.
+        $quantities = PhysicalQuantity::with(['dimension', 'units' => fn ($u) => $u->orderBy('code')])->get()
+            ->sortBy(fn ($pq) => strtolower(\Illuminate\Support\Str::ascii(\App\Support\Lang::pick($pq->namePt ?: $pq->name, $pq->name))))
+            ->values();
+        $unclassified = Unit::whereNull('physical_quantity_guid')->with('dimension')->orderBy('code')->get();
+        $dimensions = Dimension::withCount('physicalQuantities')->orderBy('canonical')->get();
+
+        if ($q !== '') {
+            $needle = mb_strtolower($q);
+            $hit = fn (?string $s) => $s !== null && str_contains(mb_strtolower($s), $needle);
+            $resolved = UnitsReference::resolveCode($q);
+            $unitHit = fn ($u) => $hit($u->code) || $hit($u->name) || $u->code === $resolved;
+            $quantities = $quantities->filter(function ($pq) use ($hit, $unitHit) {
+                if ($hit($pq->name) || $hit($pq->namePt)) {
+                    return true;
+                }
+                $pq->setRelation('units', $pq->units->filter($unitHit)->values());
+                return $pq->units->isNotEmpty();
+            })->values();
+            $unclassified = $unclassified->filter($unitHit)->values();
+            $dimensions = $dimensions->filter(fn ($d) => $hit($d->canonical))->values();
+        }
+
+        return view('reference.index', compact('q', 'quantities', 'unclassified', 'dimensions'));
+    }
+
     public function unit(Request $request, string $code)
     {
         $code = $this->stripJson($code);
@@ -131,7 +165,7 @@ class UnitsReferenceController extends Controller
         abort_if(!$unit, 404, "Unknown unit: {$code}");
 
         $quantity = $unit->physicalQuantity;
-        $dimension = $quantity ? $quantity->dimension : null;
+        $dimension = $unit->effectiveDimension();
         $authority = UnitsReference::qudtAuthority($unit->reference_uri, $unit->code, 'unit');
 
         if ($this->wantsJson($request)) {
@@ -143,6 +177,7 @@ class UnitsReferenceController extends Controller
                 'name' => $unit->name,
                 'physicalQuantity' => $quantity ? [
                     'name' => $quantity->name,
+                    'namePt' => $quantity->namePt,
                     'languageIsoCode' => $quantity->languageIsoCode,
                     '@id' => UnitsReference::quantityKindUri($quantity->name),
                 ] : null,
@@ -159,7 +194,10 @@ class UnitsReferenceController extends Controller
             ], 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
 
-        return view('reference.unit', compact('unit', 'quantity', 'dimension', 'authority'));
+        $siblings = $quantity ? $quantity->units()->where('guid', '<>', $unit->guid)->orderBy('code')->get() : collect();
+        $properties = UnitsReference::propertiesUsing([$unit->code]);
+
+        return view('reference.unit', compact('unit', 'quantity', 'dimension', 'authority', 'siblings', 'properties'));
     }
 
     public function quantityKind(Request $request, string $name)
@@ -178,6 +216,7 @@ class UnitsReferenceController extends Controller
                 'type' => 'QuantityKind',
                 'guid' => $quantity->guid,
                 'name' => $quantity->name,
+                'namePt' => $quantity->namePt,
                 'languageIsoCode' => $quantity->languageIsoCode,
                 'dimension' => $dimension ? [
                     'canonical' => $dimension->canonical,
@@ -185,6 +224,7 @@ class UnitsReferenceController extends Controller
                 ] : null,
                 'units' => $units->map(fn ($u) => [
                     'code' => $u->code,
+                    'name' => $u->name,
                     '@id' => UnitsReference::unitUri($u->code),
                 ])->all(),
                 'sameAs' => $authority['reference'],
@@ -192,7 +232,9 @@ class UnitsReferenceController extends Controller
             ], 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
 
-        return view('reference.quantitykind', compact('quantity', 'dimension', 'units', 'authority'));
+        $properties = UnitsReference::propertiesUsing($units->pluck('code')->all());
+
+        return view('reference.quantitykind', compact('quantity', 'dimension', 'units', 'authority', 'properties'));
     }
 
     public function dimension(Request $request, string $canonical)
@@ -202,6 +244,7 @@ class UnitsReferenceController extends Controller
         abort_if(!$dimension, 404, "Unknown dimension: {$canonical}");
 
         $quantities = $dimension->physicalQuantities()->orderBy('name')->get();
+        $units = $dimension->units()->with('physicalQuantity')->orderBy('code')->get();
         // Exponents in ISO 80000 order.
         $exponents = [
             'Length' => $dimension->exp_length,
@@ -224,10 +267,14 @@ class UnitsReferenceController extends Controller
                     'name' => $q->name,
                     '@id' => UnitsReference::quantityKindUri($q->name),
                 ])->all(),
+                'units' => $units->map(fn ($u) => [
+                    'code' => $u->code,
+                    '@id' => UnitsReference::unitUri($u->code),
+                ])->all(),
                 'sameAs' => $dimension->reference_uri,
             ], 200, [], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
 
-        return view('reference.dimension', compact('dimension', 'quantities', 'exponents'));
+        return view('reference.dimension', compact('dimension', 'quantities', 'units', 'exponents'));
     }
 }

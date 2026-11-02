@@ -773,6 +773,10 @@ class UriService
         self::assertEntity($entity);
         $def = self::MAP[$entity];
 
+        if (in_array($entity, [self::UNIT, self::QUANTITY_KIND, self::DIMENSION], true)) {
+            return $version === null ? self::resolveReferenceAlias($entity, $code) : null;
+        }
+
         if (!self::hasAlias($entity)) return null;
         if ($version !== null && !$def['versioned']) return null;
 
@@ -796,6 +800,46 @@ class UriService
         }
 
         return self::pickVersion($candidates, $version);
+    }
+
+    /**
+     * Other spellings of a unit, quantity kind or dimension identifier, so they redirect to
+     * the canonical one instead of 404ing:
+     *  - unit: the spellings the dictionary uses ("m2", "N/mm2", "KN"), see UnitsReference::resolveCode().
+     *  - quantity kind: the Portuguese name, or a UNIT's name or code. Quantity kinds used to be
+     *    one per unit and named after it (/pq/millimetre); those identifiers were exported, so
+     *    they now lead to the quantity the unit measures (/pq/length).
+     *  - dimension: exponents of 1 may be left out (/dim/L, /dim/LMT-2).
+     */
+    private static function resolveReferenceAlias(string $entity, string $code)
+    {
+        switch ($entity) {
+            case self::UNIT:
+                $resolved = UnitsReference::resolveCode($code);
+
+                return $resolved === null || $resolved === $code ? null
+                    : DB::table('units')->whereRaw('BINARY `code` = ?', [$resolved])->first();
+
+            case self::QUANTITY_KIND:
+                $pq = DB::table('physical_quantities')->where('namePt', $code)->first();
+                if ($pq) {
+                    return $pq;
+                }
+                $unit = DB::table('units')->whereRaw('BINARY `name` = ?', [$code])->first()
+                    ?? DB::table('units')->whereRaw('BINARY `code` = ?', [UnitsReference::resolveCode($code) ?? $code])->first();
+
+                return $unit && $unit->physical_quantity_guid
+                    ? DB::table('physical_quantities')->where('guid', $unit->physical_quantity_guid)->first()
+                    : null;
+
+            case self::DIMENSION:
+                $full = preg_replace('/([LMTIΘNJ])(?![0-9.\-])/u', '${1}1', $code);
+
+                return $full === $code ? null
+                    : DB::table('dimensions')->whereRaw('BINARY `canonical` = ?', [$full])->first();
+        }
+
+        return null;
     }
 
     /**

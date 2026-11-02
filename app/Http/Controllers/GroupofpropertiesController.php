@@ -145,7 +145,9 @@ class GroupofpropertiesController extends Controller
     //function for survey page
     public function getCommentProperty($propID)
     {
-        $comments = comments::with('user')->where('properties_Id', $propID)->get();
+        // Only what the comment list shows: never the commenters' e-mail or other account data.
+        $comments = comments::with('user:id,name,photo')->where('properties_Id', (int) $propID)
+            ->get(['id', 'body', 'properties_Id', 'users_id', 'created_at']);
 
         return response()->json([
             'comments' => $comments
@@ -302,8 +304,8 @@ class GroupofpropertiesController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'body' => 'required|string',
-            'properties_Id' => 'required|integer',
+            'body' => 'required|string|max:5000',
+            'properties_Id' => 'required|integer|exists:properties,Id',
         ]);
 
         if ($validator->fails()) {
@@ -366,11 +368,9 @@ class GroupofpropertiesController extends Controller
             $comment->users_id = Auth::user()->id;
             $comment->save();
 
-            $comment = comments::with('user')
-                ->where('properties_Id', $propertyId)
-                ->orderBy('created_at', 'desc')
-                ->limit(1)
-                ->get();
+            $comment = comments::with('user:id,name,photo')
+                ->where('id', $comment->id)
+                ->get(['id', 'body', 'properties_Id', 'users_id', 'created_at']);
 
             return response()->json([
                 'status' => 200,
@@ -384,32 +384,38 @@ class GroupofpropertiesController extends Controller
     public function saveAnswers(Request $request)
     {
         $userId = Auth::user()->id;
+        $request->validate(['pdtName' => 'nullable|string|max:255']);
         $pdtName = $request->input('pdtName');
+
+        // Every other field is "{class property id} => answer". Keep only real property ids
+        // and bounded text, so the form cannot write answers for arbitrary keys.
+        $answers = collect($request->except(['pdtName', '_token']))
+            ->filter(fn ($answer, $key) => ctype_digit((string) $key) && (is_scalar($answer) || $answer === null))
+            ->map(fn ($answer) => mb_substr((string) $answer, 0, 5000));
+        $known = properties::whereIn('Id', $answers->keys())->pluck('Id')->map(fn ($id) => (string) $id)->flip();
+        $answers = $answers->filter(fn ($answer, $key) => isset($known[(string) $key]));
+
         Mail::to('pdts.portugal@gmail.com')->send(new SurveyMailAdmin($pdtName));
 
-        $answers = $request->except('pdtName');
-
         foreach ($answers as $properties_id => $answer) {
-            if ($properties_id != '_token') {
-                $existingAnswer = Answers::where('users_id', $userId)
-                    ->where('properties_id', $properties_id)
-                    ->first();
+            $existingAnswer = Answers::where('users_id', $userId)
+                ->where('properties_id', $properties_id)
+                ->first();
 
-                if ($existingAnswer) {
-                    // An answer already exists for this property and user
-                    if ($existingAnswer->answer != $answer) {
-                        // The submitted answer is different, so update the existing answer
-                        $existingAnswer->answer = $answer;
-                        $existingAnswer->save();
-                    }
-                } else {
-                    // No existing answer for this property and user, so create a new answer
-                    $newAnswer = new Answers;
-                    $newAnswer->answer = $answer;
-                    $newAnswer->properties_id = $properties_id;
-                    $newAnswer->users_id = $userId;
-                    $newAnswer->save();
+            if ($existingAnswer) {
+                // An answer already exists for this property and user
+                if ($existingAnswer->answer != $answer) {
+                    // The submitted answer is different, so update the existing answer
+                    $existingAnswer->answer = $answer;
+                    $existingAnswer->save();
                 }
+            } else {
+                // No existing answer for this property and user, so create a new answer
+                $newAnswer = new Answers;
+                $newAnswer->answer = $answer;
+                $newAnswer->properties_id = $properties_id;
+                $newAnswer->users_id = $userId;
+                $newAnswer->save();
             }
         }
 
@@ -428,9 +434,10 @@ class GroupofpropertiesController extends Controller
 
     public function destroyfeedback(Request $request)
     {
-        $commentId = $request->input('comment_id');
-        $comment = comments::where('id', $commentId);
-        if ($comment) {
+        $commentId = (int) $request->input('comment_id');
+        $comment = comments::find($commentId);
+        // Authors delete their own comments; admins may delete any.
+        if ($comment && ((int) $comment->users_id === (int) Auth::id() || Auth::user()->isAdmin)) {
             $comment->delete();
             return response()->json([
                 'status' => 200,

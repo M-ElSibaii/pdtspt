@@ -72,6 +72,10 @@
                             <td><x-reference-link type="unit" :value="$propertyDefinition->units ?? null" placeholder="N/A" /></td>
                         </tr>
                         <tr>
+                            <th>{{ Lg::t('Quantidade física') }}</th>
+                            <td><x-reference-link type="quantitykind" :value="$propertyDefinition->physicalQuantity ?? null" :unit="$propertyDefinition->units ?? null" placeholder="N/A" /></td>
+                        </tr>
+                        <tr>
                             <th>{{ Lg::t('Tipo de dados') }}</th>
                             <td>{{$propertyDefinition->dataType ?? 'N/A'}}</td>
                         </tr>

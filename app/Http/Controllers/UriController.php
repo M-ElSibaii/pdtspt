@@ -87,7 +87,11 @@ class UriController extends Controller
             return $this->redirectToCanonical($request, $entity, $record, $version);
         }
 
-        return $json
+        // Units, quantity kinds and dimensions have their own JSON (quantity, dimension, QUDT
+        // authority), produced by the same controller that renders their pages.
+        $ownJson = in_array($entity, [UriService::UNIT, UriService::QUANTITY_KIND, UriService::DIMENSION], true);
+
+        return $json && !$ownJson
             ? $this->asJson($entity, $code, $version, $record)
             : $this->asPage($request, $entity, $code, $version, $record);
     }

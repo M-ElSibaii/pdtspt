@@ -39,4 +39,16 @@ class Unit extends Model
     {
         return $this->belongsTo(PhysicalQuantity::class, 'physical_quantity_guid', 'guid');
     }
+
+    /** The unit's own dimension (set even when it has no named quantity). */
+    public function dimension()
+    {
+        return $this->belongsTo(Dimension::class, 'dimension_guid', 'guid');
+    }
+
+    /** Its own dimension, else its quantity's. */
+    public function effectiveDimension(): ?Dimension
+    {
+        return $this->dimension ?? $this->physicalQuantity?->dimension;
+    }
 }

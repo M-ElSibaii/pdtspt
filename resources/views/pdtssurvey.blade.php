@@ -213,7 +213,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "pdtssurveystore",
+                url: @json(route('pdtssurveystore')),
                 dataType: 'json',
                 data: data,
                 success: function(response) {
@@ -292,7 +292,7 @@
             });
             $.ajax({
                 type: "POST",
-                url: "/comments/" + id,
+                url: @json(url('/comments')) + "/" + parseInt(id, 10),
                 success: function(response) {
                     console.log(response.comments)
                     for (let index = 0; index < response.comments.length; index++) {
@@ -304,32 +304,31 @@
 
         }
 
+        // Comments and names are typed by users: everything inserted as HTML is escaped.
+        const CURRENT_USER_ID = @json(Auth::id());
+        const CAN_DELETE_ANY = @json((bool) (Auth::user()->isAdmin ?? false));
+        const ASSET_BASE = @json(rtrim(asset(''), '/'));
+        const DEFAULT_AVATAR = @json(asset('img/users/default.png'));
+
+        function esc(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
         function addComment(comment) {
+            const id = parseInt(comment.id, 10);
+            const user = comment.user || {};
+            const avatar = user.photo ? ASSET_BASE + '/' + encodeURI(user.photo) : DEFAULT_AVATAR;
 
-            var section = '';
-            section = "<div id='commentbodysection" + comment.id + "' class='w-full mb-4'>\
-                    <div class='flex flex-row'>";
-            if (comment.user.photo != null) {
-                section += "<img src='{{ asset(' + comment.user.photo + ') }}' alt='{{ ' + comment.user.name + ' }}' class='img-fluid rounded-circle mr-3' style='width: 40px; height: 40px;'>";
-            } else {
-                section += "<img src='{{ asset('img/users/default.png ') }}' alt='{{ " + comment.user.name + " }}' class='img-fluid rounded-circle mr-3' style='width: 40px; height: 40px;'>";
+            let section = "<div id='commentbodysection" + id + "' class='w-full mb-4'><div class='flex flex-row'>"
+                + "<img src='" + esc(avatar) + "' alt='" + esc(user.name) + "' class='img-fluid rounded-circle mr-3' style='width: 40px; height: 40px;'>"
+                + "<div class='flex flex-col w-full'><div class='flex flex-row gap-2 align-bottom'>"
+                + "<span class='font-bold my-auto'>" + esc(user.name) + "</span>"
+                + "<span class='text-xs font-thin my-auto'>" + esc(moment(comment.created_at).fromNow()) + "</span>";
+            if (CAN_DELETE_ANY || Number(comment.users_id) === CURRENT_USER_ID) {
+                section += "<a class='text-xs font-thin my-auto' type='button' data-te-toggle='modal' data-te-target='#DeleteModal' style='color: red;' onclick='openDeleteModal(" + id + ")'>Apagar</a>";
             }
-            section += "<div class='flex flex-col w-full'>\
-                <div class='flex flex-row gap-2 align-bottom'>\
-                    <span class='font-bold my-auto'>" + comment.user.name + "</span>\
-                    <span class='text-xs font-thin my-auto'>" + moment(comment.created_at).fromNow() + "</span>";
-            if (comment.user.name == "{{Auth::user()->name}}") {
-                section += "<a class='text-xs font-thin my-auto' type='button' data-te-toggle='modal' data-te-target='#DeleteModal' style='color: red;' onclick='openDeleteModal(" + comment.id + ")'>Apagar</a>";
-            }
-            section += '</div>\
-                        <div class="div-comment flex-gow">\
-                        <p class="m-1">' + comment.body + '</p>\
-                    </div>\
-                </div>\
-                    </div>\
-            </div>';
-            $('#comments-section-' + comment.properties_Id).append(section);
-
+            section += "</div><div class='div-comment flex-gow'><p class='m-1'>" + esc(comment.body) + "</p></div></div></div></div>";
+            $('#comments-section-' + parseInt(comment.properties_Id, 10)).append(section);
         }
 
         function openDeleteModal(id) {
@@ -351,7 +350,7 @@
 
             $.ajax({
                 type: "DELETE",
-                url: "/deletefeedback",
+                url: @json(url('/deletefeedback')),
                 data: data,
                 success: function(response) {
                     var parent = $('#commentbodysection' + response.comment_id).parent()

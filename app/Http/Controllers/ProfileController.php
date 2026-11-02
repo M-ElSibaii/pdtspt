@@ -52,14 +52,20 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        if ($request->hasFile('photo')) {
-            $image = $request->file('photo');
-            $filename = time() . '.' . $image->getClientOriginalExtension();
-            $img = Image::make($image);
-            $img->fit(200)->circle(100, 100, 100);
-            $img->save(public_path('img/users/' . $filename));
-            $user->photo = 'img/users/' . $filename;
-            $request->user()->save();
+        // The file lands in the public web root: accept real images only, and never take the
+        // file name or extension from the upload.
+        $request->validate(['photo' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,gif,webp', 'max:5120']]);
+
+        $filename = $user->id . '_' . bin2hex(random_bytes(8)) . '.png';
+        $img = Image::make($request->file('photo'));
+        $img->fit(200)->circle(100, 100, 100);
+        $img->save(public_path('img/users/' . $filename), null, 'png');
+
+        $old = $user->photo;
+        $user->photo = 'img/users/' . $filename;
+        $user->save();
+        if ($old && str_starts_with($old, 'img/users/') && basename($old) !== 'default.png' && File::exists(public_path($old))) {
+            File::delete(public_path($old));
         }
 
         return Redirect::route('profile.edit')->with('photostatus', 'Foto do perfil actualizada');
@@ -67,9 +73,11 @@ class ProfileController extends Controller
     public function deletePhoto(Request $request)
     {
         $user = $request->user();
-        $photoPath = public_path($user->photo);
+        $photoPath = public_path((string) $user->photo);
 
-        if (File::exists($photoPath)) {
+        // Only ever this user's own upload, never a shared image such as the default avatar.
+        if ($user->photo && str_starts_with($user->photo, 'img/users/') && !str_contains($user->photo, '..')
+            && basename($user->photo) !== 'default.png' && File::exists($photoPath)) {
             File::delete($photoPath);
             $user->photo = null;
             $user->save();

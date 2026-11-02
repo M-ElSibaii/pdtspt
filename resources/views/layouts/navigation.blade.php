@@ -1,3 +1,11 @@
+<style>
+    /* Below 1280px the full menu does not fit beside the logo and the login buttons: use the
+       hamburger menu instead (it carries the same links, plus login/profile). */
+    @media (max-width: 1279px) {
+        nav .nav-wide { display: none !important; }
+        nav .nav-burger { display: flex !important; }
+    }
+</style>
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-row justify-between h-16">
@@ -11,39 +19,45 @@
 
                 <!-- Navigation Links -->
                 @if (Route::has('login'))
-                <div class="sm:hidden space-x-8 -my-px ml-10 flex">
+                <div class="nav-wide sm:hidden space-x-8 -my-px ml-6 flex">
                     <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
                         {{ Lg::t('Home') }}
                     </x-nav-link>
                 </div>
 
-                <div class="sm:hidden space-x-8 -my-px ml-10 flex">
+                <div class="nav-wide sm:hidden space-x-8 -my-px ml-6 flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ Lg::t('PDTs') }}
                     </x-nav-link>
                 </div>
 
 
-                <div class="sm:hidden space-x-8 -my-px ml-10 flex">
+                <div class="nav-wide sm:hidden space-x-8 -my-px ml-6 flex">
                     <x-nav-link :href="route('apidoc')" :active="request()->routeIs('apidoc')">
                         {{ Lg::t('Documentação API') }}
                     </x-nav-link>
                 </div>
 
+                <div class="nav-wide sm:hidden space-x-8 -my-px ml-6 flex">
+                    <x-nav-link :href="route('reference.index')" :active="request()->routeIs('reference.index') || request()->is('uri/*/unit/*', 'uri/*/pq/*', 'uri/*/dim/*')">
+                        {{ Lg::t('Unidades') }}
+                    </x-nav-link>
+                </div>
 
-                <div class="sm:hidden space-x-8 -my-px ml-10 flex">
+
+                <div class="nav-wide sm:hidden space-x-8 -my-px ml-6 flex">
                     <x-nav-link :href="route('participantes')" :active="request()->routeIs('participantes')">
                         {{ Lg::t('Participantes') }}
                     </x-nav-link>
                 </div>
 
-                <div class="sm:hidden space-x-8 -my-px ml-10 flex">
+                <div class="nav-wide sm:hidden space-x-8 -my-px ml-6 flex">
                     <x-nav-link :href="route('knowledge')" :active="request()->routeIs('knowledge')">
                         {{ Lg::t('Publicações') }}
                     </x-nav-link>
                 </div>
 
-                <div class="sm:hidden space-x-8 -my-px ml-10 flex">
+                <div class="nav-wide sm:hidden space-x-8 -my-px ml-6 flex">
                     <x-nav-link :href="route('contact.store')" :active="request()->routeIs('contact.store')">
                         {{ Lg::t('Contactos') }}
                     </x-nav-link>
@@ -51,7 +65,7 @@
 
                 @auth
                 @if (Auth::user()->isAdmin == 1)
-                <div class="sm:hidden space-x-8 -my-px ml-10 flex">
+                <div class="nav-wide sm:hidden space-x-8 -my-px ml-6 flex">
                     <x-nav-link :href="route('admin')" :active="request()->routeIs('admin')">
                         {{ Lg::t('Admin') }}
                     </x-nav-link>
@@ -88,14 +102,14 @@
             <div class="flex items-center ml-6">
                 <div class="grid grid-cols-2">
                     @if (Route::has('login'))
-                    <div class="sm:hidden flex">
+                    <div class="nav-wide sm:hidden flex">
                         <x-button-primary-pdts link="{{ route('login') }}" :active="request()->routeIs('login')" title="{{ Lg::t('Login') }}">
                         </x-button-primary-pdts>
                     </div>
                     @endif
 
                     @if (Route::has('register'))
-                    <div class="sm:hidden flex">
+                    <div class="nav-wide sm:hidden flex">
                         <a href="{{ route('register') }}">
                             <x-secondary-button :active="request()->routeIs('register')">
                                 {{ Lg::t('Registo') }}
@@ -109,7 +123,7 @@
 
             <!-- Settings Dropdown -->
             @auth
-            <div class="sm:hidden flex items-center ml-6">
+            <div class="nav-wide sm:hidden flex items-center ml-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
@@ -142,7 +156,7 @@
             @endauth
 
             <!-- Hamburger Menu (responsive) -->
-            <div class="-mr-2 flex items-center md:hidden lg:hidden">
+            <div class="nav-burger -mr-2 flex items-center md:hidden lg:hidden">
                 <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -164,6 +178,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('apidoc')" :active="request()->routeIs('apidoc')">
                 {{ Lg::t('Documentação API') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('reference.index')" :active="request()->routeIs('reference.index')">
+                {{ Lg::t('Unidades') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('contact.store')" :active="request()->routeIs('contact.store')">
                 {{ Lg::t('Contactos') }}

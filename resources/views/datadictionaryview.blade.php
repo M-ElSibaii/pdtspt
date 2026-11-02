@@ -149,11 +149,11 @@
                         </tr>
                         <tr>
                             <th>{{ Lg::t('Quantidade física') }}</th>
-                            <td><x-reference-link type="quantitykind" :value="$propdd->physicalQuantity" /></td>
+                            <td><x-reference-link type="quantitykind" :value="$propdd->physicalQuantity" :unit="$propdd->units" /></td>
                         </tr>
                         <tr>
                             <th>{{ Lg::t('Dimensão') }}</th>
-                            <td><x-reference-link type="dimension" :value="$propdd->dimension" /></td>
+                            <td><x-reference-link type="dimension" :value="$propdd->dimension" :unit="$propdd->units" /></td>
                         </tr>
                         <tr>
                             <th>{{ Lg::t('Tipo de dados') }}</th>

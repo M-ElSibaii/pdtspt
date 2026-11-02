@@ -19,6 +19,7 @@ use App\Http\Controllers\AdminLookupController;
 use App\Http\Controllers\RelationshipController;
 use App\Http\Controllers\PropertyDependencyController;
 use App\Http\Controllers\UriController;
+use App\Http\Controllers\UnitsReferenceController;
 use App\Support\Lang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -63,7 +64,7 @@ Route::get('/manifestobuildingsmartpt', function () {
 })->name('manifestobuildingsmartpt');
 
 Route::post('/contact', [ContactController::class, 'store'])
-    ->name('contact.store');
+    ->middleware('throttle:5,1')->name('contact.store');
 
 
 
@@ -96,11 +97,19 @@ Route::get('/language/{locale}', function (Request $request, string $locale) {
     Lang::set($locale);
 
     // Only return into this site, and drop any ?lang= so it cannot override the choice.
+    // Compare scheme, host and port, not a string prefix: "http://site.evil.com" starts with
+    // "http://site" and was accepted.
     $to = (string) $request->query('redirect', '');
-    if ($to === '' || !str_starts_with($to, url('/'))) {
+    $parts = $to === '' ? false : parse_url($to);
+    $home = parse_url(url('/'));
+    $sameSite = $parts && isset($parts['host'])
+        && strcasecmp($parts['host'], $home['host'] ?? '') === 0
+        && ($parts['scheme'] ?? '') === ($home['scheme'] ?? '')
+        && ($parts['port'] ?? null) === ($home['port'] ?? null)
+        && !isset($parts['user']);
+    if (!$sameSite) {
         return redirect(url()->previous(url('/')));
     }
-    $parts = parse_url($to);
     parse_str($parts['query'] ?? '', $query);
     unset($query['lang']);
 
@@ -134,21 +143,26 @@ Route::get('/pdtssurvey/{pdtID}', [GroupofpropertiesController::class, 'getGroup
     ->whereNumber('pdtID')   // otherwise a GET to the POST-only /pdtssurvey/saveAnswers matched here
     ->middleware(['auth', 'verified'])->name('pdtssurvey');
 Route::post('/pdtssurvey/saveAnswers', [GroupofpropertiesController::class, 'saveAnswers'])
-    ->middleware(['auth', 'verified'])->name('saveAnswers');
-Route::post('/pdtssurvey/{pdtID}', [GroupofpropertiesController::class, 'store'])
-    ->middleware(['auth', 'verified']);
+    ->middleware(['auth', 'verified', 'throttle:10,1'])->name('saveAnswers');
+// Each comment e-mails the admins and earlier commenters: rate-limited.
 Route::post('/pdtssurvey/store', [GroupofpropertiesController::class, 'store'])
-    ->middleware(['auth', 'verified'])->name('pdtssurveystore');
+    ->middleware(['auth', 'verified', 'throttle:10,1'])->name('pdtssurveystore');
 
 
 // The whole ISO 23387 reference layer — units, quantity kinds AND dimensions — is
 // addressed through the identifier scheme above (/uri/{v}/unit, /uri/{v}/pq,
 // /uri/{v}/dim). JSON via Accept, ?format=json, or a .json suffix.
+// /units is the browsable index of all three.
+Route::get('/units', [UnitsReferenceController::class, 'index'])->name('reference.index');
 
 
-Route::post('/comments/{propID}', [GroupofpropertiesController::class, 'getCommentProperty']);
+// Comments live on the survey page, which needs a verified account; so do these. Deleting
+// is limited to the author (or an admin) in the controller.
+Route::post('/comments/{propID}', [GroupofpropertiesController::class, 'getCommentProperty'])
+    ->whereNumber('propID')->middleware(['auth', 'verified']);
 
-Route::delete('/deletefeedback', [GroupofpropertiesController::class, 'destroyfeedback']);
+Route::delete('/deletefeedback', [GroupofpropertiesController::class, 'destroyfeedback'])
+    ->middleware(['auth', 'verified']);
 
 
 // Routes accessible only to admins. The middleware MUST be one array: written as

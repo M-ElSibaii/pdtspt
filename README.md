@@ -128,8 +128,24 @@ the identifier scheme below:
 ```
 GET /uri/0.1/unit/{code}       e.g. /uri/0.1/unit/mm
 GET /uri/0.1/pq/{name}         e.g. /uri/0.1/pq/length
-GET /uri/0.1/dim/{canonical}   e.g. /uri/0.1/dim/L
+GET /uri/0.1/dim/{canonical}   e.g. /uri/0.1/dim/L1
 ```
+
+`/units` is the browsable index (search by symbol, unit name or quantity, in either language).
+
+How the layer is built (`units:seed-reference`): every bSDD unit gets its SI dimension from
+its symbol (`App\Services\SiDimension`) and the physical quantity it measures
+(`App\Services\QuantityKinds`): mm → length, N/mm² → pressure, W/(m·K) → thermal
+conductivity. The dimension decides by default; units that share a dimension with another
+quantity (N·m torque vs J energy) or have none (currencies, data sizes, environmental
+indicators) are classified explicitly. A unit that fits nothing stays unclassified rather than
+getting an invented quantity, and keeps its own dimension.
+
+Dictionary values were typed by hand, so `UnitsReference::resolveCode()` also accepts
+`m2`, `N/mm2`, `kg/m3`, `KN`, `W/mK`…: pages link them to the right unit, exports carry
+its references, and `/uri/0.1/unit/m2` redirects to `/uri/0.1/unit/m²`. Older identifiers
+keep working: `/pq/millimetre` (quantity kinds used to be one per unit) redirects to
+`/pq/length`, `/pq/comprimento` to `/pq/length`, and `/dim/L` to `/dim/L1`.
 
 ## Identifiers
 
@@ -244,11 +260,17 @@ php artisan test
 ## Maintenance commands
 
 ```bash
-# Rebuild the reference layer (units from bsDD, dimensions, quantity kinds)
+# Rebuild the reference layer (units from bSDD, their SI dimensions and physical quantities).
+# Dry run first; --apply writes after a JSON backup in storage/app/units-reconcile.
 
-php artisan units:seed-reference
-php artisan dimensions:derive --apply
-php artisan units:map-qudt --apply
+php artisan units:seed-reference            # what would change
+php artisan units:seed-reference --apply
+php artisan units:map-qudt --apply          # QUDT references for new units
+php artisan uri:check --sync                # refresh the identifier registry
+
+# Optional: rewrite the dictionary's free-text physicalQuantity/dimension columns from each
+# property's unit (pages and exports already derive them from the unit).
+php artisan properties:reconcile-units      # dry run
 php artisan properties:reconcile-units --apply
 
 # Re-run the dictionary dedup

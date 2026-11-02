@@ -62,9 +62,11 @@
                         @foreach($latestPDT as $pdt)
                         <tr
                             class="border-b"
-                            x-show="(search === '' || @js(mb_strtolower(Lg::f($pdt, 'pdtName') ?? '')).includes(search.toLowerCase())) && (selectedCategories.length === 0 || selectedCategories.includes('{{ $pdt->category }}'))">
+                            x-show="(search === '' || @js(mb_strtolower(Lg::f($pdt, 'pdtName') ?? '')).includes(search.toLowerCase())) && (selectedCategories.length === 0 || selectedCategories.includes(@js((string) $pdt->category)))">
                             <td class="whitespace-nowrap px-6 py-4 font-medium">
+                                @if (is_file(public_path('img/' . $pdt->pdtNameEn . '.png')))
                                 <img class="w-auto max-w-[100px] max-h-14" src="{{ asset('/img/' . $pdt->pdtNameEn . '.png') }}" alt="" />
+                                @endif
                             </td>
                             <td class="whitespace-normal px-6 py-4 font-medium" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: normal;">
                             <a href="{{ Uri::buildLink('dt', $pdt) }}" class="text-blue-500 hover:text-blue-700">{{ Lg::f($pdt, 'pdtName') }}

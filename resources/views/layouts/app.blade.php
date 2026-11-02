@@ -38,16 +38,7 @@
     {{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous"> --}}
 
     <!-- Favicons -->
-    <link rel="apple-touch-icon" href="/docs/5.3/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
-    <link rel="icon" href="/docs/5.3/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
-    <link rel="icon" href="/docs/5.3/assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
-    <link rel="manifest" href="/docs/5.3/assets/img/favicons/manifest.json">
-    <link rel="mask-icon" href="/docs/5.3/assets/img/favicons/safari-pinned-tab.svg" color="#712cf9">
-    <link rel="icon" href="/docs/5.3/assets/img/favicons/favicon.ico">
-    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
-    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
-    
-    <meta name="theme-color" content="#712cf9">
+    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
     <!-- Fonts -->
     <!-- <link rel="stylesheet" href="https://fonts.bunny.net/css2?family=Nunito:wght@400;600;700&display=swap"> -->
     <link rel="stylesheet" type="text/css" href="//use.fontawesome.com/releases/v5.7.2/css/all.css">
@@ -299,6 +290,21 @@
             color: black;
             background-color: transparent;
             text-decoration: none;
+        }
+
+        /* Links to definitions (units, quantities, dimensions…) must look like links: the
+           rule above makes every link black and undecorated. */
+        a.ref-link:link,
+        a.ref-link:visited {
+            color: #1d4ed8;
+            text-decoration: underline;
+            text-decoration-color: rgba(29, 78, 216, .35);
+            text-underline-offset: 2px;
+        }
+
+        a.ref-link:hover {
+            color: #1e3a8a;
+            text-decoration-color: currentColor;
         }
 
         .btn-secondary:hover {

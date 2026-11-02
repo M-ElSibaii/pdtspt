@@ -31,6 +31,8 @@ class SiDimension
             '1' => $v(), 'rad' => $v(), 'sr' => $v(), '°' => $v(), 'deg' => $v(), "'" => $v(), '%' => $v(),
             // length
             'm' => $v(1), 'ft' => $v(1), 'in' => $v(1), 'yd' => $v(1), 'mile' => $v(1), 'nmi' => $v(1), 'Ao' => $v(1),
+            // typographic point (1/72 in) — listed so it is not read as pico-tonne
+            'pt' => $v(1),
             // area / volume (non-SI named)
             'acre' => $v(2), 'ar' => $v(2), 'l' => $v(3), 'L' => $v(3), 'gal' => $v(3), 'galUK' => $v(3), 'bbl' => $v(3), 'qt' => $v(3),
             // mass
@@ -38,7 +40,8 @@ class SiDimension
             // time
             's' => $v(0, 0, 1), 'min' => $v(0, 0, 1), 'h' => $v(0, 0, 1), 'hr' => $v(0, 0, 1),
             'day' => $v(0, 0, 1), 'wk' => $v(0, 0, 1), 'yr' => $v(0, 0, 1), 'mo' => $v(0, 0, 1),
-            'Month' => $v(0, 0, 1), 'Jaar' => $v(0, 0, 1), 'year' => $v(0, 0, 1), 'week' => $v(0, 0, 1),
+            'Month' => $v(0, 0, 1), 'Jaar' => $v(0, 0, 1), 'jaar' => $v(0, 0, 1), 'year' => $v(0, 0, 1), 'week' => $v(0, 0, 1),
+            'a' => $v(0, 0, 1),   // annum, as in kWh/(m²·a)
             // electric current
             'A' => $v(0, 0, 0, 1), 'At' => $v(0, 0, 0, 1),
             // temperature
@@ -51,6 +54,7 @@ class SiDimension
             'N' => $v(1, 1, -2),
             'Pa' => $v(-1, 1, -2), 'bar' => $v(-1, 1, -2), 'atm' => $v(-1, 1, -2),
             'mmHg' => $v(-1, 1, -2), 'cmHg' => $v(-1, 1, -2), 'inHg' => $v(-1, 1, -2), 'psi' => $v(-1, 1, -2),
+            'mH2O' => $v(-1, 1, -2), 'cmH₂O' => $v(-1, 1, -2),
             'J' => $v(2, 1, -2), 'cal' => $v(2, 1, -2), 'BTU' => $v(2, 1, -2), 'Wh' => $v(2, 1, -2),
             'eV' => $v(2, 1, -2), 'therm' => $v(2, 1, -2), 'Nm' => $v(2, 1, -2), 'VAh' => $v(2, 1, -2),
             'W' => $v(2, 1, -3), 'hp' => $v(2, 1, -3), 'VA' => $v(2, 1, -3), 'var' => $v(2, 1, -3), 'VAR' => $v(2, 1, -3),
@@ -79,9 +83,54 @@ class SiDimension
         ];
     }
 
+    /**
+     * Whole symbols the token grammar cannot express (annotations, square roots, gravimetric
+     * shorthands). Same vector format as atomic().
+     */
+    private const EXACT = [
+        'in/wc'          => [-1, 1, -2, 0, 0, 0, 0],    // inch of water column (pressure)
+        'W/m² irr'       => [0, 1, -3, 0, 0, 0, 0],     // irradiance
+        'W/ft² irr'      => [0, 1, -3, 0, 0, 0, 0],
+        'kg/24h'         => [0, 1, -1, 0, 0, 0, 0],     // mass per day
+        'kg/100m'        => [-1, 1, 0, 0, 0, 0, 0],     // mass per length
+        'MPa·√m'         => [-0.5, 1, -2, 0, 0, 0, 0],  // stress intensity
+        'Pa·√m'          => [-0.5, 1, -2, 0, 0, 0, 0],
+        'tonref'         => [2, 1, -3, 0, 0, 0, 0],     // ton of refrigeration (power)
+        'tonrefh'        => [2, 1, -2, 0, 0, 0, 0],     // energy
+        'ft·lbs/sec'     => [2, 1, -3, 0, 0, 0, 0],     // foot-pound-force per second (power)
+        'kcmil'          => [2, 0, 0, 0, 0, 0, 0],      // thousand circular mils (area)
+        'fl oz'          => [3, 0, 0, 0, 0, 0, 0],      // fluid ounce (volume)
+        'ft³ gas'        => [3, 0, 0, 0, 0, 0, 0],
+        'm³ gas'         => [3, 0, 0, 0, 0, 0, 0],
+        'hundred cubic feet natural gas'  => [3, 0, 0, 0, 0, 0, 0],
+        'thousand cubic feet natural gas' => [3, 0, 0, 0, 0, 0, 0],
+        'million cubic feet natural gas'  => [3, 0, 0, 0, 0, 0, 0],
+        'degPh'          => [0, 0, 0, 0, 0, 0, 0],      // degrees of phase
+        'Wp'             => [2, 1, -3, 0, 0, 0, 0],     // peak power
+        'kWp'            => [2, 1, -3, 0, 0, 0, 0],
+        'AirWatt'        => [2, 1, -3, 0, 0, 0, 0],
+        'J/kg dry'       => [2, 0, -2, 0, 0, 0, 0],     // per kilogram of dry air
+        'kJ/kg dry'      => [2, 0, -2, 0, 0, 0, 0],
+        'MJ/kg dry'      => [2, 0, -2, 0, 0, 0, 0],
+        'BTU/lb dry'     => [2, 0, -2, 0, 0, 0, 0],
+        'gH₂O/kgAir'     => [0, 0, 0, 0, 0, 0, 0],      // humidity ratio
+        '°daysC'         => [0, 0, 1, 0, 1, 0, 0],      // degree days
+        '°daysF'         => [0, 0, 1, 0, 1, 0, 0],
+        'Fps'            => [0, 0, -1, 0, 0, 0, 0],     // frames per second
+        'c/h'            => [0, 0, -1, 0, 0, 0, 0],     // counts per hour
+        'c/min'          => [0, 0, -1, 0, 0, 0, 0],
+        'm³/(h·m²) @ 50Pa' => [1, 0, -1, 0, 0, 0, 0],   // air permeability at 50 Pa
+        'm³/m²h50Pa'     => [1, 0, -1, 0, 0, 0, 0],
+        'mm⁴'            => [4, 0, 0, 0, 0, 0, 0],
+        'm⁴'             => [4, 0, 0, 0, 0, 0, 0],
+    ];
+
     /** @return array<int,float>|null the 7-exponent vector, or null if not derivable. */
     public static function derive(string $code): ?array
     {
+        if (isset(self::EXACT[trim($code)])) {
+            return self::EXACT[trim($code)];
+        }
         $norm = self::normalize($code);
         if ($norm === '' ) return null;
         try {
@@ -129,11 +178,17 @@ class SiDimension
     private static function parseExpr(string $s, int &$pos): array
     {
         $vec = self::parseFactor($s, $pos);
+        // After a "/", the "·"-joined factors that follow stay in the denominator until the
+        // next "/": J/kg·K reads as J/(kg·K), the way unit tables write it.
+        $sign = 1;
         while ($pos < strlen($s) && ($s[$pos] === '*' || $s[$pos] === '/')) {
             $op = $s[$pos++];
+            if ($op === '/') {
+                $sign = -1;
+            }
             $f = self::parseFactor($s, $pos);
             for ($i = 0; $i < 7; $i++) {
-                $vec[$i] += $op === '/' ? -$f[$i] : $f[$i];
+                $vec[$i] += $sign * $f[$i];
             }
         }
         return $vec;

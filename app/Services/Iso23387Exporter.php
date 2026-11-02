@@ -773,7 +773,8 @@ class Iso23387Exporter
         }
 
         $this->loadReferenceMaps();
-        $unit = $this->unitByCode[$code] ?? null;
+        // Hand-typed spellings ("m2", "N/mm2") resolve to the reference unit (m², N/mm²).
+        $unit = $this->unitByCode[\App\Services\UnitsReference::resolveCode($code) ?? $code] ?? null;
         if (!$unit) {
             // Unknown unit — do not guess. Flag for the Stage 4 cleanup / review.
             $out['_physicalQuantity'] = null;
@@ -795,14 +796,16 @@ class Iso23387Exporter
                 'referenceURI' => \App\Services\UnitsReference::quantityKindUri($pq->name),
             ];
             $out['_physicalQuantity'] = $pq->name . ' | ' . $pq->languageIsoCode;
+        }
 
-            $dim = $pq->dimension_guid ? ($this->dimByGuid[$pq->dimension_guid] ?? null) : null;
-            if ($dim && !empty($dim->canonical)) {
-                $out['DimensionRef'] = [
-                    'dt:GUID' => self::toDashedGuid($dim->guid),
-                    'referenceURI' => \App\Services\UnitsReference::dimensionUri($dim->canonical),
-                ];
-            }
+        // The unit's own dimension, else its quantity's.
+        $dimGuid = ($unit->dimension_guid ?? null) ?: ($pq->dimension_guid ?? null);
+        $dim = $dimGuid ? ($this->dimByGuid[$dimGuid] ?? null) : null;
+        if ($dim && !empty($dim->canonical)) {
+            $out['DimensionRef'] = [
+                'dt:GUID' => self::toDashedGuid($dim->guid),
+                'referenceURI' => \App\Services\UnitsReference::dimensionUri($dim->canonical),
+            ];
         }
 
         return $out;
