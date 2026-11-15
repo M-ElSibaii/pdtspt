@@ -256,6 +256,26 @@
                                             This will repoint <strong>{{ $group['affectedCount'] }}</strong> properties row(s)
                                             and delete <strong>{{ count($group['duplicates']) }}</strong> dictionary row(s).
                                         </p>
+
+                                        {{-- What the merge deletes for good. Every actionable row is listed; the
+                                             one chosen as survivor is hidden (it is kept). --}}
+                                        <div class="dd-delete-confirm mt-3 p-3 rounded border-l-4 border-red-500 bg-red-50 text-sm">
+                                            <div class="font-semibold mb-1">Will be permanently deleted:</div>
+                                            <ul class="dd-delete-list list-disc ml-5 mb-2">
+                                                @foreach ($actionable as $i => $row)
+                                                    <li class="dd-delete-row" data-id="{{ $row['id'] }}" @if ($i === 0) hidden @endif>
+                                                        GUID <code>{{ $row['guid'] }}</code>
+                                                        · v{{ $row['versionNumber'] }}.{{ $row['revisionNumber'] }}
+                                                        · <code>{{ $row['uri'] ?? '—' }}</code>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                            <p class="mb-2">These identifiers will no longer resolve to these rows, and this cannot be undone.</p>
+                                            <label class="flex items-start gap-2">
+                                                <input type="checkbox" class="dd-confirm-delete mt-1">
+                                                <span>I understand that these rows are deleted permanently.</span>
+                                            </label>
+                                        </div>
                                     </div>
 
                                     {{-- KEEP SEPARATE panel --}}
@@ -356,8 +376,26 @@
                 // (don't clobber a custom definition the admin has started typing).
                 const defsEl = card.querySelector('.dd-defs');
                 const defs = defsEl ? JSON.parse(defsEl.textContent || '{}') : {};
+                // A merge deletes rows for good: Apply stays disabled until the admin ticks the
+                // confirmation, and the list shows every row except the chosen survivor.
+                const confirmBox = card.querySelector('.dd-confirm-delete');
+                function syncDeleteConfirm() {
+                    const survivor = (card.querySelector('.dd-survivor:checked') || {}).value;
+                    card.querySelectorAll('.dd-delete-row').forEach(li => { li.hidden = li.dataset.id === survivor; });
+                    const btn = card.querySelector('.dedupe-apply');
+                    const action = (card.querySelector('.dd-action:checked') || {}).value;
+                    if (btn) btn.disabled = action === 'merge' && !(confirmBox && confirmBox.checked);
+                }
+                card.syncDeleteConfirm = syncDeleteConfirm;
+                if (confirmBox) confirmBox.addEventListener('change', syncDeleteConfirm);
+                card.querySelectorAll('.dd-action').forEach(r => r.addEventListener('change', syncDeleteConfirm));
+                syncDeleteConfirm();
+
                 card.querySelectorAll('.dd-survivor').forEach(function (radio) {
                     radio.addEventListener('change', function () {
+                        // A different survivor deletes different rows: ask again.
+                        if (confirmBox) confirmBox.checked = false;
+                        syncDeleteConfirm();
                         const d = defs[radio.value];
                         if (!d) return;
                         const enTa = card.querySelector('.dd-defen-text');
@@ -440,6 +478,12 @@
                             status.className = 'dedupe-status text-sm text-red-700';
                             return;
                         }
+                        const confirmDelete = card.querySelector('.dd-confirm-delete');
+                        if (!confirmDelete || !confirmDelete.checked) {
+                            status.textContent = 'Tick the box to confirm the permanent deletion before merging.';
+                            status.className = 'dedupe-status text-sm text-red-700';
+                            return;
+                        }
                     } else if (action === 'keep_separate') {
                         const renames = {};
                         card.querySelectorAll('.dd-rename-row').forEach(function (rowEl) {
@@ -469,7 +513,7 @@
                     })
                         .then(r => r.json().then(j => ({ ok: r.ok, body: j })))
                         .then(({ ok, body }) => {
-                            applyBtn.disabled = false;
+                            card.syncDeleteConfirm();
                             if (!ok || !body.ok) {
                                 status.textContent = '✗ ' + (body.error || 'Apply failed.');
                                 status.className = 'dedupe-status text-sm text-red-700';
@@ -478,7 +522,7 @@
                             resolveCard(card, body);
                         })
                         .catch(err => {
-                            applyBtn.disabled = false;
+                            card.syncDeleteConfirm();
                             status.textContent = '✗ ' + err;
                             status.className = 'dedupe-status text-sm text-red-700';
                         });

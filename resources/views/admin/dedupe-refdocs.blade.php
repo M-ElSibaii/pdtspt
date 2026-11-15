@@ -135,6 +135,26 @@
                                 </label>
                             @endif
 
+                            {{-- What a merge deletes for good. Every document is listed; the one
+                                 chosen as survivor is hidden (it is kept). --}}
+                            <div class="rd-delete-confirm mt-4 p-3 rounded border-l-4 border-red-500 bg-red-50 text-sm">
+                                <div class="font-semibold mb-1">A merge permanently deletes:</div>
+                                <ul class="list-disc ml-5 mb-2">
+                                    @foreach ($group['documents'] as $doc)
+                                        <li class="rd-delete-row" data-guid="{{ $doc['guid'] }}" @if ($loop->first) hidden @endif>
+                                            GUID <code>{{ $doc['guid'] }}</code>
+                                            · version: not versioned
+                                            · <code>{{ $doc['uri'] ?? '—' }}</code>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                                <p class="mb-2">These identifiers will no longer resolve to these documents, and this cannot be undone.</p>
+                                <label class="flex items-start gap-2">
+                                    <input type="checkbox" class="rd-confirm-delete mt-1">
+                                    <span>I understand that these documents are deleted permanently.</span>
+                                </label>
+                            </div>
+
                             <div class="flex flex-wrap items-center gap-4 mt-4">
                                 <label class="inline-flex items-center gap-2 text-sm">
                                     <input type="radio" name="action-{{ md5($group['key']) }}" class="rd-action" value="merge" checked>
@@ -169,6 +189,24 @@
                 const button = card.querySelector('.rd-apply');
                 if (!button) return;
 
+                // A merge deletes documents for good: Apply stays disabled until the admin
+                // ticks the confirmation; the list shows every document except the survivor.
+                const confirmBox = card.querySelector('.rd-confirm-delete');
+                function syncDeleteConfirm() {
+                    const survivor = (card.querySelector('.rd-survivor:checked') || {}).value;
+                    card.querySelectorAll('.rd-delete-row').forEach(li => { li.hidden = li.dataset.guid === survivor; });
+                    const action = (card.querySelector('.rd-action:checked') || {}).value;
+                    button.disabled = action === 'merge' && !(confirmBox && confirmBox.checked);
+                }
+                if (confirmBox) confirmBox.addEventListener('change', syncDeleteConfirm);
+                card.querySelectorAll('.rd-action').forEach(r => r.addEventListener('change', syncDeleteConfirm));
+                card.querySelectorAll('.rd-survivor').forEach(r => r.addEventListener('change', function () {
+                    // A different survivor deletes different documents: ask again.
+                    if (confirmBox) confirmBox.checked = false;
+                    syncDeleteConfirm();
+                }));
+                syncDeleteConfirm();
+
                 button.addEventListener('click', function () {
                     const status = card.querySelector('.rd-status');
                     status.textContent = '';
@@ -188,6 +226,11 @@
 
                         if (card.dataset.needsAck === '1' && !decision.acknowledgeDifferentNames) {
                             status.textContent = 'Confirm these are the same document before merging.';
+                            status.className = 'rd-status text-sm text-red-700';
+                            return;
+                        }
+                        if (!confirmBox || !confirmBox.checked) {
+                            status.textContent = 'Tick the box to confirm the permanent deletion before merging.';
                             status.className = 'rd-status text-sm text-red-700';
                             return;
                         }
@@ -218,7 +261,7 @@
                     })
                         .then(r => r.json().then(j => ({ ok: r.ok, body: j })))
                         .then(function (res) {
-                            button.disabled = false;
+                            syncDeleteConfirm();
                             if (!res.ok || !res.body.ok) {
                                 status.textContent = '✗ ' + (res.body.error || 'Apply failed.');
                                 status.className = 'rd-status text-sm text-red-700';
@@ -232,7 +275,7 @@
                             }
                         })
                         .catch(function (err) {
-                            button.disabled = false;
+                            syncDeleteConfirm();
                             status.textContent = '✗ ' + err;
                             status.className = 'rd-status text-sm text-red-700';
                         });

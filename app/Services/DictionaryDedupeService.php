@@ -743,6 +743,15 @@ class DictionaryDedupeService
      * Enrich a dictionary row with the properties that reference it and any
      * propertyId/GUID disagreements.
      */
+    private function pinnedUri($row): ?string
+    {
+        try {
+            return \App\Services\UriService::buildPinned(\App\Services\UriService::PROPERTY, $row);
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
     private function enrichRow($row): array
     {
         $refs = $this->referencingProperties($row);
@@ -760,6 +769,9 @@ class DictionaryDedupeService
             'definitionEn'          => $row->definitionEn ?? null,
             'definitionPt'          => $row->definitionPt ?? null,
             'status'                => $row->status ?? null,
+            // The row's own (pinned) identifier, listed in the merge confirmation so the
+            // admin sees which URIs a merge removes. Admin page data only, not the API.
+            'uri'                   => $this->pinnedUri($row),
             'referenceCount'        => $refs->count(),
             'referencingProperties' => $refs->all(),
             'mismatchProperties'    => $mismatches->all(),
