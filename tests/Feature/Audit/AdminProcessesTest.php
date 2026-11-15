@@ -343,3 +343,30 @@ test('the status check with nothing selected changes nothing', function () {
     $this->post(route('admin.statusCheck.apply'), [])->assertRedirect(route('admin.statusCheck'))->assertSessionHas('error');
     expect(DB::table('propertiesdatadictionaries')->get())->toEqual($before);
 });
+
+test('rule as found: merging duplicates deletes the other GUID and re-points its uses to the survivor', function () {
+    $a = F::pdt([1]);
+    $b = F::pdt([1]);
+    DB::table('propertiesdatadictionaries')->where('Id', $a['dicts'][0]->Id)->update(['nameEn' => 'Colour', 'namePt' => 'Cor']);
+    DB::table('propertiesdatadictionaries')->where('Id', $b['dicts'][0]->Id)->update(['nameEn' => 'Colour', 'namePt' => 'Cor']);
+    $survivor = $a['dicts'][0];
+    $merged = $b['dicts'][0];
+    $svc = app(\App\Services\DictionaryDedupeService::class);
+    $group = collect($svc->analyzeGroups())->first(fn($g) => in_array($merged->Id, $g['actionableIds'], true));
+    expect($group)->not->toBeNull();
+    $backupsBefore = glob(storage_path('app/*')) ?: [];
+
+    $this->postJson(route('admin.dedupe.apply'), ['decision' => [
+        'key' => $group['key'], 'action' => 'merge', 'expectedActionableIds' => $group['actionableIds'],
+        'survivorId' => $survivor->Id, 'acknowledgeMismatch' => true,
+    ]])->assertOk()->assertJson(['ok' => true]);
+
+    // The merged row, its GUID and its dictionary Id are gone; its uses now carry the survivor's GUID.
+    expect(DB::table('propertiesdatadictionaries')->where('GUID', $merged->GUID)->exists())->toBeFalse();
+    expect(DB::table('properties')->where('pdtID', $b['pdt']->Id)->value('GUID'))->toBe($survivor->GUID);
+    expect($this->getJson('/api/dataDictionary/' . $merged->Id)->getContent())->toBe('');
+
+    foreach (array_diff(glob(storage_path('app/*')) ?: [], $backupsBefore) as $f) {
+        is_file($f) && unlink($f); // the merge's JSON backup, written by the service
+    }
+});
