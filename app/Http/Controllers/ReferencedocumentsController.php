@@ -99,7 +99,8 @@ class ReferencedocumentsController extends Controller
     {
         // Validate incoming request data
         $validated = $request->validate([
-            'GUID' => 'required|string|max:255',
+            // GUID is the primary key: a duplicate is a validation error, not a 500.
+            'GUID' => 'required|string|max:255|unique:referencedocuments,GUID',
             'name' => 'required|string|max:255',
             'title' => 'required|string|max:255',
             'description' => 'required|string',

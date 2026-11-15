@@ -267,6 +267,16 @@ test('reference documents: the AJAX create writes one row with a fresh GUID', fu
     $this->postJson(route('admin.refdoc.createAjax'), ['name' => 'x'])->assertStatus(422);
 });
 
+test('reference documents: the list form refuses a GUID that already exists instead of failing with 500', function () {
+    $existing = F::guid();
+    DB::table('referencedocuments')->insert(['GUID' => $existing, 'rdName' => 'Original', 'title' => 't', 'description' => 'd', 'status' => 'Current']);
+
+    $res = $this->post(route('referencedocuments.create'), ['GUID' => $existing, 'name' => 'Other', 'title' => 't', 'description' => 'd', 'status' => 'Current']);
+
+    $res->assertSessionHasErrors('GUID');
+    expect(DB::table('referencedocuments')->where('GUID', $existing)->value('rdName'))->toBe('Original');
+});
+
 test('relations between templates are created and removed (soft) by an admin', function () {
     $a = F::pdt([1]);
     $b = F::pdt([1]);
