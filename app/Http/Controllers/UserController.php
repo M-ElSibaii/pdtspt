@@ -72,19 +72,37 @@ class UserController extends Controller
     public function updateUsers(Request $request)
     {
 
-        $isAdmin = $request->input('isAdmin');
-
-        foreach ($isAdmin as $userId => $value) {
+        // Either list may be absent (a partial form) and ids may be stale (a user deleted
+        // since the page loaded): skip what is missing instead of failing.
+        $selfRefused = false;
+        foreach ((array) $request->input('isAdmin', []) as $userId => $value) {
             $user = User::find($userId);
-            $user->isAdmin = $value == 1;
+            if (!$user) {
+                continue;
+            }
+            $wantAdmin = $value == 1;
+            // An admin may not change their own admin flag: another admin has to.
+            if ((int) $user->id === (int) $request->user()->id && $wantAdmin !== (bool) $user->isAdmin) {
+                $selfRefused = true;
+                continue;
+            }
+            $user->isAdmin = $wantAdmin;
             $user->save();
         }
-        $subscribe = $request->input('subscribe');
 
-        foreach ($subscribe as $userId => $value) {
+        foreach ((array) $request->input('subscribe', []) as $userId => $value) {
             $user = User::find($userId);
+            if (!$user) {
+                continue;
+            }
             $user->subscribe = $value == 1;
             $user->save();
+        }
+
+        if ($selfRefused) {
+            return redirect()->back()
+                ->withErrors(['isAdmin' => 'You cannot change your own admin status; ask another admin.'])
+                ->with('success', 'The other changes were saved.');
         }
 
         return redirect()->back()->with('success', 'User status updated successfully');

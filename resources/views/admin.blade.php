@@ -18,6 +18,9 @@
                     <div class="adm-banner {{ $cls }}">{{ session($key) }}</div>
                 @endif
             @endforeach
+            @foreach ($errors->all() as $message)
+                <div class="adm-banner is-bad">{{ $message }}</div>
+            @endforeach
 
             @php
                 $published = $templates->where('status', 'Active')->count();
