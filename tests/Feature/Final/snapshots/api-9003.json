@@ -1,0 +1,1265 @@
+{
+    "Library": {
+        "dt:GUID": "a0000000-0000-0000-0000-000000009003",
+        "Name": [
+            {
+                "language": "pt",
+                "value": "Tijolo cerâmico"
+            },
+            {
+                "language": "en",
+                "value": "Clay brick"
+            }
+        ],
+        "DataTemplates": [
+            {
+                "Name": [
+                    {
+                        "language": "pt",
+                        "value": "Tijolo cerâmico"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Clay brick"
+                    }
+                ],
+                "Definition": [
+                    {
+                        "language": "pt",
+                        "value": "Descrição de Tijolo cerâmico"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Description of Clay brick"
+                    }
+                ],
+                "ReferenceDocumentRef": {
+                    "dt:GUID": "d0000000-0000-0000-0000-000000000001"
+                },
+                "MajorVersion": 2,
+                "Status": "Active",
+                "IsSubtypeOfRef": {
+                    "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/dt\/Alvenaria"
+                },
+                "HasObjectTypeRef": {
+                    "dt:GUID": "c0000000-0000-0000-0000-000000000001"
+                },
+                "HasPropertyRef": [
+                    {
+                        "dt:GUID": "e0000000-0000-0000-0000-000000009205",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste5"
+                    },
+                    {
+                        "dt:GUID": "e0000000-0000-0000-0000-000000009206",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste6"
+                    },
+                    {
+                        "dt:GUID": "e0000000-0000-0000-0000-000000009207",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste7"
+                    },
+                    {
+                        "dt:GUID": "e0000000-0000-0000-0000-000000009208",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste8"
+                    },
+                    {
+                        "dt:GUID": "e0000000-0000-0000-0000-000000009203",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste3"
+                    },
+                    {
+                        "dt:GUID": "e0000000-0000-0000-0000-000000009204",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste4"
+                    },
+                    {
+                        "dt:GUID": "e0000000-0000-0000-0000-000000009201",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste1"
+                    },
+                    {
+                        "dt:GUID": "e0000000-0000-0000-0000-000000009202",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste2"
+                    }
+                ],
+                "HasGroupOfPropertiesRef": [
+                    {
+                        "dt:GUID": "b0000000-0000-0000-0000-000000009103",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/gop\/9103-DadosGerais"
+                    },
+                    {
+                        "dt:GUID": "b0000000-0000-0000-0000-000000009104",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/gop\/9104-DadosDeDesempenho"
+                    },
+                    {
+                        "dt:GUID": "b0000000-0000-0000-0000-000000009102",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/gop\/9102-DadosGerais"
+                    },
+                    {
+                        "dt:GUID": "b0000000-0000-0000-0000-000000009101",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/gop\/9101-DadosDeConformidade"
+                    }
+                ],
+                "dt:GUID": "a0000000-0000-0000-0000-000000009003",
+                "dateOfCreation": "2024-01-01T00:00:00+00:00",
+                "_uri": "https:\/\/pdts.pt\/uri\/0.1\/dt\/TijoloCeramico"
+            }
+        ],
+        "ObjectType": {
+            "Name": [
+                {
+                    "language": "pt",
+                    "value": "Unidade de alvenaria"
+                },
+                {
+                    "language": "en",
+                    "value": "Masonry unit"
+                }
+            ],
+            "Definition": [
+                {
+                    "language": "pt",
+                    "value": "unidade"
+                },
+                {
+                    "language": "en",
+                    "value": "unit"
+                }
+            ],
+            "MajorVersion": 1,
+            "Status": "Active",
+            "dt:GUID": "c0000000-0000-0000-0000-000000000001",
+            "dateOfCreation": "2024-01-01T00:00:00+00:00",
+            "_uri": "https:\/\/pdts.pt\/uri\/0.1\/class\/UnidadeDeAlvenaria",
+            "_raw": {
+                "\u0000*\u0000connection": "mysql",
+                "\u0000*\u0000table": "constructionobjects",
+                "\u0000*\u0000primaryKey": "id",
+                "\u0000*\u0000keyType": "int",
+                "incrementing": true,
+                "\u0000*\u0000with": [],
+                "\u0000*\u0000withCount": [],
+                "preventsLazyLoading": false,
+                "\u0000*\u0000perPage": 15,
+                "exists": true,
+                "wasRecentlyCreated": false,
+                "\u0000*\u0000escapeWhenCastingToString": false,
+                "\u0000*\u0000attributes": {
+                    "GUID": "c0000000000000000000000000000001",
+                    "referenceDocumentGUID": "n\/a",
+                    "constructionObjectNameEn": "Masonry unit",
+                    "constructionObjectNamePt": "Unidade de alvenaria",
+                    "dateOfRevision": "2024-01-01",
+                    "dateOfVersion": "2024-01-01",
+                    "updated_at": "2024-01-01",
+                    "created_at": "2024-01-01",
+                    "status": "Active",
+                    "versionNumber": 1,
+                    "revisionNumber": 0,
+                    "descriptionEn": "unit",
+                    "descriptionPt": "unidade"
+                },
+                "\u0000*\u0000original": {
+                    "GUID": "c0000000000000000000000000000001",
+                    "referenceDocumentGUID": "n\/a",
+                    "constructionObjectNameEn": "Masonry unit",
+                    "constructionObjectNamePt": "Unidade de alvenaria",
+                    "dateOfRevision": "2024-01-01",
+                    "dateOfVersion": "2024-01-01",
+                    "updated_at": "2024-01-01",
+                    "created_at": "2024-01-01",
+                    "status": "Active",
+                    "versionNumber": 1,
+                    "revisionNumber": 0,
+                    "descriptionEn": "unit",
+                    "descriptionPt": "unidade"
+                },
+                "\u0000*\u0000changes": [],
+                "\u0000*\u0000casts": [],
+                "\u0000*\u0000classCastCache": [],
+                "\u0000*\u0000attributeCastCache": [],
+                "\u0000*\u0000dates": [],
+                "\u0000*\u0000dateFormat": null,
+                "\u0000*\u0000appends": [
+                    "uri"
+                ],
+                "\u0000*\u0000dispatchesEvents": [],
+                "\u0000*\u0000observables": [],
+                "\u0000*\u0000relations": [],
+                "\u0000*\u0000touches": [],
+                "timestamps": true,
+                "\u0000*\u0000hidden": [],
+                "\u0000*\u0000visible": [],
+                "\u0000*\u0000fillable": [],
+                "\u0000*\u0000guarded": [
+                    "*"
+                ]
+            }
+        },
+        "GroupOfProperties": [
+            {
+                "Name": [
+                    {
+                        "language": "pt",
+                        "value": "Dados gerais"
+                    },
+                    {
+                        "language": "en",
+                        "value": "General data"
+                    }
+                ],
+                "Definition": [
+                    {
+                        "language": "pt",
+                        "value": "Grupo Dados gerais"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Group General data"
+                    }
+                ],
+                "MajorVersion": 1,
+                "Status": "Active",
+                "HasPropertyRef": [
+                    {
+                        "dt:GUID": "e0000000-0000-0000-0000-000000009205",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste5"
+                    }
+                ],
+                "dt:GUID": "b0000000-0000-0000-0000-000000009103",
+                "dateOfCreation": "2024-01-01T00:00:00+00:00",
+                "_uri": "https:\/\/pdts.pt\/uri\/0.1\/gop\/9103-DadosGerais",
+                "_raw": {
+                    "Id": 9103,
+                    "GUID": "b0000000000000000000000000009103",
+                    "pdtId": 9003,
+                    "referenceDocumentGUID": "n\/a",
+                    "gopNameEn": "General data",
+                    "gopNamePt": "Dados gerais",
+                    "definitionEn": "Group General data",
+                    "definitionPt": "Grupo Dados gerais",
+                    "status": "Active",
+                    "dateOfCreation": null,
+                    "dateofActivation": null,
+                    "dateOfLastChange": null,
+                    "dateOfRevision": "2024-01-01",
+                    "dateOfVersion": "2024-01-01",
+                    "versionNumber": 1,
+                    "revisionNumber": 0,
+                    "listOfReplacedProperties": null,
+                    "listOfReplacingProperties": null,
+                    "relationToOtherDataDictionaries": null,
+                    "creatorsLanguage": null,
+                    "visualRepresentation": null,
+                    "countryOfUse": null,
+                    "countryOfOrigin": null,
+                    "categoryOfGroupOfProperties": null,
+                    "parentGroupOfProperties": null,
+                    "updated_at": "2024-01-01",
+                    "created_at": "2024-01-01",
+                    "depreciationExplanation": null,
+                    "depreciationDate": null,
+                    "uri": "https:\/\/pdts.pt\/uri\/0.1\/gop\/9103-DadosGerais"
+                }
+            },
+            {
+                "Name": [
+                    {
+                        "language": "pt",
+                        "value": "Dados de desempenho"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Performance data"
+                    }
+                ],
+                "Definition": [
+                    {
+                        "language": "pt",
+                        "value": "Grupo Dados de desempenho"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Group Performance data"
+                    }
+                ],
+                "MajorVersion": 1,
+                "Status": "Active",
+                "HasPropertyRef": [
+                    {
+                        "dt:GUID": "e0000000-0000-0000-0000-000000009206",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste6"
+                    },
+                    {
+                        "dt:GUID": "e0000000-0000-0000-0000-000000009207",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste7"
+                    },
+                    {
+                        "dt:GUID": "e0000000-0000-0000-0000-000000009208",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste8"
+                    }
+                ],
+                "dt:GUID": "b0000000-0000-0000-0000-000000009104",
+                "dateOfCreation": "2024-01-01T00:00:00+00:00",
+                "_uri": "https:\/\/pdts.pt\/uri\/0.1\/gop\/9104-DadosDeDesempenho",
+                "_raw": {
+                    "Id": 9104,
+                    "GUID": "b0000000000000000000000000009104",
+                    "pdtId": 9003,
+                    "referenceDocumentGUID": "n\/a",
+                    "gopNameEn": "Performance data",
+                    "gopNamePt": "Dados de desempenho",
+                    "definitionEn": "Group Performance data",
+                    "definitionPt": "Grupo Dados de desempenho",
+                    "status": "Active",
+                    "dateOfCreation": null,
+                    "dateofActivation": null,
+                    "dateOfLastChange": null,
+                    "dateOfRevision": "2024-01-01",
+                    "dateOfVersion": "2024-01-01",
+                    "versionNumber": 1,
+                    "revisionNumber": 0,
+                    "listOfReplacedProperties": null,
+                    "listOfReplacingProperties": null,
+                    "relationToOtherDataDictionaries": null,
+                    "creatorsLanguage": null,
+                    "visualRepresentation": null,
+                    "countryOfUse": null,
+                    "countryOfOrigin": null,
+                    "categoryOfGroupOfProperties": null,
+                    "parentGroupOfProperties": null,
+                    "updated_at": "2024-01-01",
+                    "created_at": "2024-01-01",
+                    "depreciationExplanation": null,
+                    "depreciationDate": null,
+                    "uri": "https:\/\/pdts.pt\/uri\/0.1\/gop\/9104-DadosDeDesempenho"
+                }
+            },
+            {
+                "Name": [
+                    {
+                        "language": "pt",
+                        "value": "Dados gerais"
+                    },
+                    {
+                        "language": "en",
+                        "value": "General data"
+                    }
+                ],
+                "Definition": [
+                    {
+                        "language": "pt",
+                        "value": "Grupo Dados gerais"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Group General data"
+                    }
+                ],
+                "MajorVersion": 1,
+                "Status": "Active",
+                "HasPropertyRef": [
+                    {
+                        "dt:GUID": "e0000000-0000-0000-0000-000000009203",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste3"
+                    },
+                    {
+                        "dt:GUID": "e0000000-0000-0000-0000-000000009204",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste4"
+                    }
+                ],
+                "dt:GUID": "b0000000-0000-0000-0000-000000009102",
+                "dateOfCreation": "2024-01-01T00:00:00+00:00",
+                "_uri": "https:\/\/pdts.pt\/uri\/0.1\/gop\/9102-DadosGerais",
+                "_raw": {
+                    "Id": 9102,
+                    "GUID": "b0000000000000000000000000009102",
+                    "pdtId": 9002,
+                    "referenceDocumentGUID": "n\/a",
+                    "gopNameEn": "General data",
+                    "gopNamePt": "Dados gerais",
+                    "definitionEn": "Group General data",
+                    "definitionPt": "Grupo Dados gerais",
+                    "status": "Active",
+                    "dateOfCreation": null,
+                    "dateofActivation": null,
+                    "dateOfLastChange": null,
+                    "dateOfRevision": "2024-01-01",
+                    "dateOfVersion": "2024-01-01",
+                    "versionNumber": 1,
+                    "revisionNumber": 0,
+                    "listOfReplacedProperties": null,
+                    "listOfReplacingProperties": null,
+                    "relationToOtherDataDictionaries": null,
+                    "creatorsLanguage": null,
+                    "visualRepresentation": null,
+                    "countryOfUse": null,
+                    "countryOfOrigin": null,
+                    "categoryOfGroupOfProperties": null,
+                    "parentGroupOfProperties": null,
+                    "updated_at": "2024-01-01",
+                    "created_at": "2024-01-01",
+                    "depreciationExplanation": null,
+                    "depreciationDate": null,
+                    "uri": "https:\/\/pdts.pt\/uri\/0.1\/gop\/9102-DadosGerais"
+                }
+            },
+            {
+                "Name": [
+                    {
+                        "language": "pt",
+                        "value": "Dados de conformidade"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Compliance data"
+                    }
+                ],
+                "Definition": [
+                    {
+                        "language": "pt",
+                        "value": "Grupo Dados de conformidade"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Group Compliance data"
+                    }
+                ],
+                "MajorVersion": 1,
+                "Status": "Active",
+                "HasPropertyRef": [
+                    {
+                        "dt:GUID": "e0000000-0000-0000-0000-000000009201",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste1"
+                    },
+                    {
+                        "dt:GUID": "e0000000-0000-0000-0000-000000009202",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste2"
+                    }
+                ],
+                "dt:GUID": "b0000000-0000-0000-0000-000000009101",
+                "dateOfCreation": "2024-01-01T00:00:00+00:00",
+                "_uri": "https:\/\/pdts.pt\/uri\/0.1\/gop\/9101-DadosDeConformidade",
+                "_raw": {
+                    "Id": 9101,
+                    "GUID": "b0000000000000000000000000009101",
+                    "pdtId": 9001,
+                    "referenceDocumentGUID": "n\/a",
+                    "gopNameEn": "Compliance data",
+                    "gopNamePt": "Dados de conformidade",
+                    "definitionEn": "Group Compliance data",
+                    "definitionPt": "Grupo Dados de conformidade",
+                    "status": "Active",
+                    "dateOfCreation": null,
+                    "dateofActivation": null,
+                    "dateOfLastChange": null,
+                    "dateOfRevision": "2024-01-01",
+                    "dateOfVersion": "2024-01-01",
+                    "versionNumber": 1,
+                    "revisionNumber": 0,
+                    "listOfReplacedProperties": null,
+                    "listOfReplacingProperties": null,
+                    "relationToOtherDataDictionaries": null,
+                    "creatorsLanguage": null,
+                    "visualRepresentation": null,
+                    "countryOfUse": null,
+                    "countryOfOrigin": null,
+                    "categoryOfGroupOfProperties": null,
+                    "parentGroupOfProperties": null,
+                    "updated_at": "2024-01-01",
+                    "created_at": "2024-01-01",
+                    "depreciationExplanation": null,
+                    "depreciationDate": null,
+                    "uri": "https:\/\/pdts.pt\/uri\/0.1\/gop\/9101-DadosDeConformidade"
+                }
+            }
+        ],
+        "Properties": [
+            {
+                "Name": [
+                    {
+                        "language": "pt",
+                        "value": "PropriedadeTeste5"
+                    },
+                    {
+                        "language": "en",
+                        "value": "TestProperty5"
+                    }
+                ],
+                "Definition": [
+                    {
+                        "language": "pt",
+                        "value": "Definição 5"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Definition 5"
+                    }
+                ],
+                "MajorVersion": 1,
+                "Status": "Active",
+                "DataType": {
+                    "name": "REAL"
+                },
+                "_physicalQuantity": null,
+                "_unitUnmapped": "mm",
+                "dt:GUID": "e0000000-0000-0000-0000-000000009205",
+                "dateOfCreation": "2024-01-01T00:00:00+00:00",
+                "_uri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste5",
+                "_raw": {
+                    "dictionary": {
+                        "Id": 9205,
+                        "GUID": "e0000000000000000000000000009205",
+                        "namePt": "PropriedadeTeste5",
+                        "namePtSc": "Propriedade teste 5",
+                        "nameEn": "TestProperty5",
+                        "nameEnSc": "Test property 5",
+                        "definitionPt": "Definição 5",
+                        "definitionEn": "Definition 5",
+                        "status": "Active",
+                        "dateOfCreation": null,
+                        "dateofActivation": null,
+                        "dateOfLastChange": null,
+                        "dateOfRevision": "2024-01-01",
+                        "dateOfVersion": "2024-01-01",
+                        "versionNumber": 1,
+                        "revisionNumber": 0,
+                        "listOfReplacedProperties": null,
+                        "listOfReplacingProperties": null,
+                        "relationToOtherDataDictionaries": null,
+                        "creatorsLanguage": null,
+                        "visualRepresentation": null,
+                        "countryOfUse": null,
+                        "countryOfOrigin": null,
+                        "physicalQuantity": null,
+                        "dimension": null,
+                        "dataType": "Real",
+                        "dynamicProperty": null,
+                        "parametersOfTheDynamicProperty": null,
+                        "units": "mm",
+                        "namesOfDefiningValues": null,
+                        "definingValues": null,
+                        "tolerance": null,
+                        "digitalFormat": null,
+                        "textFormat": null,
+                        "listOfPossibleValuesInLanguageN": null,
+                        "boundaryValues": null,
+                        "updated_at": "2024-01-01",
+                        "created_at": "2024-01-01",
+                        "depreciationExplanation": null,
+                        "depreciationDate": null,
+                        "uri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste5"
+                    },
+                    "pivot": {
+                        "Id": 9305,
+                        "GUID": "e0000000000000000000000000009205",
+                        "gopID": 9103,
+                        "pdtID": 9003,
+                        "referenceDocumentGUID": "n\/a",
+                        "descriptionEn": "Usage 5",
+                        "descriptionPt": "Uso 5",
+                        "visualRepresentation": null,
+                        "updated_at": "2024-01-01",
+                        "created_at": "2024-01-01",
+                        "propertyId": 9205,
+                        "uri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9305-PropriedadeTeste5"
+                    },
+                    "source": "PDT"
+                }
+            },
+            {
+                "Name": [
+                    {
+                        "language": "pt",
+                        "value": "PropriedadeTeste6"
+                    },
+                    {
+                        "language": "en",
+                        "value": "TestProperty6"
+                    }
+                ],
+                "Definition": [
+                    {
+                        "language": "pt",
+                        "value": "Definição 6"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Definition 6"
+                    }
+                ],
+                "MajorVersion": 1,
+                "Status": "Active",
+                "DataType": {
+                    "name": "STRING"
+                },
+                "_physicalQuantity": "without",
+                "dt:GUID": "e0000000-0000-0000-0000-000000009206",
+                "dateOfCreation": "2024-01-01T00:00:00+00:00",
+                "_uri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste6",
+                "_raw": {
+                    "dictionary": {
+                        "Id": 9206,
+                        "GUID": "e0000000000000000000000000009206",
+                        "namePt": "PropriedadeTeste6",
+                        "namePtSc": "Propriedade teste 6",
+                        "nameEn": "TestProperty6",
+                        "nameEnSc": "Test property 6",
+                        "definitionPt": "Definição 6",
+                        "definitionEn": "Definition 6",
+                        "status": "Active",
+                        "dateOfCreation": null,
+                        "dateofActivation": null,
+                        "dateOfLastChange": null,
+                        "dateOfRevision": "2024-01-01",
+                        "dateOfVersion": "2024-01-01",
+                        "versionNumber": 1,
+                        "revisionNumber": 0,
+                        "listOfReplacedProperties": null,
+                        "listOfReplacingProperties": null,
+                        "relationToOtherDataDictionaries": null,
+                        "creatorsLanguage": null,
+                        "visualRepresentation": null,
+                        "countryOfUse": null,
+                        "countryOfOrigin": null,
+                        "physicalQuantity": null,
+                        "dimension": null,
+                        "dataType": "String",
+                        "dynamicProperty": null,
+                        "parametersOfTheDynamicProperty": null,
+                        "units": null,
+                        "namesOfDefiningValues": null,
+                        "definingValues": null,
+                        "tolerance": null,
+                        "digitalFormat": null,
+                        "textFormat": null,
+                        "listOfPossibleValuesInLanguageN": null,
+                        "boundaryValues": null,
+                        "updated_at": "2024-01-01",
+                        "created_at": "2024-01-01",
+                        "depreciationExplanation": null,
+                        "depreciationDate": null,
+                        "uri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste6"
+                    },
+                    "pivot": {
+                        "Id": 9306,
+                        "GUID": "e0000000000000000000000000009206",
+                        "gopID": 9104,
+                        "pdtID": 9003,
+                        "referenceDocumentGUID": "n\/a",
+                        "descriptionEn": "Usage 6",
+                        "descriptionPt": "Uso 6",
+                        "visualRepresentation": null,
+                        "updated_at": "2024-01-01",
+                        "created_at": "2024-01-01",
+                        "propertyId": 9206,
+                        "uri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9306-PropriedadeTeste6"
+                    },
+                    "source": "PDT"
+                }
+            },
+            {
+                "Name": [
+                    {
+                        "language": "pt",
+                        "value": "PropriedadeTeste7"
+                    },
+                    {
+                        "language": "en",
+                        "value": "TestProperty7"
+                    }
+                ],
+                "Definition": [
+                    {
+                        "language": "pt",
+                        "value": "Definição 7"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Definition 7"
+                    }
+                ],
+                "MajorVersion": 1,
+                "Status": "Active",
+                "DataType": {
+                    "name": "REAL"
+                },
+                "_physicalQuantity": null,
+                "_unitUnmapped": "mm",
+                "dt:GUID": "e0000000-0000-0000-0000-000000009207",
+                "dateOfCreation": "2024-01-01T00:00:00+00:00",
+                "_uri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste7",
+                "_raw": {
+                    "dictionary": {
+                        "Id": 9207,
+                        "GUID": "e0000000000000000000000000009207",
+                        "namePt": "PropriedadeTeste7",
+                        "namePtSc": "Propriedade teste 7",
+                        "nameEn": "TestProperty7",
+                        "nameEnSc": "Test property 7",
+                        "definitionPt": "Definição 7",
+                        "definitionEn": "Definition 7",
+                        "status": "Active",
+                        "dateOfCreation": null,
+                        "dateofActivation": null,
+                        "dateOfLastChange": null,
+                        "dateOfRevision": "2024-01-01",
+                        "dateOfVersion": "2024-01-01",
+                        "versionNumber": 1,
+                        "revisionNumber": 0,
+                        "listOfReplacedProperties": null,
+                        "listOfReplacingProperties": null,
+                        "relationToOtherDataDictionaries": null,
+                        "creatorsLanguage": null,
+                        "visualRepresentation": null,
+                        "countryOfUse": null,
+                        "countryOfOrigin": null,
+                        "physicalQuantity": null,
+                        "dimension": null,
+                        "dataType": "Real",
+                        "dynamicProperty": null,
+                        "parametersOfTheDynamicProperty": null,
+                        "units": "mm",
+                        "namesOfDefiningValues": null,
+                        "definingValues": null,
+                        "tolerance": null,
+                        "digitalFormat": null,
+                        "textFormat": null,
+                        "listOfPossibleValuesInLanguageN": null,
+                        "boundaryValues": null,
+                        "updated_at": "2024-01-01",
+                        "created_at": "2024-01-01",
+                        "depreciationExplanation": null,
+                        "depreciationDate": null,
+                        "uri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste7"
+                    },
+                    "pivot": {
+                        "Id": 9307,
+                        "GUID": "e0000000000000000000000000009207",
+                        "gopID": 9104,
+                        "pdtID": 9003,
+                        "referenceDocumentGUID": "n\/a",
+                        "descriptionEn": "Usage 7",
+                        "descriptionPt": "Uso 7",
+                        "visualRepresentation": null,
+                        "updated_at": "2024-01-01",
+                        "created_at": "2024-01-01",
+                        "propertyId": 9207,
+                        "uri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9307-PropriedadeTeste7"
+                    },
+                    "source": "PDT"
+                }
+            },
+            {
+                "Name": [
+                    {
+                        "language": "pt",
+                        "value": "PropriedadeTeste8"
+                    },
+                    {
+                        "language": "en",
+                        "value": "TestProperty8"
+                    }
+                ],
+                "Definition": [
+                    {
+                        "language": "pt",
+                        "value": "Definição 8"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Definition 8"
+                    }
+                ],
+                "MajorVersion": 1,
+                "Status": "Active",
+                "DataType": {
+                    "name": "STRING"
+                },
+                "_physicalQuantity": "without",
+                "dt:GUID": "e0000000-0000-0000-0000-000000009208",
+                "dateOfCreation": "2024-01-01T00:00:00+00:00",
+                "_uri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste8",
+                "_raw": {
+                    "dictionary": {
+                        "Id": 9208,
+                        "GUID": "e0000000000000000000000000009208",
+                        "namePt": "PropriedadeTeste8",
+                        "namePtSc": "Propriedade teste 8",
+                        "nameEn": "TestProperty8",
+                        "nameEnSc": "Test property 8",
+                        "definitionPt": "Definição 8",
+                        "definitionEn": "Definition 8",
+                        "status": "Active",
+                        "dateOfCreation": null,
+                        "dateofActivation": null,
+                        "dateOfLastChange": null,
+                        "dateOfRevision": "2024-01-01",
+                        "dateOfVersion": "2024-01-01",
+                        "versionNumber": 1,
+                        "revisionNumber": 0,
+                        "listOfReplacedProperties": null,
+                        "listOfReplacingProperties": null,
+                        "relationToOtherDataDictionaries": null,
+                        "creatorsLanguage": null,
+                        "visualRepresentation": null,
+                        "countryOfUse": null,
+                        "countryOfOrigin": null,
+                        "physicalQuantity": null,
+                        "dimension": null,
+                        "dataType": "String",
+                        "dynamicProperty": null,
+                        "parametersOfTheDynamicProperty": null,
+                        "units": null,
+                        "namesOfDefiningValues": null,
+                        "definingValues": null,
+                        "tolerance": null,
+                        "digitalFormat": null,
+                        "textFormat": null,
+                        "listOfPossibleValuesInLanguageN": null,
+                        "boundaryValues": null,
+                        "updated_at": "2024-01-01",
+                        "created_at": "2024-01-01",
+                        "depreciationExplanation": null,
+                        "depreciationDate": null,
+                        "uri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste8"
+                    },
+                    "pivot": {
+                        "Id": 9308,
+                        "GUID": "e0000000000000000000000000009208",
+                        "gopID": 9104,
+                        "pdtID": 9003,
+                        "referenceDocumentGUID": "n\/a",
+                        "descriptionEn": "Usage 8",
+                        "descriptionPt": "Uso 8",
+                        "visualRepresentation": null,
+                        "updated_at": "2024-01-01",
+                        "created_at": "2024-01-01",
+                        "propertyId": 9208,
+                        "uri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9308-PropriedadeTeste8"
+                    },
+                    "source": "PDT"
+                }
+            },
+            {
+                "Name": [
+                    {
+                        "language": "pt",
+                        "value": "PropriedadeTeste3"
+                    },
+                    {
+                        "language": "en",
+                        "value": "TestProperty3"
+                    }
+                ],
+                "Definition": [
+                    {
+                        "language": "pt",
+                        "value": "Definição 3"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Definition 3"
+                    }
+                ],
+                "MajorVersion": 1,
+                "Status": "Active",
+                "DataType": {
+                    "name": "REAL"
+                },
+                "_physicalQuantity": null,
+                "_unitUnmapped": "mm",
+                "dt:GUID": "e0000000-0000-0000-0000-000000009203",
+                "dateOfCreation": "2024-01-01T00:00:00+00:00",
+                "_uri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste3",
+                "_raw": {
+                    "dictionary": {
+                        "Id": 9203,
+                        "GUID": "e0000000000000000000000000009203",
+                        "namePt": "PropriedadeTeste3",
+                        "namePtSc": "Propriedade teste 3",
+                        "nameEn": "TestProperty3",
+                        "nameEnSc": "Test property 3",
+                        "definitionPt": "Definição 3",
+                        "definitionEn": "Definition 3",
+                        "status": "Active",
+                        "dateOfCreation": null,
+                        "dateofActivation": null,
+                        "dateOfLastChange": null,
+                        "dateOfRevision": "2024-01-01",
+                        "dateOfVersion": "2024-01-01",
+                        "versionNumber": 1,
+                        "revisionNumber": 0,
+                        "listOfReplacedProperties": null,
+                        "listOfReplacingProperties": null,
+                        "relationToOtherDataDictionaries": null,
+                        "creatorsLanguage": null,
+                        "visualRepresentation": null,
+                        "countryOfUse": null,
+                        "countryOfOrigin": null,
+                        "physicalQuantity": null,
+                        "dimension": null,
+                        "dataType": "Real",
+                        "dynamicProperty": null,
+                        "parametersOfTheDynamicProperty": null,
+                        "units": "mm",
+                        "namesOfDefiningValues": null,
+                        "definingValues": null,
+                        "tolerance": null,
+                        "digitalFormat": null,
+                        "textFormat": null,
+                        "listOfPossibleValuesInLanguageN": null,
+                        "boundaryValues": null,
+                        "updated_at": "2024-01-01",
+                        "created_at": "2024-01-01",
+                        "depreciationExplanation": null,
+                        "depreciationDate": null,
+                        "uri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste3"
+                    },
+                    "pivot": null,
+                    "source": "MASTER"
+                }
+            },
+            {
+                "Name": [
+                    {
+                        "language": "pt",
+                        "value": "PropriedadeTeste4"
+                    },
+                    {
+                        "language": "en",
+                        "value": "TestProperty4"
+                    }
+                ],
+                "Definition": [
+                    {
+                        "language": "pt",
+                        "value": "Definição 4"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Definition 4"
+                    }
+                ],
+                "MajorVersion": 1,
+                "Status": "Active",
+                "DataType": {
+                    "name": "STRING"
+                },
+                "_physicalQuantity": "without",
+                "dt:GUID": "e0000000-0000-0000-0000-000000009204",
+                "dateOfCreation": "2024-01-01T00:00:00+00:00",
+                "_uri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste4",
+                "_raw": {
+                    "dictionary": {
+                        "Id": 9204,
+                        "GUID": "e0000000000000000000000000009204",
+                        "namePt": "PropriedadeTeste4",
+                        "namePtSc": "Propriedade teste 4",
+                        "nameEn": "TestProperty4",
+                        "nameEnSc": "Test property 4",
+                        "definitionPt": "Definição 4",
+                        "definitionEn": "Definition 4",
+                        "status": "Active",
+                        "dateOfCreation": null,
+                        "dateofActivation": null,
+                        "dateOfLastChange": null,
+                        "dateOfRevision": "2024-01-01",
+                        "dateOfVersion": "2024-01-01",
+                        "versionNumber": 1,
+                        "revisionNumber": 0,
+                        "listOfReplacedProperties": null,
+                        "listOfReplacingProperties": null,
+                        "relationToOtherDataDictionaries": null,
+                        "creatorsLanguage": null,
+                        "visualRepresentation": null,
+                        "countryOfUse": null,
+                        "countryOfOrigin": null,
+                        "physicalQuantity": null,
+                        "dimension": null,
+                        "dataType": "String",
+                        "dynamicProperty": null,
+                        "parametersOfTheDynamicProperty": null,
+                        "units": null,
+                        "namesOfDefiningValues": null,
+                        "definingValues": null,
+                        "tolerance": null,
+                        "digitalFormat": null,
+                        "textFormat": null,
+                        "listOfPossibleValuesInLanguageN": null,
+                        "boundaryValues": null,
+                        "updated_at": "2024-01-01",
+                        "created_at": "2024-01-01",
+                        "depreciationExplanation": null,
+                        "depreciationDate": null,
+                        "uri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste4"
+                    },
+                    "pivot": null,
+                    "source": "MASTER"
+                }
+            },
+            {
+                "Name": [
+                    {
+                        "language": "pt",
+                        "value": "PropriedadeTeste1"
+                    },
+                    {
+                        "language": "en",
+                        "value": "TestProperty1"
+                    }
+                ],
+                "Definition": [
+                    {
+                        "language": "pt",
+                        "value": "Definição 1"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Definition 1"
+                    }
+                ],
+                "ReferenceDocumentRef": {
+                    "dt:GUID": "d0000000-0000-0000-0000-000000000001"
+                },
+                "MajorVersion": 1,
+                "Status": "Active",
+                "DataType": {
+                    "name": "REAL"
+                },
+                "_physicalQuantity": null,
+                "_unitUnmapped": "mm",
+                "dt:GUID": "e0000000-0000-0000-0000-000000009201",
+                "dateOfCreation": "2024-01-01T00:00:00+00:00",
+                "_uri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste1",
+                "_raw": {
+                    "dictionary": {
+                        "Id": 9201,
+                        "GUID": "e0000000000000000000000000009201",
+                        "namePt": "PropriedadeTeste1",
+                        "namePtSc": "Propriedade teste 1",
+                        "nameEn": "TestProperty1",
+                        "nameEnSc": "Test property 1",
+                        "definitionPt": "Definição 1",
+                        "definitionEn": "Definition 1",
+                        "status": "Active",
+                        "dateOfCreation": null,
+                        "dateofActivation": null,
+                        "dateOfLastChange": null,
+                        "dateOfRevision": "2024-01-01",
+                        "dateOfVersion": "2024-01-01",
+                        "versionNumber": 1,
+                        "revisionNumber": 0,
+                        "listOfReplacedProperties": null,
+                        "listOfReplacingProperties": null,
+                        "relationToOtherDataDictionaries": null,
+                        "creatorsLanguage": null,
+                        "visualRepresentation": null,
+                        "countryOfUse": null,
+                        "countryOfOrigin": null,
+                        "physicalQuantity": null,
+                        "dimension": null,
+                        "dataType": "Real",
+                        "dynamicProperty": null,
+                        "parametersOfTheDynamicProperty": null,
+                        "units": "mm",
+                        "namesOfDefiningValues": null,
+                        "definingValues": null,
+                        "tolerance": null,
+                        "digitalFormat": null,
+                        "textFormat": null,
+                        "listOfPossibleValuesInLanguageN": null,
+                        "boundaryValues": null,
+                        "updated_at": "2024-01-01",
+                        "created_at": "2024-01-01",
+                        "depreciationExplanation": null,
+                        "depreciationDate": null,
+                        "uri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste1"
+                    },
+                    "pivot": null,
+                    "source": "MASTER"
+                }
+            },
+            {
+                "Name": [
+                    {
+                        "language": "pt",
+                        "value": "PropriedadeTeste2"
+                    },
+                    {
+                        "language": "en",
+                        "value": "TestProperty2"
+                    }
+                ],
+                "Definition": [
+                    {
+                        "language": "pt",
+                        "value": "Definição 2"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Definition 2"
+                    }
+                ],
+                "MajorVersion": 1,
+                "Status": "Active",
+                "DataType": {
+                    "name": "STRING"
+                },
+                "_physicalQuantity": "without",
+                "dt:GUID": "e0000000-0000-0000-0000-000000009202",
+                "dateOfCreation": "2024-01-01T00:00:00+00:00",
+                "_uri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste2",
+                "_raw": {
+                    "dictionary": {
+                        "Id": 9202,
+                        "GUID": "e0000000000000000000000000009202",
+                        "namePt": "PropriedadeTeste2",
+                        "namePtSc": "Propriedade teste 2",
+                        "nameEn": "TestProperty2",
+                        "nameEnSc": "Test property 2",
+                        "definitionPt": "Definição 2",
+                        "definitionEn": "Definition 2",
+                        "status": "Active",
+                        "dateOfCreation": null,
+                        "dateofActivation": null,
+                        "dateOfLastChange": null,
+                        "dateOfRevision": "2024-01-01",
+                        "dateOfVersion": "2024-01-01",
+                        "versionNumber": 1,
+                        "revisionNumber": 0,
+                        "listOfReplacedProperties": null,
+                        "listOfReplacingProperties": null,
+                        "relationToOtherDataDictionaries": null,
+                        "creatorsLanguage": null,
+                        "visualRepresentation": null,
+                        "countryOfUse": null,
+                        "countryOfOrigin": null,
+                        "physicalQuantity": null,
+                        "dimension": null,
+                        "dataType": "String",
+                        "dynamicProperty": null,
+                        "parametersOfTheDynamicProperty": null,
+                        "units": null,
+                        "namesOfDefiningValues": null,
+                        "definingValues": null,
+                        "tolerance": null,
+                        "digitalFormat": null,
+                        "textFormat": null,
+                        "listOfPossibleValuesInLanguageN": null,
+                        "boundaryValues": null,
+                        "updated_at": "2024-01-01",
+                        "created_at": "2024-01-01",
+                        "depreciationExplanation": null,
+                        "depreciationDate": null,
+                        "uri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste2"
+                    },
+                    "pivot": null,
+                    "source": "MASTER"
+                }
+            }
+        ],
+        "ReferenceDocuments": [
+            {
+                "Name": [
+                    {
+                        "language": "en",
+                        "value": "EN 771-1:2011+A1:2015"
+                    }
+                ],
+                "Definition": [
+                    {
+                        "language": "en",
+                        "value": "Specification for masonry units"
+                    }
+                ],
+                "Status": "Active",
+                "URI": "https:\/\/pdts.pt\/uri\/0.1\/doc\/EN771-12011%2BA12015",
+                "Language": "en",
+                "dt:GUID": "d0000000-0000-0000-0000-000000000001",
+                "dateOfCreation": "2024-01-01T00:00:00+00:00",
+                "_uri": "https:\/\/pdts.pt\/uri\/0.1\/doc\/EN771-12011%2BA12015",
+                "_raw": {
+                    "GUID": "d0000000000000000000000000000001",
+                    "rdName": "EN 771-1:2011+A1:2015",
+                    "title": "Specification for masonry units",
+                    "description": null,
+                    "status": "Active",
+                    "updated_at": "2024-01-01T00:00:00.000000Z",
+                    "created_at": "2024-01-01T00:00:00.000000Z",
+                    "uri": "https:\/\/pdts.pt\/uri\/0.1\/doc\/EN771-12011%2BA12015"
+                }
+            }
+        ],
+        "_raw": {
+            "\u0000*\u0000connection": "mysql",
+            "\u0000*\u0000table": "productdatatemplates",
+            "\u0000*\u0000primaryKey": "Id",
+            "\u0000*\u0000keyType": "int",
+            "incrementing": true,
+            "\u0000*\u0000with": [],
+            "\u0000*\u0000withCount": [],
+            "preventsLazyLoading": false,
+            "\u0000*\u0000perPage": 15,
+            "exists": true,
+            "wasRecentlyCreated": false,
+            "\u0000*\u0000escapeWhenCastingToString": false,
+            "\u0000*\u0000attributes": {
+                "Id": 9003,
+                "GUID": "a0000000000000000000000000009003",
+                "referenceDocumentGUID": "d0000000000000000000000000000001",
+                "pdtNameEn": "Clay brick",
+                "pdtNamePt": "Tijolo cerâmico",
+                "dateOfRevision": "2024-01-01",
+                "dateOfVersion": "2024-01-01",
+                "updated_at": "2024-01-01",
+                "created_at": "2024-01-01",
+                "status": "Active",
+                "category": "Construção",
+                "versionNumber": 2,
+                "revisionNumber": 0,
+                "descriptionEn": "Description of Clay brick",
+                "descriptionPt": "Descrição de Tijolo cerâmico",
+                "constructionObjectGUID": "c0000000000000000000000000000001",
+                "depreciationExplanation": null,
+                "depreciationDate": null
+            },
+            "\u0000*\u0000original": {
+                "Id": 9003,
+                "GUID": "a0000000000000000000000000009003",
+                "referenceDocumentGUID": "d0000000000000000000000000000001",
+                "pdtNameEn": "Clay brick",
+                "pdtNamePt": "Tijolo cerâmico",
+                "dateOfRevision": "2024-01-01",
+                "dateOfVersion": "2024-01-01",
+                "updated_at": "2024-01-01",
+                "created_at": "2024-01-01",
+                "status": "Active",
+                "category": "Construção",
+                "versionNumber": 2,
+                "revisionNumber": 0,
+                "descriptionEn": "Description of Clay brick",
+                "descriptionPt": "Descrição de Tijolo cerâmico",
+                "constructionObjectGUID": "c0000000000000000000000000000001",
+                "depreciationExplanation": null,
+                "depreciationDate": null
+            },
+            "\u0000*\u0000changes": [],
+            "\u0000*\u0000casts": [],
+            "\u0000*\u0000classCastCache": [],
+            "\u0000*\u0000attributeCastCache": [],
+            "\u0000*\u0000dates": [],
+            "\u0000*\u0000dateFormat": null,
+            "\u0000*\u0000appends": [
+                "uri"
+            ],
+            "\u0000*\u0000dispatchesEvents": [],
+            "\u0000*\u0000observables": [],
+            "\u0000*\u0000relations": [],
+            "\u0000*\u0000touches": [],
+            "timestamps": false,
+            "\u0000*\u0000hidden": [],
+            "\u0000*\u0000visible": [],
+            "\u0000*\u0000fillable": [],
+            "\u0000*\u0000guarded": [
+                "*"
+            ]
+        }
+    }
+}

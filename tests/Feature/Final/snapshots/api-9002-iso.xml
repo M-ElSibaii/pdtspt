@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dt:Library xmlns:dt="https://standards.iso.org/iso/23387/ed-2/en/" dt:GUID="a0000000-0000-0000-0000-000000009002">
+  <dt:Name language="pt">Alvenaria</dt:Name>
+  <dt:Name language="en">Masonry</dt:Name>
+  <dt:DataTemplate dt:GUID="a0000000-0000-0000-0000-000000009002" dateOfCreation="2024-01-01T00:00:00+00:00">
+    <dt:Name language="pt">Alvenaria</dt:Name>
+    <dt:Name language="en">Masonry</dt:Name>
+    <dt:Definition language="pt">Descrição de Alvenaria</dt:Definition>
+    <dt:Definition language="en">Description of Masonry</dt:Definition>
+    <dt:ReferenceDocumentRef dt:GUID="d0000000-0000-0000-0000-000000000001"/>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:IsSubtypeOfRef dt:referenceURI="https://pdts.pt/uri/0.1/dt/ModeloMestre"/>
+    <dt:HasObjectTypeRef dt:GUID="c0000000-0000-0000-0000-000000000001"/>
+    <dt:HasPropertyRef dt:GUID="e0000000-0000-0000-0000-000000009203" dt:referenceURI="https://pdts.pt/uri/0.1/prop/PropriedadeTeste3"/>
+    <dt:HasPropertyRef dt:GUID="e0000000-0000-0000-0000-000000009204" dt:referenceURI="https://pdts.pt/uri/0.1/prop/PropriedadeTeste4"/>
+    <dt:HasPropertyRef dt:GUID="e0000000-0000-0000-0000-000000009201" dt:referenceURI="https://pdts.pt/uri/0.1/prop/PropriedadeTeste1"/>
+    <dt:HasPropertyRef dt:GUID="e0000000-0000-0000-0000-000000009202" dt:referenceURI="https://pdts.pt/uri/0.1/prop/PropriedadeTeste2"/>
+    <dt:HasGroupOfPropertiesRef dt:GUID="b0000000-0000-0000-0000-000000009102" dt:referenceURI="https://pdts.pt/uri/0.1/gop/9102-DadosGerais"/>
+    <dt:HasGroupOfPropertiesRef dt:GUID="b0000000-0000-0000-0000-000000009101" dt:referenceURI="https://pdts.pt/uri/0.1/gop/9101-DadosDeConformidade"/>
+  </dt:DataTemplate>
+  <dt:ObjectType dt:GUID="c0000000-0000-0000-0000-000000000001" dateOfCreation="2024-01-01T00:00:00+00:00">
+    <dt:Name language="pt">Unidade de alvenaria</dt:Name>
+    <dt:Name language="en">Masonry unit</dt:Name>
+    <dt:Definition language="pt">unidade</dt:Definition>
+    <dt:Definition language="en">unit</dt:Definition>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:Status>Active</dt:Status>
+  </dt:ObjectType>
+  <dt:GroupOfProperties dt:GUID="b0000000-0000-0000-0000-000000009102" dateOfCreation="2024-01-01T00:00:00+00:00">
+    <dt:Name language="pt">Dados gerais</dt:Name>
+    <dt:Name language="en">General data</dt:Name>
+    <dt:Definition language="pt">Grupo Dados gerais</dt:Definition>
+    <dt:Definition language="en">Group General data</dt:Definition>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:HasPropertyRef dt:GUID="e0000000-0000-0000-0000-000000009203" dt:referenceURI="https://pdts.pt/uri/0.1/prop/PropriedadeTeste3"/>
+    <dt:HasPropertyRef dt:GUID="e0000000-0000-0000-0000-000000009204" dt:referenceURI="https://pdts.pt/uri/0.1/prop/PropriedadeTeste4"/>
+  </dt:GroupOfProperties>
+  <dt:GroupOfProperties dt:GUID="b0000000-0000-0000-0000-000000009101" dateOfCreation="2024-01-01T00:00:00+00:00">
+    <dt:Name language="pt">Dados de conformidade</dt:Name>
+    <dt:Name language="en">Compliance data</dt:Name>
+    <dt:Definition language="pt">Grupo Dados de conformidade</dt:Definition>
+    <dt:Definition language="en">Group Compliance data</dt:Definition>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:HasPropertyRef dt:GUID="e0000000-0000-0000-0000-000000009201" dt:referenceURI="https://pdts.pt/uri/0.1/prop/PropriedadeTeste1"/>
+    <dt:HasPropertyRef dt:GUID="e0000000-0000-0000-0000-000000009202" dt:referenceURI="https://pdts.pt/uri/0.1/prop/PropriedadeTeste2"/>
+  </dt:GroupOfProperties>
+  <dt:Property dt:GUID="e0000000-0000-0000-0000-000000009203" dateOfCreation="2024-01-01T00:00:00+00:00">
+    <dt:Name language="pt">PropriedadeTeste3</dt:Name>
+    <dt:Name language="en">TestProperty3</dt:Name>
+    <dt:Definition language="pt">Definição 3</dt:Definition>
+    <dt:Definition language="en">Definition 3</dt:Definition>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="REAL"/>
+  </dt:Property>
+  <dt:Property dt:GUID="e0000000-0000-0000-0000-000000009204" dateOfCreation="2024-01-01T00:00:00+00:00">
+    <dt:Name language="pt">PropriedadeTeste4</dt:Name>
+    <dt:Name language="en">TestProperty4</dt:Name>
+    <dt:Definition language="pt">Definição 4</dt:Definition>
+    <dt:Definition language="en">Definition 4</dt:Definition>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="STRING"/>
+  </dt:Property>
+  <dt:Property dt:GUID="e0000000-0000-0000-0000-000000009201" dateOfCreation="2024-01-01T00:00:00+00:00">
+    <dt:Name language="pt">PropriedadeTeste1</dt:Name>
+    <dt:Name language="en">TestProperty1</dt:Name>
+    <dt:Definition language="pt">Definição 1</dt:Definition>
+    <dt:Definition language="en">Definition 1</dt:Definition>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:ReferenceDocumentRef dt:GUID="d0000000-0000-0000-0000-000000000001"/>
+    <dt:DataType name="REAL"/>
+  </dt:Property>
+  <dt:Property dt:GUID="e0000000-0000-0000-0000-000000009202" dateOfCreation="2024-01-01T00:00:00+00:00">
+    <dt:Name language="pt">PropriedadeTeste2</dt:Name>
+    <dt:Name language="en">TestProperty2</dt:Name>
+    <dt:Definition language="pt">Definição 2</dt:Definition>
+    <dt:Definition language="en">Definition 2</dt:Definition>
+    <dt:MajorVersion>1</dt:MajorVersion>
+    <dt:Status>Active</dt:Status>
+    <dt:DataType name="STRING"/>
+  </dt:Property>
+  <dt:ReferenceDocument dt:GUID="d0000000-0000-0000-0000-000000000001" dateOfCreation="2024-01-01T00:00:00+00:00">
+    <dt:Name language="en">EN 771-1:2011+A1:2015</dt:Name>
+    <dt:Definition language="en">Specification for masonry units</dt:Definition>
+    <dt:Status>Active</dt:Status>
+    <dt:Language>en</dt:Language>
+    <dt:URI>https://pdts.pt/uri/0.1/doc/EN771-12011%2BA12015</dt:URI>
+  </dt:ReferenceDocument>
+</dt:Library>

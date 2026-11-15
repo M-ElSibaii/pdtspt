@@ -1,0 +1,523 @@
+{
+    "ModelVersion": "2.0",
+    "OrganizationCode": "pdtspt",
+    "DictionaryCode": "pdtspt",
+    "LanguageIsoCode": "pt-PT",
+    "LanguageOnly": false,
+    "UseOwnUri": true,
+    "DictionaryUri": "https:\/\/pdts.pt\/uri\/0.1",
+    "DictionaryName": "PDTs.pt",
+    "DictionaryVersion": "0.1",
+    "MoreInfoUrl": "https:\/\/pdts.pt",
+    "ChangeRequestEmailAddress": "pdts.portugal@gmail.com",
+    "License": "CC BY",
+    "LicenseUrl": "https:\/\/creativecommons.org\/share-your-work\/cclicenses\/",
+    "QualityAssuranceProcedure": "EN ISO 23386:2020",
+    "Classes": [
+        {
+            "ClassType": "Class",
+            "Code": "ModeloMestre",
+            "Name": "Modelo mestre",
+            "Definition": "Descrição de Modelo mestre",
+            "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/dt\/ModeloMestre",
+            "ActivationDateUtc": "2024-01-01",
+            "DeActivationDateUtc": null,
+            "DeprecationExplanation": null,
+            "DocumentReference": "EN 771-1:2011+A1:2015",
+            "RevisionDateUtc": "2024-01-01",
+            "RevisionNumber": 0,
+            "Status": "Active",
+            "Uid": "230d9954097541b793f2a1fddb8bd0ad",
+            "VersionDateUtc": "2024-01-01",
+            "VersionNumber": 5,
+            "ClassProperties": [
+                {
+                    "Code": "9301-PropriedadeTeste1",
+                    "PropertyCode": "PropriedadeTeste1",
+                    "Description": "Uso 1",
+                    "PropertySet": "9101-DadosDeConformidade",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9301-PropriedadeTeste1-ModeloMestre9001"
+                },
+                {
+                    "Code": "9302-PropriedadeTeste2",
+                    "PropertyCode": "PropriedadeTeste2",
+                    "Description": "Uso 2",
+                    "PropertySet": "9101-DadosDeConformidade",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9302-PropriedadeTeste2-ModeloMestre9001"
+                }
+            ]
+        },
+        {
+            "ClassType": "GroupOfProperties",
+            "Code": "9101-DadosDeConformidade",
+            "Name": "Dados de conformidade",
+            "Definition": "Grupo Dados de conformidade",
+            "Status": "Active",
+            "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/gop\/9101-DadosDeConformidade",
+            "ActivationDateUtc": "2024-01-01",
+            "Uid": "b0000000000000000000000000009101",
+            "VersionNumber": 1,
+            "RevisionNumber": 0,
+            "ParentClassCode": "ModeloMestre",
+            "ClassProperties": [
+                {
+                    "Code": "9301-PropriedadeTeste1",
+                    "PropertyCode": "PropriedadeTeste1",
+                    "Description": "Uso 1",
+                    "PropertySet": "9101-DadosDeConformidade",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9301-PropriedadeTeste1-DadosDeConformidade9101"
+                },
+                {
+                    "Code": "9302-PropriedadeTeste2",
+                    "PropertyCode": "PropriedadeTeste2",
+                    "Description": "Uso 2",
+                    "PropertySet": "9101-DadosDeConformidade",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9302-PropriedadeTeste2-DadosDeConformidade9101"
+                }
+            ]
+        },
+        {
+            "ClassType": "Class",
+            "Code": "Alvenaria",
+            "Name": "Alvenaria",
+            "Definition": "Descrição de Alvenaria",
+            "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/dt\/Alvenaria",
+            "ActivationDateUtc": "2024-01-01",
+            "DeActivationDateUtc": null,
+            "DeprecationExplanation": null,
+            "DocumentReference": "EN 771-1:2011+A1:2015",
+            "RevisionDateUtc": "2024-01-01",
+            "RevisionNumber": 0,
+            "Status": "Active",
+            "Uid": "a0000000000000000000000000009002",
+            "VersionDateUtc": "2024-01-01",
+            "VersionNumber": 1,
+            "ClassProperties": [
+                {
+                    "Code": "9303-PropriedadeTeste3",
+                    "PropertyCode": "PropriedadeTeste3",
+                    "Description": "Uso 3",
+                    "PropertySet": "9102-DadosGerais",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9303-PropriedadeTeste3-Alvenaria9002"
+                },
+                {
+                    "Code": "9304-PropriedadeTeste4",
+                    "PropertyCode": "PropriedadeTeste4",
+                    "Description": "Uso 4",
+                    "PropertySet": "9102-DadosGerais",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9304-PropriedadeTeste4-Alvenaria9002"
+                },
+                {
+                    "Code": "9301-PropriedadeTeste1",
+                    "PropertyCode": "PropriedadeTeste1",
+                    "Description": "Uso 1",
+                    "PropertySet": "9101-DadosDeConformidade",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9301-PropriedadeTeste1-Alvenaria9002"
+                },
+                {
+                    "Code": "9302-PropriedadeTeste2",
+                    "PropertyCode": "PropriedadeTeste2",
+                    "Description": "Uso 2",
+                    "PropertySet": "9101-DadosDeConformidade",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9302-PropriedadeTeste2-Alvenaria9002"
+                }
+            ],
+            "ClassRelations": [
+                {
+                    "RelationType": "IsChildOf",
+                    "RelatedClassUri": "https:\/\/pdts.pt\/uri\/0.1\/dt\/ModeloMestre",
+                    "RelatedClassName": "ModeloMestre",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/dt\/Alvenaria#IsChildOf-dt-ModeloMestre"
+                }
+            ]
+        },
+        {
+            "ClassType": "GroupOfProperties",
+            "Code": "9102-DadosGerais",
+            "Name": "Dados gerais",
+            "Definition": "Grupo Dados gerais",
+            "Status": "Active",
+            "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/gop\/9102-DadosGerais",
+            "ActivationDateUtc": "2024-01-01",
+            "Uid": "b0000000000000000000000000009102",
+            "VersionNumber": 1,
+            "RevisionNumber": 0,
+            "ParentClassCode": "Alvenaria",
+            "ClassProperties": [
+                {
+                    "Code": "9303-PropriedadeTeste3",
+                    "PropertyCode": "PropriedadeTeste3",
+                    "Description": "Uso 3",
+                    "PropertySet": "9102-DadosGerais",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9303-PropriedadeTeste3-DadosGerais9102"
+                },
+                {
+                    "Code": "9304-PropriedadeTeste4",
+                    "PropertyCode": "PropriedadeTeste4",
+                    "Description": "Uso 4",
+                    "PropertySet": "9102-DadosGerais",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9304-PropriedadeTeste4-DadosGerais9102"
+                }
+            ]
+        },
+        {
+            "ClassType": "Class",
+            "Code": "TijoloCeramico",
+            "Name": "Tijolo cerâmico",
+            "Definition": "Descrição de Tijolo cerâmico",
+            "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/dt\/TijoloCeramico",
+            "ActivationDateUtc": "2024-01-01",
+            "DeActivationDateUtc": null,
+            "DeprecationExplanation": null,
+            "DocumentReference": "EN 771-1:2011+A1:2015",
+            "RevisionDateUtc": "2024-01-01",
+            "RevisionNumber": 0,
+            "Status": "Active",
+            "Uid": "a0000000000000000000000000009003",
+            "VersionDateUtc": "2024-01-01",
+            "VersionNumber": 2,
+            "ClassProperties": [
+                {
+                    "Code": "9305-PropriedadeTeste5",
+                    "PropertyCode": "PropriedadeTeste5",
+                    "Description": "Uso 5",
+                    "PropertySet": "9103-DadosGerais",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9305-PropriedadeTeste5-TijoloCeramico9003"
+                },
+                {
+                    "Code": "9306-PropriedadeTeste6",
+                    "PropertyCode": "PropriedadeTeste6",
+                    "Description": "Uso 6",
+                    "PropertySet": "9104-DadosDeDesempenho",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9306-PropriedadeTeste6-TijoloCeramico9003"
+                },
+                {
+                    "Code": "9307-PropriedadeTeste7",
+                    "PropertyCode": "PropriedadeTeste7",
+                    "Description": "Uso 7",
+                    "PropertySet": "9104-DadosDeDesempenho",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9307-PropriedadeTeste7-TijoloCeramico9003"
+                },
+                {
+                    "Code": "9308-PropriedadeTeste8",
+                    "PropertyCode": "PropriedadeTeste8",
+                    "Description": "Uso 8",
+                    "PropertySet": "9104-DadosDeDesempenho",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9308-PropriedadeTeste8-TijoloCeramico9003"
+                },
+                {
+                    "Code": "9303-PropriedadeTeste3",
+                    "PropertyCode": "PropriedadeTeste3",
+                    "Description": "Uso 3",
+                    "PropertySet": "9102-DadosGerais",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9303-PropriedadeTeste3-TijoloCeramico9003"
+                },
+                {
+                    "Code": "9304-PropriedadeTeste4",
+                    "PropertyCode": "PropriedadeTeste4",
+                    "Description": "Uso 4",
+                    "PropertySet": "9102-DadosGerais",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9304-PropriedadeTeste4-TijoloCeramico9003"
+                },
+                {
+                    "Code": "9301-PropriedadeTeste1",
+                    "PropertyCode": "PropriedadeTeste1",
+                    "Description": "Uso 1",
+                    "PropertySet": "9101-DadosDeConformidade",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9301-PropriedadeTeste1-TijoloCeramico9003"
+                },
+                {
+                    "Code": "9302-PropriedadeTeste2",
+                    "PropertyCode": "PropriedadeTeste2",
+                    "Description": "Uso 2",
+                    "PropertySet": "9101-DadosDeConformidade",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9302-PropriedadeTeste2-TijoloCeramico9003"
+                }
+            ],
+            "ClassRelations": [
+                {
+                    "RelationType": "IsChildOf",
+                    "RelatedClassUri": "https:\/\/pdts.pt\/uri\/0.1\/dt\/Alvenaria",
+                    "RelatedClassName": "Alvenaria",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/dt\/TijoloCeramico#IsChildOf-dt-Alvenaria"
+                }
+            ]
+        },
+        {
+            "ClassType": "GroupOfProperties",
+            "Code": "9103-DadosGerais",
+            "Name": "Dados gerais",
+            "Definition": "Grupo Dados gerais",
+            "Status": "Active",
+            "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/gop\/9103-DadosGerais",
+            "ActivationDateUtc": "2024-01-01",
+            "Uid": "b0000000000000000000000000009103",
+            "VersionNumber": 1,
+            "RevisionNumber": 0,
+            "ParentClassCode": "TijoloCeramico",
+            "ClassProperties": [
+                {
+                    "Code": "9305-PropriedadeTeste5",
+                    "PropertyCode": "PropriedadeTeste5",
+                    "Description": "Uso 5",
+                    "PropertySet": "9103-DadosGerais",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9305-PropriedadeTeste5-DadosGerais9103"
+                }
+            ]
+        },
+        {
+            "ClassType": "GroupOfProperties",
+            "Code": "9104-DadosDeDesempenho",
+            "Name": "Dados de desempenho",
+            "Definition": "Grupo Dados de desempenho",
+            "Status": "Active",
+            "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/gop\/9104-DadosDeDesempenho",
+            "ActivationDateUtc": "2024-01-01",
+            "Uid": "b0000000000000000000000000009104",
+            "VersionNumber": 1,
+            "RevisionNumber": 0,
+            "ParentClassCode": "TijoloCeramico",
+            "ClassProperties": [
+                {
+                    "Code": "9306-PropriedadeTeste6",
+                    "PropertyCode": "PropriedadeTeste6",
+                    "Description": "Uso 6",
+                    "PropertySet": "9104-DadosDeDesempenho",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9306-PropriedadeTeste6-DadosDeDesempenho9104"
+                },
+                {
+                    "Code": "9307-PropriedadeTeste7",
+                    "PropertyCode": "PropriedadeTeste7",
+                    "Description": "Uso 7",
+                    "PropertySet": "9104-DadosDeDesempenho",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9307-PropriedadeTeste7-DadosDeDesempenho9104"
+                },
+                {
+                    "Code": "9308-PropriedadeTeste8",
+                    "PropertyCode": "PropriedadeTeste8",
+                    "Description": "Uso 8",
+                    "PropertySet": "9104-DadosDeDesempenho",
+                    "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9308-PropriedadeTeste8-DadosDeDesempenho9104"
+                }
+            ]
+        }
+    ],
+    "Properties": [
+        {
+            "Code": "PropriedadeTeste1",
+            "Name": "PropriedadeTeste1",
+            "Definition": "Definição 1",
+            "DataType": "Real",
+            "Units": [
+                "mm"
+            ],
+            "ActivationDateUtc": "2024-01-01",
+            "CountryOfOrigin": null,
+            "CreatorLanguageIsoCode": null,
+            "DeActivationDateUtc": null,
+            "DeprecationExplanation": null,
+            "DocumentReference": "EN 771-1:2011+A1:2015",
+            "IsDynamic": false,
+            "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste1",
+            "PhysicalQuantity": null,
+            "ReplacedObjectCodes": [],
+            "ReplacingObjectCodes": [],
+            "RevisionDateUtc": "2024-01-01",
+            "RevisionNumber": 0,
+            "Status": "Active",
+            "TextFormat": null,
+            "Uid": "e0000000000000000000000000009201",
+            "VersionDateUtc": "2024-01-01",
+            "VersionNumber": 1,
+            "VisualRepresentationUri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste1"
+        },
+        {
+            "Code": "PropriedadeTeste2",
+            "Name": "PropriedadeTeste2",
+            "Definition": "Definição 2",
+            "DataType": "String",
+            "Units": [],
+            "ActivationDateUtc": "2024-01-01",
+            "CountryOfOrigin": null,
+            "CreatorLanguageIsoCode": null,
+            "DeActivationDateUtc": null,
+            "DeprecationExplanation": null,
+            "DocumentReference": null,
+            "IsDynamic": false,
+            "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste2",
+            "PhysicalQuantity": null,
+            "ReplacedObjectCodes": [],
+            "ReplacingObjectCodes": [],
+            "RevisionDateUtc": "2024-01-01",
+            "RevisionNumber": 0,
+            "Status": "Active",
+            "TextFormat": null,
+            "Uid": "e0000000000000000000000000009202",
+            "VersionDateUtc": "2024-01-01",
+            "VersionNumber": 1,
+            "VisualRepresentationUri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste2"
+        },
+        {
+            "Code": "PropriedadeTeste3",
+            "Name": "PropriedadeTeste3",
+            "Definition": "Definição 3",
+            "DataType": "Real",
+            "Units": [
+                "mm"
+            ],
+            "ActivationDateUtc": "2024-01-01",
+            "CountryOfOrigin": null,
+            "CreatorLanguageIsoCode": null,
+            "DeActivationDateUtc": null,
+            "DeprecationExplanation": null,
+            "DocumentReference": null,
+            "IsDynamic": false,
+            "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste3",
+            "PhysicalQuantity": null,
+            "ReplacedObjectCodes": [],
+            "ReplacingObjectCodes": [],
+            "RevisionDateUtc": "2024-01-01",
+            "RevisionNumber": 0,
+            "Status": "Active",
+            "TextFormat": null,
+            "Uid": "e0000000000000000000000000009203",
+            "VersionDateUtc": "2024-01-01",
+            "VersionNumber": 1,
+            "VisualRepresentationUri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste3"
+        },
+        {
+            "Code": "PropriedadeTeste4",
+            "Name": "PropriedadeTeste4",
+            "Definition": "Definição 4",
+            "DataType": "String",
+            "Units": [],
+            "ActivationDateUtc": "2024-01-01",
+            "CountryOfOrigin": null,
+            "CreatorLanguageIsoCode": null,
+            "DeActivationDateUtc": null,
+            "DeprecationExplanation": null,
+            "DocumentReference": null,
+            "IsDynamic": false,
+            "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste4",
+            "PhysicalQuantity": null,
+            "ReplacedObjectCodes": [],
+            "ReplacingObjectCodes": [],
+            "RevisionDateUtc": "2024-01-01",
+            "RevisionNumber": 0,
+            "Status": "Active",
+            "TextFormat": null,
+            "Uid": "e0000000000000000000000000009204",
+            "VersionDateUtc": "2024-01-01",
+            "VersionNumber": 1,
+            "VisualRepresentationUri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste4"
+        },
+        {
+            "Code": "PropriedadeTeste5",
+            "Name": "PropriedadeTeste5",
+            "Definition": "Definição 5",
+            "DataType": "Real",
+            "Units": [
+                "mm"
+            ],
+            "ActivationDateUtc": "2024-01-01",
+            "CountryOfOrigin": null,
+            "CreatorLanguageIsoCode": null,
+            "DeActivationDateUtc": null,
+            "DeprecationExplanation": null,
+            "DocumentReference": null,
+            "IsDynamic": false,
+            "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste5",
+            "PhysicalQuantity": null,
+            "ReplacedObjectCodes": [],
+            "ReplacingObjectCodes": [],
+            "RevisionDateUtc": "2024-01-01",
+            "RevisionNumber": 0,
+            "Status": "Active",
+            "TextFormat": null,
+            "Uid": "e0000000000000000000000000009205",
+            "VersionDateUtc": "2024-01-01",
+            "VersionNumber": 1,
+            "VisualRepresentationUri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste5"
+        },
+        {
+            "Code": "PropriedadeTeste6",
+            "Name": "PropriedadeTeste6",
+            "Definition": "Definição 6",
+            "DataType": "String",
+            "Units": [],
+            "ActivationDateUtc": "2024-01-01",
+            "CountryOfOrigin": null,
+            "CreatorLanguageIsoCode": null,
+            "DeActivationDateUtc": null,
+            "DeprecationExplanation": null,
+            "DocumentReference": null,
+            "IsDynamic": false,
+            "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste6",
+            "PhysicalQuantity": null,
+            "ReplacedObjectCodes": [],
+            "ReplacingObjectCodes": [],
+            "RevisionDateUtc": "2024-01-01",
+            "RevisionNumber": 0,
+            "Status": "Active",
+            "TextFormat": null,
+            "Uid": "e0000000000000000000000000009206",
+            "VersionDateUtc": "2024-01-01",
+            "VersionNumber": 1,
+            "VisualRepresentationUri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste6"
+        },
+        {
+            "Code": "PropriedadeTeste7",
+            "Name": "PropriedadeTeste7",
+            "Definition": "Definição 7",
+            "DataType": "Real",
+            "Units": [
+                "mm"
+            ],
+            "ActivationDateUtc": "2024-01-01",
+            "CountryOfOrigin": null,
+            "CreatorLanguageIsoCode": null,
+            "DeActivationDateUtc": null,
+            "DeprecationExplanation": null,
+            "DocumentReference": null,
+            "IsDynamic": false,
+            "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste7",
+            "PhysicalQuantity": null,
+            "ReplacedObjectCodes": [],
+            "ReplacingObjectCodes": [],
+            "RevisionDateUtc": "2024-01-01",
+            "RevisionNumber": 0,
+            "Status": "Active",
+            "TextFormat": null,
+            "Uid": "e0000000000000000000000000009207",
+            "VersionDateUtc": "2024-01-01",
+            "VersionNumber": 1,
+            "VisualRepresentationUri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste7"
+        },
+        {
+            "Code": "PropriedadeTeste8",
+            "Name": "PropriedadeTeste8",
+            "Definition": "Definição 8",
+            "DataType": "String",
+            "Units": [],
+            "ActivationDateUtc": "2024-01-01",
+            "CountryOfOrigin": null,
+            "CreatorLanguageIsoCode": null,
+            "DeActivationDateUtc": null,
+            "DeprecationExplanation": null,
+            "DocumentReference": null,
+            "IsDynamic": false,
+            "OwnedUri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste8",
+            "PhysicalQuantity": null,
+            "ReplacedObjectCodes": [],
+            "ReplacingObjectCodes": [],
+            "RevisionDateUtc": "2024-01-01",
+            "RevisionNumber": 0,
+            "Status": "Active",
+            "TextFormat": null,
+            "Uid": "e0000000000000000000000000009208",
+            "VersionDateUtc": "2024-01-01",
+            "VersionNumber": 1,
+            "VisualRepresentationUri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste8"
+        }
+    ]
+}

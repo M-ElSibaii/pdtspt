@@ -1,0 +1,522 @@
+{
+    "Library": {
+        "dt:GUID": "230d9954-0975-41b7-93f2-a1fddb8bd0ad",
+        "Name": [
+            {
+                "language": "pt",
+                "value": "Modelo mestre"
+            },
+            {
+                "language": "en",
+                "value": "Master template"
+            }
+        ],
+        "DataTemplates": [
+            {
+                "Name": [
+                    {
+                        "language": "pt",
+                        "value": "Modelo mestre"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Master template"
+                    }
+                ],
+                "Definition": [
+                    {
+                        "language": "pt",
+                        "value": "Descrição de Modelo mestre"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Description of Master template"
+                    }
+                ],
+                "ReferenceDocumentRef": {
+                    "dt:GUID": "d0000000-0000-0000-0000-000000000001"
+                },
+                "MajorVersion": 5,
+                "Status": "Active",
+                "HasObjectTypeRef": {
+                    "dt:GUID": "c0000000-0000-0000-0000-000000000001"
+                },
+                "HasPropertyRef": [
+                    {
+                        "dt:GUID": "e0000000-0000-0000-0000-000000009201",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste1"
+                    },
+                    {
+                        "dt:GUID": "e0000000-0000-0000-0000-000000009202",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste2"
+                    }
+                ],
+                "HasGroupOfPropertiesRef": [
+                    {
+                        "dt:GUID": "b0000000-0000-0000-0000-000000009101",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/gop\/9101-DadosDeConformidade"
+                    }
+                ],
+                "dt:GUID": "230d9954-0975-41b7-93f2-a1fddb8bd0ad",
+                "dateOfCreation": "2024-01-01T00:00:00+00:00",
+                "_uri": "https:\/\/pdts.pt\/uri\/0.1\/dt\/ModeloMestre"
+            }
+        ],
+        "ObjectType": {
+            "Name": [
+                {
+                    "language": "pt",
+                    "value": "Unidade de alvenaria"
+                },
+                {
+                    "language": "en",
+                    "value": "Masonry unit"
+                }
+            ],
+            "Definition": [
+                {
+                    "language": "pt",
+                    "value": "unidade"
+                },
+                {
+                    "language": "en",
+                    "value": "unit"
+                }
+            ],
+            "MajorVersion": 1,
+            "Status": "Active",
+            "dt:GUID": "c0000000-0000-0000-0000-000000000001",
+            "dateOfCreation": "2024-01-01T00:00:00+00:00",
+            "_uri": "https:\/\/pdts.pt\/uri\/0.1\/class\/UnidadeDeAlvenaria",
+            "_raw": {
+                "\u0000*\u0000connection": "mysql",
+                "\u0000*\u0000table": "constructionobjects",
+                "\u0000*\u0000primaryKey": "id",
+                "\u0000*\u0000keyType": "int",
+                "incrementing": true,
+                "\u0000*\u0000with": [],
+                "\u0000*\u0000withCount": [],
+                "preventsLazyLoading": false,
+                "\u0000*\u0000perPage": 15,
+                "exists": true,
+                "wasRecentlyCreated": false,
+                "\u0000*\u0000escapeWhenCastingToString": false,
+                "\u0000*\u0000attributes": {
+                    "GUID": "c0000000000000000000000000000001",
+                    "referenceDocumentGUID": "n\/a",
+                    "constructionObjectNameEn": "Masonry unit",
+                    "constructionObjectNamePt": "Unidade de alvenaria",
+                    "dateOfRevision": "2024-01-01",
+                    "dateOfVersion": "2024-01-01",
+                    "updated_at": "2024-01-01",
+                    "created_at": "2024-01-01",
+                    "status": "Active",
+                    "versionNumber": 1,
+                    "revisionNumber": 0,
+                    "descriptionEn": "unit",
+                    "descriptionPt": "unidade"
+                },
+                "\u0000*\u0000original": {
+                    "GUID": "c0000000000000000000000000000001",
+                    "referenceDocumentGUID": "n\/a",
+                    "constructionObjectNameEn": "Masonry unit",
+                    "constructionObjectNamePt": "Unidade de alvenaria",
+                    "dateOfRevision": "2024-01-01",
+                    "dateOfVersion": "2024-01-01",
+                    "updated_at": "2024-01-01",
+                    "created_at": "2024-01-01",
+                    "status": "Active",
+                    "versionNumber": 1,
+                    "revisionNumber": 0,
+                    "descriptionEn": "unit",
+                    "descriptionPt": "unidade"
+                },
+                "\u0000*\u0000changes": [],
+                "\u0000*\u0000casts": [],
+                "\u0000*\u0000classCastCache": [],
+                "\u0000*\u0000attributeCastCache": [],
+                "\u0000*\u0000dates": [],
+                "\u0000*\u0000dateFormat": null,
+                "\u0000*\u0000appends": [
+                    "uri"
+                ],
+                "\u0000*\u0000dispatchesEvents": [],
+                "\u0000*\u0000observables": [],
+                "\u0000*\u0000relations": [],
+                "\u0000*\u0000touches": [],
+                "timestamps": true,
+                "\u0000*\u0000hidden": [],
+                "\u0000*\u0000visible": [],
+                "\u0000*\u0000fillable": [],
+                "\u0000*\u0000guarded": [
+                    "*"
+                ]
+            }
+        },
+        "GroupOfProperties": [
+            {
+                "Name": [
+                    {
+                        "language": "pt",
+                        "value": "Dados de conformidade"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Compliance data"
+                    }
+                ],
+                "Definition": [
+                    {
+                        "language": "pt",
+                        "value": "Grupo Dados de conformidade"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Group Compliance data"
+                    }
+                ],
+                "MajorVersion": 1,
+                "Status": "Active",
+                "HasPropertyRef": [
+                    {
+                        "dt:GUID": "e0000000-0000-0000-0000-000000009201",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste1"
+                    },
+                    {
+                        "dt:GUID": "e0000000-0000-0000-0000-000000009202",
+                        "referenceURI": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste2"
+                    }
+                ],
+                "dt:GUID": "b0000000-0000-0000-0000-000000009101",
+                "dateOfCreation": "2024-01-01T00:00:00+00:00",
+                "_uri": "https:\/\/pdts.pt\/uri\/0.1\/gop\/9101-DadosDeConformidade",
+                "_raw": {
+                    "Id": 9101,
+                    "GUID": "b0000000000000000000000000009101",
+                    "pdtId": 9001,
+                    "referenceDocumentGUID": "n\/a",
+                    "gopNameEn": "Compliance data",
+                    "gopNamePt": "Dados de conformidade",
+                    "definitionEn": "Group Compliance data",
+                    "definitionPt": "Grupo Dados de conformidade",
+                    "status": "Active",
+                    "dateOfCreation": null,
+                    "dateofActivation": null,
+                    "dateOfLastChange": null,
+                    "dateOfRevision": "2024-01-01",
+                    "dateOfVersion": "2024-01-01",
+                    "versionNumber": 1,
+                    "revisionNumber": 0,
+                    "listOfReplacedProperties": null,
+                    "listOfReplacingProperties": null,
+                    "relationToOtherDataDictionaries": null,
+                    "creatorsLanguage": null,
+                    "visualRepresentation": null,
+                    "countryOfUse": null,
+                    "countryOfOrigin": null,
+                    "categoryOfGroupOfProperties": null,
+                    "parentGroupOfProperties": null,
+                    "updated_at": "2024-01-01",
+                    "created_at": "2024-01-01",
+                    "depreciationExplanation": null,
+                    "depreciationDate": null,
+                    "uri": "https:\/\/pdts.pt\/uri\/0.1\/gop\/9101-DadosDeConformidade"
+                }
+            }
+        ],
+        "Properties": [
+            {
+                "Name": [
+                    {
+                        "language": "pt",
+                        "value": "PropriedadeTeste1"
+                    },
+                    {
+                        "language": "en",
+                        "value": "TestProperty1"
+                    }
+                ],
+                "Definition": [
+                    {
+                        "language": "pt",
+                        "value": "Definição 1"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Definition 1"
+                    }
+                ],
+                "ReferenceDocumentRef": {
+                    "dt:GUID": "d0000000-0000-0000-0000-000000000001"
+                },
+                "MajorVersion": 1,
+                "Status": "Active",
+                "DataType": {
+                    "name": "REAL"
+                },
+                "_physicalQuantity": null,
+                "_unitUnmapped": "mm",
+                "dt:GUID": "e0000000-0000-0000-0000-000000009201",
+                "dateOfCreation": "2024-01-01T00:00:00+00:00",
+                "_uri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste1",
+                "_raw": {
+                    "dictionary": {
+                        "Id": 9201,
+                        "GUID": "e0000000000000000000000000009201",
+                        "namePt": "PropriedadeTeste1",
+                        "namePtSc": "Propriedade teste 1",
+                        "nameEn": "TestProperty1",
+                        "nameEnSc": "Test property 1",
+                        "definitionPt": "Definição 1",
+                        "definitionEn": "Definition 1",
+                        "status": "Active",
+                        "dateOfCreation": null,
+                        "dateofActivation": null,
+                        "dateOfLastChange": null,
+                        "dateOfRevision": "2024-01-01",
+                        "dateOfVersion": "2024-01-01",
+                        "versionNumber": 1,
+                        "revisionNumber": 0,
+                        "listOfReplacedProperties": null,
+                        "listOfReplacingProperties": null,
+                        "relationToOtherDataDictionaries": null,
+                        "creatorsLanguage": null,
+                        "visualRepresentation": null,
+                        "countryOfUse": null,
+                        "countryOfOrigin": null,
+                        "physicalQuantity": null,
+                        "dimension": null,
+                        "dataType": "Real",
+                        "dynamicProperty": null,
+                        "parametersOfTheDynamicProperty": null,
+                        "units": "mm",
+                        "namesOfDefiningValues": null,
+                        "definingValues": null,
+                        "tolerance": null,
+                        "digitalFormat": null,
+                        "textFormat": null,
+                        "listOfPossibleValuesInLanguageN": null,
+                        "boundaryValues": null,
+                        "updated_at": "2024-01-01",
+                        "created_at": "2024-01-01",
+                        "depreciationExplanation": null,
+                        "depreciationDate": null,
+                        "uri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste1"
+                    },
+                    "pivot": {
+                        "Id": 9301,
+                        "GUID": "e0000000000000000000000000009201",
+                        "gopID": 9101,
+                        "pdtID": 9001,
+                        "referenceDocumentGUID": "d0000000000000000000000000000001",
+                        "descriptionEn": "Usage 1",
+                        "descriptionPt": "Uso 1",
+                        "visualRepresentation": null,
+                        "updated_at": "2024-01-01",
+                        "created_at": "2024-01-01",
+                        "propertyId": 9201,
+                        "uri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9301-PropriedadeTeste1"
+                    },
+                    "source": "PDT"
+                }
+            },
+            {
+                "Name": [
+                    {
+                        "language": "pt",
+                        "value": "PropriedadeTeste2"
+                    },
+                    {
+                        "language": "en",
+                        "value": "TestProperty2"
+                    }
+                ],
+                "Definition": [
+                    {
+                        "language": "pt",
+                        "value": "Definição 2"
+                    },
+                    {
+                        "language": "en",
+                        "value": "Definition 2"
+                    }
+                ],
+                "MajorVersion": 1,
+                "Status": "Active",
+                "DataType": {
+                    "name": "STRING"
+                },
+                "_physicalQuantity": "without",
+                "dt:GUID": "e0000000-0000-0000-0000-000000009202",
+                "dateOfCreation": "2024-01-01T00:00:00+00:00",
+                "_uri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste2",
+                "_raw": {
+                    "dictionary": {
+                        "Id": 9202,
+                        "GUID": "e0000000000000000000000000009202",
+                        "namePt": "PropriedadeTeste2",
+                        "namePtSc": "Propriedade teste 2",
+                        "nameEn": "TestProperty2",
+                        "nameEnSc": "Test property 2",
+                        "definitionPt": "Definição 2",
+                        "definitionEn": "Definition 2",
+                        "status": "Active",
+                        "dateOfCreation": null,
+                        "dateofActivation": null,
+                        "dateOfLastChange": null,
+                        "dateOfRevision": "2024-01-01",
+                        "dateOfVersion": "2024-01-01",
+                        "versionNumber": 1,
+                        "revisionNumber": 0,
+                        "listOfReplacedProperties": null,
+                        "listOfReplacingProperties": null,
+                        "relationToOtherDataDictionaries": null,
+                        "creatorsLanguage": null,
+                        "visualRepresentation": null,
+                        "countryOfUse": null,
+                        "countryOfOrigin": null,
+                        "physicalQuantity": null,
+                        "dimension": null,
+                        "dataType": "String",
+                        "dynamicProperty": null,
+                        "parametersOfTheDynamicProperty": null,
+                        "units": null,
+                        "namesOfDefiningValues": null,
+                        "definingValues": null,
+                        "tolerance": null,
+                        "digitalFormat": null,
+                        "textFormat": null,
+                        "listOfPossibleValuesInLanguageN": null,
+                        "boundaryValues": null,
+                        "updated_at": "2024-01-01",
+                        "created_at": "2024-01-01",
+                        "depreciationExplanation": null,
+                        "depreciationDate": null,
+                        "uri": "https:\/\/pdts.pt\/uri\/0.1\/prop\/PropriedadeTeste2"
+                    },
+                    "pivot": {
+                        "Id": 9302,
+                        "GUID": "e0000000000000000000000000009202",
+                        "gopID": 9101,
+                        "pdtID": 9001,
+                        "referenceDocumentGUID": "n\/a",
+                        "descriptionEn": "Usage 2",
+                        "descriptionPt": "Uso 2",
+                        "visualRepresentation": null,
+                        "updated_at": "2024-01-01",
+                        "created_at": "2024-01-01",
+                        "propertyId": 9202,
+                        "uri": "https:\/\/pdts.pt\/uri\/0.1\/classprop\/9302-PropriedadeTeste2"
+                    },
+                    "source": "PDT"
+                }
+            }
+        ],
+        "ReferenceDocuments": [
+            {
+                "Name": [
+                    {
+                        "language": "en",
+                        "value": "EN 771-1:2011+A1:2015"
+                    }
+                ],
+                "Definition": [
+                    {
+                        "language": "en",
+                        "value": "Specification for masonry units"
+                    }
+                ],
+                "Status": "Active",
+                "URI": "https:\/\/pdts.pt\/uri\/0.1\/doc\/EN771-12011%2BA12015",
+                "Language": "en",
+                "dt:GUID": "d0000000-0000-0000-0000-000000000001",
+                "dateOfCreation": "2024-01-01T00:00:00+00:00",
+                "_uri": "https:\/\/pdts.pt\/uri\/0.1\/doc\/EN771-12011%2BA12015",
+                "_raw": {
+                    "GUID": "d0000000000000000000000000000001",
+                    "rdName": "EN 771-1:2011+A1:2015",
+                    "title": "Specification for masonry units",
+                    "description": null,
+                    "status": "Active",
+                    "updated_at": "2024-01-01T00:00:00.000000Z",
+                    "created_at": "2024-01-01T00:00:00.000000Z",
+                    "uri": "https:\/\/pdts.pt\/uri\/0.1\/doc\/EN771-12011%2BA12015"
+                }
+            }
+        ],
+        "_raw": {
+            "\u0000*\u0000connection": "mysql",
+            "\u0000*\u0000table": "productdatatemplates",
+            "\u0000*\u0000primaryKey": "Id",
+            "\u0000*\u0000keyType": "int",
+            "incrementing": true,
+            "\u0000*\u0000with": [],
+            "\u0000*\u0000withCount": [],
+            "preventsLazyLoading": false,
+            "\u0000*\u0000perPage": 15,
+            "exists": true,
+            "wasRecentlyCreated": false,
+            "\u0000*\u0000escapeWhenCastingToString": false,
+            "\u0000*\u0000attributes": {
+                "Id": 9001,
+                "GUID": "230d9954097541b793f2a1fddb8bd0ad",
+                "referenceDocumentGUID": "d0000000000000000000000000000001",
+                "pdtNameEn": "Master template",
+                "pdtNamePt": "Modelo mestre",
+                "dateOfRevision": "2024-01-01",
+                "dateOfVersion": "2024-01-01",
+                "updated_at": "2024-01-01",
+                "created_at": "2024-01-01",
+                "status": "Active",
+                "category": "Construção",
+                "versionNumber": 5,
+                "revisionNumber": 0,
+                "descriptionEn": "Description of Master template",
+                "descriptionPt": "Descrição de Modelo mestre",
+                "constructionObjectGUID": "c0000000000000000000000000000001",
+                "depreciationExplanation": null,
+                "depreciationDate": null
+            },
+            "\u0000*\u0000original": {
+                "Id": 9001,
+                "GUID": "230d9954097541b793f2a1fddb8bd0ad",
+                "referenceDocumentGUID": "d0000000000000000000000000000001",
+                "pdtNameEn": "Master template",
+                "pdtNamePt": "Modelo mestre",
+                "dateOfRevision": "2024-01-01",
+                "dateOfVersion": "2024-01-01",
+                "updated_at": "2024-01-01",
+                "created_at": "2024-01-01",
+                "status": "Active",
+                "category": "Construção",
+                "versionNumber": 5,
+                "revisionNumber": 0,
+                "descriptionEn": "Description of Master template",
+                "descriptionPt": "Descrição de Modelo mestre",
+                "constructionObjectGUID": "c0000000000000000000000000000001",
+                "depreciationExplanation": null,
+                "depreciationDate": null
+            },
+            "\u0000*\u0000changes": [],
+            "\u0000*\u0000casts": [],
+            "\u0000*\u0000classCastCache": [],
+            "\u0000*\u0000attributeCastCache": [],
+            "\u0000*\u0000dates": [],
+            "\u0000*\u0000dateFormat": null,
+            "\u0000*\u0000appends": [
+                "uri"
+            ],
+            "\u0000*\u0000dispatchesEvents": [],
+            "\u0000*\u0000observables": [],
+            "\u0000*\u0000relations": [],
+            "\u0000*\u0000touches": [],
+            "timestamps": false,
+            "\u0000*\u0000hidden": [],
+            "\u0000*\u0000visible": [],
+            "\u0000*\u0000fillable": [],
+            "\u0000*\u0000guarded": [
+                "*"
+            ]
+        }
+    }
+}

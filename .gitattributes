@@ -9,3 +9,6 @@
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore
+
+# Byte-for-byte export snapshots: never convert line endings.
+/tests/Feature/Final/snapshots/** -text
