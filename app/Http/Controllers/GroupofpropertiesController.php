@@ -138,7 +138,10 @@ class GroupofpropertiesController extends Controller
             return 0; // Default ordering for others
         });
 
-        return view('pdtsdownload', compact('sorted_combined_groups', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'latestPdt', 'inheritedFrom', 'inheritedFromLabels', 'sourceColors'));
+        // Origin of each group, for the on-page filter (display only; exports are untouched).
+        $originFilter = (new \App\Services\PdtInheritanceService())->origins($pdt, $inherited_groups);
+
+        return view('pdtsdownload', compact('sorted_combined_groups', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'latestPdt', 'inheritedFrom', 'inheritedFromLabels', 'sourceColors', 'originFilter'));
     }
 
 
@@ -273,7 +276,10 @@ class GroupofpropertiesController extends Controller
         $answers = Answers::where('users_id', Auth::id())->get();
 
 
-        return view('pdtssurvey', compact('combined_groups', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'comments', 'answers', 'properties', 'latestPdt', 'inheritedFrom', 'inheritedFromLabels', 'sourceColors'));
+        // Origin of each group, for the on-page filter (display only).
+        $originFilter = (new \App\Services\PdtInheritanceService())->origins($pdt, $inherited_groups);
+
+        return view('pdtssurvey', compact('combined_groups', 'joined_properties', 'properties_dict', 'pdt', 'referenceDocument', 'comments', 'answers', 'properties', 'latestPdt', 'inheritedFrom', 'inheritedFromLabels', 'sourceColors', 'originFilter'));
     }
 
 

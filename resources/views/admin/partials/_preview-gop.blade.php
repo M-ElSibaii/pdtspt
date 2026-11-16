@@ -6,7 +6,7 @@
 @php
     $count = $context->count();
 @endphp
-<details class="pe-gop js-gop-card" id="gop-{{ $gop->Id }}" data-gop-id="{{ $gop->Id }}">
+<details class="pe-gop js-gop-card" id="gop-{{ $gop->Id }}" data-gop-id="{{ $gop->Id }}" data-origin="own">
     <summary class="pe-gop-sum">
         <span class="pe-chev" aria-hidden="true"></span>
         <span class="pe-gop-title">

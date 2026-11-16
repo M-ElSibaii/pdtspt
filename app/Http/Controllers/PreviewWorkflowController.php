@@ -148,7 +148,14 @@ class PreviewWorkflowController extends Controller
 
         $markers = $drafts->markers($pdt);
 
+        // Where each group comes from, for the origin filter; the inherited groups are shown
+        // read-only below the template's own (display only).
+        $inheritance = new \App\Services\PdtInheritanceService();
+        $originFilter = $inheritance->origins($pdtRow);
+
         return view('admin.preview-editor', [
+            'originFilter' => $originFilter,
+            'inheritedGroups' => $inheritance->inheritedGroupsWithProperties($pdtRow, $originFilter),
             'pdt' => $pdtRow,
             'base' => $markers['diff']['base'],
             'diff' => $markers['diff'],

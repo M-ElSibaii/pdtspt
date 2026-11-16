@@ -1,4 +1,5 @@
 <x-app-layout>
+    @include('admin.partials._admin-styles')
     <div style="background-color: white;">
         <div class="container sm:max-w-full py-9" id="active-edit" data-pdt-id="{{ $pdt->Id }}">
 
@@ -33,8 +34,9 @@
                  across versions and need no new draft/version. --}}
             <x-relation-editor entity-type="pdt" :guid="$pdt->GUID" title="Template relationships (editable on Active)" />
 
+            <x-origin-filter :filter="$originFilter" class="mt-4">
             @foreach ($gops as $gop)
-                <div class="mt-4 border rounded shadow-sm">
+                <div class="mt-4 border rounded shadow-sm" data-origin="own">
                     <div class="px-4 py-2 border-b bg-slate-50 flex flex-wrap items-center gap-2">
                         <span class="font-semibold">{{ $gop->gopNameEn }} <span class="text-gray-400">/</span> {{ $gop->gopNamePt }}</span>
                         <span class="text-xs text-gray-500">(Id={{ $gop->Id }} · <x-version-badge :version="$gop->versionNumber" :revision="$gop->revisionNumber" />) — read-only</span>
@@ -83,6 +85,9 @@
                     </div>
                 </div>
             @endforeach
+
+            @include('admin.partials._inherited-groups', ['inheritedGroups' => $inheritedGroups])
+            </x-origin-filter>
         </div>
     </div>
 

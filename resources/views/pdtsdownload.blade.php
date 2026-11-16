@@ -1,5 +1,6 @@
 <x-app-layout>
     @php
+    $isPt = app()->getLocale() === 'pt';
         // A property's bSDD link, if its relationToOtherDataDictionaries names one.
         $bsddLink = function ($property) {
             if (is_null($property->relationToOtherDataDictionaries)) return null;
@@ -38,6 +39,8 @@
                         </x-secondary-button>
                     </div>
                 </div>
+                <p class="text-end" style="font-size:0.8rem; color:#475569; margin:0 0 6px;">{{ Lg::t('As transferências (XLSX, XML, JSON) e a API incluem sempre todas as propriedades, qualquer que seja o filtro.') }}</p>
+                <x-origin-filter :filter="$originFilter">
                 <div class="overflow-auto" style="overflow-y: auto; max-height: calc(100vh - 300px); border: #cbd5e1 1px Solid;">
                     <table class="table-auto" id="tblpdts" cellpadding="0" cellspacing="0">
                         <thead class="sticky top-0 z-50">
@@ -49,7 +52,8 @@
                             </tr>
                         </thead>
                         @foreach($sorted_combined_groups as $group)
-                        <tbody>
+                        @php $headingOrigins = collect($group)->map(fn($g) => $originFilter['groupOrigin'][$g->Id] ?? 'own')->unique()->implode(' '); @endphp
+                        <tbody data-origins="{{ $headingOrigins }}">
                             <tr>
                                 <td class="text-left content-start bg-slate-300 p-3" colspan="5">
                                     <input class="text-left expand" type="checkbox" name="{{ $group[0]->gopNamePt }}" id="{{ $group[0]->gopNamePt }}" data-toggle="toggle">
@@ -62,7 +66,7 @@
                             </tr>
                         </tbody>
 
-                        <tbody class="hide">
+                        <tbody class="hide" data-origins="{{ $headingOrigins }}">
                             @foreach($group as $propertyGroup)
                             @foreach($joined_properties as $property)
                             @if($property->gopID == $propertyGroup->Id)
@@ -71,20 +75,22 @@
                                 $referenceDoc = $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first();
                             @endphp
                             <!-- Row colour-coded by inheritance source (IsSubtypeOf chain); see legend under the table -->
-                            <tr @if($property->is_inherited && isset($sourceColors[$property->inherited_from])) style="background-color: {{ $sourceColors[$property->inherited_from] }};" @endif>
+                            <tr data-origin="{{ $originFilter['groupOrigin'][$property->gopID] ?? 'own' }}" @if($property->is_inherited && isset($sourceColors[$property->inherited_from])) style="background-color: {{ $sourceColors[$property->inherited_from] }};" @endif>
                                 <td class="p-1.5 property-td">
                                     @if($bsdd)
                                         {{-- A property mapped into bSDD is shown under BOTH names, since bSDD
                                              and IFC know it by its English one. Order is the same in either
                                              language: English name, the bSDD link, then the Portuguese name. --}}
-                                        <a href="{{ Uri::buildLink('classprop', $property) }}">{{ $property->nameEn }}</a>
-                                        <a href="{{ $bsdd }}" target="_blank" title="buildingSMART Data Dictionary">
-                                            <img src="{{ asset('img/IFCBSDD.png') }}" alt="IFC Logo" style="width:40px; height:auto; margin-left:10px;">
-                                        </a>
-                                        <a href="{{ Uri::buildLink('classprop', $property) }}">{{ $property->namePt }}</a>
-                                    @else
-                                        <a href="{{ Uri::buildLink('classprop', $property) }}">{{ Lg::f($property, 'name') }}</a>
-                                    @endif
+                                       <a href="{{ Uri::buildLink('classprop', $property) }}">{{ $property->nameEn }}</a>
+    <a href="{{ $bsdd }}" target="_blank" title="buildingSMART Data Dictionary">
+        <img src="{{ asset('img/IFCBSDD.png') }}" alt="IFC Logo" style="width:40px; height:auto; margin-left:10px;">
+    </a>
+    @if($isPt)
+        <a href="{{ Uri::buildLink('classprop', $property) }}">{{ $property->namePt }}</a>
+    @endif
+@else
+    <a href="{{ Uri::buildLink('classprop', $property) }}">{{ Lg::f($property, 'name') }}</a>
+@endif
                                     @if($property->status == 'InActive')
                                         <span class="status-tag status-tag-inactive">{{ Lg::t('Inativa') }}</span>
                                     @endif
@@ -117,6 +123,7 @@
                         @endforeach
                     </table>
                 </div>
+                </x-origin-filter>
                 @if(!empty($inheritedFrom))
                 <div style="padding-top: 8px; font-size: 0.85rem;">
                     <strong>{{ Lg::t('Código de cores — origem das propriedades (relação IsSubtypeOf):') }}</strong>
@@ -142,35 +149,43 @@
         </div>
 
         {{-- Flat table behind the CSV/XLS download — same language as the page. --}}
-        <table hidden id="tblpdtsh">
-            <tr>
-                <th style="width: 15%;">{{ Lg::t('Grupo de propriedades') }}</th>
-                <th>{{ Lg::t('Propriedade') }}</th>
-                <th style="width: 7%;">{{ Lg::t('Unidade') }}</th>
-                <th style="width: 40%;">{{ Lg::t('Descrição') }}</th>
-                <th style="width: 16%;">{{ Lg::t('Documento de referência') }}</th>
-                <th>{{ Lg::t('Origem') }}</th>
-                <th>URI</th>
-            </tr>
-            @foreach($sorted_combined_groups as $group)
-            @foreach($group as $propertyGroup)
-            @foreach($joined_properties as $property)
-            @if($property->gopID == $propertyGroup->Id)
-                @php $referenceDoc = $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first(); @endphp
-                <tr>
-                    <td>{{ Lg::f($propertyGroup, 'gopName') }}</td>
-                    <td>@if($bsddLink($property)){{ $property->nameEn }} - {{ $property->namePt }}@else{{ Lg::f($property, 'name') }}@endif</td>
-                    <td>{{ $property->units }}</td>
-                    <td>{{ Lg::fSc($property, 'name') }}: {{ Lg::f($property, 'description') }}</td>
-                    <td>{{ $referenceDoc ? $referenceDoc->rdName : 'n/a' }}</td>
-                    <td>{{ $property->is_inherited ? Lg::t('Herdado de: :source', ['source' => $inheritedFromLabels[$property->inherited_from] ?? $property->inherited_from]) : Lg::t('Próprio') }}</td>
-                    <td>{{ Uri::build('classprop', $property) }}</td>
-                </tr>
-            @endif
-            @endforeach
-            @endforeach
-            @endforeach
-        </table>
+       <table hidden id="tblpdtsh">
+    <tr>
+        <th>{{ Lg::t('Grupo de propriedades') }} (EN)</th>
+        <th>{{ Lg::t('Grupo de propriedades') }} (PT)</th>
+        <th>Name (EN)</th>
+        <th>Nome (PT)</th>
+        <th>{{ Lg::t('Unidade') }}</th>
+        <th>Description (EN)</th>
+        <th>Descrição (PT)</th>
+        <th>{{ Lg::t('Documento de referência') }}</th>
+        <th>{{ Lg::t('Origem') }}</th>
+        <th>URI</th>
+        <th>bSDD URI</th>
+    </tr>
+    @foreach($sorted_combined_groups as $group)
+    @foreach($group as $propertyGroup)
+    @foreach($joined_properties as $property)
+    @if($property->gopID == $propertyGroup->Id)
+        @php $referenceDoc = $referenceDocument->where('GUID', $property->referenceDocumentGUID)->first(); @endphp
+        <tr>
+            <td>{{ $propertyGroup->gopNameEn }}</td>
+            <td>{{ $propertyGroup->gopNamePt }}</td>
+            <td>{{ $property->nameEn }}</td>
+            <td>{{ $property->namePt }}</td>
+            <td>{{ $property->units }}</td>
+            <td>{{ $property->descriptionEn }}</td>
+            <td>{{ $property->descriptionPt }}</td>
+            <td>{{ $referenceDoc ? $referenceDoc->rdName : 'n/a' }}</td>
+            <td>{{ $property->is_inherited ? Lg::t('Herdado de: :source', ['source' => $inheritedFromLabels[$property->inherited_from] ?? $property->inherited_from]) : Lg::t('Próprio') }}</td>
+            <td>{{ Uri::build('classprop', $property) }}</td>
+            <td>{{ $bsddLink($property) }}</td>
+        </tr>
+    @endif
+    @endforeach
+    @endforeach
+    @endforeach
+</table>
 
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.min.js"></script>

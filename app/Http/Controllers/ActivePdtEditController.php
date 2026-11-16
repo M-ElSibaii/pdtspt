@@ -57,7 +57,14 @@ class ActivePdtEditController extends Controller
         $dictIds = $context->pluck('propertyId')->filter()->unique()->values();
         $dictRows = $dictIds->isEmpty() ? collect() : DB::table(self::DICT)->whereIn('Id', $dictIds)->get()->keyBy('Id');
 
+        // Where each group comes from, for the origin filter; the inherited groups are shown
+        // read-only below the template's own (display only).
+        $inheritance = new \App\Services\PdtInheritanceService();
+        $originFilter = $inheritance->origins($pdtRow);
+
         return view('admin.active-edit', [
+            'originFilter' => $originFilter,
+            'inheritedGroups' => $inheritance->inheritedGroupsWithProperties($pdtRow, $originFilter),
             'pdt' => $pdtRow,
             'gops' => $gops,
             'contextByGop' => $context->groupBy('gopID'),

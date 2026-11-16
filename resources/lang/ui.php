@@ -112,6 +112,21 @@ return [
     'Erro ao descarregar JSON: ' => 'Could not download the JSON: ',
     'Erro ao descarregar XML: ' => 'Could not download the XML: ',
 
+    // ------------------------------------------------- property origin filter
+    'Mostrar propriedades de:' => 'Show properties from:',
+    'Este modelo' => 'This template',
+    'Modelo mestre' => 'Master template',
+    'Mostrar todas' => 'Show all',
+    'A mostrar :shown de :total propriedades' => 'Showing :shown of :total properties',
+    'Nenhuma origem selecionada: não há propriedades para mostrar.'
+        => 'No origin selected: there are no properties to show.',
+    'As transferências (XLSX, XML, JSON) e a API incluem sempre todas as propriedades, qualquer que seja o filtro.'
+        => 'Downloads (XLSX, XML, JSON) and the API always include every property, whatever the filter shows.',
+    'Grupos herdados (só leitura)' => 'Inherited groups (read-only)',
+    'Estes grupos vêm de :source. Edite-os no modelo de onde vêm.'
+        => 'These groups come from :source. Edit them in the template they come from.',
+    'Sem propriedades' => 'No properties',
+
     // ------------------------------------------------------- datadictionary
     'Atributos de propriedade no dicionário de dados baseado em EN ISO 23386'
         => 'Property attributes in the data dictionary, per EN ISO 23386',

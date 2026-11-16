@@ -159,6 +159,7 @@
                         </div>
                     </details>
 
+                    <x-origin-filter :filter="$originFilter" style="margin-top:18px;">
                     <div style="display:flex; align-items:baseline; gap:10px; margin:18px 2px 10px;">
                         <h2>Groups of properties</h2>
                         <span class="adm-muted adm-small">Click a group to open it, then a property to edit it.</span>
@@ -184,6 +185,9 @@
                             <div class="adm-card adm-empty" style="margin:0 0 10px;">No groups yet — add the first one below.</div>
                         @endforelse
                     </div>
+
+                    @include('admin.partials._inherited-groups', ['inheritedGroups' => $inheritedGroups])
+                    </x-origin-filter>
 
                     {{-- Add a group --}}
                     <div class="adm-card" id="add-gop" style="margin-top:16px;">

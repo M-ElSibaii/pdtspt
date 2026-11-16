@@ -21,6 +21,7 @@
                 <div>
 
                     <form name="form" id="form" method="post" action="{{ route('saveAnswers') }}">
+                        <x-origin-filter :filter="$originFilter">
                         <div class="overflow-auto" style="overflow-y: auto; max-height: calc(100vh - 300px); border: #cbd5e1 1px Solid;">
                             <input type="hidden" name="pdtName" value="{{ $pdt->pdtNamePt }}">
 
@@ -39,7 +40,8 @@
 
 
                                 @foreach($combined_groups as $group)
-                                <tbody>
+                                @php $headingOrigins = collect($group)->map(fn($g) => $originFilter['groupOrigin'][$g->Id] ?? 'own')->unique()->implode(' '); @endphp
+                                <tbody data-origins="{{ $headingOrigins }}">
                                     <tr>
                                         <td class="text-left content-start bg-slate-300 p-3" colspan="6">
                                             <input class="text-left expand" type="checkbox" name="{{ $group[0]->gopNamePt }}" id="{{ $group[0]->gopNamePt }}" data-toggle="toggle">
@@ -52,13 +54,13 @@
                                     </tr>
                                 </tbody>
 
-                                <tbody class="hide">
+                                <tbody class="hide" data-origins="{{ $headingOrigins }}">
 
                                     @foreach($group as $propertyGroup)
                                     @foreach($joined_properties as $property)
                                     @if($property->gopID == $propertyGroup->Id)
                                     <!-- Row colour-coded by inheritance source (IsSubtypeOf chain); see legend under the table -->
-                                    <tr @if($property->is_inherited && isset($sourceColors[$property->inherited_from])) style="background-color: {{ $sourceColors[$property->inherited_from] }};" @endif>
+                                    <tr data-origin="{{ $originFilter['groupOrigin'][$property->gopID] ?? 'own' }}" @if($property->is_inherited && isset($sourceColors[$property->inherited_from])) style="background-color: {{ $sourceColors[$property->inherited_from] }};" @endif>
                                         <td class="p-1.5 property-td">
                                             <a href="{{ Uri::buildLink('classprop', $property) }}">{{ Lg::f($property, 'name') }}
                                                 {{-- Check if the relationToOtherDataDictionaries attribute exists and is not null --}}
@@ -157,6 +159,7 @@
                                 @endforeach
                             </table>
                         </div>
+                        </x-origin-filter>
                         @if(!empty($inheritedFrom))
                         <div style="padding-top: 8px; font-size: 0.85rem;">
                             <strong>{{ Lg::t('Código de cores — origem das propriedades (relação IsSubtypeOf):') }}</strong>
