@@ -38,12 +38,6 @@
                     </x-nav-link>
                 </div>
 
-                <div class="nav-wide sm:hidden space-x-8 -my-px ml-6 flex">
-                    <x-nav-link :href="route('reference.index')" :active="request()->routeIs('reference.index') || request()->is('uri/*/unit/*', 'uri/*/pq/*', 'uri/*/dim/*')">
-                        {{ Lg::t('Unidades') }}
-                    </x-nav-link>
-                </div>
-
 
                 <div class="nav-wide sm:hidden space-x-8 -my-px ml-6 flex">
                     <x-nav-link :href="route('participantes')" :active="request()->routeIs('participantes')">
@@ -178,9 +172,6 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('apidoc')" :active="request()->routeIs('apidoc')">
                 {{ Lg::t('Documentação API') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('reference.index')" :active="request()->routeIs('reference.index')">
-                {{ Lg::t('Unidades') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('contact.store')" :active="request()->routeIs('contact.store')">
                 {{ Lg::t('Contactos') }}
